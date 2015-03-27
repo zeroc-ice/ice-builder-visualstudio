@@ -20,7 +20,8 @@
     <RootNamespace>ZeroC.IceVisualStudio</RootNamespace>
     <AssemblyName>IceVisualStudio</AssemblyName>
     <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>Key.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -177,9 +178,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Key.snk" />
-  </ItemGroup>
-  <ItemGroup>
     <VSCTCompile Include="IceVisualStudio.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
       <SubType>Designer</SubType>
@@ -220,12 +218,8 @@
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
-
-  
-  
   <Import Project="..\MSBuild\Sign.targets" />
   <Target Name="AfterCompile" Condition="Exists('$(CertFile)')" DependsOnTargets="CoreCompile">
-      <Exec Command="$(SignCommand) obj\$(Configuration)\IceVisualStudio.dll"/>
+    <Exec Command="$(SignCommand) obj\$(Configuration)\IceVisualStudio.dll" />
   </Target>
- 
 </Project>
