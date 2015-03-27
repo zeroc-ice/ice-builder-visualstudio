@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+  <Metadata>
+    <Identity Id="ef9502be-dbc2-4568-a846-02b8e42d04c2" Version="4.0.0.0" Language="en-US" Publisher="ZeroC" />
+    <DisplayName>Ice Extension for Visual Studio</DisplayName>
+    <Description xml:space="preserve">Ice Extension for Visual Studio provides seamless integration of Ice application development with the Visual Studio IDE, making it a breeze to create and modify Visual Studio projects for Ice applications.</Description>
+    <MoreInfo>https://doc.zeroc.com/display/IDE/Ice+Extension+for+Visual+Studio</MoreInfo>
+    <License>LICENSE.txt</License>
+    <Icon>Resources\Package.png</Icon>
+    <PreviewImage>Resources\Preview.png</PreviewImage>
+    <Tags>ZeroC, Ice, Slice</Tags>
+  </Metadata>
+  <Installation InstalledByMsi="false">
+    <InstallationTarget Version="[11.0, 12.0]" Id="Microsoft.VisualStudio.Pro" />
+  </Installation>
+  <Dependencies>
+    <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="4.5" />
+    <Dependency Id="Microsoft.VisualStudio.MPF.11.0" DisplayName="Visual Studio MPF 11.0" d:Source="Installed" Version="11.0" />
+  </Dependencies>
+  <Assets>
+    <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
+    <Asset Type="Microsoft.VisualStudio.ItemTemplate" d:Source="Project" d:ProjectName="CSharpSliceItemTemplate" d:TargetPath="|CSharpSliceItemTemplate;TemplateProjectOutputGroup|" Path="ItemTemplates" d:VsixSubPath="ItemTemplates" />
+    <Asset Type="Microsoft.VisualStudio.ItemTemplate" d:Source="Project" d:ProjectName="VCSliceItemTemplate" d:TargetPath="|VCSliceItemTemplate;TemplateProjectOutputGroup|" Path="ItemTemplates" d:VsixSubPath="ItemTemplates" />
+  </Assets>
+</PackageManifest>
