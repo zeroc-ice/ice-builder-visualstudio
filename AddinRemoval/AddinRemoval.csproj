@@ -35,6 +35,9 @@
   <PropertyGroup>
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -48,6 +51,9 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="app.manifest" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets. -->
@@ -57,6 +63,6 @@
   </Target>
   <Import Project="..\MSBuild\Sign.targets" />
   <Target Name="Sign" Condition="Exists('$(CertFile)')">
-      <Exec Command="$(SignCommand) ..\IceVisualStudio\Resources\AddinRemoval.exe"/>
+    <Exec Command="$(SignCommand) ..\IceVisualStudio\Resources\AddinRemoval.exe" />
   </Target>
 </Project>

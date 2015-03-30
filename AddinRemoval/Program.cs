@@ -29,17 +29,12 @@ namespace AddinRemoval
                 foreach(String path in paths)
                 {
                     //
-                    // Only update the add-in config it if is in one of the
-                    // known add-in loations and it matches the program first 
-                    // argument.
+                    // Delete the add-in config it if is in one of the known 
+                    // add-in loations and it matches the program first argument.
                     //
                     if(path.Equals(args[0]))
                     {
-                        XmlDocument doc = new XmlDocument();
-                        doc.Load(path);
-                        doc["Extensibility"]["Addin"]["LoadBehavior"].InnerText = "0";
-                        doc["Extensibility"]["Addin"]["CommandPreload"].InnerText = "0";
-                        doc.Save(path);
+                        File.Delete(path);
                         break;
                     }
                 }

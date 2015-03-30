@@ -1572,11 +1572,17 @@ namespace ZeroC.IceVisualStudio
                 }
             }
         }
-        
+
         public static string getSliceCompilerPath(Project project)
         {
+            return getSliceCompilerPath(project, Util.getIceHome());
+        }
+
+        public static string getSliceCompilerPath(Project project, String iceHome)
+        { 
             string compiler = Util.isCSharpProject(project) ? Util.slice2cs : Util.slice2cpp;
-            string iceHome = Util.getIceHome();            
+            
+
             if(File.Exists(Path.Combine(iceHome, "cpp", "bin", compiler)))
             {
                 return Path.Combine(iceHome, "cpp", "bin", compiler);
@@ -1759,9 +1765,9 @@ namespace ZeroC.IceVisualStudio
             return success;
         }
 
-        public String getSliceCompilerVersion()
+        public String getSliceCompilerVersion(String iceHome)
         {
-            String sliceCompiler = getSliceCompilerPath(null);
+            String sliceCompiler = getSliceCompilerPath(null, iceHome);
             if(!File.Exists(sliceCompiler))
             {
                 Util.write(null, Util.msgLevel.msgError,
@@ -3430,7 +3436,7 @@ namespace ZeroC.IceVisualStudio
                 String assemblyDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
                 //
-                // Disable the old version of the add-in
+                // Unistall the old version of the add-in
                 //
                 foreach(AddIn addin in dte2.AddIns)
                 {
@@ -3440,30 +3446,24 @@ namespace ZeroC.IceVisualStudio
                            (dte2.DTE.Version.StartsWith("11.0") ?            
                                 "Microsoft\\VisualStudio\\11.0\\Addins\\Ice-VS2012.AddIn" :
                                 "Microsoft\\VisualStudio\\12.0\\Addins\\Ice-VS2013.AddIn"));
+
                         if(File.Exists(path))
                         {
-
-                            XmlDocument doc = new XmlDocument();
-                            doc.Load(path);
-                            if(!doc["Extensibility"]["Addin"]["LoadBehavior"].InnerText.Equals("0"))
+                            System.Diagnostics.Process process = new System.Diagnostics.Process();
+                            process.StartInfo.FileName = Path.Combine(assemblyDir, "AddinRemoval.exe");
+                            process.StartInfo.Arguments = String.Format("\"{0}\"", path);
+                            process.StartInfo.CreateNoWindow = true;
+                            process.StartInfo.UseShellExecute = true;
+                            process.Start();
+                            process.WaitForExit();
+                            if(process.ExitCode == 0)
                             {
-                                System.Diagnostics.Process process = new System.Diagnostics.Process();
-                                process.StartInfo.FileName = Path.Combine(assemblyDir, "AddinRemoval.exe");
-                                process.StartInfo.Arguments = String.Format("\"{0}\"", path);
-                                process.StartInfo.CreateNoWindow = true;
-                                process.StartInfo.UseShellExecute = false;
-                                process.StartInfo.Verb = "runas";
-                                process.Start();
-                                process.WaitForExit();
-                                if(process.ExitCode == 0)
-                                {
-                                    dte2.Events.DTEEvents.OnStartupComplete += DTEEvents_OnStartupComplete;
-                                }
-                                else
-                                {
-                                    throw new InitializationException(
-                                        "Error trying to disable Ice Visual Studio Add-in:\n" + path);
-                                }
+                                dte2.Events.DTEEvents.OnStartupComplete += DTEEvents_OnStartupComplete;
+                            }
+                            else
+                            {
+                                throw new InitializationException(
+                                    "Error trying to disable Ice Visual Studio Add-in:\n" + path);
                             }
                         }
                         break;

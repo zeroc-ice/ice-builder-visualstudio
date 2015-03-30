@@ -21,7 +21,7 @@ namespace ZeroC.IceVisualStudio
 {
     [ClassInterface(ClassInterfaceType.AutoDual)]
     [Guid("1D9ECCF3-5D2F-4112-9B25-264596873DC9")]
-    public class IceOptionsPage : DialogPage
+    public class IceOptionsPage : UIElementDialogPage
     {
         [Category("General")]
         [DisplayName("Ice Home")]
@@ -39,16 +39,14 @@ namespace ZeroC.IceVisualStudio
             }
         }
 
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        protected override IWin32Window Window
+        protected override System.Windows.UIElement Child
         {
             get
             {
-                IceHomeEditor page = new IceHomeEditor();
-                page.optionsPage = this;
-                page.Initialize();
-                return page;
+                IceHomeEditor editor = new IceHomeEditor();
+                editor.optionsPage = this;
+                editor.Initialize();
+                return editor; 
             }
         }
 

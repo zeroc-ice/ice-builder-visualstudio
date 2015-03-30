@@ -123,6 +123,6 @@
   </Target>
   <Import Project="..\MSBuild\Sign.targets" />
   <Target Name="Sign" Condition="Exists('$(CertFile)')">
-      <Exec Command="$(SignCommand) ..\IceVisualStudio\Resources\IceVisualStudio_2013.dll"/>
+    <Exec Command="$(SignCommand) ..\IceVisualStudio\Resources\IceVisualStudio_2013.dll" />
   </Target>
 </Project>
