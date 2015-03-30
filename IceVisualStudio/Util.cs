@@ -367,43 +367,72 @@ namespace ZeroC.IceVisualStudio
 
         public static void setIceHome(String value)
         {
-            Microsoft.Win32.Registry.SetValue(IceHomeKey, IceHomeValue, value,
-                                              Microsoft.Win32.RegistryValueKind.String);
-
-            Version v = Version.Parse(Builder.instance().getSliceCompilerVersion());
-
-            Microsoft.Win32.Registry.SetValue(IceHomeKey, IceVersionValue, v.ToString(),
-                                              Microsoft.Win32.RegistryValueKind.String);
-
-            Microsoft.Win32.Registry.SetValue(IceHomeKey, IceVersionMMValue, String.Format("{0}.{1}", v.Major, v.Minor),
-                                              Microsoft.Win32.RegistryValueKind.String);
-            if (String.IsNullOrEmpty(value))
+            if(String.IsNullOrEmpty(value))
             {
+                //
+                // Remove all registry settings.
+                //
+                Microsoft.Win32.Registry.SetValue(IceHomeKey, IceHomeValue, "",
+                                                  Microsoft.Win32.RegistryValueKind.String);
+                Microsoft.Win32.Registry.SetValue(IceHomeKey, IceVersionValue, "",
+                                                  Microsoft.Win32.RegistryValueKind.String);
+                Microsoft.Win32.Registry.SetValue(IceHomeKey, IceVersionMMValue, "",
+                                                  Microsoft.Win32.RegistryValueKind.String);
                 Microsoft.Win32.Registry.SetValue(IceCSharpAssembleyKey, "", "",
                                                   Microsoft.Win32.RegistryValueKind.String);
                 Microsoft.Win32.Registry.SetValue(IceSilverlightAssembleyKey, "", "",
                                                   Microsoft.Win32.RegistryValueKind.String);
+                return;
 
             }
-            else if (File.Exists(Path.Combine(value, "bin", "slice2cpp.exe")))
+            else
             {
-                Microsoft.Win32.Registry.SetValue(IceCSharpAssembleyKey, "",
-                                                  Path.Combine(value, "Assemblies"),
+                Version v = null;
+
+                try
+                {
+                    v = Version.Parse(Builder.instance().getSliceCompilerVersion(value));
+                }
+                catch (System.Exception)
+                {
+                    string err = "Failed to run Slice compiler using Ice installation from `" + value + "'";
+                    MessageBox.Show(err, "Ice Extension for Visual Studio", 
+                                    MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1,
+                                    (MessageBoxOptions)0);
+
+                    Util.write(null, msgLevel.msgError, err);
+                    return;
+                }
+                Microsoft.Win32.Registry.SetValue(IceHomeKey, IceHomeValue, value,
+                                              Microsoft.Win32.RegistryValueKind.String);
+
+                Microsoft.Win32.Registry.SetValue(IceHomeKey, IceVersionValue, v.ToString(),
                                                   Microsoft.Win32.RegistryValueKind.String);
 
-                Microsoft.Win32.Registry.SetValue(IceSilverlightAssembleyKey, "",
-                                                  Path.Combine(value, "Assemblies", "sl"),
-                                                  Microsoft.Win32.RegistryValueKind.String);
-            }
-            else if (File.Exists(Path.Combine(value, "cpp", "bin", "slice2cpp.exe")))
-            {
-                Microsoft.Win32.Registry.SetValue(IceCSharpAssembleyKey, "",
-                                                  Path.Combine(value, "csharp", "Assemblies"),
+                Microsoft.Win32.Registry.SetValue(IceHomeKey, IceVersionMMValue, String.Format("{0}.{1}", v.Major, v.Minor),
                                                   Microsoft.Win32.RegistryValueKind.String);
 
-                Microsoft.Win32.Registry.SetValue(IceSilverlightAssembleyKey, "",
-                                                  Path.Combine(value, "csharp", "Assemblies", "sl"),
-                                                  Microsoft.Win32.RegistryValueKind.String);
+                if(File.Exists(Path.Combine(value, "bin", "slice2cpp.exe")))
+                {
+                    Microsoft.Win32.Registry.SetValue(IceCSharpAssembleyKey, "",
+                                                      Path.Combine(value, "Assemblies"),
+                                                      Microsoft.Win32.RegistryValueKind.String);
+
+                    Microsoft.Win32.Registry.SetValue(IceSilverlightAssembleyKey, "",
+                                                      Path.Combine(value, "Assemblies", "sl"),
+                                                      Microsoft.Win32.RegistryValueKind.String);
+                }
+                else if(File.Exists(Path.Combine(value, "cpp", "bin", "slice2cpp.exe")))
+                {
+                    Microsoft.Win32.Registry.SetValue(IceCSharpAssembleyKey, "",
+                                                      Path.Combine(value, "csharp", "Assemblies"),
+                                                      Microsoft.Win32.RegistryValueKind.String);
+
+                    Microsoft.Win32.Registry.SetValue(IceSilverlightAssembleyKey, "",
+                                                      Path.Combine(value, "csharp", "Assemblies", "sl"),
+                                                      Microsoft.Win32.RegistryValueKind.String);
+                }
+
             }
         }
 
