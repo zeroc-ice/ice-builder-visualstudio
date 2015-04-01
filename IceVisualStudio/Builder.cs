@@ -1141,6 +1141,10 @@ namespace ZeroC.IceVisualStudio
                 Util.checkCppRunTimeLibrary(this, project, compilerTool);
             }
             string sliceCompiler = getSliceCompilerPath(project);
+            if(String.IsNullOrEmpty(sliceCompiler))
+            {
+                return false;
+            }
             return buildCppProject(project, project.ProjectItems, sliceCompiler, force, ref buildedItems);
         }
 
@@ -1337,6 +1341,10 @@ namespace ZeroC.IceVisualStudio
         {
             string projectDir = Path.GetDirectoryName(project.FileName);
             string sliceCompiler = getSliceCompilerPath(project);
+            if(String.IsNullOrEmpty(sliceCompiler))
+            {
+                return;
+            }
             buildCSharpProject(project, projectDir, project.ProjectItems, sliceCompiler, force, excludeItem);
         }
 
@@ -1573,26 +1581,39 @@ namespace ZeroC.IceVisualStudio
             }
         }
 
-        public static string getSliceCompilerPath(Project project)
+        public string getSliceCompilerPath(Project project)
         {
             return getSliceCompilerPath(project, Util.getIceHome());
         }
 
-        public static string getSliceCompilerPath(Project project, String iceHome)
-        { 
+        public string getSliceCompilerPath(Project project, String iceHome)
+        {
             string compiler = Util.isCSharpProject(project) ? Util.slice2cs : Util.slice2cpp;
-            
-
-            if(File.Exists(Path.Combine(iceHome, "cpp", "bin", compiler)))
+            if(!String.IsNullOrEmpty(iceHome))
             {
-                return Path.Combine(iceHome, "cpp", "bin", compiler);
+                if (File.Exists(Path.Combine(iceHome, "cpp", "bin", compiler)))
+                {
+                    return Path.Combine(iceHome, "cpp", "bin", compiler);
+                }
+
+                if (File.Exists(Path.Combine(iceHome, "bin", compiler)))
+                {
+                    return Path.Combine(iceHome, "bin", compiler);
+                }
             }
 
-            if(File.Exists(Path.Combine(iceHome, "bin", compiler)))
+            String message = "'" + compiler + "' not found";
+            if(!String.IsNullOrEmpty(iceHome))
             {
-                return Path.Combine(iceHome, "bin", compiler);
+                message += " in '" + iceHome + "'. You may need to update Ice Home in 'Tools > Options > Ice'";
             }
-            return compiler;
+            else
+            {
+                message += ". You may need to set Ice Home in 'Tools > Options > Ice'";
+            }
+            Util.write(project, Util.msgLevel.msgError, message);
+            addError(project, "", TaskErrorCategory.Error, 0, 0, message);
+            return null;
         }
 
         private static string getSliceCompilerArgs(Project project, string file, bool depend)
@@ -1699,6 +1720,10 @@ namespace ZeroC.IceVisualStudio
             DependenciesMap dependenciesMap = getDependenciesMap();
             dependenciesMap[project.FullName] = new Dictionary<string, List<string>>();
             string sliceCompiler = getSliceCompilerPath(project);
+            if(String.IsNullOrEmpty(sliceCompiler))
+            {
+                return false;
+            }
             return updateDependencies(project, project.ProjectItems, sliceCompiler, excludeItem);
         }
 
