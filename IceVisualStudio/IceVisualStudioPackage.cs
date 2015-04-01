@@ -102,7 +102,8 @@ namespace ZeroC.IceVisualStudio
 
         public static String getIceHome()
         {
-            return _getIceHome.Invoke(null, null).ToString();
+            Object result = _getIceHome.Invoke(null, null);
+            return result == null ? "" : result.ToString();
         }
 
         private MethodInfo _menuCallback;
