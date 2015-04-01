@@ -26,7 +26,7 @@ namespace ZeroC.IceVisualStudio
 
             if(_project != null)
             {
-                this.Text = "Ice Configuration - Project: " + _project.Name;
+                this.Text = "Ice Builder Configuration - Project: " + _project.Name;
                 bool enabled = Util.isSliceBuilderEnabled(project);
                 setEnabled(enabled);
                 chkEnableBuilder.Checked = enabled;

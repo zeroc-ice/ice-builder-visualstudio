@@ -199,7 +199,7 @@ namespace ZeroC.IceVisualStudio
             this.MaximizeBox = false;
             this.Name = "IceVBConfigurationDialog";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Ice Configuration";
+            this.Text = "Ice Builder Configuration";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.formClosing);
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();

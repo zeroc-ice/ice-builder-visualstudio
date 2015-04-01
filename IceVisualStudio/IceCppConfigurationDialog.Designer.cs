@@ -228,7 +228,7 @@ namespace ZeroC.IceVisualStudio
             this.MaximizeBox = false;
             this.Name = "IceCppConfigurationDialog";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Ice Configuration";
+            this.Text = "Ice Builder Configuration";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.formClosing);
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();

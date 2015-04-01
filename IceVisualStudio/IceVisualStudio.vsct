@@ -16,14 +16,14 @@
         <Parent guid="guidIceVisualStudioCmdSet" id="MyMenuGroup" />
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
-          <ButtonText>Ice Configuration</ButtonText>
+          <ButtonText>Ice Builder Configuration</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidIceVisualStudioCmdSet" id="IceConfiguration" priority="0x100" type="Button">
         <Parent guid="guidIceVisualStudioCmdSet" id="MyMenuGroup2" />
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
-          <ButtonText>Ice Configuration</ButtonText>
+          <ButtonText>Ice Builder Configuration</ButtonText>
         </Strings>
       </Button>
     </Buttons>

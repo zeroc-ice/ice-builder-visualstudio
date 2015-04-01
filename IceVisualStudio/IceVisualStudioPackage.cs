@@ -24,7 +24,7 @@ namespace ZeroC.IceVisualStudio
     [PackageRegistration(UseManagedResourcesOnly = true)]
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    [ProvideOptionPage(typeof(IceOptionsPage), "Ice", "General", 0, 0, true)]
+    [ProvideOptionPage(typeof(IceOptionsPage), "Ice Builder", "General", 0, 0, true)]
     [ProvideAutoLoad(UIContextGuids80.NoSolution)]
     [Guid(GuidList.guidIceVisualStudioPkgString)]
     public sealed class IceVisualStudioPackage : Package
