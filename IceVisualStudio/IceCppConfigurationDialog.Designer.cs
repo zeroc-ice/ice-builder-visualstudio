@@ -51,6 +51,7 @@ namespace ZeroC.IceVisualStudio
             this.outputDirView = new ZeroC.IceVisualStudio.OutputDirView();
             this.includePathView = new ZeroC.IceVisualStudio.IncludePathView();
             this.extraCompilerOptions = new ZeroC.IceVisualStudio.ExtraCompilerOptionsView();
+            this.label2 = new System.Windows.Forms.Label();
             this.groupBox4.SuspendLayout();
             this.grouDllExportSymbol.SuspendLayout();
             this.SuspendLayout();
@@ -207,12 +208,22 @@ namespace ZeroC.IceVisualStudio
             this.extraCompilerOptions.Size = new System.Drawing.Size(487, 102);
             this.extraCompilerOptions.TabIndex = 5;
             // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(289, 10);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(75, 13);
+            this.label2.TabIndex = 12;
+            this.label2.Text = "Tracing Level:";
+            // 
             // IceCppConfigurationDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
             this.ClientSize = new System.Drawing.Size(494, 520);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.comboBoxVerboseLevel);
             this.Controls.Add(this.outputDirView);
@@ -257,5 +268,6 @@ namespace ZeroC.IceVisualStudio
         private IncludePathView includePathView;
         private OutputDirView outputDirView;
         private ExtraCompilerOptionsView extraCompilerOptions;
+        private System.Windows.Forms.Label label2;
     }
 }
