@@ -676,9 +676,17 @@ namespace ZeroC.IceVisualStudio
         public void addBuilderToProject(Project project, ComponentList components)
         {
             string iceHome = Util.getIceHome();
-            if(!Directory.Exists(iceHome))
+            if(String.IsNullOrEmpty(iceHome) || !Directory.Exists(iceHome))
             {
-                string message = "Ice installation not detected.\n";
+                String message = "Ice installation not detected.\n";
+                if(String.IsNullOrEmpty(iceHome))
+                {
+                    message += "You may need to set Ice Home in 'Tools > Options > Ice'";
+                }
+                else
+                {
+                    message += " in '" + iceHome + "'. You may need to update Ice Home in 'Tools > Options > Ice'";
+                }
                 Util.write(project, Util.msgLevel.msgError, message);
                 MessageBox.Show("Ice Extension for Visual Studio Error:\n" +
                                 message,
