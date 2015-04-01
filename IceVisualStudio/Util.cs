@@ -396,7 +396,7 @@ namespace ZeroC.IceVisualStudio
                 catch (System.Exception)
                 {
                     string err = "Failed to run Slice compiler using Ice installation from `" + value + "'";
-                    MessageBox.Show(err, "Ice Extension for Visual Studio", 
+                    MessageBox.Show(err, "Ice Builder", 
                                     MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1,
                                     (MessageBoxOptions)0);
 
@@ -695,7 +695,7 @@ namespace ZeroC.IceVisualStudio
             }
 
             MessageBox.Show("Could not locate '" + component + ".dll'.",
-                            "Ice Extension for Visual Studio", MessageBoxButtons.OK,
+                            "Ice Builder", MessageBoxButtons.OK,
                             MessageBoxIcon.Error,
                             MessageBoxDefaultButton.Button1,
                             (MessageBoxOptions)0);
@@ -2508,7 +2508,7 @@ namespace ZeroC.IceVisualStudio
         private static void showRunTimeLibraryWarning(Project p)
         {
             string err = "Run Time library not supported with Ice, Ice requires /MD or /MDd Run Time Library.";
-            MessageBox.Show(err, "Ice Extension for Visual Studio", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1,
+            MessageBox.Show(err, "Ice Builder", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1,
                             (MessageBoxOptions)0);
 
             Util.write(p, msgLevel.msgError, err);
@@ -2518,7 +2518,7 @@ namespace ZeroC.IceVisualStudio
         {
             MessageBox.Show("Extra Options field contains some errors:\n" +
                                                  ex.reason,
-                                                 "Ice Extension for Visual Studio", MessageBoxButtons.OK,
+                                                 "Ice Builder", MessageBoxButtons.OK,
                                                  MessageBoxIcon.Error,
                                                  MessageBoxDefaultButton.Button1,
                                                  (MessageBoxOptions)0);
@@ -2542,9 +2542,9 @@ namespace ZeroC.IceVisualStudio
             {
                 if(!Builder.instance().isCommandLineMode())
                 {
-                    MessageBox.Show("The Ice Extension for Visual Studio has raised an unexpected exception:\n" +
+                    MessageBox.Show("The Ice Builder has raised an unexpected exception:\n" +
                                     message,
-                                    "Ice Extension for Visual Studio", MessageBoxButtons.OK,
+                                    "Ice Builder", MessageBoxButtons.OK,
                                     MessageBoxIcon.Error,
                                     MessageBoxDefaultButton.Button1,
                                     (MessageBoxOptions)0);
@@ -2590,7 +2590,7 @@ namespace ZeroC.IceVisualStudio
         public static bool warnUnsavedChanges(IWin32Window owner)
         {
             if(MessageBox.Show(owner, "Are you sure you want to discard all changes?",
-                               "Ice Extension for Visual Studio", MessageBoxButtons.YesNo,
+                               "Ice Builder", MessageBoxButtons.YesNo,
                                MessageBoxIcon.Question, MessageBoxDefaultButton.Button1,
                                (MessageBoxOptions)0) == DialogResult.Yes)
             {

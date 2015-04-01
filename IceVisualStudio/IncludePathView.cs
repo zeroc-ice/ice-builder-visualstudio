@@ -206,7 +206,7 @@ namespace ZeroC.IceVisualStudio
                     {
                         MessageBox.Show(this, "The Slice Include Path doesn't allow duplicates.\n" +
                                    "Value: `" + path + "' will be removed.\n",
-                                   "Ice Extension for Visual Studio", MessageBoxButtons.OK,
+                                   "Ice Builder", MessageBoxButtons.OK,
                                    MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1,
                                    (MessageBoxOptions)0);
                         sliceIncludeList.Items.RemoveAt(_editingIndex);

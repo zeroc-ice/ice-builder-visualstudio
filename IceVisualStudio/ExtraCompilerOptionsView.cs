@@ -183,7 +183,7 @@ namespace ZeroC.IceVisualStudio
                 MessageBox.Show("Extra Options field contains some errors:\n" +
                                 "--header-ext and --source-ext can only be used in the configuration named 'All'" +
                                 " header-ext: " + headerExt + " source-ext: " + sourceExt,
-                                "Ice Extension for Visual Studio", MessageBoxButtons.OK,
+                                "Ice Builder", MessageBoxButtons.OK,
                                 MessageBoxIcon.Error,
                                 MessageBoxDefaultButton.Button1,
                                 (MessageBoxOptions)0);

@@ -688,9 +688,9 @@ namespace ZeroC.IceVisualStudio
                     message += " in '" + iceHome + "'. You may need to update Ice Home in 'Tools > Options > Ice'";
                 }
                 Util.write(project, Util.msgLevel.msgError, message);
-                MessageBox.Show("Ice Extension for Visual Studio Error:\n" +
+                MessageBox.Show("Ice Builder Error:\n" +
                                 message,
-                                "Ice Extension for Visual Studio", MessageBoxButtons.OK,
+                                "Ice Builder", MessageBoxButtons.OK,
                                 MessageBoxIcon.Error,
                                 MessageBoxDefaultButton.Button1,
                                (MessageBoxOptions)0);
@@ -1131,11 +1131,11 @@ namespace ZeroC.IceVisualStudio
             if(conf.ConfigurationType == ConfigurationTypes.typeGeneric ||
                conf.ConfigurationType == ConfigurationTypes.typeUnknown)
             {
-                string err = "Configuration Type: '" + conf.ConfigurationType.ToString() + "' not supported by Ice Extension for Visual Studio";
+                string err = "Configuration Type: '" + conf.ConfigurationType.ToString() + "' not supported by Ice Builder";
                 Util.write(project, Util.msgLevel.msgError,
                     "------ Slice compilation failed: Project: " + Util.getTraceProjectName(project) + " ------\n\n" +
                     err);
-                MessageBox.Show(err, "Ice Extension for Visual Studio", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1,
+                MessageBox.Show(err, "Ice Builder", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1,
                                (MessageBoxOptions)0);
                 addError(project, "", TaskErrorCategory.Error, 0, 0, err);
                 return false;
@@ -2304,7 +2304,7 @@ namespace ZeroC.IceVisualStudio
                                         Path.GetFileName(fullPath) + "' first remove " +
                                         " '" + Path.GetFileName(cppPath) + "' and '" +
                                         Path.GetFileName(hPath) + "'.",
-                                        "Ice Extension for Visual Studio",
+                                        "Ice Builder",
                                         MessageBoxButtons.OK,
                                         MessageBoxIcon.Error,
                                         MessageBoxDefaultButton.Button1,
@@ -2320,7 +2320,7 @@ namespace ZeroC.IceVisualStudio
                                         Path.GetFileName(fullPath) + "' first remove " +
                                         " '" + Path.GetFileName(cppPath) + "' and '" +
                                         Path.GetFileName(hPath) + "'.",
-                                        "Ice Extension for Visual Studio",
+                                        "Ice Builder",
                                         MessageBoxButtons.OK,
                                         MessageBoxIcon.Error,
                                         MessageBoxDefaultButton.Button1,
@@ -2412,7 +2412,7 @@ namespace ZeroC.IceVisualStudio
                                     "' already exists.\n" + "If you want to add '" +
                                     Path.GetFileName(fullPath) + "' first remove " +
                                     " '" + Path.GetFileName(csPath) + "'.",
-                                    "Ice Extension for Visual Studio",
+                                    "Ice Builder",
                                     MessageBoxButtons.OK,
                                     MessageBoxIcon.Error,
                                     MessageBoxDefaultButton.Button1,
@@ -3364,7 +3364,7 @@ namespace ZeroC.IceVisualStudio
                             MessageBox.Show("A file named '" + Path.GetFileName(csPath) +
                                             "' already exists.\n" + oldName +
                                             " could not be renamed to '" + item.Name + "'.",
-                                            "Ice Extension for Visual Studio",
+                                            "Ice Builder",
                                             MessageBoxButtons.OK,
                                             MessageBoxIcon.Error,
                                             MessageBoxDefaultButton.Button1,
@@ -3396,7 +3396,7 @@ namespace ZeroC.IceVisualStudio
                                             Path.GetFileName(newName) + "' first remove " + " '" +
                                             Path.GetFileName(cppPath) + "' and '" +
                                             Path.GetFileName(hPath) + "' from your project.",
-                                            "Ice Extension for Visual Studio",
+                                            "Ice Builder",
                                             MessageBoxButtons.OK, MessageBoxIcon.Error, 
                                             MessageBoxDefaultButton.Button1,(MessageBoxOptions)0);
                             return -1;
@@ -3409,7 +3409,7 @@ namespace ZeroC.IceVisualStudio
                                             Path.GetFileName(newName) + "' first remove " +
                                             " '" + Path.GetFileName(cppPath) + "' and '" +
                                             Path.GetFileName(hPath) + "' from your project.",
-                                            "Ice Extension for Visual Studio",
+                                            "Ice Builder",
                                             MessageBoxButtons.OK, MessageBoxIcon.Error,
                                             MessageBoxDefaultButton.Button1,(MessageBoxOptions)0);
                             return -1;
@@ -3567,10 +3567,10 @@ namespace ZeroC.IceVisualStudio
         static void DTEEvents_OnStartupComplete()
         {
             if(MessageBox.Show("Ice Visual Studio Add-in has been disabled because it is " +
-                                "incompatible with the newly installed Ice Extension for Visual Studio.\n" +
+                                "incompatible with the newly installed Ice Builder.\n" +
                                 "You must restart Microsoft Visual Studio for the changes to take effect." +
                                 "Restart Microsoft Visual Studio now?", 
-                                "Ice Extension for Visual Studio", 
+                                "Ice Builder", 
                                 MessageBoxButtons.YesNo, 
                                 MessageBoxIcon.Question) == DialogResult.Yes)
             {

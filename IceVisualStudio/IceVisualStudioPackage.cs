@@ -80,9 +80,9 @@ namespace ZeroC.IceVisualStudio
             }
             catch(System.Exception ex)
             {
-                MessageBox.Show("The Ice Extension for Visual Studio has raised an unexpected exception:\n" +
+                MessageBox.Show("The Ice Builder has raised an unexpected exception:\n" +
                                 ex.ToString(),
-                                "Ice Extension for Visual Studio", MessageBoxButtons.OK,
+                                "Ice Builder", MessageBoxButtons.OK,
                                 MessageBoxIcon.Error,
                                 MessageBoxDefaultButton.Button1,
                                 (MessageBoxOptions)0);

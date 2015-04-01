@@ -2,8 +2,8 @@
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
     <Identity Id="ef9502be-dbc2-4568-a846-02b8e42d04c2" Version="4.0.0.0" Language="en-US" Publisher="ZeroC" />
-    <DisplayName>Ice Extension for Visual Studio</DisplayName>
-    <Description xml:space="preserve">Ice Extension for Visual Studio provides seamless integration of Ice application development with the Visual Studio IDE, making it a breeze to create and modify Visual Studio projects for Ice applications.</Description>
+    <DisplayName>Ice Builder</DisplayName>
+    <Description xml:space="preserve">Ice Builder provides seamless integration of Ice application development with the Visual Studio IDE, making it a breeze to create and modify Visual Studio projects for Ice applications.</Description>
     <MoreInfo>https://doc.zeroc.com/display/IDE/Ice+Extension+for+Visual+Studio</MoreInfo>
     <License>Resources\LICENSE.rtf</License>
     <Icon>Resources\Package.png</Icon>
