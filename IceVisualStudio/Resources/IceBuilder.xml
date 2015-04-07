@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) 2009-2015 ZeroC, Inc. All rights reserved. -->
+<ProjectSchemaDefinitions xmlns="clr-namespace:Microsoft.Build.Framework.XamlTypes;assembly=Microsoft.Build.Framework">
+  <Rule Name="IceBuilder" PageTemplate="tool" DisplayName="Ice Builder" Order="9" SwitchPrefix="">
+
+    <Rule.DataSource>
+      <DataSource Persistence="ProjectFile" ItemType="IceBuilder" Label="" HasConfigurationCondition="true"/>
+    </Rule.DataSource>
+    
+    <Rule.Categories>
+      <Category Name="General" DisplayName="General"/>
+      <Category Name="Command Line" DisplayName="Command Line" Subtype="CommandLine"/>
+    </Rule.Categories>
+
+    <StringProperty Name="OutDir" 
+                    DisplayName="Output Directory"
+                    Subtype="folder"
+                    Category="General"
+                    Switch="--output-dir"
+                    Description="Create files in the directory DIR."/>
+
+    <BoolProperty Name="IcePrefix"
+                  DisplayName="Allow Reserved Ice Identifiers"
+                  Description="Permit `Ice' prefix (for building Ice source code only)."
+                  Switch="--ice"
+                  Category="General"/>
+
+    <BoolProperty Name="Underscore"
+                  DisplayName="Allow Underscore In Identifiers"
+                  Description="Permit underscores in Slice indentifiers."
+                  Switch="--underscore"
+                  Category="General"/>
+
+    <BoolProperty Name="Streaming"
+                  DisplayName="Generate Helper Functions For Streaming"
+                  Description="Generate marshaling support for public stream API."
+                  Switch="--stream"
+                  Category="General"/>
+
+    <BoolProperty Name="Checksum"
+                  DisplayName="Generate Slice Checksums"
+                  Description="Generate checksums for Slice definitions."
+                  Switch="--checksum"
+                  Category="General"/>
+    
+    <StringProperty Name="DLLExportMacro" 
+                    DisplayName="DLL Export Macro"
+                    Switch="--dll-export"
+                    Category="General"
+                    Description="Macro for exporting symbols from DLL."/>
+
+    <EnumProperty Name="HeaderExt" 
+                  DisplayName="Generated Header Extension"
+                  Category="General"
+                  Switch="--header-ext"
+                  Description="Use extension instead of default `h' header extension.">
+      <EnumValue Name="h" DisplayName=".h" Description=".h"/>
+      <EnumValue Name="hpp" DisplayName=".hpp" Description=".hpp"/>
+      <EnumValue Name="hh" DisplayName=".hh" Description=".hh"/>
+      <EnumValue Name="hxx" DisplayName=".hxx" Description=".hxx"/>
+    </EnumProperty>
+
+    <EnumProperty Name="SourceExt" 
+                  DisplayName="Generated Source Extension"
+                  Category="General"
+                  Switch="--source-ext"
+                  Description="Use extension instead of default `cpp' source extension.">
+      <EnumValue Name="cpp" DisplayName=".cpp" Description=".cpp"/>
+      <EnumValue Name="cc" DisplayName=".cc" Description=".cc"/>
+      <EnumValue Name="cxx" DisplayName=".cxx" Description=".cxx"/>
+    </EnumProperty>
+
+    <StringListProperty Name="AdditionalIncludeDirectories"
+                        DisplayName="Additional Include Directories"
+                        Description=""
+                        Switch="-I"
+                        Subtype="folder"
+                        Category="General"/>
+    
+    <StringProperty Name="BaseDirectoryForGeneratedInclude"
+                    DisplayName="Base Directory For Generated #include"
+                    Category="General"
+                    Switch="--include-dir"
+                    Description="Base directory for generated #include statements."/>
+    
+    <StringProperty Name="AdditionalOptions" 
+                    DisplayName="Additional Options"
+                    Category="General"
+                    Visible="False"/>
+
+    <EnumProperty Name="TracingLevel"
+                  DisplayName="Tracing Level"
+                  Description="Ice Builder tracing level."
+                  Category="General">
+      <EnumValue Name="Info" DisplayName="Info" Description="Info."/>
+      <EnumValue Name="ErrorsOnly" DisplayName="Errors Only" Description="Errors Only."/>
+      <EnumValue Name="Debug" DisplayName="Debug" Description="Debug."/>
+    </EnumProperty>
+  </Rule>
+  
+  <ItemType Name="IceBuilder" DisplayName="Build Slice Files" />
+  <FileExtension Name="*.ice" ContentType="IceBuilder" />
+  <ContentType Name="IceBuilder" DisplayName="Build Slice Files" ItemType="IceBuilder" />
+
+</ProjectSchemaDefinitions>

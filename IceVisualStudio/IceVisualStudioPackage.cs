@@ -27,6 +27,17 @@ namespace ZeroC.IceVisualStudio
     [ProvideOptionPage(typeof(IceOptionsPage), "Ice Builder", "General", 0, 0, true)]
     [ProvideAutoLoad(UIContextGuids80.NoSolution)]
     [Guid(GuidList.guidIceVisualStudioPkgString)]
+
+    [ProvideObject(typeof(IceCustomProject.PropertyPage),
+        RegisterUsing = RegistrationMethod.CodeBase)]
+
+    [ProvideProjectFactory(typeof(IceCustomProject.ProjectFactory),
+        "Ice Builder",
+        null,
+        null,
+        null,
+        @"..\Templates\Projects")]
+
     public sealed class IceVisualStudioPackage : Package
     {
         public IceVisualStudioPackage()
@@ -77,6 +88,8 @@ namespace ZeroC.IceVisualStudio
                 Type util = assembly.GetType("ZeroC.IceVisualStudio.Util");
                 _setIceHome = util.GetMethod("setIceHome");
                 _getIceHome = util.GetMethod("getIceHome");
+
+                this.RegisterProjectFactory(new IceCustomProject.ProjectFactory(this));
             }
             catch(System.Exception ex)
             {

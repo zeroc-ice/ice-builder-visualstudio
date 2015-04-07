@@ -3504,7 +3504,7 @@ namespace ZeroC.IceVisualStudio
                 }
 
                 //
-                // Copy Ice.props property sheet if required.
+                // Copy Ice.props property sheet and IceBuilder.xml if required.
                 //
                 String dataDir = Path.Combine(Environment.GetEnvironmentVariable("LOCALAPPDATA"),
                                           "ZeroC\\IceVisualStudioExtension");
@@ -3514,22 +3514,24 @@ namespace ZeroC.IceVisualStudio
                     Directory.CreateDirectory(dataDir);
                 }
 
-                if(!File.Exists(Path.Combine(dataDir, "Ice.props")))
+                foreach(String f in new String[] { "Ice.props", "IceBuilder.xml" })
                 {
-                    File.Copy(Path.Combine(assemblyDir, "Ice.props"),
-                              Path.Combine(dataDir, "Ice.props"));
-                }
-                else
-                {
-                    byte[] data1 = File.ReadAllBytes(Path.Combine(assemblyDir, "Ice.props"));
-                    byte[] data2 = File.ReadAllBytes(Path.Combine(dataDir, "Ice.props"));
-                    if(!data1.SequenceEqual(data2))
+                    if(!File.Exists(Path.Combine(dataDir, f)))
                     {
-                        File.Copy(Path.Combine(assemblyDir, "Ice.props"),
-                                  Path.Combine(dataDir, "Ice.props"), true);
+                        File.Copy(Path.Combine(assemblyDir, f),
+                                  Path.Combine(dataDir, f));
+                    }
+                    else
+                    {
+                        byte[] data1 = File.ReadAllBytes(Path.Combine(assemblyDir, f));
+                        byte[] data2 = File.ReadAllBytes(Path.Combine(dataDir, f));
+                        if(!data1.SequenceEqual(data2))
+                        {
+                            File.Copy(Path.Combine(assemblyDir, f),
+                                      Path.Combine(dataDir, f), true);
+                        }
                     }
                 }
-
                 bool commandLineMode = false;
                 if(shell != null)
                 {

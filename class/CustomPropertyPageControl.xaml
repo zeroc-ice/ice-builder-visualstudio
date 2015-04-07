@@ -1,0 +1,55 @@
+﻿<UserControl x:Class="IceBuilder.CustomPropertyPageControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="500">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <Label Grid.Column="0" Grid.Row="0">Output Directory</Label>
+        <TextBox Grid.Column="1" Grid.Row="0"></TextBox>
+
+        <Label Grid.Column="0" Grid.Row="1">Ice</Label>
+        <TextBox Grid.Column="1" Grid.Row="1"></TextBox>
+
+        <Label Grid.Column="0" Grid.Row="2">Underscore</Label>
+        <TextBox Grid.Column="1" Grid.Row="2"></TextBox>
+
+        <Label Grid.Column="0" Grid.Row="3">Checksum</Label>
+        <TextBox Grid.Column="1" Grid.Row="3" TextChanged="TextBox_TextChanged"></TextBox>
+
+        <Label Grid.Column="0" Grid.Row="4">Streaming</Label>
+        <TextBox Grid.Column="1" Grid.Row="4"></TextBox>
+
+        <Label Grid.Column="0" Grid.Row="5">Tie</Label>
+        <TextBox Grid.Column="1" Grid.Row="5"></TextBox>
+
+        <Label Grid.Column="0" Grid.Row="6">Additional Include Directories</Label>
+        <TextBox Grid.Column="1" Grid.Row="6"></TextBox>
+
+        <Label Grid.Column="0" Grid.Row="7">Additional References</Label>
+        <TextBox Grid.Column="1" Grid.Row="7"></TextBox>
+
+        <Label Grid.Column="0" Grid.Row="8">Tracing Level</Label>
+        <TextBox Grid.Column="1" Grid.Row="8"></TextBox>
+        
+        
+    </Grid>
+</UserControl>

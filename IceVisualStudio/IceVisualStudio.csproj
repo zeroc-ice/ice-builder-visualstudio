@@ -47,6 +47,8 @@
   <ItemGroup>
     <Reference Include="Microsoft.Build" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="Microsoft.VisualBasic.PowerPacks.Vs, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.OLE.Interop" />
     <Reference Include="Microsoft.VisualStudio.Shell.Interop" />
     <Reference Include="Microsoft.VisualStudio.Shell.Interop.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -130,9 +132,19 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CSharpConfigurationView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CSharpConfigurationView.Designer.cs">
+      <DependentUpon>CSharpConfigurationView.cs</DependentUpon>
+    </Compile>
     <Compile Include="IceHomeEditor.xaml.cs">
       <DependentUpon>IceHomeEditor.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Project.cs" />
+    <Compile Include="ProjectConfiguration.cs" />
+    <Compile Include="ProjectFactory.cs" />
+    <Compile Include="PropertyPage.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -145,6 +157,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="CSharpConfigurationView.resx">
+      <DependentUpon>CSharpConfigurationView.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -158,6 +173,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\AddinRemoval.exe">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Resources\IceBuilder.xml">
+      <SubType>Designer</SubType>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Resources\Package.png">

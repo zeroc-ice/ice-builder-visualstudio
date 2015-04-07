@@ -34,7 +34,6 @@ namespace ZeroC.IceVisualStudio
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             this.chkEnableBuilder = new System.Windows.Forms.CheckBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.chkIceDiscovery = new System.Windows.Forms.CheckBox();
@@ -52,7 +51,7 @@ namespace ZeroC.IceVisualStudio
             this.label1 = new System.Windows.Forms.Label();
             this.comboBoxVerboseLevel = new System.Windows.Forms.ComboBox();
             this.btnCancel = new System.Windows.Forms.Button();
-            this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.toolTip = new System.Windows.Forms.ToolTip();
             this.btnApply = new System.Windows.Forms.Button();
             this.btnOk = new System.Windows.Forms.Button();
             this.outputDirView = new ZeroC.IceVisualStudio.OutputDirView();
@@ -292,6 +291,7 @@ namespace ZeroC.IceVisualStudio
             this.includePathView.Name = "includePathView";
             this.includePathView.Size = new System.Drawing.Size(487, 168);
             this.includePathView.TabIndex = 6;
+            this.includePathView.Load += new System.EventHandler(this.includePathView_Load);
             // 
             // extraCompilerOptions
             // 
@@ -329,6 +329,7 @@ namespace ZeroC.IceVisualStudio
             this.groupBox4.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
+
         }
 
         #endregion

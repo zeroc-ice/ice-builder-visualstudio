@@ -697,5 +697,10 @@ namespace ZeroC.IceVisualStudio
         private Project _project;
         private bool _changed = false;
         private bool _silverlightFramework = false;
+
+        private void includePathView_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }
