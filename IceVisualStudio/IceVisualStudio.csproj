@@ -29,17 +29,18 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CopyVsixExtensionFiles>False</CopyVsixExtensionFiles>
     <CopyVsixExtensionLocation>Package</CopyVsixExtensionLocation>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;CODE_ANALYSIS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>true</RunCodeAnalysis>
@@ -138,9 +139,18 @@
     <Compile Include="CSharpConfigurationView.Designer.cs">
       <DependentUpon>CSharpConfigurationView.cs</DependentUpon>
     </Compile>
+    <Compile Include="DTEUtil.cs" />
+    <Compile Include="FileUtil.cs" />
     <Compile Include="IceHomeEditor.xaml.cs">
       <DependentUpon>IceHomeEditor.xaml</DependentUpon>
     </Compile>
+    <Compile Include="IncludeDirectories.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="IncludeDirectories.Designer.cs">
+      <DependentUpon>IncludeDirectories.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MSBuildUtils.cs" />
     <Compile Include="Project.cs" />
     <Compile Include="ProjectConfiguration.cs" />
     <Compile Include="ProjectFactory.cs" />
@@ -159,6 +169,9 @@
   <ItemGroup>
     <EmbeddedResource Include="CSharpConfigurationView.resx">
       <DependentUpon>CSharpConfigurationView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IncludeDirectories.resx">
+      <DependentUpon>IncludeDirectories.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -219,6 +232,12 @@
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <IncludeOutputGroupsInVSIX>TemplateProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
       <TemplateType>Item</TemplateType>
+    </ProjectReference>
+    <ProjectReference Include="..\IceBuilder_Common\IceBuilder_Common.csproj">
+      <Project>{0f705d19-e13c-41af-ba0f-58aa83882d3e}</Project>
+      <Name>IceBuilder_Common</Name>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\VCSliceItemTemplate\VCSliceItemTemplate.csproj">
       <Project>{5B778A54-EFB1-4085-9CA2-49C83AC352B5}</Project>

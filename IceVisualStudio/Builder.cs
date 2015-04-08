@@ -199,14 +199,17 @@ namespace ZeroC.IceVisualStudio
                 Project p = getActiveProject();
                 if(p != null)
                 {
-                    _configurationCommand.Enabled = Util.isCppProject(p) ||
+                    _configurationCommand.Visible = Util.isCppProject(p) ||
                                                     Util.isCSharpProject(p) ||
                                                     Util.isSilverlightProject(p);
                 }
                 else
                 {
-                    _configurationCommand.Enabled = false;
+                    _configurationCommand.Visible = false;
                 }
+                _configurationCommand.Visible = false;
+                _configurationCommand.Enabled = false;
+                _configurationCommand.Supported = false;
             }
 
             _serviceProvider =
@@ -229,15 +232,18 @@ namespace ZeroC.IceVisualStudio
                     }
                     else
                     {
-                        _configurationCommand.Enabled = Util.isCppProject(p) || 
+                        _configurationCommand.Visible = Util.isCppProject(p) || 
                                                         Util.isCSharpProject(p) || 
                                                         Util.isSilverlightProject(p);
                     }
                 }
                 else
                 {
-                    _configurationCommand.Enabled = false;
+                    _configurationCommand.Visible = false;
                 }
+                _configurationCommand.Visible = false;
+                _configurationCommand.Enabled = false;
+                _configurationCommand.Supported = false;
             }
             catch(Exception ex)
             {
@@ -3594,40 +3600,6 @@ namespace ZeroC.IceVisualStudio
         {
             "3.6.0"
         };
-
-        public static void MenuItemCallback()
-        {
-            try
-            {
-                EnvDTE.Project project = Builder.instance().getSelectedProject();
-
-                if(project == null)
-                {
-                    return;
-                }
-
-                if(Util.isCSharpProject(project))
-                {
-                    IceCsharpConfigurationDialog dialog = new IceCsharpConfigurationDialog(project);
-                    dialog.ShowDialog();
-                }
-                else if(Util.isVBProject(project))
-                {
-                    IceVBConfigurationDialog dialog = new IceVBConfigurationDialog(project);
-                    dialog.ShowDialog();
-                }
-                else if(Util.isCppProject(project))
-                {
-                    IceCppConfigurationDialog dialog = new IceCppConfigurationDialog(project);
-                    dialog.ShowDialog();
-                }
-            }
-            catch(Exception ex)
-            {
-                Util.unexpectedExceptionWarning(ex);
-                throw;
-            }
-        }
 
         private IVsShell _shell;
         private MenuCommand _configurationCommand;

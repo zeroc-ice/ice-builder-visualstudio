@@ -74,45 +74,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\IceVisualStudio\Builder.cs" />
     <Compile Include="..\IceVisualStudio\FileTracker.cs" />
-    <Compile Include="..\IceVisualStudio\IceDialog.cs" />
-    <Compile Include="..\IceVisualStudio\Options.cs" />
     <Compile Include="..\IceVisualStudio\Util.cs" />
-    <Compile Include="..\IceVisualStudio\ExtraCompilerOptionsView.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="..\IceVisualStudio\ExtraCompilerOptionsView.Designer.cs">
-      <DependentUpon>ExtraCompilerOptionsView.cs</DependentUpon>
-    </Compile>
-    <Compile Include="..\IceVisualStudio\IncludePathView.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="..\IceVisualStudio\IncludePathView.Designer.cs">
-      <DependentUpon>IncludePathView.cs</DependentUpon>
-    </Compile>
-    <Compile Include="..\IceVisualStudio\OutputDirView.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="..\IceVisualStudio\OutputDirView.Designer.cs">
-      <DependentUpon>OutputDirView.cs</DependentUpon>
-    </Compile>
-    <Compile Include="..\IceVisualStudio\IceCppConfigurationDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="..\IceVisualStudio\IceCppConfigurationDialog.Designer.cs">
-      <DependentUpon>IceCppConfigurationDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="..\IceVisualStudio\IceCSharpConfigurationDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="..\IceVisualStudio\IceCSharpConfigurationDialog.Designer.cs">
-      <DependentUpon>IceCSharpConfigurationDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="..\IceVisualStudio\IceVBConfigurationDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="..\IceVisualStudio\IceVBConfigurationDialog.Designer.cs">
-      <DependentUpon>IceVBConfigurationDialog.cs</DependentUpon>
-    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

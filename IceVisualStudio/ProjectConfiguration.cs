@@ -19,16 +19,20 @@ namespace IceCustomProject
         public readonly String checksumPropertyName = "IceBuilder_Checksum";
         public readonly String streamingPropertyName = "IceBuilder_Streaming";
         public readonly String tiePropertyName = "IceBuilder_Tie";
+        public readonly String underscoresPropertyName = "IceBuilder_Underscores";
         public readonly String additionalIncludeDirectoriesPropertyName = "IceBuilder_AdditionalIncludeDirectories";
         public readonly String additionalOptionsPropertyName = "IceBuilder_AdditionalOptions";
+        public readonly String traceLevelPropertyName = "IceBuilder_TraceLevel";
 
         private bool outputDirNeedSave = false;
         private bool iceNeedSave = false;
         private bool checksumNeedSave = false;
         private bool streamingNeedSave = false;
         private bool tieNeedSave = false;
+        private bool underscoresNeedSave = false;
         private bool additionalIncludeDirectoriesNeedSave = false;
         private bool additionalOptionsNeedSave = false;
+        private bool traceLevelNeedSave = false;
 
         public Boolean NeedSave
         {
@@ -39,8 +43,10 @@ namespace IceCustomProject
                     checksumNeedSave ||
                     streamingNeedSave ||
                     tieNeedSave ||
+                    underscoresNeedSave ||
                     additionalIncludeDirectoriesNeedSave ||
-                    additionalOptionsNeedSave;
+                    additionalOptionsNeedSave ||
+                    traceLevelNeedSave;
             }
         }
 
@@ -73,6 +79,10 @@ namespace IceCustomProject
             Tie = value == null ? false : value.Equals("yes", StringComparison.CurrentCultureIgnoreCase);
             tieNeedSave = false;
 
+            _storage.GetPropertyValue(underscoresPropertyName, _configuration, storageType, out value);
+            Underscores = value == null ? false : value.Equals("yes", StringComparison.CurrentCultureIgnoreCase);
+            underscoresNeedSave = false;
+
             _storage.GetPropertyValue(additionalIncludeDirectoriesPropertyName, _configuration, storageType, out value);
             AdditionalIncludeDirectories = value == null ? "" : value;
             additionalIncludeDirectoriesNeedSave = false;
@@ -80,6 +90,15 @@ namespace IceCustomProject
             _storage.GetPropertyValue(additionalOptionsPropertyName, _configuration, storageType, out value);
             AdditionalOptions = value == null ? "" : value;
             additionalOptionsNeedSave = false;
+
+            _storage.GetPropertyValue(traceLevelPropertyName, _configuration, storageType, out value);
+            int traceLevel = 0;
+            if(value != null)
+            {
+                Int32.TryParse(value, out traceLevel);
+            }
+            TraceLevel = traceLevel;
+            traceLevelNeedSave = false;
         }
 
         public void Save()
@@ -114,17 +133,29 @@ namespace IceCustomProject
                 tieNeedSave = false;
             }
 
-            if (additionalOptionsNeedSave)
+            if (underscoresNeedSave)
+            {
+                _storage.SetPropertyValue(underscoresPropertyName, _configuration, storageType, Underscores ? "yes" : "no");
+                underscoresNeedSave = false;
+            }
+
+            if (additionalIncludeDirectoriesNeedSave)
             {
                 _storage.SetPropertyValue(additionalIncludeDirectoriesPropertyName, _configuration, storageType,
                         AdditionalIncludeDirectories);
-                additionalOptionsNeedSave = false;
+                additionalIncludeDirectoriesNeedSave = false;
             }
 
             if (additionalOptionsNeedSave)
             {
                 _storage.SetPropertyValue(additionalOptionsPropertyName, _configuration, storageType, AdditionalOptions);
                 additionalOptionsNeedSave = false;
+            }
+
+            if (traceLevelNeedSave)
+            {
+                _storage.SetPropertyValue(traceLevelPropertyName, _configuration, storageType, TraceLevel.ToString());
+                traceLevelNeedSave = false;
             }
         }
 
@@ -213,6 +244,23 @@ namespace IceCustomProject
             }
         }
 
+        private Boolean _underscores = false;
+        public Boolean Underscores
+        {
+            get
+            {
+                return _underscores;
+            }
+            set
+            {
+                if (_underscores != value)
+                {
+                    _underscores = value;
+                    underscoresNeedSave = true;
+                }
+            }
+        }
+
         private String _additionalIncludeDirectories = "";
         public String AdditionalIncludeDirectories
         {
@@ -247,6 +295,23 @@ namespace IceCustomProject
             }
         }
 
+        private int _traceLevel;
+        public int TraceLevel
+        {
+            get
+            {
+                return _traceLevel;
+            }
+            set
+            {
+                if (_traceLevel != value)
+                {
+                    _traceLevel = value;
+                    traceLevelNeedSave = true;
+                }
+            }
+        }
+
         IVsBuildPropertyStorage _storage;
         String _configuration;
     }
@@ -277,11 +342,17 @@ namespace IceCustomProject
             _innerConfiguration = innerConfiguration;
             _configurations.Add(baseConfiguration, this);
 
-            String config = null;
-            _baseConfiguration.get_DisplayName(out config);
-            _settings = new ProjectConfigurationSettigns(_project.InnerHierarchy as IVsBuildPropertyStorage,
-                config);
+            _baseConfiguration.get_DisplayName(out _configuration);
+            _storage = _project.InnerHierarchy as IVsBuildPropertyStorage;
+            _settings = new ProjectConfigurationSettigns(_storage, _configuration);
             _settings.Load();
+        }
+
+        public String GetProperty(String name)
+        {
+            String value;
+            _storage.GetPropertyValue(name, _configuration, (uint)_PersistStorageType.PST_PROJECT_FILE, out value);
+            return value;
         }
 
         /// <summary>
@@ -337,5 +408,8 @@ namespace IceCustomProject
         private Project _project;
         private IVsCfg _baseConfiguration;
         private IVsProjectFlavorCfg _innerConfiguration;
+
+        private IVsBuildPropertyStorage _storage;
+        private String _configuration;
     }
 }

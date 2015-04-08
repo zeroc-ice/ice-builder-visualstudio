@@ -8,16 +8,19 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.VisualStudio;
+using System.IO;
+using ZeroC.IceVisualStudio;
 
 namespace IceCustomProject
 {
     public partial class CSharpConfigurationView : UserControl
     {
-        public CSharpConfigurationView()
+        private PropertyPage _page;
+        public CSharpConfigurationView(PropertyPage page)
         {
+            _page = page;
             InitializeComponent();
         }
-
 
         public virtual void Initialize(Control parent, Rectangle rect)
         {
@@ -34,16 +37,16 @@ namespace IceCustomProject
             return VSConstants.S_FALSE;
         }
 
-        public bool _neeSave;
+        public bool _needSave;
         public Boolean NeedSave
         {
             get 
             {
-                return _neeSave;
+                return _needSave;
             }
             set
             {
-                _neeSave = value;
+                _needSave = value;
             }
         }
 
@@ -121,6 +124,18 @@ namespace IceCustomProject
             }
         }
 
+        public CheckState Underscores
+        {
+            get
+            {
+                return chkUnderscores.CheckState;
+            }
+            set
+            {
+                chkUnderscores.CheckState = value;
+            }
+        }
+
         public String AdditionalOptions
         {
             get
@@ -147,60 +162,67 @@ namespace IceCustomProject
             }
         }
 
+        public int TraceLevel
+        {
+            get
+            {
+                return cmbTraceLevel.SelectedIndex;
+            }
+            set
+            {
+                cmbTraceLevel.SelectedIndex = value;
+            }
+        }
+
+        private bool _traceLevelMultipleValues;
+        public Boolean TraceLevelMultipleValues
+        {
+            get
+            {
+                return _traceLevelMultipleValues;
+            }
+            set
+            {
+                _traceLevelMultipleValues = value;
+            }
+        }
+
         private void txtOutputDir_TextChanged(object sender, EventArgs e)
         {
-            _neeSave = true;
+            NeedSave = true;
         }
 
-        void chkTie_CheckedChanged(object sender, System.EventArgs e)
+        void option_CheckedChanged(object sender, System.EventArgs e)
         {
-            _neeSave = true;
-        }
-
-        void chkChecksum_CheckedChanged(object sender, System.EventArgs e)
-        {
-            _neeSave = true;
-        }
-
-        void chkStreaming_CheckedChanged(object sender, System.EventArgs e)
-        {
-            _neeSave = true;
-        }
-
-        void chkIce_CheckedChanged(object sender, System.EventArgs e)
-        {
-            _neeSave = true;
-        }
-
-        private void label4_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void lblTracingLevel_Click(object sender, EventArgs e)
-        {
-
+            NeedSave = true;
         }
 
         private void btnOutputDirectoryBrowse_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog dialog = new FolderBrowserDialog();
-            dialog.Description = "Select Output Path";
-            DialogResult result = dialog.ShowDialog();
-            if (result == DialogResult.OK)
+            String projectDir = _page.GetProperty("MSBuildProjectDirectory");
+            String outputDir = OutputDir;
+            if(!String.IsNullOrEmpty(outputDir))
             {
-                txtOutputDir.Text = dialog.SelectedPath;
+                outputDir = Path.GetFullPath(Path.Combine(projectDir, outputDir));
+            }
+            dialog.SelectedPath = outputDir;
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                OutputDir = FileUtil.RelativePath(projectDir,  dialog.SelectedPath);
             }
         }
 
-        private void CSharpConfigurationView_Load(object sender, EventArgs e)
+        private void txtAdditionalOptions_TextChanged(object sender, EventArgs e)
         {
-
+            NeedSave = true;
+            AdditionalOptionsMultipleValues = false;
         }
 
-        private void groupBoxGeneral_Enter(object sender, EventArgs e)
+        private void cmbTraceLevel_SelectedIndexChanged(object sender, EventArgs e)
         {
-
+            NeedSave = true;
+            TraceLevelMultipleValues = false;
         }
     }
 }

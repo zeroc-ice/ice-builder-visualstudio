@@ -19,7 +19,7 @@ namespace IceCustomProject
             {
                 if (_view == null)
                 {
-                    _view = new CSharpConfigurationView();
+                    _view = new CSharpConfigurationView(this);
                 }
                 return _view;
             }
@@ -30,6 +30,15 @@ namespace IceCustomProject
         }
 
         private List<ProjectConfiguration> _configs = null;
+
+        public String GetProperty(String name)
+        {
+            if (_configs != null && _configs.Count > 0)
+            {
+                return _configs[0].GetProperty(name);
+            }
+            return "";
+        }
 
         #region IPropertyPage2 methods
 
@@ -71,10 +80,21 @@ namespace IceCustomProject
                         config.Settings.Tie = ConfigurationView.Tie == CheckState.Checked ? true : false;
                     }
 
+                    if (ConfigurationView.Underscores != CheckState.Indeterminate)
+                    {
+                        config.Settings.Underscores = ConfigurationView.Underscores == CheckState.Checked ? true : false;
+                    }
+
                     if(!ConfigurationView.AdditionalOptionsMultipleValues)
                     {
-                        config.Settings.AdditionalOptions = ConfigurationView.OutputDir;
+                        config.Settings.AdditionalOptions = ConfigurationView.AdditionalOptions;
                     }
+
+                    if (!ConfigurationView.TraceLevelMultipleValues)
+                    {
+                        config.Settings.TraceLevel = ConfigurationView.TraceLevel;
+                    }
+
                     config.Settings.Save();
                 }
                 ConfigurationView.NeedSave = false;
@@ -137,7 +157,6 @@ namespace IceCustomProject
                     }
                 }
 
-
                 for(int i = 0; i < _configs.Count; ++i)
                 {
                     ProjectConfiguration config = _configs[i];
@@ -149,8 +168,9 @@ namespace IceCustomProject
                         ConfigurationView.Checksum = config.Settings.Checksum ? CheckState.Checked : CheckState.Unchecked;
                         ConfigurationView.Streaming = config.Settings.Streaming ? CheckState.Checked : CheckState.Unchecked;
                         ConfigurationView.Tie = config.Settings.Tie ? CheckState.Checked : CheckState.Unchecked;
-
+                        ConfigurationView.Underscores = config.Settings.Underscores ? CheckState.Checked : CheckState.Unchecked;
                         ConfigurationView.AdditionalOptions = config.Settings.AdditionalOptions;
+                        ConfigurationView.TraceLevel = config.Settings.TraceLevel;
                     }
                     else
                     {
@@ -184,14 +204,27 @@ namespace IceCustomProject
                             ConfigurationView.Tie = CheckState.Indeterminate;
                         }
 
+                        if (ConfigurationView.Underscores != CheckState.Indeterminate &&
+                           ConfigurationView.Underscores != (config.Settings.Underscores ? CheckState.Checked : CheckState.Unchecked))
+                        {
+                            ConfigurationView.Underscores = CheckState.Indeterminate;
+                        }
+
                         if (!ConfigurationView.AdditionalOptions.Equals(config.Settings.AdditionalOptions))
                         {
                             ConfigurationView.AdditionalOptions = "";
                             ConfigurationView.AdditionalOptionsMultipleValues = true;
                         }
 
+                        if (ConfigurationView.TraceLevel != -1 &&
+                            ConfigurationView.TraceLevel != config.Settings.TraceLevel)
+                        {
+                            ConfigurationView.TraceLevel = -1;
+                            ConfigurationView.TraceLevelMultipleValues = true;
+                        }
                     }
                 }
+                ConfigurationView.NeedSave = false;
             }
         }
 
@@ -243,24 +276,5 @@ namespace IceCustomProject
             return VSConstants.S_OK;
         }
         #endregion
-
-        /// <summary>
-        /// Use a site object with this interface to set up communications between the
-        /// property frame and the property page object.
-        /// http://msdn.microsoft.com/en-us/library/ms690583(VS.85).aspx
-        /// </summary>
-        public IPropertyPageSite PropertyPageSite
-        {
-            get
-            {
-                return _propertyPageSite;
-            }
-            set
-            {
-                _propertyPageSite = value;
-            }
-        }
-
-        private IPropertyPageSite _propertyPageSite;
     }
 }
