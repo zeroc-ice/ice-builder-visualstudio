@@ -30,7 +30,6 @@
         {
             this.lblOutputDirectory = new System.Windows.Forms.Label();
             this.lblSliceCompilerOptions = new System.Windows.Forms.Label();
-            this.lblTracingLevel = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.label2 = new System.Windows.Forms.Label();
@@ -45,15 +44,10 @@
             this.chkStreaming = new System.Windows.Forms.CheckBox();
             this.chkChecksum = new System.Windows.Forms.CheckBox();
             this.chkTie = new System.Windows.Forms.CheckBox();
-            this.includeDirectories = new IceCustomProject.IncludeDirectories();
-            this.label6 = new System.Windows.Forms.Label();
-            this.groupBox5 = new System.Windows.Forms.GroupBox();
-            this.label7 = new System.Windows.Forms.Label();
-            this.cmbTraceLevel = new System.Windows.Forms.ComboBox();
             this.groupBoxGeneral = new System.Windows.Forms.GroupBox();
+            this.includeDirectories = new IceCustomProject.IncludeDirectories();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
-            this.groupBox5.SuspendLayout();
             this.groupBoxGeneral.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -74,15 +68,6 @@
             this.lblSliceCompilerOptions.Size = new System.Drawing.Size(115, 13);
             this.lblSliceCompilerOptions.TabIndex = 27;
             this.lblSliceCompilerOptions.Text = "Slice Compiler Options:";
-            // 
-            // lblTracingLevel
-            // 
-            this.lblTracingLevel.AutoSize = true;
-            this.lblTracingLevel.Location = new System.Drawing.Point(2, 415);
-            this.lblTracingLevel.Name = "lblTracingLevel";
-            this.lblTracingLevel.Size = new System.Drawing.Size(38, 13);
-            this.lblTracingLevel.TabIndex = 29;
-            this.lblTracingLevel.Text = "Trace:";
             // 
             // label1
             // 
@@ -227,70 +212,28 @@
             this.chkTie.UseVisualStyleBackColor = true;
             this.chkTie.CheckStateChanged += new System.EventHandler(this.option_CheckedChanged);
             // 
-            // includeDirectories
-            // 
-            this.includeDirectories.Location = new System.Drawing.Point(12, 105);
-            this.includeDirectories.Name = "includeDirectories";
-            this.includeDirectories.Size = new System.Drawing.Size(631, 158);
-            this.includeDirectories.TabIndex = 46;
-            // 
-            // label6
-            // 
-            this.label6.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.label6.Location = new System.Drawing.Point(46, 422);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(600, 2);
-            this.label6.TabIndex = 55;
-            // 
-            // groupBox5
-            // 
-            this.groupBox5.Controls.Add(this.label7);
-            this.groupBox5.Controls.Add(this.cmbTraceLevel);
-            this.groupBox5.Location = new System.Drawing.Point(9, 431);
-            this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(637, 31);
-            this.groupBox5.TabIndex = 56;
-            this.groupBox5.TabStop = false;
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(9, 6);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(67, 13);
-            this.label7.TabIndex = 48;
-            this.label7.Text = "Trace Level:";
-            // 
-            // cmbTraceLevel
-            // 
-            this.cmbTraceLevel.FormattingEnabled = true;
-            this.cmbTraceLevel.Items.AddRange(new object[] {
-            "Errors Only",
-            "Info",
-            "Debug"});
-            this.cmbTraceLevel.Location = new System.Drawing.Point(236, 6);
-            this.cmbTraceLevel.Name = "cmbTraceLevel";
-            this.cmbTraceLevel.Size = new System.Drawing.Size(323, 21);
-            this.cmbTraceLevel.TabIndex = 35;
-            this.cmbTraceLevel.SelectedIndexChanged += new System.EventHandler(this.cmbTraceLevel_SelectedIndexChanged);
-            // 
             // groupBoxGeneral
             // 
-            this.groupBoxGeneral.Controls.Add(this.groupBox5);
-            this.groupBoxGeneral.Controls.Add(this.label6);
             this.groupBoxGeneral.Controls.Add(this.groupBox2);
             this.groupBoxGeneral.Controls.Add(this.label3);
             this.groupBoxGeneral.Controls.Add(this.groupBox1);
             this.groupBoxGeneral.Controls.Add(this.label1);
-            this.groupBoxGeneral.Controls.Add(this.lblTracingLevel);
             this.groupBoxGeneral.Controls.Add(this.lblSliceCompilerOptions);
             this.groupBoxGeneral.Controls.Add(this.lblOutputDirectory);
             this.groupBoxGeneral.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.groupBoxGeneral.Location = new System.Drawing.Point(0, 0);
             this.groupBoxGeneral.Name = "groupBoxGeneral";
-            this.groupBoxGeneral.Size = new System.Drawing.Size(665, 465);
+            this.groupBoxGeneral.Size = new System.Drawing.Size(665, 429);
             this.groupBoxGeneral.TabIndex = 5;
             this.groupBoxGeneral.TabStop = false;
+            // 
+            // includeDirectories
+            // 
+            this.includeDirectories.Location = new System.Drawing.Point(12, 105);
+            this.includeDirectories.Margin = new System.Windows.Forms.Padding(0);
+            this.includeDirectories.Name = "includeDirectories";
+            this.includeDirectories.Size = new System.Drawing.Size(631, 158);
+            this.includeDirectories.TabIndex = 46;
             // 
             // CSharpConfigurationView
             // 
@@ -299,13 +242,11 @@
             this.AutoScroll = true;
             this.Controls.Add(this.groupBoxGeneral);
             this.Name = "CSharpConfigurationView";
-            this.Size = new System.Drawing.Size(685, 466);
+            this.Size = new System.Drawing.Size(685, 429);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
-            this.groupBox5.ResumeLayout(false);
-            this.groupBox5.PerformLayout();
             this.groupBoxGeneral.ResumeLayout(false);
             this.groupBoxGeneral.PerformLayout();
             this.ResumeLayout(false);
@@ -316,7 +257,6 @@
 
         private System.Windows.Forms.Label lblOutputDirectory;
         private System.Windows.Forms.Label lblSliceCompilerOptions;
-        private System.Windows.Forms.Label lblTracingLevel;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Label label2;
@@ -331,10 +271,6 @@
         private System.Windows.Forms.CheckBox chkTie;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.TextBox txtAdditionalOptions;
-        private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.GroupBox groupBox5;
-        private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.ComboBox cmbTraceLevel;
         private System.Windows.Forms.GroupBox groupBoxGeneral;
         private IncludeDirectories includeDirectories;
 

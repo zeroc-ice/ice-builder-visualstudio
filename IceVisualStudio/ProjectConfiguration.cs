@@ -14,15 +14,14 @@ namespace IceCustomProject
     {
         public readonly uint storageType = (uint)_PersistStorageType.PST_PROJECT_FILE;
 
-        public readonly String outputDirPropertyName = "IceBuilder_OutputDir";
-        public readonly String icePropertyName = "IceBuilder_Ice";
-        public readonly String checksumPropertyName = "IceBuilder_Checksum";
-        public readonly String streamingPropertyName = "IceBuilder_Streaming";
-        public readonly String tiePropertyName = "IceBuilder_Tie";
-        public readonly String underscoresPropertyName = "IceBuilder_Underscores";
-        public readonly String additionalIncludeDirectoriesPropertyName = "IceBuilder_AdditionalIncludeDirectories";
-        public readonly String additionalOptionsPropertyName = "IceBuilder_AdditionalOptions";
-        public readonly String traceLevelPropertyName = "IceBuilder_TraceLevel";
+        public readonly String outputDirPropertyName = "OutputDir";
+        public readonly String icePropertyName = "Ice";
+        public readonly String checksumPropertyName = "Checksum";
+        public readonly String streamingPropertyName = "Stream";
+        public readonly String tiePropertyName = "Tie";
+        public readonly String underscoresPropertyName = "Underscore";
+        public readonly String additionalIncludeDirectoriesPropertyName = "AdditionalSliceIncludeDirectories";
+        public readonly String additionalOptionsPropertyName = "AdditionalOptions";
 
         private bool outputDirNeedSave = false;
         private bool iceNeedSave = false;
@@ -32,7 +31,6 @@ namespace IceCustomProject
         private bool underscoresNeedSave = false;
         private bool additionalIncludeDirectoriesNeedSave = false;
         private bool additionalOptionsNeedSave = false;
-        private bool traceLevelNeedSave = false;
 
         public Boolean NeedSave
         {
@@ -45,8 +43,7 @@ namespace IceCustomProject
                     tieNeedSave ||
                     underscoresNeedSave ||
                     additionalIncludeDirectoriesNeedSave ||
-                    additionalOptionsNeedSave ||
-                    traceLevelNeedSave;
+                    additionalOptionsNeedSave;
             }
         }
 
@@ -90,15 +87,6 @@ namespace IceCustomProject
             _storage.GetPropertyValue(additionalOptionsPropertyName, _configuration, storageType, out value);
             AdditionalOptions = value == null ? "" : value;
             additionalOptionsNeedSave = false;
-
-            _storage.GetPropertyValue(traceLevelPropertyName, _configuration, storageType, out value);
-            int traceLevel = 0;
-            if(value != null)
-            {
-                Int32.TryParse(value, out traceLevel);
-            }
-            TraceLevel = traceLevel;
-            traceLevelNeedSave = false;
         }
 
         public void Save()
@@ -106,6 +94,7 @@ namespace IceCustomProject
             if (outputDirNeedSave)
             {
                 _storage.SetPropertyValue(outputDirPropertyName, _configuration, storageType, OutputDir);
+                
                 outputDirNeedSave = false;
             }
 
@@ -150,12 +139,6 @@ namespace IceCustomProject
             {
                 _storage.SetPropertyValue(additionalOptionsPropertyName, _configuration, storageType, AdditionalOptions);
                 additionalOptionsNeedSave = false;
-            }
-
-            if (traceLevelNeedSave)
-            {
-                _storage.SetPropertyValue(traceLevelPropertyName, _configuration, storageType, TraceLevel.ToString());
-                traceLevelNeedSave = false;
             }
         }
 
@@ -291,23 +274,6 @@ namespace IceCustomProject
                 {
                     _additionalOptions = value;
                     additionalOptionsNeedSave = true;
-                }
-            }
-        }
-
-        private int _traceLevel;
-        public int TraceLevel
-        {
-            get
-            {
-                return _traceLevel;
-            }
-            set
-            {
-                if (_traceLevel != value)
-                {
-                    _traceLevel = value;
-                    traceLevelNeedSave = true;
                 }
             }
         }

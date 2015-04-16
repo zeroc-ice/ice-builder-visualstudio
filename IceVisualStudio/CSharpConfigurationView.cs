@@ -20,6 +20,7 @@ namespace IceCustomProject
         {
             _page = page;
             InitializeComponent();
+            includeDirectories.PropertyPage = page;
         }
 
         public virtual void Initialize(Control parent, Rectangle rect)
@@ -42,7 +43,7 @@ namespace IceCustomProject
         {
             get 
             {
-                return _needSave;
+                return _needSave || includeDirectories.NeedSave;
             }
             set
             {
@@ -162,18 +163,6 @@ namespace IceCustomProject
             }
         }
 
-        public int TraceLevel
-        {
-            get
-            {
-                return cmbTraceLevel.SelectedIndex;
-            }
-            set
-            {
-                cmbTraceLevel.SelectedIndex = value;
-            }
-        }
-
         private bool _traceLevelMultipleValues;
         public Boolean TraceLevelMultipleValues
         {
@@ -184,6 +173,14 @@ namespace IceCustomProject
             set
             {
                 _traceLevelMultipleValues = value;
+            }
+        }
+
+        public IncludeDirectories AdditionalIncludeDirectories
+        {
+            get
+            {
+                return includeDirectories;
             }
         }
 
@@ -199,17 +196,11 @@ namespace IceCustomProject
 
         private void btnOutputDirectoryBrowse_Click(object sender, EventArgs e)
         {
-            FolderBrowserDialog dialog = new FolderBrowserDialog();
             String projectDir = _page.GetProperty("MSBuildProjectDirectory");
-            String outputDir = OutputDir;
-            if(!String.IsNullOrEmpty(outputDir))
+            String selectedPath = UIUtil.BrowserFolderDialog(Handle, "Select Output Directory", projectDir);
+            if (!String.IsNullOrEmpty(selectedPath))
             {
-                outputDir = Path.GetFullPath(Path.Combine(projectDir, outputDir));
-            }
-            dialog.SelectedPath = outputDir;
-            if (dialog.ShowDialog() == DialogResult.OK)
-            {
-                OutputDir = FileUtil.RelativePath(projectDir,  dialog.SelectedPath);
+                OutputDir = FileUtil.RelativePath(projectDir, selectedPath);
             }
         }
 

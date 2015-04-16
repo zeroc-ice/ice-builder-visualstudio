@@ -52,12 +52,15 @@ namespace ZeroC.IceVisualStudio
 
         public override void SaveSettingsToStorage()
         {
-            IceVisualStudioPackage.setIceHome(_value);
+            if(!Package.Instance.GetIceHome().Equals(_value))
+            {
+                Package.Instance.SetIceHome(_value);
+            }
         }
 
         public override void LoadSettingsFromStorage()
         {
-            _value = IceVisualStudioPackage.getIceHome();
+            _value = Package.Instance.GetIceHome();
         }
 
         private String _value;

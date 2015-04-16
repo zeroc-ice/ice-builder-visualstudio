@@ -85,14 +85,15 @@ namespace IceCustomProject
                         config.Settings.Underscores = ConfigurationView.Underscores == CheckState.Checked ? true : false;
                     }
 
+                    if (!ConfigurationView.AdditionalIncludeDirectories.MultipleValues)
+                    {
+                        config.Settings.AdditionalIncludeDirectories = 
+                            String.Join(";", ConfigurationView.AdditionalIncludeDirectories.Values);
+                    }
+
                     if(!ConfigurationView.AdditionalOptionsMultipleValues)
                     {
                         config.Settings.AdditionalOptions = ConfigurationView.AdditionalOptions;
-                    }
-
-                    if (!ConfigurationView.TraceLevelMultipleValues)
-                    {
-                        config.Settings.TraceLevel = ConfigurationView.TraceLevel;
                     }
 
                     config.Settings.Save();
@@ -169,8 +170,9 @@ namespace IceCustomProject
                         ConfigurationView.Streaming = config.Settings.Streaming ? CheckState.Checked : CheckState.Unchecked;
                         ConfigurationView.Tie = config.Settings.Tie ? CheckState.Checked : CheckState.Unchecked;
                         ConfigurationView.Underscores = config.Settings.Underscores ? CheckState.Checked : CheckState.Unchecked;
+                        ConfigurationView.AdditionalIncludeDirectories.Values = new List<String>(
+                            config.Settings.AdditionalIncludeDirectories.Split(new char[]{';'}, StringSplitOptions.RemoveEmptyEntries));
                         ConfigurationView.AdditionalOptions = config.Settings.AdditionalOptions;
-                        ConfigurationView.TraceLevel = config.Settings.TraceLevel;
                     }
                     else
                     {
@@ -210,17 +212,17 @@ namespace IceCustomProject
                             ConfigurationView.Underscores = CheckState.Indeterminate;
                         }
 
+                        if (!String.Join(";", ConfigurationView.AdditionalIncludeDirectories.Values).Equals(
+                            config.Settings.AdditionalIncludeDirectories))
+                        {
+                            ConfigurationView.AdditionalIncludeDirectories.Values = new List<String>();
+                            ConfigurationView.AdditionalIncludeDirectories.MultipleValues = true;
+                        }
+
                         if (!ConfigurationView.AdditionalOptions.Equals(config.Settings.AdditionalOptions))
                         {
                             ConfigurationView.AdditionalOptions = "";
                             ConfigurationView.AdditionalOptionsMultipleValues = true;
-                        }
-
-                        if (ConfigurationView.TraceLevel != -1 &&
-                            ConfigurationView.TraceLevel != config.Settings.TraceLevel)
-                        {
-                            ConfigurationView.TraceLevel = -1;
-                            ConfigurationView.TraceLevelMultipleValues = true;
                         }
                     }
                 }

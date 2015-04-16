@@ -10,7 +10,7 @@
     <PreviewImage>Resources\Preview.png</PreviewImage>
     <Tags>ZeroC, Ice, Slice</Tags>
   </Metadata>
-  <Installation InstalledByMsi="false">
+  <Installation>
     <InstallationTarget Version="[11.0, 12.0]" Id="Microsoft.VisualStudio.Pro" />
   </Installation>
   <Dependencies>
@@ -21,6 +21,5 @@
     <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
     <Asset Type="Microsoft.VisualStudio.ItemTemplate" d:Source="Project" d:ProjectName="CSharpSliceItemTemplate" d:TargetPath="|CSharpSliceItemTemplate;TemplateProjectOutputGroup|" Path="ItemTemplates" d:VsixSubPath="ItemTemplates" />
     <Asset Type="Microsoft.VisualStudio.ItemTemplate" d:Source="Project" d:ProjectName="VCSliceItemTemplate" d:TargetPath="|VCSliceItemTemplate;TemplateProjectOutputGroup|" Path="ItemTemplates" d:VsixSubPath="ItemTemplates" />
-    <Asset Type="Microsoft.VisualStudio.Assembly" d:Source="Project" d:ProjectName="IceBuilder_Common" Path="|IceBuilder_Common|" AssemblyName="|IceBuilder_Common;AssemblyName|" />
   </Assets>
 </PackageManifest>

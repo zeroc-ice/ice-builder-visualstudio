@@ -194,24 +194,6 @@ namespace ZeroC.IceVisualStudio
                 }
             }
 
-            if(_configurationCommand != null)
-            {
-                Project p = getActiveProject();
-                if(p != null)
-                {
-                    _configurationCommand.Visible = Util.isCppProject(p) ||
-                                                    Util.isCSharpProject(p) ||
-                                                    Util.isSilverlightProject(p);
-                }
-                else
-                {
-                    _configurationCommand.Visible = false;
-                }
-                _configurationCommand.Visible = false;
-                _configurationCommand.Enabled = false;
-                _configurationCommand.Supported = false;
-            }
-
             _serviceProvider =
                     new ServiceProvider((Microsoft.VisualStudio.OLE.Interop.IServiceProvider)_dte2.DTE);
             initErrorListProvider();
@@ -219,37 +201,7 @@ namespace ZeroC.IceVisualStudio
 
         void selectionChange()
         {
-            try
-            {
-                Project p = getActiveProject();
-                if(p != null)
-                {
-
-                    if(Util.isSliceBuilderEnabled(p))
-                    {
-                        initializeProject(p);
-                        _configurationCommand.Enabled = true;
-                    }
-                    else
-                    {
-                        _configurationCommand.Visible = Util.isCppProject(p) || 
-                                                        Util.isCSharpProject(p) || 
-                                                        Util.isSilverlightProject(p);
-                    }
-                }
-                else
-                {
-                    _configurationCommand.Visible = false;
-                }
-                _configurationCommand.Visible = false;
-                _configurationCommand.Enabled = false;
-                _configurationCommand.Supported = false;
-            }
-            catch(Exception ex)
-            {
-                Util.unexpectedExceptionWarning(ex);
-                throw;
-            }
+            
         }
 
         void initializeProject(Project p)
@@ -3468,76 +3420,11 @@ namespace ZeroC.IceVisualStudio
             return _instance;
         }
 
-        public static Builder create(IVsShell shell, EnvDTE80.DTE2 dte2, MenuCommand configurationCommand)
+        public static Builder create(IVsShell shell, EnvDTE80.DTE2 dte2)
         {
             if(_instance == null)
             {
-                String assemblyDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-
-                //
-                // Unistall the old version of the add-in
-                //
-                foreach(AddIn addin in dte2.AddIns)
-                {
-                    if(addin.ProgID.Equals("Ice.VisualStudio.Connect"))
-                    {
-                        String path = Path.Combine(System.Environment.GetEnvironmentVariable("ALLUSERSPROFILE"),
-                           (dte2.DTE.Version.StartsWith("11.0") ?            
-                                "Microsoft\\VisualStudio\\11.0\\Addins\\Ice-VS2012.AddIn" :
-                                "Microsoft\\VisualStudio\\12.0\\Addins\\Ice-VS2013.AddIn"));
-
-                        if(File.Exists(path))
-                        {
-                            System.Diagnostics.Process process = new System.Diagnostics.Process();
-                            process.StartInfo.FileName = Path.Combine(assemblyDir, "AddinRemoval.exe");
-                            process.StartInfo.Arguments = String.Format("\"{0}\"", path);
-                            process.StartInfo.CreateNoWindow = true;
-                            process.StartInfo.UseShellExecute = true;
-                            process.Start();
-                            process.WaitForExit();
-                            if(process.ExitCode == 0)
-                            {
-                                dte2.Events.DTEEvents.OnStartupComplete += DTEEvents_OnStartupComplete;
-                            }
-                            else
-                            {
-                                throw new InitializationException(
-                                    "Error trying to disable Ice Visual Studio Add-in:\n" + path);
-                            }
-                        }
-                        break;
-                    }
-                }
-
-                //
-                // Copy Ice.props property sheet and IceBuilder.xml if required.
-                //
-                String dataDir = Path.Combine(Environment.GetEnvironmentVariable("LOCALAPPDATA"),
-                                          "ZeroC\\IceVisualStudioExtension");
-
-                if(!Directory.Exists(dataDir))
-                {
-                    Directory.CreateDirectory(dataDir);
-                }
-
-                foreach(String f in new String[] { "Ice.props", "IceBuilder.xml" })
-                {
-                    if(!File.Exists(Path.Combine(dataDir, f)))
-                    {
-                        File.Copy(Path.Combine(assemblyDir, f),
-                                  Path.Combine(dataDir, f));
-                    }
-                    else
-                    {
-                        byte[] data1 = File.ReadAllBytes(Path.Combine(assemblyDir, f));
-                        byte[] data2 = File.ReadAllBytes(Path.Combine(dataDir, f));
-                        if(!data1.SequenceEqual(data2))
-                        {
-                            File.Copy(Path.Combine(assemblyDir, f),
-                                      Path.Combine(dataDir, f), true);
-                        }
-                    }
-                }
+                
                 bool commandLineMode = false;
                 if(shell != null)
                 {
@@ -3548,7 +3435,6 @@ namespace ZeroC.IceVisualStudio
 
                 _instance = new Builder();
                 _instance._shell = shell;
-                _instance._configurationCommand = configurationCommand;
                 _instance.init(dte2, commandLineMode);
 
                 //
@@ -3602,7 +3488,6 @@ namespace ZeroC.IceVisualStudio
         };
 
         private IVsShell _shell;
-        private MenuCommand _configurationCommand;
         private DTE2 _dte2;
         private SolutionEvents _solutionEvents;
         private SelectionEvents _selectionEvents;

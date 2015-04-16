@@ -74,7 +74,7 @@ namespace IceCustomProject
         public int CreateProjectFlavorCfg(IVsCfg pBaseProjectCfg, out IVsProjectFlavorCfg ppFlavorCfg)
         {
             IVsProjectFlavorCfg cfg = null;
-            if(_cfgProvider != null)
+            if (_cfgProvider != null)
             {
                 _cfgProvider.CreateProjectFlavorCfg(pBaseProjectCfg, out cfg);
             }
@@ -92,6 +92,19 @@ namespace IceCustomProject
             {
                 return this._innerVsHierarchy;
             }
+        }
+
+        public EnvDTE.Project InnerProject
+        {
+            get
+            {
+                object o;
+                GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_ExtObject, out o);
+
+                var project = o as EnvDTE.Project;
+                return project;
+            }
+    
         }
 
         protected IVsProjectFlavorCfgProvider _cfgProvider = null;
