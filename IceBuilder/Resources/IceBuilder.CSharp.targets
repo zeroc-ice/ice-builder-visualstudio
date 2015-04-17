@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) 2009-2015 ZeroC, Inc. All rights reserved. -->
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+
+  <Target Name="IceBuilder_Items">
+
+    <Error Text="Ice Installation not detected. You may need to update Ice Home in 'Tools > Options > Ice Builder'"
+           Condition="'$(IceHome)' == ''" />
+
+    <ItemGroup>
+      <IceBuilder Include="@(None)" Condition="'%(Extension)'=='.ice'"/>
+    </ItemGroup>
+    
+    <!-- Escape properties before we can use then in the tasks -->
+    <PropertyGroup>
+      <_OutputDir Condition="'$(OutputDir)' != ''">$([MSBuild]::Unescape($(OutputDir)))</_OutputDir>
+      <_OutputDir Condition="'$(OutputDir)' == ''">$(ProjectDir)</_OutputDir>
+      <_AdditionalIncludeDirectories>$([MSBuild]::Unescape($(AdditionalIncludeDirectories)))</_AdditionalIncludeDirectories>
+      <_AdditionalOptions>$([MSBuild]::Unescape($(AdditionalOptions)))</_AdditionalOptions>
+      <IncludeDirectories>$(_AdditionalIncludeDirectories);$(IceHome)\slice;.</IncludeDirectories>
+    </PropertyGroup>
+  </Target>
+  
+  <Target Name="IceBuilder_Generated" DependsOnTargets="IceBuilder_Items" 
+          Condition="'$(IncludeGeneratedItems)' == 'Yes'">    
+    <Slice2CSharpGeneratedTask OutputDir="$(_OutputDir)" Sources="@(IceBuilder)">
+      <Output ItemName="Compile" TaskParameter="GeneratedSources"/>
+    </Slice2CSharpGeneratedTask>
+  </Target>
+
+  <Target Name="IceBuilder_Depend"
+          DependsOnTargets="IceBuilder_Items"
+          Inputs="@(IceBuilder)"
+          Outputs="$(_OutputDir)\IceBuilder.Depend.xml">
+    <Message Text="Updating Slice File Dependencies"/>
+    <MakeDir Directories="$(_OutputDir)" Condition="!Exists('$(_OutputDir)')"/>
+    <Slice2CSharpDependTask IceHome="$(IceHome)"
+                     OutputDir="$(_OutputDir)"
+                     WorkingDirectory="$(MSBuildProjectDirectory)"
+                     DependFile="$(_OutputDir)\IceBuilder.Depend.xml"
+                     IncludeDirectories="$(IncludeDirectories)"
+                     AdditionalOptions="$(_AdditionalOptions)"
+                     Sources="@(IceBuilder)">
+      <Output ItemName="_IceBuilder" TaskParameter="Outputs"/>
+    </Slice2CSharpDependTask>
+  </Target>
+
+  <Target Name="IceBuilder_Compile"
+          DependsOnTargets="IceBuilder_Depend;IceBuilder_Generated;IceBuilder_Items"
+          Inputs="%(_IceBuilder.FullPath);%(_IceBuilder.Depends)"
+          Outputs="$(_OutputDir)\%(_IceBuilder.RelativeDir)%(_IceBuilder.FileName).cs">
+    <MakeDir Directories="$(OutputDir)" Condition="!Exists('$(OutputDir)')"/>
+    <Message Text="Compiling %(_IceBuilder.Identity)"/>
+    <Slice2CSharpTask IceHome="$(IceHome)"
+                   OutputDir="$(_OutputDir)"
+                   WorkingDirectory="$(MSBuildProjectDirectory)"
+                   Ice="$(Ice)"
+                   Underscore="$(Underscore)"
+                   Stream="$(Stream)"
+                   Checksum="$(Checksum)"
+                   IncludeDirectories="$(IncludeDirectories)"
+                   AdditionalOptions="$(_AdditionalOptions)"
+                   Sources="%(_IceBuilder.Identity)"/>
+  </Target>
+
+  <Target Name="IceBuilder_Clean" BeforeTargets="Clean" DependsOnTargets="IceBuilder_Items">
+    <Delete Files="$([System.IO.Path]::Combine($(_OutputDir), %(IceBuilder.RelativeDir), %(IceBuilder.FileName).cs))"/>
+    <Delete Files="$(_OutputDir)\IceBuilder.Depend.xml"/>
+  </Target>
+
+  <PropertyGroup>
+    <BuildDependsOn>
+      IceBuilder_Compile;
+      $(BuildDependsOn);
+    </BuildDependsOn>
+  </PropertyGroup>
+</Project>

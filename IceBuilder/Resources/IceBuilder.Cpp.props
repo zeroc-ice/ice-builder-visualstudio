@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) 2009-2015 ZeroC, Inc. All rights reserved. -->
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- Import IceBuilder common settings -->
+  <Import Project="$(MSBuildThisFileDirectory)\IceBuilder.Common.props"/>
+  
+  <!-- Import our custom MSbuild tasks used to build Ice C++ projects -->
+  <UsingTask TaskName="IceBuilder.Slice2CppTask"
+             AssemblyFile="$(MSBuildThisFileDirectory)IceBuilder.Tasks.dll" />
+
+  <UsingTask TaskName="IceBuilder.Slice2CppGeneratedTask"
+             AssemblyFile="$(MSBuildThisFileDirectory)IceBuilder.Tasks.dll" />
+
+  <UsingTask TaskName="IceBuilder.Slice2CppDependTask"
+             AssemblyFile="$(MSBuildThisFileDirectory)IceBuilder.Tasks.dll" />
+  
+  <Choose>
+    <!-- Windows store application settings -->
+    <When Condition="'$(ApplicationType)' == 'Windows Store'">
+      <PropertyGroup Condition="!Exists('$(IceSourceHome)')">
+        <IceSDKDirectory>$(IceHome)\SDKs\</IceSDKDirectory>
+      </PropertyGroup>
+      <PropertyGroup Condition="Exists('$(IceSourceHome)')">
+        <IceSDKDirectory>$(IceHome)\cpp\SDKs\</IceSDKDirectory>
+      </PropertyGroup>
+      <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+        <ConfigurationPrefix>Debug</ConfigurationPrefix>
+      </PropertyGroup>
+      <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+        <ConfigurationPrefix>Retail</ConfigurationPrefix>
+      </PropertyGroup>
+      <!-- Set Include, Library and SDK search paths for the given platform and configuration -->
+      <PropertyGroup>
+        <IncludePath>$(IceSDKDirectory)\$(TargetPlatformIdentifier)\v$(TargetPlatformVersion)\ExtensionSDKs\Ice\$(IceVersionMM)\Designtime\CommonConfiguration\Neutral\include;$(IncludePath)</IncludePath>
+        <LibraryPath>$(IceSDKDirectory)\$(TargetPlatformIdentifier)\v$(TargetPlatformVersion)\ExtensionSDKs\Ice\$(IceVersionMM)\Designtime\$(ConfigurationPrefix)\$(PlatformTarget);$(LibraryPath)</LibraryPath>
+        <SDKReferenceDirectoryRoot>$(IceSDKDirectory);$(SDKReferenceDirectoryRoot);$(ExtensionSDKDirectoryRoot)</SDKReferenceDirectoryRoot>
+      </PropertyGroup>
+      <!-- Add a reference to the Ice SDK -->
+      <ItemGroup>
+        <SDKReference Include="Ice, Version=$(IceVersionMM)" />
+      </ItemGroup>
+    </When>
+    <!-- Windows C++ application settings-->
+    <When Condition="'$(ApplicationType)' != 'Windows Store'">
+      <!-- Configure the library and binary paths for the given platform and configuration -->
+      <Choose>
+        <!-- 3.6 targets -->
+        <When Condition="'$(IceVersionMM)' == '3.6'">
+          <!-- Ice 3.6 binary distribution with Visual Sudio 2012 Win32 -->
+          <PropertyGroup Condition="!Exists('$(IceSourceHome)') And '$(Platform)' == 'Win32' And '$(PlatformToolset)' == 'v110'">
+            <IceLib>$(IceHome)\lib\vc110\</IceLib>
+            <IceBin>$(IceHome)\bin\vc110\</IceBin>
+          </PropertyGroup>
+          <!-- Ice 3.6 binary distribution with Visual Sudio 2012 x64 -->
+          <PropertyGroup Condition="!Exists('$(IceSourceHome)') And '$(Platform)' != 'Win32' And '$(PlatformToolset)' == 'v110'">
+            <IceLib>$(IceHome)\lib\vc110\$(Platform)\</IceLib>
+            <IceBin>$(IceHome)\bin\vc110\$(Platform)\</IceBin>
+          </PropertyGroup>
+          <!-- Ice 3.6 binary distribution with Visual Sudio 2013 Win32 -->
+          <PropertyGroup Condition="!Exists('$(IceSourceHome)') And '$(Platform)' == 'Win32' And '$(PlatformToolset)' == 'v120'">
+            <IceLib>$(IceHome)\lib\</IceLib>
+            <IceBin>$(IceHome)\bin\</IceBin>
+          </PropertyGroup>
+          <!-- Ice 3.6 binary distribution with Visual Sudio 2013 x64 -->
+          <PropertyGroup Condition="!Exists('$(IceSourceHome)') And '$(Platform)' != 'Win32' And '$(PlatformToolset)' == 'v120'">
+            <IceLib>$(IceHome)\lib\$(Platform)\</IceLib>
+            <IceBin>$(IceHome)\bin\$(Platform)\</IceBin>
+          </PropertyGroup>
+        </When>
+      </Choose>
+      <!-- Binary distributions include path -->
+      <PropertyGroup Condition="!Exists('$(IceSourceHome)')">
+        <IceInclude>$(IceHome)\cpp\include\</IceInclude>
+      </PropertyGroup>
+      <!-- Source distributions library, binary and  include paths -->
+      <PropertyGroup Condition="Exists('$(IceSourceHome)')">
+        <IceInclude>$(IceHome)\cpp\include\</IceInclude>
+        <IceBin>$(IceHome)\cpp\bin\</IceBin>
+        <IceLib>$(IceHome)\cpp\lib\</IceLib>
+      </PropertyGroup>
+      <!-- Preprend our settings to C++ configuration settings -->
+      <PropertyGroup>
+        <IncludePath>$(IceInclude);$(IncludePath)</IncludePath>
+        <LibraryPath>$(IceLib);$(LibraryPath)</LibraryPath>
+        <ExecutablePath>$(IceBin);$(ExecutablePath)</ExecutablePath>
+      </PropertyGroup>
+      <ItemGroup>
+        <BuildMacro Include="IceInclude">
+          <Value>$(IceInclude)</Value>
+          <EnvironmentVariable>true</EnvironmentVariable>
+        </BuildMacro>
+        <BuildMacro Include="IceLib">
+          <Value>$(IceLib)</Value>
+          <EnvironmentVariable>true</EnvironmentVariable>
+        </BuildMacro>
+        <BuildMacro Include="IceBin">
+          <Value>$(IceBin)</Value>
+          <EnvironmentVariable>true</EnvironmentVariable>
+        </BuildMacro>
+      </ItemGroup>
+      </When>
+    </Choose>
+  
+  <!-- Default settings for IceBuilder -->
+  <ItemDefinitionGroup>
+    <IceBuilder>
+      <OutputDir>$(ProjectDir)generated\</OutputDir>
+      <IcePrefix>false</IcePrefix>
+      <Underscore>false</Underscore>
+      <Checksum>false</Checksum>
+      <Streaming>false</Streaming>
+      <HeaderExt>h</HeaderExt>
+      <SourceExt>cpp</SourceExt>
+      <AdditionalIncludeDirectories>$(IceHome)\slice\;.</AdditionalIncludeDirectories>
+      <TracingLevel>Info</TracingLevel>
+    </IceBuilder>
+  </ItemDefinitionGroup>
+</Project>
