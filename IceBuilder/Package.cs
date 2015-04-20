@@ -426,7 +426,9 @@ namespace IceBuilder
 
         public string GetIceHome()
         {
-            return (String)Microsoft.Win32.Registry.GetValue(IceHomeKey, IceHomeValue, "");
+            // IceHome will be null if IceHomeKey is not in the registry
+            string IceHome = (String)Microsoft.Win32.Registry.GetValue(IceHomeKey, IceHomeValue, "");
+            return (IceHome == null) ? String.Empty : IceHome;
         }
 
         public System.Version GetIceVersion()
