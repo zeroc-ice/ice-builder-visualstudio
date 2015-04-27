@@ -63,34 +63,14 @@ namespace IceBuilder
 
         public static String GetOutputDir(EnvDTE.ProjectItem item)
         {
-            if (DTEUtil.IsCSharpProject(item.ContainingProject))
-            {
-                return Path.GetFullPath(
-                    Path.Combine(Path.GetDirectoryName(item.ContainingProject.FullName),
-                                 GetEvaluatedProperty(item.ContainingProject, "OutputDir")));
-            }
-            else
-            {
-                return Path.GetFullPath(
-                    Path.Combine(Path.GetDirectoryName(item.ContainingProject.FullName),
-                    GetEvaluatedMetadata(item.ContainingProject, item, "OutputDir")));
-            }
+            return GetOutputDir(item.ContainingProject);
         }
 
         public static String GetOutputDir(EnvDTE.Project project)
         {
-            if (DTEUtil.IsCSharpProject(project))
-            {
-                return Path.GetFullPath(
-                    Path.Combine(Path.GetDirectoryName(project.FullName),
-                                 GetEvaluatedProperty(project, "OutputDir")));
-            }
-            else
-            {
-                return Path.GetFullPath(
-                    Path.Combine(Path.GetDirectoryName(project.FullName),
-                    GetEvaluatedMetadata(project, "OutputDir")));
-            }
+            return Path.GetFullPath(
+                Path.Combine(Path.GetDirectoryName(project.FullName),
+                             GetEvaluatedProperty(project, "OutputDir")));
         }
 
         public static String GetProperty(EnvDTE.Project project, String name)
@@ -120,32 +100,7 @@ namespace IceBuilder
             return String.IsNullOrEmpty(value) ? defaultValue : value;
         }
 
-        public static String GetEvaluatedMetadata(EnvDTE.Project project, EnvDTE.ProjectItem item, String name)
-        {
-            return GetEvaluatedMetadata(project, item, name, String.Empty);
-        }
-
-        public static String GetEvaluatedMetadata(EnvDTE.Project project, EnvDTE.ProjectItem item, String name, String defaultValue)
-        {
-            String value = MSBuildUtils.GetEvaluatedMetadata(
-                MSBuildUtils.LoadedProject(project.FullName), 
-                "IceBuilder",
-                FileUtil.RelativePath(Path.GetDirectoryName(project.FullName), item.FileNames[1]),
-                name);
-            return String.IsNullOrEmpty(value) ? defaultValue : value;
-        }
-
-        public static String GetEvaluatedMetadata(EnvDTE.Project project, String name)
-        {
-            return GetEvaluatedMetadata(project, name, String.Empty);
-        }
-
-        public static String GetEvaluatedMetadata(EnvDTE.Project project, String name, String defaultValue)
-        {
-            String value = MSBuildUtils.GetEvaluatedMetadata(MSBuildUtils.LoadedProject(project.FullName), "IceBuilder", name);
-            return String.IsNullOrEmpty(value) ? defaultValue : value;
-        }
-
+       
         public static String GetPathRelativeToProject(EnvDTE.Project project, String path)
         {
             return FileUtil.RelativePath(GetProjectBaseDirectory(project), path);
