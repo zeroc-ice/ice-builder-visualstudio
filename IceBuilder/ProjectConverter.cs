@@ -223,150 +223,116 @@ namespace IceBuilder
 
         private static bool UpdateCSharpConfiguration(Microsoft.Build.Evaluation.Project project, OldConfiguration cfg)
         {
-            foreach (ProjectPropertyGroupElement group in project.Xml.PropertyGroups)
+            ProjectPropertyGroupElement propertyGroup = project.Xml.PropertyGroups.FirstOrDefault(g => g.Label.Equals("IceBuilder"));
+            if (propertyGroup == null)
             {
-                if (group.Condition.IndexOf("'$(Configuration)|$(Platform)'") != -1)
-                {
-                    if (!String.IsNullOrEmpty(cfg.OutputDir))
-                    {
-                        group.AddProperty("OutputDir", cfg.OutputDir);
-                    }
-
-                    if (!String.IsNullOrEmpty(cfg.HeaderExt))
-                    {
-                        group.AddProperty("HeaderExt", cfg.HeaderExt);
-                    }
-
-                    if (!String.IsNullOrEmpty(cfg.SourceExt))
-                    {
-                        group.AddProperty("SourceExt", cfg.SourceExt);
-                    }
-
-                    if (!String.IsNullOrEmpty(cfg.AdditionalOptions))
-                    {
-                        group.AddProperty("AdditionalOptions", cfg.AdditionalOptions);
-                    }
-
-                    if (!String.IsNullOrEmpty(cfg.AdditionalIncludeDirectories))
-                    {
-                        group.AddProperty("AdditionalIncludeDirectories", cfg.AdditionalIncludeDirectories);
-                    }
-
-                    if (cfg.Stream)
-                    {
-                        group.AddProperty("Stream", "True");
-                    }
-
-                    if (cfg.Checksum)
-                    {
-                        group.AddProperty("CheckSum", "True");
-                    }
-
-                    if (cfg.Ice)
-                    {
-                        group.AddProperty("Ice", "True");
-                    }
-
-                    if (cfg.Tie)
-                    {
-                        group.AddProperty("Tie", "True");
-                    }
-                }
+                propertyGroup = project.Xml.AddPropertyGroup();
+                propertyGroup.Label = "IceBuilder";
             }
 
-            ICollection<ProjectItem> items = project.GetItems("None");
-            ICollection<ProjectItem> generatedItems = project.GetItems("Compile");
-
-
-            foreach (ProjectItem j in generatedItems)
+            if (!String.IsNullOrEmpty(cfg.OutputDir))
             {
-                foreach (ProjectItem k in items)
-                {
-                    if (Path.GetExtension(k.UnevaluatedInclude).Equals(".ice"))
-                    {
-                        if (Path.GetFullPath(j.UnevaluatedInclude).Equals(
-                            String.IsNullOrEmpty(cfg.OutputDir) ?
-                                Path.GetFullPath(Path.ChangeExtension(k.UnevaluatedInclude, Path.GetExtension(j.UnevaluatedInclude))) :
-                                Path.GetFullPath(
-                                    Path.Combine(cfg.OutputDir,
-                                                    Path.ChangeExtension(k.UnevaluatedInclude, Path.GetExtension(j.UnevaluatedInclude))))))
-                        {
-                            j.SetMetadataValue("DependentUpon", k.UnevaluatedInclude);
-                            j.SetMetadataValue("AutoGen", "True");
-                            break;
-                        }
-                    }
-                }
+                propertyGroup.AddProperty("OutputDir", cfg.OutputDir);
             }
 
-            
-            //
-            // Remove old property sheet from all configurations
-            //
-            IEnumerable<ProjectImportElement> imports = project.Xml.Imports.Where(
-                p => p.Project.Equals("$(ICE_HOME)\\config\\Slice.CSharp.targets"));
-            if(imports != null)
+            if (!String.IsNullOrEmpty(cfg.HeaderExt))
             {
-                foreach (ProjectImportElement import in imports)
-                {
-                    import.Parent.RemoveChild(import);
-                }
-                return true;
+                propertyGroup.AddProperty("HeaderExt", cfg.HeaderExt);
+            }
+
+            if (!String.IsNullOrEmpty(cfg.SourceExt))
+            {
+                propertyGroup.AddProperty("SourceExt", cfg.SourceExt);
+            }
+
+            if (!String.IsNullOrEmpty(cfg.AdditionalOptions))
+            {
+                propertyGroup.AddProperty("AdditionalOptions", cfg.AdditionalOptions);
+            }
+
+            if (!String.IsNullOrEmpty(cfg.AdditionalIncludeDirectories))
+            {
+                propertyGroup.AddProperty("AdditionalIncludeDirectories", cfg.AdditionalIncludeDirectories);
+            }
+
+            if (cfg.Stream)
+            {
+                propertyGroup.AddProperty("Stream", "True");
+            }
+
+            if (cfg.Checksum)
+            {
+                propertyGroup.AddProperty("CheckSum", "True");
+            }
+
+            if (cfg.Ice)
+            {
+                propertyGroup.AddProperty("Ice", "True");
+            }
+
+            if (cfg.Tie)
+            {
+                propertyGroup.AddProperty("Tie", "True");
             }
             return true;
         }
 
         private static bool UpdateCppConfiguration(Microsoft.Build.Evaluation.Project project, OldConfiguration cfg)
         {
+            ProjectPropertyGroupElement propertyGroup = project.Xml.PropertyGroups.FirstOrDefault(g => g.Label.Equals("IceBuilder"));
+            if (propertyGroup == null)
+            {
+                propertyGroup = project.Xml.AddPropertyGroup();
+                propertyGroup.Label = "IceBuilder";
+            }
+
+            if (!String.IsNullOrEmpty(cfg.OutputDir))
+            {
+                propertyGroup.AddProperty("OutputDir", cfg.OutputDir);
+            }
+
+            if (!String.IsNullOrEmpty(cfg.HeaderExt))
+            {
+                propertyGroup.AddProperty("HeaderExt", cfg.HeaderExt);
+            }
+
+            if (!String.IsNullOrEmpty(cfg.SourceExt))
+            {
+                propertyGroup.AddProperty("SourceExt", cfg.SourceExt);
+            }
+
+            if (!String.IsNullOrEmpty(cfg.AdditionalOptions))
+            {
+                propertyGroup.AddProperty("AdditionalOptions", cfg.AdditionalOptions);
+            }
+
+            if (!String.IsNullOrEmpty(cfg.AdditionalIncludeDirectories))
+            {
+                propertyGroup.AddProperty("AdditionalIncludeDirectories", cfg.AdditionalIncludeDirectories);
+            }
+
+            if (cfg.Stream)
+            {
+                propertyGroup.AddProperty("Stream", "True");
+            }
+
+            if (cfg.Checksum)
+            {
+                propertyGroup.AddProperty("CheckSum", "True");
+            }
+
+            if (cfg.Ice)
+            {
+                propertyGroup.AddProperty("Ice", "True");
+            }
+
+            if (!String.IsNullOrEmpty(cfg.DLLExport))
+            {
+                propertyGroup.AddProperty("DLLExport", cfg.DLLExport);
+            }
+
             foreach (ProjectItemDefinitionGroupElement group in project.Xml.ItemDefinitionGroups)
             {
-                ProjectItemDefinitionElement item = group.AddItemDefinition("IceBuilder");
-
-                if (!String.IsNullOrEmpty(cfg.OutputDir))
-                {
-                    item.AddMetadata("OutputDir", cfg.OutputDir);
-                }
-
-                if (!String.IsNullOrEmpty(cfg.HeaderExt))
-                {
-                    item.AddMetadata("HeaderExt", cfg.HeaderExt);
-                }
-
-                if (!String.IsNullOrEmpty(cfg.SourceExt))
-                {
-                    item.AddMetadata("SourceExt", cfg.SourceExt);
-                }
-
-                if (!String.IsNullOrEmpty(cfg.AdditionalOptions))
-                {
-                    item.AddMetadata("AdditionalOptions", cfg.AdditionalOptions);
-                }
-
-                if (!String.IsNullOrEmpty(cfg.AdditionalIncludeDirectories))
-                {
-                    item.AddMetadata("AdditionalIncludeDirectories", cfg.AdditionalIncludeDirectories);
-                }
-
-                if (cfg.Stream)
-                {
-                    item.AddMetadata("Stream", "True");
-                }
-
-                if (cfg.Checksum)
-                {
-                    item.AddMetadata("CheckSum", "True");
-                }
-
-                if (cfg.Ice)
-                {
-                    item.AddMetadata("Ice", "True");
-                }
-
-                if (!String.IsNullOrEmpty(cfg.DLLExport))
-                {
-                    item.AddMetadata("DLLExport", cfg.DLLExport);
-                }
-
                 //
                 // Remove old property sheet from all configurations
                 //
@@ -477,80 +443,7 @@ namespace IceBuilder
                 project.RemoveItem(j);
                 project.AddItem("IceBuilder", j.UnevaluatedInclude);
             }
-
-
-            items = project.GetItems("IceBuilder");
-            ICollection<ProjectItem> generatedSourcesItems = project.GetItems("ClCompile");
-            ICollection<ProjectItem> generatedHeaderItems = project.GetItems("ClInclude");
-
-            foreach (ICollection<ProjectItem> generatedItems in
-                    new ICollection<ProjectItem>[] { generatedHeaderItems, generatedSourcesItems })
-            {
-                foreach (ProjectItem j in generatedItems)
-                {
-                    foreach (ProjectItem k in items)
-                    {
-                        if (Path.GetFullPath(j.UnevaluatedInclude).Equals(
-                            String.IsNullOrEmpty(cfg.OutputDir) ?
-                                Path.GetFullPath(Path.ChangeExtension(k.UnevaluatedInclude, Path.GetExtension(j.UnevaluatedInclude))) :
-                                Path.GetFullPath(
-                                    Path.Combine(cfg.OutputDir,
-                                                    Path.ChangeExtension(k.UnevaluatedInclude, Path.GetExtension(j.UnevaluatedInclude))))))
-                        {
-                            j.SetMetadataValue("DependentUpon", k.UnevaluatedInclude);
-                            j.SetMetadataValue("AutoGen", "True");
-                            break;
-                        }
-                    }
-                }
-            }
             return true;
-        }
-
-        private static void UpdateCppConfiguration2(Microsoft.Build.Evaluation.Project project)
-        {
-            List<ProjectItemDefinitionElement> items = null;
-            foreach (ProjectItemDefinitionGroupElement group in project.Xml.ItemDefinitionGroups)
-            {
-                items = group.ItemDefinitions.Where(item => item.ItemType.Equals("IceBuilder")).ToList();
-            }
-
-            ProjectPropertyGroupElement propertyGroup = 
-                project.Xml.PropertyGroups.FirstOrDefault(g => g.Label.Equals("IceBuilder"));
-            if (propertyGroup == null)
-            {
-                propertyGroup = project.Xml.AddPropertyGroup();
-                propertyGroup.Label = "IceBuilder";
-            }
-
-            foreach (ProjectItemDefinitionElement item in items)
-            {
-                foreach (ProjectMetadataElement meta in item.Metadata)
-                {
-                    propertyGroup.SetProperty(meta.Name, meta.Value);
-                }
-                item.Parent.RemoveChild(item);
-            }
-        }
-
-        private static void UpdateCSharpConfiguration2(Microsoft.Build.Evaluation.Project project)
-        {
-            List<ProjectPropertyElement> properties =
-                project.Xml.Properties.Where(p => p.Name.Equals("OutputDir")).ToList();
-
-            ProjectPropertyGroupElement propertyGroup =
-                project.Xml.PropertyGroups.FirstOrDefault(g => g.Label.Equals("IceBuilder"));
-            if (propertyGroup == null)
-            {
-                propertyGroup = project.Xml.AddPropertyGroup();
-                propertyGroup.Label = "IceBuilder";
-            }
-
-            foreach (ProjectPropertyElement item in properties)
-            {
-                propertyGroup.SetProperty(item.Name, item.Value);
-                item.Parent.RemoveChild(item);
-            }
         }
     }
 }
