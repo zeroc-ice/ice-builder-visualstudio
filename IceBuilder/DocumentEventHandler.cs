@@ -1,4 +1,10 @@
-﻿using System;
+﻿// **********************************************************************
+//
+// Copyright (c) 2009-2015 ZeroC, Inc. All rights reserved.
+//
+// **********************************************************************
+
+using System;
 using System.Timers;
 using System.Collections.Generic;
 using System.Linq;
