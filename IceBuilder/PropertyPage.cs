@@ -35,17 +35,6 @@ namespace IceBuilder
             }
         }
 
-        private List<ProjectConfiguration> _configs = null;
-
-        public String GetProperty(String name)
-        {
-            if (_configs != null && _configs.Count > 0)
-            {
-                return _configs[0].GetProperty(name);
-            }
-            return "";
-        }
-
         #region IPropertyPage2 methods
 
         public void Activate(IntPtr parentHandle, RECT[] pRect, int modal)
@@ -57,55 +46,16 @@ namespace IceBuilder
 
         public void Apply()
         {
-            if(_configs != null)
-            {
-                foreach (ProjectConfiguration config in _configs)
-                {
-                    if(!ConfigurationView.OutputDirMultipleValues)
-                    {
-                        config.Settings.OutputDir = ConfigurationView.OutputDir;
-                    }
-
-                    if (ConfigurationView.Ice != CheckState.Indeterminate)
-                    {
-                        config.Settings.Ice = ConfigurationView.Ice == CheckState.Checked ? true : false;
-                    }
-
-                    if (ConfigurationView.Checksum != CheckState.Indeterminate)
-                    {
-                        config.Settings.Checksum = ConfigurationView.Checksum == CheckState.Checked ? true : false;
-                    }
-
-                    if (ConfigurationView.Streaming != CheckState.Indeterminate)
-                    {
-                        config.Settings.Streaming = ConfigurationView.Streaming == CheckState.Checked ? true : false;
-                    }
-
-                    if (ConfigurationView.Tie != CheckState.Indeterminate)
-                    {
-                        config.Settings.Tie = ConfigurationView.Tie == CheckState.Checked ? true : false;
-                    }
-
-                    if (ConfigurationView.Underscores != CheckState.Indeterminate)
-                    {
-                        config.Settings.Underscores = ConfigurationView.Underscores == CheckState.Checked ? true : false;
-                    }
-
-                    if (!ConfigurationView.AdditionalIncludeDirectories.MultipleValues)
-                    {
-                        config.Settings.AdditionalIncludeDirectories = 
-                            String.Join(";", ConfigurationView.AdditionalIncludeDirectories.Values);
-                    }
-
-                    if(!ConfigurationView.AdditionalOptionsMultipleValues)
-                    {
-                        config.Settings.AdditionalOptions = ConfigurationView.AdditionalOptions;
-                    }
-
-                    config.Settings.Save();
-                }
-                ConfigurationView.NeedSave = false;
-            }
+            Settings.OutputDir = ConfigurationView.OutputDir;
+            Settings.Ice = ConfigurationView.Ice == CheckState.Checked ? true : false;
+            Settings.Checksum = ConfigurationView.Checksum == CheckState.Checked ? true : false;
+            Settings.Streaming = ConfigurationView.Streaming == CheckState.Checked ? true : false;
+            Settings.Tie = ConfigurationView.Tie == CheckState.Checked ? true : false;
+            Settings.Underscores = ConfigurationView.Underscores == CheckState.Checked ? true : false;
+            Settings.AdditionalIncludeDirectories = String.Join(";", ConfigurationView.AdditionalIncludeDirectories.Values);
+            Settings.AdditionalOptions = ConfigurationView.AdditionalOptions;
+            Settings.Save();
+            ConfigurationView.NeedSave = false;
         }
 
         public void Deactivate()
@@ -150,89 +100,49 @@ namespace IceBuilder
             ConfigurationView.Size = new Size(rect.Width, rect.Height);
         }
 
+        public ProjectSettigns Settings
+        {
+            get;
+            private set;
+        }
+
+        public EnvDTE.Project Project
+        {
+            get;
+            private set;
+        }
+
         public void SetObjects(uint cObjects, Object[] objects)
         {
-            if (objects != null)
+            if(objects != null && cObjects > 0)
             {
-                _configs = new List<ProjectConfiguration>();
-                foreach(object o in objects)
+                IVsBrowseObject browse = objects[0] as IVsBrowseObject;
+                if(browse != null)
                 {
-                    IVsCfg config = o as IVsCfg;
-                    if(config != null)
-                    {
-                        _configs.Add(ProjectConfiguration.getProjectConfiguration(config));
-                    }
-                }
-
-                for(int i = 0; i < _configs.Count; ++i)
-                {
-                    ProjectConfiguration config = _configs[i];
-
-                    if (i == 0)
-                    {
-                        ConfigurationView.OutputDir = config.Settings.OutputDir;
-                        ConfigurationView.Ice = config.Settings.Ice ? CheckState.Checked : CheckState.Unchecked;
-                        ConfigurationView.Checksum = config.Settings.Checksum ? CheckState.Checked : CheckState.Unchecked;
-                        ConfigurationView.Streaming = config.Settings.Streaming ? CheckState.Checked : CheckState.Unchecked;
-                        ConfigurationView.Tie = config.Settings.Tie ? CheckState.Checked : CheckState.Unchecked;
-                        ConfigurationView.Underscores = config.Settings.Underscores ? CheckState.Checked : CheckState.Unchecked;
-                        ConfigurationView.AdditionalIncludeDirectories.Values = new List<String>(
-                            config.Settings.AdditionalIncludeDirectories.Split(new char[]{';'}, StringSplitOptions.RemoveEmptyEntries));
-                        ConfigurationView.AdditionalOptions = config.Settings.AdditionalOptions;
+                    IVsHierarchy hier;
+                    uint id;
+                    browse.GetProjectItem(out hier, out id);
+                    Project = DTEUtil.GetProject(hier);
+                    if (Project == null)
+                    { 
+                        //TODO initialization exception;
                     }
                     else
                     {
-                        if(!ConfigurationView.OutputDir.Equals(config.Settings.OutputDir))
-                        {
-                            ConfigurationView.OutputDir = "";
-                            ConfigurationView.OutputDirMultipleValues = true;
-                        }
-
-                        if (ConfigurationView.Ice != CheckState.Indeterminate &&
-                           ConfigurationView.Ice != (config.Settings.Ice ? CheckState.Checked : CheckState.Unchecked))
-                        {
-                            ConfigurationView.Ice = CheckState.Indeterminate;
-                        }
-
-                        if (ConfigurationView.Checksum != CheckState.Indeterminate &&
-                           ConfigurationView.Checksum != (config.Settings.Checksum ? CheckState.Checked : CheckState.Unchecked))
-                        {
-                            ConfigurationView.Checksum = CheckState.Indeterminate;
-                        }
-
-                        if (ConfigurationView.Streaming != CheckState.Indeterminate &&
-                           ConfigurationView.Streaming != (config.Settings.Streaming ? CheckState.Checked : CheckState.Unchecked))
-                        {
-                            ConfigurationView.Streaming = CheckState.Indeterminate;
-                        }
-
-                        if (ConfigurationView.Tie != CheckState.Indeterminate &&
-                           ConfigurationView.Tie != (config.Settings.Tie ? CheckState.Checked : CheckState.Unchecked))
-                        {
-                            ConfigurationView.Tie = CheckState.Indeterminate;
-                        }
-
-                        if (ConfigurationView.Underscores != CheckState.Indeterminate &&
-                           ConfigurationView.Underscores != (config.Settings.Underscores ? CheckState.Checked : CheckState.Unchecked))
-                        {
-                            ConfigurationView.Underscores = CheckState.Indeterminate;
-                        }
-
-                        if (!String.Join(";", ConfigurationView.AdditionalIncludeDirectories.Values).Equals(
-                            config.Settings.AdditionalIncludeDirectories))
-                        {
-                            ConfigurationView.AdditionalIncludeDirectories.Values = new List<String>();
-                            ConfigurationView.AdditionalIncludeDirectories.MultipleValues = true;
-                        }
-
-                        if (!ConfigurationView.AdditionalOptions.Equals(config.Settings.AdditionalOptions))
-                        {
-                            ConfigurationView.AdditionalOptions = "";
-                            ConfigurationView.AdditionalOptionsMultipleValues = true;
-                        }
+                        Settings = new ProjectSettigns(Project);
+                        Settings.Load();
+                        ConfigurationView.OutputDir = Settings.OutputDir;
+                        ConfigurationView.Ice = Settings.Ice ? CheckState.Checked : CheckState.Unchecked;
+                        ConfigurationView.Checksum = Settings.Checksum ? CheckState.Checked : CheckState.Unchecked;
+                        ConfigurationView.Streaming = Settings.Streaming ? CheckState.Checked : CheckState.Unchecked;
+                        ConfigurationView.Tie = Settings.Tie ? CheckState.Checked : CheckState.Unchecked;
+                        ConfigurationView.Underscores = Settings.Underscores ? CheckState.Checked : CheckState.Unchecked;
+                        ConfigurationView.AdditionalIncludeDirectories.Values = new List<String>(
+                            Settings.AdditionalIncludeDirectories.Split(new char[]{';'}, StringSplitOptions.RemoveEmptyEntries));
+                        ConfigurationView.AdditionalOptions = Settings.AdditionalOptions;
+                        ConfigurationView.NeedSave = false;
                     }
                 }
-                ConfigurationView.NeedSave = false;
             }
         }
 

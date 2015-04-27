@@ -6,11 +6,10 @@
     <Icon>VCSliceItemTemplate.ico</Icon>
     <TemplateID>ff2254e8-4853-40bc-8ec4-4822c6b7db88</TemplateID>
     <ProjectType>VC</ProjectType>
-    <RequiredFrameworkVersion>2.0</RequiredFrameworkVersion>
     <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
     <DefaultName>New.ice</DefaultName>
   </TemplateData>
   <TemplateContent>
-    <ProjectItem ReplaceParameters="true">New.ice</ProjectItem>
+    <ProjectItem SubType="Code" ReplaceParameters="true">New.ice</ProjectItem>
   </TemplateContent>
 </VSTemplate>

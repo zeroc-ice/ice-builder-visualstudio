@@ -21,6 +21,50 @@ using Microsoft.Build.Utilities;
 
 namespace IceBuilder
 {
+    public class TaskUtil
+    {
+        public static String MakeRelative(String from, String to)
+        {
+            if (!Path.IsPathRooted(from))
+            {
+                throw new ArgumentException(String.Format("from: `{0}' must be an absolute path", from));
+            }
+            else if (!Path.IsPathRooted(to))
+            {
+                return to;
+            }
+
+            string[] firstPathParts = Path.GetFullPath(from).Trim(Path.DirectorySeparatorChar).Split(Path.DirectorySeparatorChar);
+            string[] secondPathParts = Path.GetFullPath(to).Trim(Path.DirectorySeparatorChar).Split(Path.DirectorySeparatorChar);
+
+            int sameCounter = 0;
+            while (sameCounter < Math.Min(firstPathParts.Length, secondPathParts.Length) &&
+                String.Equals(firstPathParts[sameCounter], secondPathParts[sameCounter],
+                StringComparison.CurrentCultureIgnoreCase))
+            {
+                ++sameCounter;
+            }
+
+            // Different volumes, relative path not possible.
+            if (sameCounter == 0)
+            {
+                return to;
+            }
+
+            // Pop back up to the common point.
+            String newPath = "";
+            for (int i = sameCounter; i < firstPathParts.Length; ++i)
+            {
+                newPath += ".." + Path.DirectorySeparatorChar;
+            }
+            // Descend to the target.
+            for (int i = sameCounter; i < secondPathParts.Length; ++i)
+            {
+                newPath += secondPathParts[i] + Path.DirectorySeparatorChar;
+            }
+            return newPath.TrimEnd(Path.DirectorySeparatorChar);
+        }
+    }
     #region SliceCompilerTask
     public abstract class SliceCompilerTask : ToolTask
     {
@@ -51,6 +95,12 @@ namespace IceBuilder
 
         [Required]
         public ITaskItem[] Sources
+        {
+            get;
+            set;
+        }
+
+        public Boolean Depend
         {
             get;
             set;
@@ -100,6 +150,13 @@ namespace IceBuilder
         protected override String GenerateCommandLineCommands()
         {
             CommandLineBuilder builder = new CommandLineBuilder(false);
+            if(Depend)
+            {
+                builder.AppendSwitch("--depend-xml");
+                builder.AppendSwitch("--depend-file");
+                builder.AppendFileNameIfNotNull(Path.Combine(OutputDir, "IceBuilder.d"));
+            }
+
             if(!String.IsNullOrEmpty(OutputDir))
             {
                 builder.AppendSwitch("--output-dir");
@@ -136,12 +193,30 @@ namespace IceBuilder
 
             if(!String.IsNullOrEmpty(AdditionalOptions))
             {
+                builder.AppendTextUnquoted(" ");
                 builder.AppendTextUnquoted(AdditionalOptions);
             }
 
             builder.AppendFileNamesIfNotNull(Sources, " ");
 
             return builder.ToString();
+        }
+
+        protected override int ExecuteTool(string pathToTool, string responseFileCommands, string commandLineCommands)
+        {
+            foreach (ITaskItem source in Sources)
+            {
+                if(!Depend)
+                {
+                    Log.LogMessage(MessageImportance.Normal,
+                        String.Format(
+                            "Compiling {0} -> Generating {1}.{2}",
+                            source.GetMetadata("Identity"),
+                            TaskUtil.MakeRelative(WorkingDirectory, Path.Combine(OutputDir, source.GetMetadata("Filename"))),
+                            (ToolName.Equals("slice2cpp.exe") ? "[h,cpp]" : "cs")));
+                }
+            }
+            return base.ExecuteTool(pathToTool, responseFileCommands, commandLineCommands);
         }
 
         protected override string GenerateFullPathToTool()
@@ -160,6 +235,11 @@ namespace IceBuilder
                 Log.LogError(String.Format(message, ToolName));
             }
             return path;
+        }
+
+        protected override void LogToolCommand(string message)
+        {
+            Log.LogMessage(MessageImportance.Low, message);
         }
 
         protected override void LogEventsFromTextOutput(string singleLine, MessageImportance messageImportance)
@@ -246,204 +326,6 @@ namespace IceBuilder
                 }
             }
         }
-
-        protected List<String> TranslateDependPaths(List<String> paths)
-        {
-            List<String> newPaths = new List<string>();
-            foreach(String path in paths)
-            {
-                String newPath = path;
-                if(!Path.IsPathRooted(newPath))
-                {
-                    foreach (String includePath in IncludeDirectories)
-                    {
-                        newPath = Path.IsPathRooted(includePath) ?
-                            Path.Combine(includePath, newPath) :
-                            Path.Combine(WorkingDirectory, includePath, newPath);
-                        if(File.Exists(newPath))
-                        {
-                            break;
-                        }
-                    }
-                }
-                newPaths.Add(Path.GetFullPath(newPath));
-            }
-            return newPaths;
-        }
-    }
-    #endregion
-
-    #region SliceDependTask
-    public abstract class SliceDependTask : SliceCompilerTask
-    {
-        public String DependFile
-        {
-            get;
-            set;
-        }
-
-        [Output]
-        public ITaskItem[] Outputs
-        {
-            get;
-            private set;
-        }
-
-        protected override String GenerateCommandLineCommands()
-        {
-            CommandLineBuilder builder = new CommandLineBuilder();
-            builder.AppendSwitch("--depend-xml");
-            builder.AppendSwitch("--depend-file");
-            builder.AppendFileNameIfNotNull(DependFile);
-            builder.AppendTextUnquoted(String.Format(" {0}", base.GenerateCommandLineCommands()));
-            return builder.ToString();
-        }
-
-        protected override int ExecuteTool(string pathToTool, string responseFileCommands, string commandLineCommands)
-        {
-            int retval = base.ExecuteTool(pathToTool, responseFileCommands, commandLineCommands);
-            if (retval == 0)
-            {
-                XmlDocument doc = new XmlDocument();
-                doc.Load(DependFile);
-                Outputs = new TaskItem[Sources.Length];
-                for (int i = 0; i < Sources.Length; ++i)
-                {
-                    ITaskItem item = Sources[i];
-                    ITaskItem newItem = new TaskItem(item.ItemSpec);
-                    item.CopyMetadataTo(newItem);
-
-                    List<String> dependPaths = new List<string>();
-                    XmlNodeList depends = doc.DocumentElement.SelectNodes(
-                            String.Format("/dependencies/source[@name='{0}']/dependsOn", item.GetMetadata("Identity")));
-                    if (depends != null)
-                    {
-                        foreach (XmlNode depend in depends)
-                        {
-                            dependPaths.Add(depend.Attributes["name"].Value);
-                        }
-                    }
-                    newItem.SetMetadata("Depends", String.Join(";", TranslateDependPaths(dependPaths)));
-
-                    Outputs[i] = newItem;
-                }
-            }
-            return retval;
-        }
-    }
-    #endregion
-
-    #region Slice2CppDependTask
-    public class Slice2CppDependTask : SliceDependTask
-    {
-        protected override string ToolName
-        {
-            get
-            {
-                return "slice2cpp.exe";
-            }
-        }
-    }
-    #endregion
-
-    #region Slice2CSharpDependTask
-    public class Slice2CSharpDependTask : SliceDependTask
-    {
-        protected override string ToolName
-        {
-            get
-            {
-                return "slice2cs.exe";
-            }
-        }
-    }
-    #endregion
-
-    #region SliceGeneratedTask
-    public abstract class SliceGeneratedTask : Task
-    {
-        [Required]
-        public ITaskItem[] Sources
-        {
-            get;
-            set;
-        }
-
-        [Required]
-        public String OutputDir
-        {
-            get;
-            set;
-        }
-
-        abstract protected void GeneratedItems();
-
-        public override bool Execute()
-        {
-            GeneratedItems();
-            return true;
-        }
-    }
-    #endregion
-
-    #region Slice2CppGeneratedTask
-    public class Slice2CppGeneratedTask : SliceGeneratedTask
-    {
-        [Output]
-        public ITaskItem[] GeneratedSources
-        {
-            get;
-            private set;
-        }
-
-        [Output]
-        public ITaskItem[] GeneratedHeaders
-        {
-            get;
-            private set;
-        }
-
-        protected override void GeneratedItems()
-        {
-            GeneratedSources = new ITaskItem[Sources.Length];
-            GeneratedHeaders = new ITaskItem[Sources.Length];
-
-            for(int i = 0; i < Sources.Length; ++i)
-            {
-                ITaskItem item = Sources[i];
-                GeneratedSources[i] = new TaskItem(
-                        Path.Combine(OutputDir, item.GetMetadata("RelativeDir"),
-                                     String.Format("{0}.cpp", item.GetMetadata("Filename"))));
-                GeneratedHeaders[i] = new TaskItem(
-                    Path.Combine(OutputDir, item.GetMetadata("RelativeDir"),
-                                 String.Format("{0}.cpp", item.GetMetadata("Filename"))));
-            }
-        }
-    }
-    #endregion
-
-    #region Slice2CSharpGeneratedTask
-    public class Slice2CSharpGeneratedTask : SliceGeneratedTask
-    {
-        [Output]
-        public ITaskItem[] GeneratedSources
-        {
-            get;
-            private set;
-        }
-
-        protected override void GeneratedItems()
-        {
-            GeneratedSources = new ITaskItem[Sources.Length];
-
-            for (int i = 0; i < Sources.Length; ++i)
-            {
-                ITaskItem item = Sources[i];
-                GeneratedSources[i] = new TaskItem(
-                        Path.Combine(OutputDir, item.GetMetadata("RelativeDir"),
-                                     String.Format("{0}.cs", item.GetMetadata("Filename"))));
-            }
-        }
     }
     #endregion
 
@@ -510,6 +392,245 @@ namespace IceBuilder
             }
             builder.AppendTextUnquoted(String.Format(" {0}", base.GenerateCommandLineCommands()));
             return builder.ToString();
+        }
+    }
+    #endregion
+
+    #region SliceDependTask
+    public abstract class SliceDependTask : Task
+    {
+        [Required]
+        public ITaskItem[] Sources
+        {
+            get;
+            set;
+        }
+
+        [Required]
+        public String OutputDir
+        {
+            get;
+            set;
+        }
+
+        [Required]
+        public String WorkingDirectory
+        {
+            get;
+            set;
+        }
+
+        [Output]
+        public ITaskItem[] ComputedSources
+        {
+            get;
+            private set;
+        }
+
+        [Output]
+        public bool UpdateDepends
+        {
+            get;
+            private set;
+        }
+
+        protected abstract String ToolName
+        {
+            get;
+        }
+
+        protected String GetGeneratedPath(ITaskItem item, String outputDir, String ext)
+        {
+            return Path.Combine(
+                outputDir,
+                Path.GetFileName(Path.ChangeExtension(item.GetMetadata("Identity"), ext)));
+        }
+
+        abstract protected ITaskItem[] GeneratedItems(ITaskItem source);
+
+        public override bool Execute()
+        {
+            List<ITaskItem> computed = new List<ITaskItem>();
+            UpdateDepends = false;
+
+            String dependFile = Path.Combine(OutputDir, "IceBuilder.d");
+            
+            XmlDocument dependsDoc = new XmlDocument();
+            bool dependExists = File.Exists(dependFile);
+            if(dependExists)
+            {
+                dependsDoc.Load(dependFile);
+            }
+            else
+            {
+                Log.LogMessage(MessageImportance.Low,
+                    String.Format("Build required because depend file: {0} doesn't exists",
+                                  TaskUtil.MakeRelative(WorkingDirectory, dependFile)));
+            }
+
+            foreach(ITaskItem source in Sources)
+            {
+                bool skip = true;
+                if(!dependExists)
+                {
+                    skip = false;
+                }
+                Log.LogMessage(MessageImportance.Low,
+                    String.Format("Computing dependencies for {0}", source.GetMetadata("Identity")));
+
+                ITaskItem[] generatedItems = GeneratedItems(source);
+
+                FileInfo sourceInfo = new FileInfo(source.GetMetadata("FullPath"));
+                if(!sourceInfo.Exists)
+                {
+                    Log.LogMessage(MessageImportance.Low,
+                        String.Format("Build required because source: {0} doesn't exists",
+                            source.GetMetadata("Identity")));
+                    skip = false;
+                }
+
+                FileInfo generatedInfo = null;
+
+                if (skip)
+                {
+                    foreach (ITaskItem item in generatedItems)
+                    {
+                        generatedInfo = new FileInfo(item.GetMetadata("FullPath"));
+                        if (!generatedInfo.Exists)
+                        {
+                            Log.LogMessage(MessageImportance.Low,
+                                String.Format("Build required because generated: {0} doesn't exists",
+                                    TaskUtil.MakeRelative(WorkingDirectory, generatedInfo.FullName)));
+                            skip = false;
+                            break;
+                        }
+                        else if (sourceInfo.LastWriteTime.ToFileTime() > generatedInfo.LastWriteTime.ToFileTime())
+                        {
+                            Log.LogMessage(MessageImportance.Low,
+                                String.Format("Build required because source: {0} is older than target {1}",
+                                    source.GetMetadata("Identity"),
+                                    TaskUtil.MakeRelative(WorkingDirectory, generatedInfo.FullName)));
+                            skip = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (skip)
+                {
+                    XmlNodeList depends = dependsDoc.DocumentElement.SelectNodes(
+                                String.Format("/dependencies/source[@name='{0}']/dependsOn", source.GetMetadata("Identity")));
+                    if (depends != null)
+                    {
+                        List<String> dependPaths = new List<String>();
+                        foreach (XmlNode depend in depends)
+                        {
+                            dependPaths.Add(depend.Attributes["name"].Value);
+                        }
+
+                        foreach (String path in dependPaths)
+                        {
+                            FileInfo dependencyInfo = new FileInfo(path);
+                            if (!dependencyInfo.Exists)
+                            {
+                                skip = false;
+                                Log.LogMessage(MessageImportance.Low,
+                                String.Format("Build required because dependency: {0} doesn't exists",
+                                    TaskUtil.MakeRelative(WorkingDirectory, dependencyInfo.FullName)));
+                                break;
+                            }
+                            else if (dependencyInfo.LastWriteTime > generatedInfo.LastWriteTime)
+                            {
+                                skip = false;
+                                Log.LogMessage(MessageImportance.Low,
+                                String.Format("Build required because source: {0} is older than target {1}",
+                                    source.GetMetadata("Identity"),
+                                    TaskUtil.MakeRelative(WorkingDirectory, dependencyInfo.FullName)));
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (skip)
+                {
+                    Log.LogMessage(MessageImportance.Normal,
+                        String.Format(
+                            "Skipping {0} -> {1}.{2} up to date",
+                            source.GetMetadata("Identity"),
+                            TaskUtil.MakeRelative(WorkingDirectory, Path.Combine(OutputDir, source.GetMetadata("Filename"))),
+                            (ToolName.Equals("slice2cpp.exe") ? "[h,cpp] are" : "cs is")));
+                }
+
+                ITaskItem computedSource = new TaskItem(source.ItemSpec);
+                source.CopyMetadataTo(computedSource);
+                computedSource.SetMetadata("BuildRequired", skip ? "False" : "True");
+                computed.Add(computedSource);
+
+                if(!UpdateDepends && !skip)
+                {
+                    UpdateDepends = true;
+                }
+            }
+            ComputedSources = computed.ToArray();
+            return true;
+        }
+    }
+    #endregion
+
+    #region Slice2CppDependTask
+    public class Slice2CppDependTask : SliceDependTask
+    {
+        [Required]
+        public String SourceExt
+        {
+            get;
+            set;
+        }
+
+        [Required]
+        public String HeaderExt
+        {
+            get;
+            set;
+        }
+
+        protected override string ToolName
+        {
+            get
+            {
+                return "slice2cpp.exe";
+            }
+        }
+
+        protected override ITaskItem[] GeneratedItems(ITaskItem source)
+        {
+            return new ITaskItem[]
+                {
+                    new TaskItem(GetGeneratedPath(source, OutputDir, SourceExt)),
+                    new TaskItem(GetGeneratedPath(source, OutputDir, HeaderExt)),
+                };
+        }
+    }
+    #endregion
+
+    #region Slice2CSharpDependTask
+    public class Slice2CSharpDependTask : SliceDependTask
+    {
+        protected override string ToolName
+        {
+            get
+            {
+                return "slice2cs.exe";
+            }
+        }
+
+        protected override ITaskItem[] GeneratedItems(ITaskItem source)
+        {
+            return new ITaskItem[]
+                {
+                    new TaskItem(GetGeneratedPath(source, OutputDir, ".cs")),
+                };
         }
     }
     #endregion

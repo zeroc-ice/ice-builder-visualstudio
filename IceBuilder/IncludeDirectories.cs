@@ -246,7 +246,7 @@ namespace IceBuilder
 
         private void btnSelectInclude_Clicked(object sender, EventArgs e)
         {
-            String projectDir = PropertyPage.GetProperty("MSBuildProjectDirectory");
+            String projectDir = Path.GetFullPath(Path.GetDirectoryName(PropertyPage.Project.FullName)); ;
             String selectedPath = UIUtil.BrowserFolderDialog(Handle, "Slice Include Directory",
                 String.IsNullOrEmpty(_editingIncludeDir) ? projectDir : _editingIncludeDir);
 
@@ -309,7 +309,7 @@ namespace IceBuilder
                 String path = includeList.Items[e.Index].ToString();
                 if (!String.IsNullOrEmpty(path) && path.IndexOf('$') == -1)
                 {
-                    String projectDir = PropertyPage.GetProperty("MSBuildProjectDirectory");
+                    String projectDir = Path.GetFullPath(Path.GetDirectoryName(PropertyPage.Project.FullName));
                     bool absolute = Path.IsPathRooted(path);
 
                     if(e.NewValue == CheckState.Unchecked)

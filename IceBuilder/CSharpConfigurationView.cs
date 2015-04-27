@@ -56,19 +56,6 @@ namespace IceBuilder
             }
         }
 
-        private bool _outputDirMultipleValues;
-        public Boolean OutputDirMultipleValues
-        {
-            get
-            {
-                return _outputDirMultipleValues;
-            }
-            set
-            {
-                _outputDirMultipleValues = value;
-            }
-        }
-
         public String OutputDir
         {
             get
@@ -78,7 +65,6 @@ namespace IceBuilder
             set
             {
                 txtOutputDir.Text = value;
-                OutputDirMultipleValues = false;
             }
         }
 
@@ -151,33 +137,6 @@ namespace IceBuilder
             set
             {
                 txtAdditionalOptions.Text = value;
-                AdditionalOptionsMultipleValues = false;
-            }
-        }
-
-        private bool _additionalOptionsMultipleValues;
-        public Boolean AdditionalOptionsMultipleValues
-        {
-            get
-            {
-                return _additionalOptionsMultipleValues;
-            }
-            set
-            {
-                _additionalOptionsMultipleValues = value;
-            }
-        }
-
-        private bool _traceLevelMultipleValues;
-        public Boolean TraceLevelMultipleValues
-        {
-            get
-            {
-                return _traceLevelMultipleValues;
-            }
-            set
-            {
-                _traceLevelMultipleValues = value;
             }
         }
 
@@ -201,7 +160,7 @@ namespace IceBuilder
 
         private void btnOutputDirectoryBrowse_Click(object sender, EventArgs e)
         {
-            String projectDir = _page.GetProperty("MSBuildProjectDirectory");
+            String projectDir = Path.GetFullPath(Path.GetDirectoryName(_page.Project.FullName));
             String selectedPath = UIUtil.BrowserFolderDialog(Handle, "Select Output Directory", projectDir);
             if (!String.IsNullOrEmpty(selectedPath))
             {
@@ -212,13 +171,6 @@ namespace IceBuilder
         private void txtAdditionalOptions_TextChanged(object sender, EventArgs e)
         {
             NeedSave = true;
-            AdditionalOptionsMultipleValues = false;
-        }
-
-        private void cmbTraceLevel_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            NeedSave = true;
-            TraceLevelMultipleValues = false;
         }
     }
 }

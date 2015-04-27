@@ -506,5 +506,51 @@ namespace IceBuilder
             }
             return true;
         }
+
+        private static void UpdateCppConfiguration2(Microsoft.Build.Evaluation.Project project)
+        {
+            List<ProjectItemDefinitionElement> items = null;
+            foreach (ProjectItemDefinitionGroupElement group in project.Xml.ItemDefinitionGroups)
+            {
+                items = group.ItemDefinitions.Where(item => item.ItemType.Equals("IceBuilder")).ToList();
+            }
+
+            ProjectPropertyGroupElement propertyGroup = 
+                project.Xml.PropertyGroups.FirstOrDefault(g => g.Label.Equals("IceBuilder"));
+            if (propertyGroup == null)
+            {
+                propertyGroup = project.Xml.AddPropertyGroup();
+                propertyGroup.Label = "IceBuilder";
+            }
+
+            foreach (ProjectItemDefinitionElement item in items)
+            {
+                foreach (ProjectMetadataElement meta in item.Metadata)
+                {
+                    propertyGroup.SetProperty(meta.Name, meta.Value);
+                }
+                item.Parent.RemoveChild(item);
+            }
+        }
+
+        private static void UpdateCSharpConfiguration2(Microsoft.Build.Evaluation.Project project)
+        {
+            List<ProjectPropertyElement> properties =
+                project.Xml.Properties.Where(p => p.Name.Equals("OutputDir")).ToList();
+
+            ProjectPropertyGroupElement propertyGroup =
+                project.Xml.PropertyGroups.FirstOrDefault(g => g.Label.Equals("IceBuilder"));
+            if (propertyGroup == null)
+            {
+                propertyGroup = project.Xml.AddPropertyGroup();
+                propertyGroup.Label = "IceBuilder";
+            }
+
+            foreach (ProjectPropertyElement item in properties)
+            {
+                propertyGroup.SetProperty(item.Name, item.Value);
+                item.Parent.RemoveChild(item);
+            }
+        }
     }
 }

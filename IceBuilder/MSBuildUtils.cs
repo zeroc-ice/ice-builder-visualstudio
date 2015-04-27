@@ -92,7 +92,7 @@ namespace IceBuilder
                 property.Value = property.Value.Replace(flavor, "").Trim(new char[] { ';' });
                 if (property.Value.Equals(CSharpProjectGUI))
                 {
-                    project.Xml.Properties.Remove(property);
+                    property.Parent.RemoveChild(property);
                 }
                 return true; //flavor removed
             }
@@ -229,6 +229,70 @@ namespace IceBuilder
                 }
             }
             return modified;
+        }
+
+        public static void SetProperty(Microsoft.Build.Evaluation.Project project, String label, String name, String value)
+        {
+            ProjectPropertyGroupElement group = project.Xml.PropertyGroups.FirstOrDefault(g => g.Label.Equals(label));
+            if(group == null)
+            {
+                group = project.Xml.AddPropertyGroup();
+                group.Label = label;
+            }
+
+            ProjectPropertyElement property = group.Properties.FirstOrDefault(p => p.Name.Equals(name));
+            if (property != null)
+            {
+                property.Value = value;
+            }
+            else
+            {
+                group.AddProperty(name, value);
+            }
+        }
+
+        public static String GetProperty(Microsoft.Build.Evaluation.Project project, String label, String name)
+        {
+            ProjectPropertyGroupElement group = project.Xml.PropertyGroups.FirstOrDefault(g => g.Label.Equals(label));
+            if (group != null)
+            { 
+                ProjectPropertyElement property = group.Properties.FirstOrDefault(p => p.Name.Equals(name));
+                if (property != null)
+                {
+                    return property.Value;
+                }
+            }
+            return String.Empty;
+        }
+
+        public static String GetEvaluatedProperty(Microsoft.Build.Evaluation.Project project, String name)
+        {
+            return project.GetPropertyValue(name);
+        }
+
+        public static String GetEvaluatedMetadata(Microsoft.Build.Evaluation.Project project, String type, String name)
+        {
+            ProjectItemDefinition item = null;
+            ProjectMetadata metadata = null;
+            if (project.ItemDefinitions.TryGetValue("IceBuilder", out item))
+            {
+                metadata = item.Metadata.FirstOrDefault(m => m.Name.Equals(name));
+            }
+            else
+            {
+                metadata =
+                    project.AllEvaluatedItemDefinitionMetadata.FirstOrDefault(
+                        m => m.ItemType.Equals("IceBuilder") && m.Name.Equals(name));
+            }
+            return metadata == null ? String.Empty : metadata.EvaluatedValue;
+        }
+
+        public static String GetEvaluatedMetadata(Microsoft.Build.Evaluation.Project project, String type, String path, String name)
+        {
+            ProjectItem item = project.AllEvaluatedItems.FirstOrDefault(
+                i => i.ItemType.Equals(type) && i.EvaluatedInclude.Equals(path) && i.HasMetadata(name));
+
+            return item == null ? String.Empty : item.GetMetadataValue(name);
         }
     }
 }

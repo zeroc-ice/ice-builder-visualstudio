@@ -4,17 +4,14 @@
 
   <!-- Import IceBuilder common settings -->
   <Import Project="$(MSBuildThisFileDirectory)\IceBuilder.Common.props"/>
-  
+
   <!-- Import our custom MSbuild tasks used to build Ice C++ projects -->
   <UsingTask TaskName="IceBuilder.Slice2CppTask"
              AssemblyFile="$(MSBuildThisFileDirectory)IceBuilder.Tasks.dll" />
 
-  <UsingTask TaskName="IceBuilder.Slice2CppGeneratedTask"
-             AssemblyFile="$(MSBuildThisFileDirectory)IceBuilder.Tasks.dll" />
-
   <UsingTask TaskName="IceBuilder.Slice2CppDependTask"
              AssemblyFile="$(MSBuildThisFileDirectory)IceBuilder.Tasks.dll" />
-  
+
   <Choose>
     <!-- Windows store application settings -->
     <When Condition="'$(ApplicationType)' == 'Windows Store'">
@@ -99,21 +96,23 @@
           <EnvironmentVariable>true</EnvironmentVariable>
         </BuildMacro>
       </ItemGroup>
-      </When>
-    </Choose>
-  
+    </When>
+  </Choose>
+
   <!-- Default settings for IceBuilder -->
+  <PropertyGroup Label="IceBuilder">
+    <OutputDir>$(ProjectDir)\generated</OutputDir>
+    <HeaderExt>h</HeaderExt>
+    <SourceExt>cpp</SourceExt>
+    <IcePrefix>false</IcePrefix>
+    <Underscore>false</Underscore>
+    <Checksum>false</Checksum>
+    <Streaming>false</Streaming>
+    <IncludeDirectories>$(IceHome)\slice\;.</IncludeDirectories>
+  </PropertyGroup>
   <ItemDefinitionGroup>
-    <IceBuilder>
-      <OutputDir>$(ProjectDir)generated\</OutputDir>
-      <IcePrefix>false</IcePrefix>
-      <Underscore>false</Underscore>
-      <Checksum>false</Checksum>
-      <Streaming>false</Streaming>
-      <HeaderExt>h</HeaderExt>
-      <SourceExt>cpp</SourceExt>
-      <AdditionalIncludeDirectories>$(IceHome)\slice\;.</AdditionalIncludeDirectories>
-      <TracingLevel>Info</TracingLevel>
-    </IceBuilder>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(OutputDir)</AdditionalIncludeDirectories>
+    </ClCompile>
   </ItemDefinitionGroup>
 </Project>

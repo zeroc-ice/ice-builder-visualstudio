@@ -6,6 +6,7 @@
     <Icon>CSharpSliceItemTemplate.ico</Icon>
     <TemplateID>12be1e27-61db-4434-b488-921a54226ec8</TemplateID>
     <ProjectType>CSharp</ProjectType>
+    <ProjectSubType>Slice</ProjectSubType>
     <RequiredFrameworkVersion>2.0</RequiredFrameworkVersion>
     <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
     <DefaultName>New.ice</DefaultName>

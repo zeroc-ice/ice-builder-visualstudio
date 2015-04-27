@@ -9,9 +9,10 @@
   <UsingTask TaskName="IceBuilder.Slice2CSharpTask"
              AssemblyFile="$(MSBuildThisFileDirectory)IceBuilder.Tasks.dll" />
 
-  <UsingTask TaskName="IceBuilder.Slice2CSharpGeneratedTask"
-             AssemblyFile="$(MSBuildThisFileDirectory)IceBuilder.Tasks.dll" />
-
   <UsingTask TaskName="IceBuilder.Slice2CSharpDependTask"
              AssemblyFile="$(MSBuildThisFileDirectory)IceBuilder.Tasks.dll" />
+
+  <PropertyGroup>
+    <OutputDir>$(MSBuildProjectDirectory)\generated</OutputDir>
+  </PropertyGroup>
 </Project>

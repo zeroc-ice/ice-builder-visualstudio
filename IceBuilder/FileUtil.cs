@@ -53,7 +53,7 @@ namespace IceBuilder
             }
 
             // Pop back up to the common point.
-            string newPath = "." + Path.DirectorySeparatorChar;
+            string newPath = "";
             for (int i = sameCounter; i < firstPathParts.Length; ++i)
             {
                 newPath += ".." + Path.DirectorySeparatorChar;
@@ -64,6 +64,7 @@ namespace IceBuilder
             {
                 newPath += secondPathParts[i] + Path.DirectorySeparatorChar;
             }
+
             return newPath.TrimEnd(Path.DirectorySeparatorChar);
         }
     }

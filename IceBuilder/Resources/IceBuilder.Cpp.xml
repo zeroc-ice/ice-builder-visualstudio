@@ -4,7 +4,7 @@
   <Rule Name="IceBuilder" PageTemplate="tool" DisplayName="Ice Builder" Order="9" SwitchPrefix="">
 
     <Rule.DataSource>
-      <DataSource Persistence="ProjectFile" ItemType="IceBuilder" HasConfigurationCondition="true"/>
+      <DataSource Persistence="ProjectFile" ItemType="" HasConfigurationCondition="true" Label="IceBuilder"/>
     </Rule.DataSource>
     
     <Rule.Categories>
@@ -17,7 +17,11 @@
                     Description="Create files in the directory DIR."
                     Subtype="folder"
                     Category="General"
-                    Switch="--output-dir"/>
+                    Switch="--output-dir">
+      <StringProperty.DataSource>
+        <DataSource Persistence="ProjectFile" ItemType="" Label="IceBuilder" HasConfigurationCondition="false" />
+      </StringProperty.DataSource>
+    </StringProperty>
 
     <!-- Parsing Options -->
     <StringListProperty Name="AdditionalIncludeDirectories"
@@ -25,44 +29,71 @@
                         Description=""
                         Switch="-I"
                         Subtype="folder"
-                        Category="General"/>
-    
+                        Category="General">
+      <StringListProperty.DataSource>
+        <DataSource Persistence="ProjectFile" ItemType="" Label="IceBuilder" HasConfigurationCondition="false" />
+      </StringListProperty.DataSource>
+    </StringListProperty>
     <BoolProperty Name="IcePrefix"
                   DisplayName="Allow Reserved Ice Identifiers"
                   Description="Permit `Ice' prefix (for building Ice source code only)."
                   Switch="--ice"
-                  Category="General"/>
+                  Category="General">
+      <BoolProperty.DataSource>
+        <DataSource Persistence="ProjectFile" ItemType="" Label="IceBuilder" HasConfigurationCondition="false" />
+      </BoolProperty.DataSource>
+    </BoolProperty>
 
     <BoolProperty Name="Underscore"
                   DisplayName="Allow Underscore In Identifiers"
                   Description="Permit underscores in Slice indentifiers."
                   Switch="--underscore"
-                  Category="General"/>
+                  Category="General">
+      <BoolProperty.DataSource>
+        <DataSource Persistence="ProjectFile" ItemType="" Label="IceBuilder" HasConfigurationCondition="false" />
+      </BoolProperty.DataSource>
+    </BoolProperty>
 
     <!-- Output Options -->
     <StringProperty Name="BaseDirectoryForGeneratedInclude"
                     DisplayName="Base Directory For Generated #include"
                     Category="General"
                     Switch="--include-dir"
-                    Description="Base directory for generated #include statements."/>
+                    Description="Base directory for generated #include statements.">
+      <StringProperty.DataSource>
+        <DataSource Persistence="ProjectFile" ItemType="" Label="IceBuilder" HasConfigurationCondition="false" />
+      </StringProperty.DataSource>
+    </StringProperty>
 
     <StringProperty Name="DLLExportMacro"
                     DisplayName="DLL Export Macro"
                     Switch="--dll-export"
                     Category="General"
-                    Description="Macro for exporting symbols from DLL."/>
-    
+                    Description="Macro for exporting symbols from DLL.">
+      <StringProperty.DataSource>
+        <DataSource Persistence="ProjectFile" ItemType="" Label="IceBuilder" HasConfigurationCondition="false" />
+      </StringProperty.DataSource>
+    </StringProperty>
+
     <BoolProperty Name="Streaming"
                   DisplayName="Generate Helper Functions For Streaming"
                   Description="Generate marshaling support for public stream API."
                   Switch="--stream"
-                  Category="General"/>
-    
+                  Category="General">
+      <BoolProperty.DataSource>
+        <DataSource Persistence="ProjectFile" ItemType="" Label="IceBuilder" HasConfigurationCondition="false" />
+      </BoolProperty.DataSource>
+    </BoolProperty>
+
     <BoolProperty Name="Checksum"
                   DisplayName="Generate Slice Checksums"
                   Description="Generate checksums for Slice definitions."
                   Switch="--checksum"
-                  Category="General"/>
+                  Category="General">
+      <BoolProperty.DataSource>
+        <DataSource Persistence="ProjectFile" ItemType="" Label="IceBuilder" HasConfigurationCondition="false" />
+      </BoolProperty.DataSource>
+    </BoolProperty>
 
     <EnumProperty Name="HeaderExt" 
                   DisplayName="Generated Header Extension"
@@ -73,6 +104,9 @@
       <EnumValue Name="hpp" DisplayName=".hpp" Description=".hpp"/>
       <EnumValue Name="hh" DisplayName=".hh" Description=".hh"/>
       <EnumValue Name="hxx" DisplayName=".hxx" Description=".hxx"/>
+      <EnumProperty.DataSource>
+        <DataSource Persistence="ProjectFile" ItemType="" Label="IceBuilder" HasConfigurationCondition="false" />
+      </EnumProperty.DataSource>
     </EnumProperty>
 
     <EnumProperty Name="SourceExt" 
@@ -83,6 +117,9 @@
       <EnumValue Name="cpp" DisplayName=".cpp" Description=".cpp"/>
       <EnumValue Name="cc" DisplayName=".cc" Description=".cc"/>
       <EnumValue Name="cxx" DisplayName=".cxx" Description=".cxx"/>
+      <EnumProperty.DataSource>
+        <DataSource Persistence="ProjectFile" ItemType="" Label="IceBuilder" HasConfigurationCondition="false" />
+      </EnumProperty.DataSource>
     </EnumProperty>
     
     <StringProperty Name="AdditionalOptions" 

@@ -16,87 +16,73 @@
            Condition="'%(ClCompile.RuntimeLibrary)' != 'MultiThreadedDebugDLL' And
                       '%(ClCompile.RuntimeLibrary)' != 'MultiThreadedDLL' "/>
   </Target>
-  
-  <Target Name="IceBuilder_Depend"
-          Inputs="@(IceBuilder)"
-          DependsOnTargets="IceBuilder_Validate"
-          Outputs="%(IceBuilder.OutputDir)\IceBuilder.Depend.xml">
-    <Message Text="Updating Slice File Dependencies"/>
-    <MakeDir Directories="%(IceBuilder.OutputDir)" Condition="!Exists('%(IceBuilder.OutputDir)')"/>
-    <Slice2CppDependTask IceHome="$(IceHome)"
-                     OutputDir="%(IceBuilder.OutputDir)"
-                     WorkingDirectory="$(MSBuildProjectDirectory)"
-                     DependFile="%(IceBuilder.OutputDir)\IceBuilder.Depend.xml"
-                     IncludeDirectories="%(IceBuilder.IncludeDirectories)"
-                     AdditionalOptions="%(IceBuider.AdditionalOptions)"
-                     Sources="@(IceBuilder)">
-      <Output ItemName="_IceBuilder" TaskParameter="Outputs"/>
-    </Slice2CppDependTask>
-  </Target>
-
-  <Target Name="IceBuilder_Generated">
-
-    <!-- Include generated items to the build if IncludeGeneratedItems is set -->
-    <Slice2CppGeneratedTask OutputDir="%(IceBuilder.OutputDir)" Sources="@(IceBuilder)"
-                            Condition="'$(IncludeGeneratedItems)' == 'Yes'">
-      <Output ItemName="CLCompile" TaskParameter="GeneratedSources"/>
-      <Output ItemName="CLInclude" TaskParameter="GeneratedHeaders"/>
-    </Slice2CppGeneratedTask>
-    
-    <!-- Preprend our settings to C++ configuration settings -->
-    <PropertyGroup>
-      <_IceBuilder_OutputDir>%(IceBuilder.OutputDir)</_IceBuilder_OutputDir>
-    </PropertyGroup>
-    <ItemGroup>
-      <ClCompile>
-        <AdditionalIncludeDirectories>$(_IceBuilder_OutputDir);%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      </ClCompile>
-    </ItemGroup>
-  </Target>
 
   <Target Name="IceBuilder_Compile"
-          DependsOnTargets="IceBuilder_Depend;IceBuilder_Generated;IceBuilder_Validate"
-          Inputs="%(_IceBuilder.FullPath);%(_IceBuilder.Depends)"
-          Outputs="%(_IceBuilder.OutputDir)\%(_IceBuilder.RelativeDir)%(_IceBuilder.FileName).%(_IceBuilder.SourceExt)"
-          BeforeTargets="CLCompile">
-    <MakeDir Directories="%(_IceBuilder.OutputDir)" Condition="!Exists('%(_IceBuilder.OutputDir)')"/>
+          DependsOnTargets="IceBuilder_Validate"
+          BeforeTargets="CLCompile"
+          Condition="'@(IceBuilder)' != ''">
 
-    <Message Text="Compiling %(_IceBuilder.Identity)"/>
-    <Slice2CppTask IceHome="$(IceHome)"
-                   OutputDir="%(_IceBuilder.OutputDir)"
-                   WorkingDirectory="$(MSBuildProjectDirectory)"
-                   Ice="%(_IceBuilder.Ice)"
-                   Underscore="%(_IceBuilder.Underscore)"
-                   Stream="%(_IceBuilder.Stream)"
-                   Checksum="%(_IceBuilder.Checksum)"
-                   IncludeDirectories="%(_IceBuilder.IncludeDirectories)"
-                   AdditionalOptions="%(_IceBuider.AdditionalOptions)"
-                   DLLExport="%(_IceBuilder.DLLExport)"
-                   IncludeDir="%(_IceBuilder.IncludeDir)"
-                   HeaderExt="%(_IceBuilder.HeaderExt)"
-                   SourceExt="%(_IceBuilder.SourceExt)"
-                   Sources="%(_IceBuilder.Identity)"/>
+    <MakeDir Directories="$(OutputDir)" Condition="!Exists('$(OutputDir)')"/>
+
+    <!-- First we check dependencies and decide what must be rebuild -->
+    <Slice2CppDependTask
+      OutputDir             = "$(OutputDir)"
+      WorkingDirectory      = "$(MSBuildProjectDirectory)"
+      Sources               = "@(IceBuilder)"
+      SourceExt             = "$(SourceExt)"
+      HeaderExt             = "$(HeaderExt)">
+
+      <Output
+        ItemName            = "_IceBuilder"
+        TaskParameter       = "ComputedSources"/>
+
+      <Output
+        PropertyName        = "_IceBuilderUdateDepends"
+        TaskParameter       = "UpdateDepends"/>
+
+    </Slice2CppDependTask>
+
+    <!-- Compile the Slice files to produce the generated code -->
+    <Slice2CppTask
+        IceHome             = "$(IceHome)"
+        OutputDir           = "$(OutputDir)"
+        WorkingDirectory    = "$(MSBuildProjectDirectory)"
+        Ice                 = "$(Ice)"
+        Underscore          = "$(Underscore)"
+        Stream              = "$(Stream)"
+        Checksum            = "$(Checksum)"
+        IncludeDirectories  = "$(IncludeDirectories)"
+        AdditionalOptions   = "$(AdditionalOptions)"
+        DLLExport           = "$(DLLExport)"
+        IncludeDir          = "$(IncludeDir)"
+        HeaderExt           = "$(HeaderExt)"
+        SourceExt           = "$(SourceExt)"
+        Sources             = "@(_IceBuilder)"
+        Condition           = "'%(_IceBuilder.BuildRequired)' == 'True'"/>
+    
+    <!-- Update the dependencies -->
+    <Slice2CppTask 
+        IceHome             = "$(IceHome)"
+        OutputDir           = "$(OutputDir)"
+        WorkingDirectory    = "$(MSBuildProjectDirectory)"
+        Ice                 = "$(Ice)"
+        Underscore          = "$(Underscore)"
+        Stream              = "$(Stream)"
+        Checksum            = "$(Checksum)"
+        IncludeDirectories  = "$(IncludeDirectories)"
+        AdditionalOptions   = "$(AdditionalOptions)"
+        DLLExport           = "$(DLLExport)"
+        IncludeDir          = "$(IncludeDir)"
+        HeaderExt           = "$(HeaderExt)"
+        SourceExt           = "$(SourceExt)"
+        Sources             = "@(_IceBuilder)"
+        Depend              = "true"
+        Condition           = "'%(_IceBuilder.BuildRequired)' == 'True'"/>
   </Target>
 
   <Target Name="IceBuilder_Clean" BeforeTargets="Clean">
-    <PropertyGroup>
-      <_IceBuilderGeneratedSourceFile>$([System.IO.Path]::Combine(%(IceBuilder.OutputDir), 
-                                              %(IceBuilder.RelativeDir), 
-                                              %(IceBuilder.FileName).%(IceBuilder.SourceExt)))
-      </_IceBuilderGeneratedSourceFile>
-      <_IceBuilderGeneratedHeaderFile>$([System.IO.Path]::Combine(%(IceBuilder.OutputDir), 
-                                              %(IceBuilder.RelativeDir), 
-                                              %(IceBuilder.FileName).%(IceBuilder.HeaderExt)))
-      </_IceBuilderGeneratedHeaderFile>
-    </PropertyGroup>
-    <Delete Files="$(_IceBuilderGeneratedSourceFile);$(_IceBuilderGeneratedHeaderFile)"/>
-    <Delete Files="%(IceBuilder.OutputDir)\IceBuilder.Depend.xml"/>
+    <Delete Files="$([System.IO.Path]::Combine($(OutputDir),%(IceBuilder.FileName).$(SourceExt)))"/>
+    <Delete Files="$([System.IO.Path]::Combine($(OutputDir),%(IceBuilder.FileName).$(HeaderExt)))"/>
+    <Delete Files="$([System.IO.Path]::Combine($(OutputDir),IceBuilder.d))"/>
   </Target>
-
-  
-  <PropertyGroup Condition="'$([MSBuild]::GetRegistryValue(`HKEY_CURRENT_USER\Software\ZeroC\IceBuilder\$(ProjectGuid)`, `IceBuilder_Default`))' != ''">
-    <BuildDependsOn>
-      $([MSBuild]::GetRegistryValue(`HKEY_CURRENT_USER\Software\ZeroC\IceBuilder\$(ProjectGuid)`, `IceBuilder_Default`))
-    </BuildDependsOn>
-  </PropertyGroup>
 </Project>

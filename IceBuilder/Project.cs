@@ -61,7 +61,7 @@ namespace IceBuilder
         /// </summary>
         protected override int GetProperty(uint itemId, int propId, out object property)
         {
-            if (propId == (int)__VSHPROPID2.VSHPROPID_CfgPropertyPagesCLSIDList)
+            if (propId == (int)__VSHPROPID2.VSHPROPID_PropertyPagesCLSIDList)
             {
                 // Get a semicolon-delimited list of clsids of the configuration-dependent
                 // property pages.
@@ -86,31 +86,10 @@ namespace IceBuilder
             }
 
             ProjectConfiguration configuration = new ProjectConfiguration();
-            configuration.Initialize(this, pBaseProjectCfg, cfg);
+            configuration.Initialize(pBaseProjectCfg, cfg);
             ppFlavorCfg = (IVsProjectFlavorCfg)configuration;
 
             return VSConstants.S_OK;
-        }
-
-        public IVsHierarchy InnerHierarchy
-        {
-            get
-            {
-                return this._innerVsHierarchy;
-            }
-        }
-
-        public EnvDTE.Project InnerProject
-        {
-            get
-            {
-                object o;
-                GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_ExtObject, out o);
-
-                var project = o as EnvDTE.Project;
-                return project;
-            }
-    
         }
 
         protected IVsProjectFlavorCfgProvider _cfgProvider = null;

@@ -10,10 +10,21 @@ using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 
+using System.Windows.Forms;
+
 namespace IceBuilder
 {
     class UIUtil
     {
+        public static void ShowErrorDialog(String title, String message)
+        {
+            MessageBox.Show(message, title, 
+                            MessageBoxButtons.OK, 
+                            MessageBoxIcon.Error,
+                            MessageBoxDefaultButton.Button1,
+                            (MessageBoxOptions)0);
+        }
+
         //
         // Open the Visual Studio native dialog for selecting a directory
         //

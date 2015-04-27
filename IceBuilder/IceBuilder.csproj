@@ -19,10 +19,14 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>IceBuilder</RootNamespace>
     <AssemblyName>IceBuilder</AssemblyName>
-    <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>
-    </AssemblyOriginatorKeyFile>
+    <SignAssembly>false</SignAssembly>
+    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <IncludeAssemblyInVSIXContainer>true</IncludeAssemblyInVSIXContainer>
+    <IncludeDebugSymbolsInVSIXContainer>true</IncludeDebugSymbolsInVSIXContainer>
+    <IncludeDebugSymbolsInLocalVSIXDeployment>true</IncludeDebugSymbolsInLocalVSIXDeployment>
+    <CopyBuildOutputToOutputDirectory>true</CopyBuildOutputToOutputDirectory>
+    <CopyOutputSymbolsToOutputDirectory>true</CopyOutputSymbolsToOutputDirectory>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -62,6 +66,10 @@
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Shell.Interop.8.0, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Microsoft.VisualStudio.Shell.Interop.9.0, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="Microsoft.VisualStudio.TemplateWizardInterface, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio 11.0\Common7\IDE\PublicAssemblies\Microsoft.VisualStudio.TemplateWizardInterface.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.VisualStudio.TextManager.Interop" />
     <Reference Include="Microsoft.VisualStudio.Shell.11.0" />
     <Reference Include="Microsoft.VisualStudio.Shell.Immutable.10.0" />
@@ -135,14 +143,21 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BuildCallback.cs" />
+    <Compile Include="Builder.cs" />
+    <Compile Include="BuildLogger.cs" />
     <Compile Include="CSharpConfigurationView.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="CSharpConfigurationView.Designer.cs">
       <DependentUpon>CSharpConfigurationView.cs</DependentUpon>
     </Compile>
+    <Compile Include="GeneratedFileTracker.cs" />
+    <Compile Include="ProjectSettigns.cs" />
+    <Compile Include="ProjectUtil.cs" />
+    <Compile Include="SolutionEventHandler.cs" />
+    <Compile Include="DocumentEventHandler.cs" />
     <Compile Include="DTEUtil.cs" />
-    <Compile Include="ErrorProvider.cs" />
     <Compile Include="FileUtil.cs" />
     <Compile Include="IceHomeEditor.xaml.cs">
       <DependentUpon>IceHomeEditor.xaml</DependentUpon>
@@ -154,7 +169,6 @@
       <DependentUpon>IncludeDirectories.cs</DependentUpon>
     </Compile>
     <Compile Include="MSBuildUtils.cs" />
-    <Compile Include="Output.cs" />
     <Compile Include="Project.cs" />
     <Compile Include="ProjectConfiguration.cs" />
     <Compile Include="ProjectConverter.cs" />
@@ -192,6 +206,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Resources\IceBuilder.Common.dll">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="Resources\IceBuilder.Cpp.xml">
       <SubType>Designer</SubType>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -199,11 +216,10 @@
     <Content Include="Resources\IceBuilder.Tasks.dll">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="Resources\Package.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Include="Resources\IceBuilder.VS2012.dll">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="Resources\Preview.png">
+    <Content Include="Resources\IceBuilder.VS2013.dll">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Resources\LICENSE.rtf">
@@ -226,7 +242,15 @@
     </Content>
     <Content Include="Resources\IceBuilder.Cpp.props">
       <IncludeInVSIX>true</IncludeInVSIX>
+      <SubType>Designer</SubType>
     </Content>
+    <Content Include="Resources\Package.png">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Resources\Preview.png">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <None Include="key.snk" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
@@ -253,6 +277,10 @@
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <IncludeOutputGroupsInVSIX>TemplateProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
       <TemplateType>Item</TemplateType>
+    </ProjectReference>
+    <ProjectReference Include="..\IceBuilder_Common\IceBuilder_Common.csproj">
+      <Project>{9d33c9b1-4436-4c37-bacf-89165396b12d}</Project>
+      <Name>IceBuilder_Common</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

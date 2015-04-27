@@ -19,17 +19,24 @@ namespace IceBuilder
 {
     public class DTEUtil
     {
-        public void UnloadProject()
+        public static void UnloadProject()
         {
             Package.Instance.DTE.ExecuteCommand("Project.UnloadProject");
         }
 
-        public void ReloadProject()
+        public static void ReloadProject()
         {
             Package.Instance.DTE.ExecuteCommand("Project.ReloadProject");
         }
 
-        public EnvDTE.Project GetSelectedProject()
+        public static IVsHierarchy GetIVsHierarchy(EnvDTE.Project project)
+        {
+            IVsHierarchy hierarchy = null;
+            Package.Instance.IVsSolution.GetProjectOfUniqueName(project.UniqueName, out hierarchy);
+            return hierarchy;
+        }
+
+        public static EnvDTE.Project GetSelectedProject()
         {
             Microsoft.VisualStudio.Shell.ServiceProvider sp = new Microsoft.VisualStudio.Shell.ServiceProvider(
                 Package.Instance.DTE as Microsoft.VisualStudio.OLE.Interop.IServiceProvider);
@@ -71,6 +78,26 @@ namespace IceBuilder
             }
 
             return project;
+        }
+
+        public static EnvDTE.Project GetProject(IVsHierarchy hierarchy)
+        {
+            object obj = null;
+            if (hierarchy != null)
+            {
+                hierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_ExtObject, out obj);
+            }
+            return obj as EnvDTE.Project;
+        }
+
+        public static EnvDTE.ProjectItem GetProjectItem(IVsHierarchy hierarchy, uint itemId)
+        {
+            object obj = null;
+            if (hierarchy != null)
+            {
+                hierarchy.GetProperty(itemId, (int)__VSHPROPID.VSHPROPID_ExtObject, out obj);
+            }
+            return obj as EnvDTE.ProjectItem;
         }
 
         public static List<EnvDTE.Project> GetProjects(Solution solution)
@@ -121,6 +148,23 @@ namespace IceBuilder
                     projects.Add(project);
                 }
             }
+        }
+
+        public static bool IsCppProject(EnvDTE.Project project)
+        {
+            return project != null && project.Kind != null &&
+                (project.Kind.Equals(cppProjectGUID) || project.Kind.Equals(cppStoreAppProjectGUID));
+        }
+
+        public static bool IsCSharpProject(EnvDTE.Project project)
+        {
+            return project != null && project.Kind != null && project.Kind.Equals(csharpProjectGUID);
+        }
+
+        public static bool IsIceBuilderEnabled(EnvDTE.Project project)
+        {
+            return project != null && (IsCppProject(project) || IsCSharpProject(project)) &&
+                MSBuildUtils.IsIceBuilderEnabeld(MSBuildUtils.LoadedProject(project.FullName));
         }
 
         public const string cppProjectGUID = "{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}";

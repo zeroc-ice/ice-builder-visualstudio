@@ -24,14 +24,6 @@ namespace IceBuilder
         public const string ProjectFactoryGuidString = "3C53C28F-DC44-46B0-8B85-0C96B85B2042";
         public static readonly Guid ProjectFactoryGuid = new Guid(ProjectFactoryGuidString);
 
-        // With this package, we can get access to VS services.
-        private Package _package;
-
-        public ProjectFactory(Package package) : base()
-        {
-            _package = package;
-        }
-
         #region IVsAggregatableProjectFactory
 
         /// <summary>
@@ -49,7 +41,7 @@ namespace IceBuilder
         protected override object PreCreateForOuter(IntPtr IUnknown)
         {
             Project project = new Project();
-            project.Package = _package;
+            project.Package = Package.Instance;
             return project;
         }
 
