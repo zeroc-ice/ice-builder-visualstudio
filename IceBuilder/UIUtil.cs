@@ -18,11 +18,13 @@ namespace IceBuilder
     {
         public static void ShowErrorDialog(String title, String message)
         {
-            MessageBox.Show(message, title, 
-                            MessageBoxButtons.OK, 
-                            MessageBoxIcon.Error,
-                            MessageBoxDefaultButton.Button1,
-                            (MessageBoxOptions)0);
+            MessageBox.Show(
+                message,
+                title,
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error,
+                MessageBoxDefaultButton.Button1,
+                0);
         }
 
         //

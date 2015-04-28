@@ -119,7 +119,7 @@ namespace IceBuilder
             return projects;
         }
 
-        private static void GetProjects(EnvDTE.Project project, ref List<EnvDTE.Project> projects)
+        public static void GetProjects(EnvDTE.Project project, ref List<EnvDTE.Project> projects)
         {
             if (String.IsNullOrEmpty(project.Kind) || project.Kind.Equals(unloadedProjectGUID))
             {

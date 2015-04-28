@@ -36,7 +36,7 @@ namespace IceBuilder
         public void EndBuild(bool succeed)
         {
             OutputPane.OutputString(
-                String.Format("------ Build {0} ------\n", (succeed ? "succeeded" : "failed")));
+                String.Format("------ Build {0} ------\n\n", (succeed ? "succeeded" : "failed")));
             Package.Instance.BuildDone(succeed);
         }
 
