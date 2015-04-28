@@ -729,6 +729,14 @@ namespace IceBuilder
                     return null;
                 }
 
+                //
+                // Convert beta version to is numeric value
+                //
+                if (version.EndsWith("b"))
+                {
+                    version = String.Format("{0}.{1}",
+                        version.Substring(0, version.Length - 1), 51);
+                }
                 return version;
             }
             catch(Exception ex)
