@@ -9,12 +9,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Data;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Microsoft.Win32;
+
+using System.IO;
 
 namespace IceBuilder
 {
@@ -23,8 +23,6 @@ namespace IceBuilder
         public IceHomeEditor()
         {
             InitializeComponent();
-            toolTip.SetToolTip(txtIceHome, "Ice SDK Location");
-            toolTip.SetToolTip(btnSelectIceHome, "Ice SDK Location");
         }
 
         internal IceOptionsPage optionsPage;
@@ -34,64 +32,36 @@ namespace IceBuilder
             txtIceHome.Text = optionsPage.IceHome;
         }
 
-        private void txtIceHome_LostFocus(object sender, EventArgs e)
+        public void ClearErrors()
         {
-            validateIceHome();
+            lblInfo.Text = "";
         }
 
-        private void btnSelectIceHome_Click(object sender, EventArgs e)
+        private void btnIceHome_Click(object sender, EventArgs e)
         {
-            FolderBrowserDialog dialog = new FolderBrowserDialog();
-            dialog.SelectedPath = optionsPage.IceHome;
-            dialog.Description = "Select Ice SDK Location";
-            DialogResult r = dialog.ShowDialog();
-            if(r == DialogResult.OK)
-            {
-                txtIceHome.Text = dialog.SelectedPath;
-                validateIceHome();
-            }
-        }
+            String selectedPath = UIUtil.BrowserFolderDialog(Handle, "Ice Home Location",
+                String.IsNullOrEmpty(txtIceHome.Text) ? 
+                    Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) : txtIceHome.Text);
 
-        private void updateIceHome()
-        {
-            optionsPage.IceHome = txtIceHome.Text;
-            optionsPage.SaveSettingsToStorage();
-        }
+            lblInfo.Text = "";
+            selectedPath = String.IsNullOrEmpty(selectedPath) ? String.Empty : selectedPath;
 
-        private bool validateIceHome()
-        {
-            if(txtIceHome.Text == optionsPage.IceHome)
+            if (!selectedPath.Equals(optionsPage.IceHome))
             {
-                lblInfo.Text = "";
-                lblInfo.Visible = false;
-                return true;
-            }
-            else
-            {
-                try
-                {
-                    if(String.IsNullOrEmpty(txtIceHome.Text) ||
-                       File.Exists(Path.Combine(txtIceHome.Text, "bin", "slice2cpp.exe")) ||
-                       File.Exists(Path.Combine(txtIceHome.Text, "cpp", "bin", "slice2cpp.exe")))
-                    {
-                        updateIceHome();
-                        lblInfo.Visible = true;
-                        return true;
-                    }
+                if (String.IsNullOrEmpty(selectedPath) ||
+                    File.Exists(Path.Combine(selectedPath, "bin", "slice2cpp.exe")) ||
+                    File.Exists(Path.Combine(selectedPath, "cpp", "bin", "slice2cpp.exe")))
+                {                 
+                    txtIceHome.Text = selectedPath;
+                    optionsPage.IceHome = txtIceHome.Text;
+                    optionsPage.SaveSettingsToStorage();
                 }
-                catch (ArgumentException)
+                else
                 {
+                    lblInfo.Text =
+                        String.Format("Invalid Ice Home Location:\r\n\"{0}\"", selectedPath);
                 }
-
-                lblInfo.Text = "Invalid Ice SDK Location";
-                lblInfo.Visible = true;
-                return false;
             }
-        }
-
-        private void txtIceHome_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            validateIceHome();
         }
     }
 }

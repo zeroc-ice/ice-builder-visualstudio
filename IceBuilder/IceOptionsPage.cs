@@ -21,48 +21,50 @@ namespace IceBuilder
 {
     [ClassInterface(ClassInterfaceType.AutoDual)]
     [Guid("1D9ECCF3-5D2F-4112-9B25-264596873DC9")]
-    public class IceOptionsPage : UIElementDialogPage
+    public class IceOptionsPage : DialogPage
     {
         [Category("General")]
         [DisplayName("Ice Home")]
         [Description("Ice Home")]
         public String IceHome
         {
-            get
-            {
-                return _value;
-            }
-
-            set
-            {
-                _value = value;
-            }
+            get;
+            set;
         }
 
-        protected override System.Windows.UIElement Child
+        IceHomeEditor Editor
+        {
+            get;
+            set;
+        }
+
+        public IceOptionsPage()
+        {
+            Editor = new IceHomeEditor();
+        }
+
+        protected override IWin32Window Window
         {
             get
             {
-                IceHomeEditor editor = new IceHomeEditor();
-                editor.optionsPage = this;
-                editor.Initialize();
-                return editor; 
+                Editor.optionsPage = this;
+                Editor.Initialize();
+                return Editor; 
             }
         }
 
         public override void SaveSettingsToStorage()
         {
-            if(!Package.Instance.GetIceHome().Equals(_value))
+            if (!Package.Instance.GetIceHome().Equals(IceHome))
             {
-                Package.Instance.SetIceHome(_value);
+                Package.Instance.SetIceHome(IceHome);
             }
         }
 
         public override void LoadSettingsFromStorage()
         {
-            _value = Package.Instance.GetIceHome();
+            IceHome = Package.Instance.GetIceHome();
+            Editor.ClearErrors();
         }
-
-        private String _value;
     }
 }
