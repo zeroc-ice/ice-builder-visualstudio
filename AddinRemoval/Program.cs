@@ -47,16 +47,6 @@ namespace AddinRemoval
                 String addinPath = args[1];
 
                 System.Console.Write("Removing Ice Add-in for Visual Studio... ");
-                //
-                // Reset the add-in registration state
-                //
-                System.Diagnostics.Process process = new System.Diagnostics.Process();
-                process.StartInfo.FileName = devenvPath;
-                process.StartInfo.Arguments = String.Format("/ResetAddin Ice.VisualStudio.Connect /Command File.Exit");
-                process.StartInfo.CreateNoWindow = true;
-                process.StartInfo.UseShellExecute = false;
-                process.Start();
-                process.WaitForExit();
 
                 //
                 // Remove the .AddIn file
@@ -69,11 +59,22 @@ namespace AddinRemoval
                         {
                             File.Delete(addinPath);
                         }
-                        catch(IOException)
-                        { 
+                        catch (IOException)
+                        {
                         }
                     }
                 }
+
+                //
+                // Reset the add-in registration state
+                //
+                System.Diagnostics.Process process = new System.Diagnostics.Process();
+                process.StartInfo.FileName = devenvPath;
+                process.StartInfo.Arguments = String.Format("/ResetAddin Ice.VisualStudio.Connect /Command File.Exit");
+                process.StartInfo.CreateNoWindow = true;
+                process.StartInfo.UseShellExecute = false;
+                process.Start();
+                process.WaitForExit();
 
                 //
                 // Remove the templates
