@@ -93,7 +93,7 @@
         </BuildMacro>
         <BuildMacro Include="IceBin">
           <Value>$(IceBin)</Value>
-          <EnvironmentVariable>true</EnvironmentVariable>
+          <EnvironmentVariable>true</EnvironmentVariable>  
         </BuildMacro>
       </ItemGroup>
     </When>
@@ -101,18 +101,18 @@
 
   <!-- Default settings for IceBuilder -->
   <PropertyGroup Label="IceBuilder">
-    <OutputDir>$(ProjectDir)\generated</OutputDir>
-    <HeaderExt>h</HeaderExt>
-    <SourceExt>cpp</SourceExt>
-    <IcePrefix>false</IcePrefix>
-    <Underscore>false</Underscore>
-    <Checksum>false</Checksum>
-    <Streaming>false</Streaming>
-    <IncludeDirectories>$(IceHome)\slice\;.</IncludeDirectories>
+      <IceBuilderOutputDir>$(ProjectDir)\generated</IceBuilderOutputDir>
+      <IceBuilderHeaderExt>h</IceBuilderHeaderExt>
+      <IceBuilderSourceExt>cpp</IceBuilderSourceExt>
+      <IceBuilderAllowIcePrefix>false</IceBuilderAllowIcePrefix>
+      <IceBuilderUnderscore>false</IceBuilderUnderscore>
+      <IceBuilderChecksum>false</IceBuilderChecksum>
+      <IceBuilderStream>false</IceBuilderStream>
+      <IceBuilderIncludeDirectories>$(IceHome)\slice</IceBuilderIncludeDirectories>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(OutputDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(IceBuilderOutputDir)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
 </Project>

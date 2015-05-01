@@ -13,6 +13,6 @@
              AssemblyFile="$(MSBuildThisFileDirectory)IceBuilder.Tasks.dll" />
 
   <PropertyGroup>
-    <OutputDir>$(MSBuildProjectDirectory)\generated</OutputDir>
+    <IceBuilderOutputDir>$(MSBuildProjectDirectory)\generated</IceBuilderOutputDir>
   </PropertyGroup>
 </Project>

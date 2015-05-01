@@ -67,27 +67,9 @@ namespace IceBuilder
             }
         }
 
-        public Boolean MultipleValues
-        {
-            get;
-            set;
-        }
-
-        public Boolean NeedSave
-        {
-            get
-            {
-                if(InitialValues == null)
-                {
-                    return false;
-                }
-                return !Values.SequenceEqual(InitialValues);
-            }
-        }
-
         private void btnAdd_Click(object sender, EventArgs e)
         {
-            if(_editing)
+            if (_editing)
             {
                 EndEditing(true);
             }
@@ -127,6 +109,7 @@ namespace IceBuilder
                     }
                     includeList.SelectedIndex = selected;
                 }
+                PropertyPage.ConfigurationView.Dirty = true;
             }
             Cursor = Cursors.Default;
         }
@@ -195,6 +178,7 @@ namespace IceBuilder
             if (_editingIndex != -1)
             {
                 _txtInclude = new TextBox();
+                _txtInclude.Leave += txtInclude_Leave;
                 _txtInclude.Text = includeList.Items[includeList.SelectedIndex].ToString();
                 _editingIncludeDir = _txtInclude.Text;
                 includeList.SelectionMode = SelectionMode.One;
@@ -204,7 +188,6 @@ namespace IceBuilder
                                                  includeList.Location.Y + rect.Y);
                 _txtInclude.Width = includeList.Width - 50;
                 _txtInclude.Parent = includeList;
-                _txtInclude.KeyDown += new KeyEventHandler(txtInclude_KeyDown);
                 _txtInclude.KeyUp += new KeyEventHandler(txtInclude_KeyUp);
                 groupBox1.Controls.Add(_txtInclude);
 
@@ -227,9 +210,9 @@ namespace IceBuilder
             }
         }
 
-        private void txtInclude_KeyDown(object sender, KeyEventArgs e)
+        void txtInclude_Leave(object sender, EventArgs e)
         {
-            
+            EndEditing(true);
         }
 
         private void txtInclude_KeyUp(object sender, KeyEventArgs e)
@@ -288,7 +271,6 @@ namespace IceBuilder
                         if(!String.IsNullOrEmpty(path))
                         {
                             includeList.Items[_editingIndex] = path;
-                            MultipleValues = false;
                         }
                         else
                         {
@@ -296,6 +278,7 @@ namespace IceBuilder
                             includeList.SelectedIndex = includeList.Items.Count - 1;
                             _editingIndex = -1;
                         }
+                        PropertyPage.ConfigurationView.Dirty = true;
                     }
                 }
                 ResetCheckState();
@@ -316,24 +299,23 @@ namespace IceBuilder
                     {
                         if(absolute)
                         {
-                            path = FileUtil.RelativePath(projectDir, path);
-                            MultipleValues = false;
+                            includeList.Items[e.Index] = FileUtil.RelativePath(projectDir, path);
+                            PropertyPage.ConfigurationView.Dirty = true;
                         }
                     }
                     else if(e.NewValue == CheckState.Checked)
                     {
                         if(!absolute)
                         {
-                            path = Path.GetFullPath(Path.Combine(projectDir, path));
-                            MultipleValues = false;
+                            includeList.Items[e.Index] = Path.GetFullPath(Path.Combine(projectDir, path));
+                            PropertyPage.ConfigurationView.Dirty = true;
                         }
                     }
-                    includeList.Items[e.Index] = path;
                 }
             }
         }
 
-        private void includeList_SelectedIndexChanged(object sender, EventArgs e)
+        private void IncludeDirectories_Leave(object sender, EventArgs e)
         {
             EndEditing(true);
         }

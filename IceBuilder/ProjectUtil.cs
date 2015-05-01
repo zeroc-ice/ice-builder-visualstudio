@@ -74,9 +74,11 @@ namespace IceBuilder
 
         public static String GetOutputDir(EnvDTE.Project project)
         {
-            return Path.GetFullPath(
+            String outputdir = GetEvaluatedProperty(project, PropertyNames.OutputDir);
+            String d = Path.GetFullPath(
                 Path.Combine(Path.GetDirectoryName(project.FullName),
-                             GetEvaluatedProperty(project, "OutputDir")));
+                             outputdir));
+            return d;
         }
 
         public static String GetProperty(EnvDTE.Project project, String name)
@@ -257,6 +259,11 @@ namespace IceBuilder
         {
             foreach (String path in paths)
             {
+                String directoryName = Path.GetDirectoryName(path);
+                if(!Directory.Exists(directoryName))
+                {
+                    Directory.CreateDirectory(directoryName);
+                }
                 File.Create(path).Dispose();
                 project.ProjectItems.AddFromFile(path);
             }
@@ -291,23 +298,28 @@ namespace IceBuilder
         //
         public static void SetupGenerated(EnvDTE.Project project)
         {
-            SetupGenerated(project.ProjectItems);
+            List<EnvDTE.ProjectItem> iceBuilderItems = new List<EnvDTE.ProjectItem>();
+            IceBuilderItems(project.ProjectItems, ref iceBuilderItems);
+            foreach (EnvDTE.ProjectItem i in iceBuilderItems)
+            {
+                SetupGenerated(i.ContainingProject, i.FileNames[1]);
+            }
         }
 
-        private static void SetupGenerated(EnvDTE.ProjectItems items)
+        private static void IceBuilderItems(EnvDTE.ProjectItems allItems, ref List<EnvDTE.ProjectItem> iceBuilderItems)
         {
-            foreach(EnvDTE.ProjectItem i in items)
+            foreach (EnvDTE.ProjectItem i in allItems)
             {
-                if(IsProjectItemFile(i))
+                if (IsProjectItemFile(i))
                 {
-                    if(IsSliceFileName(i.Name))
+                    if (IsSliceFileName(i.Name))
                     {
-                        SetupGenerated(i.ContainingProject, i.FileNames[1]);
+                        iceBuilderItems.Add(i);
                     }
                 }
                 else if (IsProjectItemFolder(i) || IsProjectItemFilter(i))
                 {
-                    SetupGenerated(i.ProjectItems);
+                    IceBuilderItems(i.ProjectItems, ref iceBuilderItems);
                 }
             }
         }

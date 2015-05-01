@@ -17,14 +17,8 @@ using Microsoft.VisualStudio.Shell.Interop;
 
 namespace IceBuilder
 {
-    public class Project : FlavoredProjectBase , IVsProjectFlavorCfgProvider
+    public class Project : FlavoredProjectBase
     {
-        /// <summary>
-        /// This is were all QI for interface on the inner object should happen. 
-        /// Then set the inner project wait for InitializeForOuter to be called to do
-        /// the real initialization
-        /// </summary>
-        /// <param name="innerIUnknown"></param>
         protected override void SetInnerProject(IntPtr innerIUnknown)
         {
             object objectForIUnknown = null;
@@ -50,46 +44,15 @@ namespace IceBuilder
             }
         }
 
-        /// <summary>
-        ///  By overriding GetProperty method and using propId parameter containing one of 
-        ///  the values of the __VSHPROPID2 enumeration, we can filter, add or remove project
-        ///  properties. 
-        ///  
-        ///  For example, to add a page to the configuration-dependent property pages, we
-        ///  need to filter configuration-dependent property pages and then add a new page 
-        ///  to the existing list. 
-        /// </summary>
         protected override int GetProperty(uint itemId, int propId, out object property)
         {
-            if (propId == (int)__VSHPROPID2.VSHPROPID_PropertyPagesCLSIDList)
+            if(propId == (int)__VSHPROPID2.VSHPROPID_PropertyPagesCLSIDList)
             {
-                // Get a semicolon-delimited list of clsids of the configuration-dependent
-                // property pages.
                 ErrorHandler.ThrowOnFailure(base.GetProperty(itemId, propId, out property));
-
-                // Add the CustomPropertyPage property page.
-                
-                property = String.Format("{0};{1}",
-                    typeof(PropertyPage).GUID.ToString("B"),
-                    property.ToString());
+                property = String.Format("{0};{1}", typeof(PropertyPage).GUID.ToString("B"), property);
                 return VSConstants.S_OK;
             }
             return base.GetProperty(itemId, propId, out property);
-        }
-
-        public int CreateProjectFlavorCfg(IVsCfg pBaseProjectCfg, out IVsProjectFlavorCfg ppFlavorCfg)
-        {
-            IVsProjectFlavorCfg cfg = null;
-            if (_cfgProvider != null)
-            {
-                _cfgProvider.CreateProjectFlavorCfg(pBaseProjectCfg, out cfg);
-            }
-
-            ProjectConfiguration configuration = new ProjectConfiguration();
-            configuration.Initialize(pBaseProjectCfg, cfg);
-            ppFlavorCfg = (IVsProjectFlavorCfg)configuration;
-
-            return VSConstants.S_OK;
         }
 
         protected IVsProjectFlavorCfgProvider _cfgProvider = null;

@@ -21,13 +21,31 @@ using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell.Interop;
 
 using System.Windows.Forms;
-
+using System.Windows.Threading;
 using System.IO;
 
 namespace IceBuilder
 {
     public class RunningDocumentTableEventHandler : IVsRunningDocTableEvents2
     {
+        Dispatcher UIDispatcher
+        {
+            get;
+            set;
+        }
+
+        System.Threading.Thread UIThread
+        {
+            get;
+            set;
+        }
+
+        public RunningDocumentTableEventHandler()
+        {
+            UIDispatcher = Dispatcher.CurrentDispatcher;
+            UIThread = System.Threading.Thread.CurrentThread;
+        }
+
         public void BeginTrack()
         {
             Package.Instance.IVsRunningDocumentTable.AdviseRunningDocTableEvents(this, out _cookie);
@@ -61,27 +79,17 @@ namespace IceBuilder
             return 0;
         }
 
-        public void BuildDeletegate(Object source, ElapsedEventArgs e)
-        {
-            Package.Instance.QueueProjectsForBuilding(_buildProjects);
-            _buildProjects.Clear();
-        }
-
         public int OnAfterSave(uint docCookie)
         {
             ProjectItem item = GetProjectItemFromDocumentCookie(docCookie);
-            if(item != null && !String.IsNullOrEmpty(item.Name) && ProjectUtil.IsSliceFileName(item.Name))
+            if(item != null )
             {
-                _buildProjects.Add(item.ContainingProject);
-                if (_buildTimer != null)
+                if (item.ContainingProject != null && DTEUtil.IsIceBuilderEnabled(item.ContainingProject) &&
+                   !String.IsNullOrEmpty(item.Name) && ProjectUtil.IsSliceFileName(item.Name))
                 {
-                    _buildTimer.Enabled = false;
-                    _buildTimer.Stop();
+                    Package.Instance.QueueProjectsForBuilding(
+                        new List<EnvDTE.Project>(new EnvDTE.Project[]{item.ContainingProject}));
                 }
-                _buildTimer = new System.Timers.Timer(50);
-                _buildTimer.AutoReset = false;
-                _buildTimer.Elapsed += BuildDeletegate;
-                _buildTimer.Enabled = true;
             }
             return 0;
         }

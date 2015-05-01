@@ -14,30 +14,6 @@ namespace IceBuilder
 {
     public class ProjectSettigns
     {
-        public readonly String OutputDirPropertyName = "OutputDir";
-        public readonly String IcePropertyName = "Ice";
-        public readonly String ChecksumPropertyName = "Checksum";
-        public readonly String StreamingPropertyName = "Stream";
-        public readonly String TiePropertyName = "Tie";
-        public readonly String UnderscoresPropertyName = "Underscore";
-        public readonly String AdditionalIncludeDirectoriesPropertyName = "AdditionalIncludeDirectories";
-        public readonly String AdditionalOptionsPropertyName = "AdditionalOptions";
-
-        public Boolean NeedSave
-        {
-            get
-            {
-                return !OutputDir.Equals(GetProperty(OutputDirPropertyName)) ||
-                    Ice != GetPropertyAsBool(IcePropertyName) ||
-                    Checksum != GetPropertyAsBool(ChecksumPropertyName) ||
-                    Streaming != GetPropertyAsBool(StreamingPropertyName) ||
-                    Tie != GetPropertyAsBool(TiePropertyName) ||
-                    Underscores != GetPropertyAsBool(UnderscoresPropertyName) ||
-                    !AdditionalIncludeDirectories.Equals(GetProperty(AdditionalIncludeDirectories)) ||
-                    !AdditionalOptions.Equals(GetProperty(AdditionalOptionsPropertyName));
-            }
-        }
-
         public ProjectSettigns(EnvDTE.Project project)
         {
             Project = project;
@@ -45,26 +21,26 @@ namespace IceBuilder
 
         public void Load()
         {
-            OutputDir = GetProperty(OutputDirPropertyName);
-            Ice = GetPropertyAsBool(IcePropertyName);
-            Checksum = GetPropertyAsBool(ChecksumPropertyName);
-            Streaming = GetPropertyAsBool(StreamingPropertyName);
-            Tie = GetPropertyAsBool(TiePropertyName);
-            Underscores = GetPropertyAsBool(UnderscoresPropertyName);
-            AdditionalIncludeDirectories = GetProperty(AdditionalIncludeDirectoriesPropertyName);
-            AdditionalOptions = GetProperty(AdditionalOptionsPropertyName);
+            OutputDir = GetProperty(PropertyNames.OutputDir);
+            AllowIcePrefix = GetPropertyAsBool(PropertyNames.AllowIcePrefix);
+            Checksum = GetPropertyAsBool(PropertyNames.Checksum);
+            Stream = GetPropertyAsBool(PropertyNames.Stream);
+            Tie = GetPropertyAsBool(PropertyNames.Tie);
+            Underscore = GetPropertyAsBool(PropertyNames.Underscore);
+            IncludeDirectories = GetProperty(PropertyNames.IncludeDirectories);
+            AdditionalOptions = GetProperty(PropertyNames.AdditionalOptions);
         }
 
         public void Save()
         {
-            SetPropertyIfChanged(OutputDirPropertyName, OutputDir);
-            SetPropertyAsBoolIfChanged(IcePropertyName, Ice);
-            SetPropertyAsBoolIfChanged(ChecksumPropertyName, Checksum);
-            SetPropertyAsBoolIfChanged(StreamingPropertyName, Streaming);
-            SetPropertyAsBoolIfChanged(TiePropertyName, Tie);
-            SetPropertyAsBoolIfChanged(UnderscoresPropertyName, Underscores);
-            SetPropertyIfChanged(AdditionalIncludeDirectoriesPropertyName, AdditionalIncludeDirectories);
-            SetPropertyIfChanged(AdditionalOptionsPropertyName, AdditionalOptions);
+            SetPropertyIfChanged(PropertyNames.OutputDir, OutputDir);
+            SetPropertyAsBoolIfChanged(PropertyNames.AllowIcePrefix, AllowIcePrefix);
+            SetPropertyAsBoolIfChanged(PropertyNames.Checksum, Checksum);
+            SetPropertyAsBoolIfChanged(PropertyNames.Stream, Stream);
+            SetPropertyAsBoolIfChanged(PropertyNames.Tie, Tie);
+            SetPropertyAsBoolIfChanged(PropertyNames.Underscore, Underscore);
+            SetPropertyIfChanged(PropertyNames.IncludeDirectories, IncludeDirectories);
+            SetPropertyIfChanged(PropertyNames.AdditionalOptions, AdditionalOptions);
         }
 
         public String OutputDir
@@ -73,7 +49,7 @@ namespace IceBuilder
             set;
         }
 
-        public Boolean Ice
+        public Boolean AllowIcePrefix
         {
             get;
             set;
@@ -85,7 +61,7 @@ namespace IceBuilder
             set;
         }
 
-        public Boolean Streaming
+        public Boolean Stream
         {
             get;
             set;
@@ -97,13 +73,13 @@ namespace IceBuilder
             set;
         }
 
-        public Boolean Underscores
+        public Boolean Underscore
         {
             get;
             set;
         }
 
-        public String AdditionalIncludeDirectories
+        public String IncludeDirectories
         {
             get;
             set;

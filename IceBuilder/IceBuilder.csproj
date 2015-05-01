@@ -50,6 +50,7 @@
     <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Ice, Version=3.6.0.0, Culture=neutral, PublicKeyToken=1f998c50fec78381, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.Build" />
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Microsoft.Build.Utilities.v4.0" />
@@ -92,6 +93,12 @@
     <Reference Include="System.Xml" />
     <Reference Include="VSLangProj, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="VSLangProj2, Version=7.0.5000.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="VSLangProj80, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
@@ -143,7 +150,6 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BuildCallback.cs" />
     <Compile Include="Builder.cs" />
     <Compile Include="BuildLogger.cs" />
     <Compile Include="CSharpConfigurationView.cs">
@@ -161,6 +167,7 @@
     </Compile>
     <Compile Include="ProjectSettigns.cs" />
     <Compile Include="ProjectUtil.cs" />
+    <Compile Include="PropertyNames.cs" />
     <Compile Include="SolutionEventHandler.cs" />
     <Compile Include="DocumentEventHandler.cs" />
     <Compile Include="DTEUtil.cs" />
@@ -173,7 +180,6 @@
     </Compile>
     <Compile Include="MSBuildUtils.cs" />
     <Compile Include="Project.cs" />
-    <Compile Include="ProjectConfiguration.cs" />
     <Compile Include="ProjectConverter.cs" />
     <Compile Include="ProjectFactory.cs" />
     <Compile Include="PropertyPage.cs" />
@@ -184,6 +190,18 @@
     </Compile>
     <Compile Include="StreamReader.cs" />
     <Compile Include="UIUtil.cs" />
+    <Compile Include="UpgradeDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UpgradeDialog.Designer.cs">
+      <DependentUpon>UpgradeDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UpgradeDialogProgress.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UpgradeDialogProgress.Designer.cs">
+      <DependentUpon>UpgradeDialogProgress.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="CSharpConfigurationView.resx">
@@ -195,6 +213,12 @@
     <EmbeddedResource Include="IncludeDirectories.resx">
       <DependentUpon>IncludeDirectories.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="UpgradeDialog.resx">
+      <DependentUpon>UpgradeDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UpgradeDialogProgress.resx">
+      <DependentUpon>UpgradeDialogProgress.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="VSPackage.resx">
       <MergeWithCTO>true</MergeWithCTO>
       <ManifestResourceName>VSPackage</ManifestResourceName>
@@ -202,6 +226,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Resources\AddinRemoval.exe">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="Resources\IceBuilder.Common.dll">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>

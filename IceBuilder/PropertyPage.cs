@@ -47,15 +47,34 @@ namespace IceBuilder
         public void Apply()
         {
             Settings.OutputDir = ConfigurationView.OutputDir;
-            Settings.Ice = ConfigurationView.Ice == CheckState.Checked ? true : false;
+            Settings.AllowIcePrefix = ConfigurationView.Ice == CheckState.Checked ? true : false;
             Settings.Checksum = ConfigurationView.Checksum == CheckState.Checked ? true : false;
-            Settings.Streaming = ConfigurationView.Streaming == CheckState.Checked ? true : false;
+            Settings.Stream = ConfigurationView.Streaming == CheckState.Checked ? true : false;
             Settings.Tie = ConfigurationView.Tie == CheckState.Checked ? true : false;
-            Settings.Underscores = ConfigurationView.Underscores == CheckState.Checked ? true : false;
-            Settings.AdditionalIncludeDirectories = String.Join(";", ConfigurationView.AdditionalIncludeDirectories.Values);
+            Settings.Underscore = ConfigurationView.Underscores == CheckState.Checked ? true : false;
+            Settings.IncludeDirectories = String.Join(";", ConfigurationView.IncludeDirectories.Values);
             Settings.AdditionalOptions = ConfigurationView.AdditionalOptions;
+
+            List<String> referencedAssemblies = ConfigurationView.ReferencedAssemblies;
+            foreach (String assembly in ConfigurationView.Assemblies)
+            {
+                if (DTEUtil.HasAssemblyReference(Project, assembly))
+                {
+                    if (!referencedAssemblies.Contains(assembly))
+                    {
+                        DTEUtil.RemoveAssemblyReference(Project, assembly);
+                    }
+                }
+                else
+                {
+                    if (referencedAssemblies.Contains(assembly))
+                    {
+                        DTEUtil.AddAssemblyReference(Project, assembly);
+                    }
+                }
+            }
             Settings.Save();
-            ConfigurationView.NeedSave = false;
+            ConfigurationView.Dirty = false;
         }
 
         public void Deactivate()
@@ -90,7 +109,7 @@ namespace IceBuilder
 
         public int IsPageDirty()
         {
-            return ConfigurationView.NeedSave ? VSConstants.S_OK : VSConstants.S_FALSE;
+            return ConfigurationView.Dirty ? VSConstants.S_OK : VSConstants.S_FALSE;
         }
 
         public void Move(RECT[] pRect)
@@ -123,31 +142,35 @@ namespace IceBuilder
                     uint id;
                     browse.GetProjectItem(out hier, out id);
                     Project = DTEUtil.GetProject(hier);
-                    if (Project == null)
-                    { 
-                        //TODO initialization exception;
-                    }
-                    else
+                    if (Project != null)
                     {
                         Settings = new ProjectSettigns(Project);
                         Settings.Load();
                         ConfigurationView.OutputDir = Settings.OutputDir;
-                        ConfigurationView.Ice = Settings.Ice ? CheckState.Checked : CheckState.Unchecked;
+                        ConfigurationView.Ice = Settings.AllowIcePrefix ? CheckState.Checked : CheckState.Unchecked;
                         ConfigurationView.Checksum = Settings.Checksum ? CheckState.Checked : CheckState.Unchecked;
-                        ConfigurationView.Streaming = Settings.Streaming ? CheckState.Checked : CheckState.Unchecked;
+                        ConfigurationView.Streaming = Settings.Stream ? CheckState.Checked : CheckState.Unchecked;
                         ConfigurationView.Tie = Settings.Tie ? CheckState.Checked : CheckState.Unchecked;
-                        ConfigurationView.Underscores = Settings.Underscores ? CheckState.Checked : CheckState.Unchecked;
-                        ConfigurationView.AdditionalIncludeDirectories.Values = new List<String>(
-                            Settings.AdditionalIncludeDirectories.Split(new char[]{';'}, StringSplitOptions.RemoveEmptyEntries));
+                        ConfigurationView.Underscores = Settings.Underscore ? CheckState.Checked : CheckState.Unchecked;
+                        ConfigurationView.IncludeDirectories.Values = new List<String>(
+                            Settings.IncludeDirectories.Split(new char[]{';'}, StringSplitOptions.RemoveEmptyEntries));
                         ConfigurationView.AdditionalOptions = Settings.AdditionalOptions;
-                        ConfigurationView.NeedSave = false;
+                        ConfigurationView.LoadReferencedAssemblies();
+                        ConfigurationView.Dirty = false;
                     }
                 }
             }
         }
 
-        public void SetPageSite(IPropertyPageSite pageSite)
+        public IPropertyPageSite PageSite
         {
+            get;
+            private set;
+        }
+
+        public void SetPageSite(IPropertyPageSite site)
+        {
+            PageSite = site;
         }
 
         public const int SW_SHOW = 5;

@@ -9,80 +9,82 @@
   </ItemGroup>
 
   <Target Name="IceBuilder_Validate">
-    <Error Text="Ice Installation not detected. You may need to update Ice Home in 'Tools > Options > Ice Builder'"
+    <Error Text="Ice Installation not detected. You may need to update Ice Home in 'Tools > Options > Projects and Solutions > Ice Builder'"
            Condition="'$(IceHome)' == ''" />
 
     <Error Text="The selected C++ Runtime Library is not supported by Ice; Ice requires /MD or /MDd."
            Condition="'%(ClCompile.RuntimeLibrary)' != 'MultiThreadedDebugDLL' And
                       '%(ClCompile.RuntimeLibrary)' != 'MultiThreadedDLL' "/>
+    
+    <Error Text="the Ice Builder requires Ice Version 3.6 or later but $(IceHome) is version $(IceVersion.Replace('.51', 'b'))"
+           Condition="'$(IceIntVersion)' &lt; '30600' Or '$(IceIntVersion)' == '30651'" File=""/>
   </Target>
 
   <Target Name="IceBuilder_Compile"
           DependsOnTargets="IceBuilder_Validate"
-          BeforeTargets="CLCompile"
-          Condition="'@(IceBuilder)' != ''">
+          BeforeTargets="CLCompile">
 
-    <MakeDir Directories="$(OutputDir)" Condition="!Exists('$(OutputDir)')"/>
+    <MakeDir Directories="$(IceBuilderOutputDir)" Condition="!Exists('$(IceBuilderOutputDir)')"/>
 
     <!-- First we check dependencies and decide what must be rebuild -->
     <Slice2CppDependTask
-      OutputDir             = "$(OutputDir)"
-      WorkingDirectory      = "$(MSBuildProjectDirectory)"
-      Sources               = "@(IceBuilder)"
-      SourceExt             = "$(SourceExt)"
-      HeaderExt             = "$(HeaderExt)">
+        OutputDir                         = "$(IceBuilderOutputDir)"
+        WorkingDirectory                  = "$(MSBuildProjectDirectory)"
+        SourceExt                         = "$(IceBuilderSourceExt)"
+        HeaderExt                         = "$(IceBuilderHeaderExt)"
+        Sources                           = "@(IceBuilder)">
 
       <Output
-        ItemName            = "_IceBuilder"
-        TaskParameter       = "ComputedSources"/>
+        ItemName                          = "_IceBuilder"
+        TaskParameter                     = "ComputedSources"/>
 
       <Output
-        PropertyName        = "_IceBuilderUdateDepends"
-        TaskParameter       = "UpdateDepends"/>
+        PropertyName                      = "_IceBuilderUdateDepends"
+        TaskParameter                     = "UpdateDepends"/>
 
     </Slice2CppDependTask>
 
     <!-- Compile the Slice files to produce the generated code -->
     <Slice2CppTask
-        IceHome             = "$(IceHome)"
-        OutputDir           = "$(OutputDir)"
-        WorkingDirectory    = "$(MSBuildProjectDirectory)"
-        Ice                 = "$(Ice)"
-        Underscore          = "$(Underscore)"
-        Stream              = "$(Stream)"
-        Checksum            = "$(Checksum)"
-        IncludeDirectories  = "$(IncludeDirectories)"
-        AdditionalOptions   = "$(AdditionalOptions)"
-        DLLExport           = "$(DLLExport)"
-        IncludeDir          = "$(IncludeDir)"
-        HeaderExt           = "$(HeaderExt)"
-        SourceExt           = "$(SourceExt)"
-        Sources             = "@(_IceBuilder)"
-        Condition           = "'%(_IceBuilder.BuildRequired)' == 'True'"/>
+        IceHome                           = "$(IceHome)"
+        OutputDir                         = "$(IceBuilderOutputDir)"
+        WorkingDirectory                  = "$(MSBuildProjectDirectory)"
+        AllowIcePrefix                    = "$(IceBuilderAllowIcePrefix)"
+        Underscore                        = "$(IceBuilderUnderscore)"
+        Stream                            = "$(IceBuilderStream)"
+        Checksum                          = "$(IceBuilderChecksum)"
+        IncludeDirectories                = "$(IceBuilderIncludeDirectories)"
+        AdditionalOptions                 = "$(AdditionalOptions)"
+        DLLExport                         = "$(IceBuilderDLLExport)"
+        BaseDirectoryForGeneratedInclude  = "$(IceBuilderIceBuilderBaseDirectoryForGeneratedInclude)"
+        HeaderExt                         = "$(IceBuilderHeaderExt)"
+        SourceExt                         = "$(IceBuilderSourceExt)"
+        Sources                           = "@(_IceBuilder)"
+        Condition                         = "'%(_IceBuilder.BuildRequired)' == 'True'"/>
     
     <!-- Update the dependencies -->
-    <Slice2CppTask 
-        IceHome             = "$(IceHome)"
-        OutputDir           = "$(OutputDir)"
-        WorkingDirectory    = "$(MSBuildProjectDirectory)"
-        Ice                 = "$(Ice)"
-        Underscore          = "$(Underscore)"
-        Stream              = "$(Stream)"
-        Checksum            = "$(Checksum)"
-        IncludeDirectories  = "$(IncludeDirectories)"
-        AdditionalOptions   = "$(AdditionalOptions)"
-        DLLExport           = "$(DLLExport)"
-        IncludeDir          = "$(IncludeDir)"
-        HeaderExt           = "$(HeaderExt)"
-        SourceExt           = "$(SourceExt)"
-        Sources             = "@(_IceBuilder)"
-        Depend              = "true"
-        Condition           = "'%(_IceBuilder.BuildRequired)' == 'True'"/>
+    <Slice2CppTask
+        IceHome                           = "$(IceHome)"
+        OutputDir                         = "$(IceBuilderOutputDir)"
+        WorkingDirectory                  = "$(MSBuildProjectDirectory)"
+        AllowIcePrefix                    = "$(IceBuilderAllowIcePrefix)"
+        Underscore                        = "$(IceBuilderUnderscore)"
+        Stream                            = "$(IceBuilderStream)"
+        Checksum                          = "$(IceBuilderChecksum)"
+        IncludeDirectories                = "$(IceBuilderIncludeDirectories)"
+        AdditionalOptions                 = "$(AdditionalOptions)"
+        DLLExport                         = "$(IceBuilderDLLExport)"
+        BaseDirectoryForGeneratedInclude  = "$(IceBuilderIceBuilderBaseDirectoryForGeneratedInclude)"
+        HeaderExt                         = "$(IceBuilderHeaderExt)"
+        SourceExt                         = "$(IceBuilderSourceExt)"
+        Depend                            = "true"
+        Sources                           = "@(_IceBuilder)"
+        Condition                         = "'$(_IceBuilderUdateDepends)' == 'True'"/>
   </Target>
 
   <Target Name="IceBuilder_Clean" BeforeTargets="Clean">
-    <Delete Files="$([System.IO.Path]::Combine($(OutputDir),%(IceBuilder.FileName).$(SourceExt)))"/>
-    <Delete Files="$([System.IO.Path]::Combine($(OutputDir),%(IceBuilder.FileName).$(HeaderExt)))"/>
-    <Delete Files="$([System.IO.Path]::Combine($(OutputDir),IceBuilder.d))"/>
+    <Delete Files="$([System.IO.Path]::Combine($(IceBuilderOutputDir),%(IceBuilder.FileName).$(SourceExt)))"/>
+    <Delete Files="$([System.IO.Path]::Combine($(IceBuilderOutputDir),%(IceBuilder.FileName).$(HeaderExt)))"/>
+    <Delete Files="$([System.IO.Path]::Combine($(IceBuilderOutputDir),IceBuilder.d))"/>
   </Target>
 </Project>

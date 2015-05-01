@@ -105,7 +105,11 @@ namespace IceBuilder
 
         public int OnBeforeCloseProject(IVsHierarchy pHierarchy, int fRemoved)
         {
-            Package.Instance.FileTracker.Remove(DTEUtil.GetProject(pHierarchy));
+            EnvDTE.Project project = DTEUtil.GetProject(pHierarchy);
+            if(project != null)
+            {
+                Package.Instance.FileTracker.Remove(project);
+            }
             return 0;
         }
 

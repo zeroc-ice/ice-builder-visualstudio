@@ -19,16 +19,6 @@ namespace IceBuilder
 {
     public class DTEUtil
     {
-        public static void UnloadProject()
-        {
-            Package.Instance.DTE.ExecuteCommand("Project.UnloadProject");
-        }
-
-        public static void ReloadProject()
-        {
-            Package.Instance.DTE.ExecuteCommand("Project.ReloadProject");
-        }
-
         public static IVsHierarchy GetIVsHierarchy(EnvDTE.Project project)
         {
             IVsHierarchy hierarchy = null;
@@ -163,8 +153,71 @@ namespace IceBuilder
 
         public static bool IsIceBuilderEnabled(EnvDTE.Project project)
         {
-            return project != null && (IsCppProject(project) || IsCSharpProject(project)) &&
+            return project != null && !String.IsNullOrEmpty(project.FullName) && 
+                (IsCppProject(project) || IsCSharpProject(project)) &&
                 MSBuildUtils.IsIceBuilderEnabeld(MSBuildUtils.LoadedProject(project.FullName));
+        }
+
+        public static bool AddAssemblyReference(EnvDTE.Project project, String component)
+        {
+            VSLangProj.VSProject vsProject = (VSLangProj.VSProject)project.Object;
+            try
+            {
+                VSLangProj80.Reference3 reference = (VSLangProj80.Reference3)vsProject.References.Add(component + ".dll");
+                //
+                // We set SpecificVersion to false so that references still work 
+                // when Ice Home setting is updated.
+                //
+                reference.SpecificVersion = false;
+                return true;
+            }
+            catch (COMException ex)
+            {
+            }
+
+            /*MessageBox.Show("Could not locate '" + component + ".dll'.",
+                            "Ice Builder", MessageBoxButtons.OK,
+                            MessageBoxIcon.Error,
+                            MessageBoxDefaultButton.Button1,
+                            (MessageBoxOptions)0);*/
+            return false;
+        }
+
+        public static bool RemoveAssemblyReference(EnvDTE.Project project, String component)
+        {
+            foreach (VSLangProj.Reference r in ((VSLangProj.VSProject)project.Object).References)
+            {
+                if (r.Name.Equals(component, StringComparison.OrdinalIgnoreCase))
+                {
+                    r.Remove();
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public static bool HasAssemblyReference(EnvDTE.Project project, String component)
+        {
+            foreach (VSLangProj.Reference r in ((VSLangProj.VSProject)project.Object).References)
+            {
+                if (r.Name.Equals(component, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public static VSLangProj.Reference FindAssemblyReference(EnvDTE.Project project, String component)
+        {
+            foreach (VSLangProj.Reference r in ((VSLangProj.VSProject)project.Object).References)
+            {
+                if (r.Name.Equals(component, StringComparison.OrdinalIgnoreCase))
+                {
+                    return r;
+                }
+            }
+            return null;
         }
 
         public const string cppProjectGUID = "{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}";

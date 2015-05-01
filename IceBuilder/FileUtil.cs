@@ -64,7 +64,6 @@ namespace IceBuilder
             {
                 newPath += secondPathParts[i] + Path.DirectorySeparatorChar;
             }
-
             return newPath.TrimEnd(Path.DirectorySeparatorChar);
         }
     }

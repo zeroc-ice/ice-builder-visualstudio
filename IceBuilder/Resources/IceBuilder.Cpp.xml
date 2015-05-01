@@ -12,9 +12,9 @@
       <Category Name="Command Line" DisplayName="Command Line" Subtype="CommandLine"/>
     </Rule.Categories>
 
-    <StringProperty Name="OutputDir"
+    <StringProperty Name="IceBuilderOutputDir"
                     DisplayName="Output Directory"
-                    Description="Create files in the directory DIR."
+                    Description="Directory where generated files are created."
                     Subtype="folder"
                     Category="General"
                     Switch="--output-dir">
@@ -24,9 +24,9 @@
     </StringProperty>
 
     <!-- Parsing Options -->
-    <StringListProperty Name="AdditionalIncludeDirectories"
-                        DisplayName="Additional Include Directories"
-                        Description=""
+    <StringListProperty Name="IceBuilderIncludeDirectories"
+                        DisplayName="Include Directories"
+                        Description="Specifies one or more directories to add to the Slice include path; use semi-colons (;) as directory separators."
                         Switch="-I"
                         Subtype="folder"
                         Category="General">
@@ -34,9 +34,10 @@
         <DataSource Persistence="ProjectFile" ItemType="" Label="IceBuilder" HasConfigurationCondition="false" />
       </StringListProperty.DataSource>
     </StringListProperty>
-    <BoolProperty Name="IcePrefix"
+    
+    <BoolProperty Name="IceBuilderAllowIcePrefix"
                   DisplayName="Allow Reserved Ice Identifiers"
-                  Description="Permit `Ice' prefix (for building Ice source code only)."
+                  Description="Allow reserved Ice prefix in Slice identifiers."
                   Switch="--ice"
                   Category="General">
       <BoolProperty.DataSource>
@@ -44,9 +45,9 @@
       </BoolProperty.DataSource>
     </BoolProperty>
 
-    <BoolProperty Name="Underscore"
+    <BoolProperty Name="IceBuilderUnderscore"
                   DisplayName="Allow Underscore In Identifiers"
-                  Description="Permit underscores in Slice indentifiers."
+                  Description="Allow underscores in Slice identifiers."
                   Switch="--underscore"
                   Category="General">
       <BoolProperty.DataSource>
@@ -55,17 +56,17 @@
     </BoolProperty>
 
     <!-- Output Options -->
-    <StringProperty Name="BaseDirectoryForGeneratedInclude"
+    <StringProperty Name="IceBuilderBaseDirectoryForGeneratedInclude"
                     DisplayName="Base Directory For Generated #include"
                     Category="General"
                     Switch="--include-dir"
-                    Description="Base directory for generated #include statements.">
+                    Description="Base directory for #include in generated C++ files.">
       <StringProperty.DataSource>
         <DataSource Persistence="ProjectFile" ItemType="" Label="IceBuilder" HasConfigurationCondition="false" />
       </StringProperty.DataSource>
     </StringProperty>
 
-    <StringProperty Name="DLLExportMacro"
+    <StringProperty Name="IceBuilderDLLExportMacro"
                     DisplayName="DLL Export Macro"
                     Switch="--dll-export"
                     Category="General"
@@ -75,7 +76,7 @@
       </StringProperty.DataSource>
     </StringProperty>
 
-    <BoolProperty Name="Streaming"
+    <BoolProperty Name="IceBuilderStream"
                   DisplayName="Generate Helper Functions For Streaming"
                   Description="Generate marshaling support for public stream API."
                   Switch="--stream"
@@ -85,7 +86,7 @@
       </BoolProperty.DataSource>
     </BoolProperty>
 
-    <BoolProperty Name="Checksum"
+    <BoolProperty Name="IceBuilderChecksum"
                   DisplayName="Generate Slice Checksums"
                   Description="Generate checksums for Slice definitions."
                   Switch="--checksum"
@@ -95,7 +96,7 @@
       </BoolProperty.DataSource>
     </BoolProperty>
 
-    <EnumProperty Name="HeaderExt" 
+    <EnumProperty Name="IceBuilderHeaderExt" 
                   DisplayName="Generated Header Extension"
                   Description="Use extension instead of default `h' header extension."
                   Category="General"
@@ -109,7 +110,7 @@
       </EnumProperty.DataSource>
     </EnumProperty>
 
-    <EnumProperty Name="SourceExt" 
+    <EnumProperty Name="IceBuilderSourceExt" 
                   DisplayName="Generated Source Extension"
                   Description="Use extension instead of default `cpp' source extension."
                   Category="General"
@@ -121,8 +122,8 @@
         <DataSource Persistence="ProjectFile" ItemType="" Label="IceBuilder" HasConfigurationCondition="false" />
       </EnumProperty.DataSource>
     </EnumProperty>
-    
-    <StringProperty Name="AdditionalOptions" 
+
+    <StringProperty Name="AdditionalOptions"
                     DisplayName="Additional Options"
                     Category="General"
                     Visible="False"/>

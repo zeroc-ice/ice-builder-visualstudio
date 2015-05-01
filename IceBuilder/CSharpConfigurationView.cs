@@ -14,18 +14,43 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.OLE.Interop;
+using Microsoft.VisualStudio.Shell.Interop;
 using System.IO;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Runtime.InteropServices;
+using System.Windows.Forms;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.OLE.Interop;
+using System.Drawing;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace IceBuilder
 {
     public partial class CSharpConfigurationView : UserControl
     {
-        private PropertyPage _page;
+        private PropertyPage Page
+        {
+            get;
+            set;
+        }
+
+        private String AssembliesDir
+        {
+            get;
+            set;
+        }
+
         public CSharpConfigurationView(PropertyPage page)
         {
-            _page = page;
+            Page = page;
             InitializeComponent();
-            includeDirectories.PropertyPage = page;
+            includeDirectories.PropertyPage = Page;
+            AssembliesDir = Package.Instance.GetAssembliesDir(Package.Instance.GetIceHome());
         }
 
         public virtual void Initialize(Control parent, Rectangle rect)
@@ -43,16 +68,22 @@ namespace IceBuilder
             return VSConstants.S_FALSE;
         }
 
-        public bool _needSave;
-        public Boolean NeedSave
+        public readonly uint PageStatusDirty = 0x1;
+        public readonly uint PageStatusClean = 0x4;
+        public bool _dirty;
+        public Boolean Dirty
         {
             get 
             {
-                return _needSave || includeDirectories.NeedSave;
+                return _dirty;
             }
             set
             {
-                _needSave = value;
+                _dirty = value;
+                if (Page.PageSite != null)
+                {
+                    Page.PageSite.OnStatusChange(value ? PageStatusDirty : PageStatusClean);
+                }
             }
         }
 
@@ -140,7 +171,56 @@ namespace IceBuilder
             }
         }
 
-        public IncludeDirectories AdditionalIncludeDirectories
+        public void LoadReferencedAssemblies()
+        {
+            if (!String.IsNullOrEmpty(AssembliesDir))
+            {
+                try
+                {
+                    String[] assemblies = Directory.GetFiles(AssembliesDir, "*.dll");
+                    foreach (String assembly in assemblies)
+                    {
+                        String name = Path.GetFileNameWithoutExtension(assembly);
+                        referencedAssemblies.Items.Add(name);
+                        if (DTEUtil.HasAssemblyReference(Page.Project, name))
+                        {
+                            referencedAssemblies.SetItemCheckState(referencedAssemblies.Items.Count - 1, CheckState.Checked);
+                        }
+                    }
+                }
+                catch (IOException)
+                {
+                }
+            }
+        }
+
+        public List<String> Assemblies
+        {
+            get
+            {
+                List<String> assemblies = new List<String>();
+                foreach (object o in referencedAssemblies.Items)
+                {
+                    assemblies.Add(o.ToString());
+                }
+                return assemblies;
+            }
+        }
+
+        public List<String> ReferencedAssemblies
+        {
+            get
+            {
+                List<String> selected = new List<String>();
+                foreach (object o in referencedAssemblies.CheckedItems)
+                {
+                    selected.Add(o.ToString());
+                }
+                return selected;
+            }
+        }
+
+        public IncludeDirectories IncludeDirectories
         {
             get
             {
@@ -148,29 +228,80 @@ namespace IceBuilder
             }
         }
 
-        private void txtOutputDir_TextChanged(object sender, EventArgs e)
-        {
-            NeedSave = true;
-        }
-
-        void option_CheckedChanged(object sender, System.EventArgs e)
-        {
-            NeedSave = true;
-        }
-
         private void btnOutputDirectoryBrowse_Click(object sender, EventArgs e)
         {
-            String projectDir = Path.GetFullPath(Path.GetDirectoryName(_page.Project.FullName));
-            String selectedPath = UIUtil.BrowserFolderDialog(Handle, "Select Output Directory", projectDir);
+            String projectDir = Path.GetFullPath(Path.GetDirectoryName(Page.Project.FullName));
+            String selectedPath = UIUtil.BrowserFolderDialog(Handle, "Output Directory", projectDir);
             if (!String.IsNullOrEmpty(selectedPath))
             {
-                OutputDir = FileUtil.RelativePath(projectDir, selectedPath);
+                selectedPath = FileUtil.RelativePath(projectDir, selectedPath);
+                OutputDir = String.IsNullOrEmpty(selectedPath) ? "." : selectedPath;
+                if(!txtOutputDir.Text.Equals(Page.Settings.OutputDir))
+                {
+                    Dirty = true;
+                }
             }
         }
 
-        private void txtAdditionalOptions_TextChanged(object sender, EventArgs e)
+        private void OutputDirectory_Leave(object sender, EventArgs e)
         {
-            NeedSave = true;
+            if (!txtOutputDir.Text.Equals(Page.Settings.OutputDir))
+            {
+                Dirty = true;
+            }
+        }
+
+        private void AllowIcePrefix_CheckedChanged(object sender, System.EventArgs e)
+        {
+            if (chkIce.Checked != Page.Settings.AllowIcePrefix)
+            {
+                Dirty = true;
+            }
+        }
+
+        private void Underscore_Changed(object sender, System.EventArgs e)
+        {
+            if (chkUnderscores.Checked != Page.Settings.Underscore)
+            {
+                Dirty = true;
+            }
+        }
+
+        private void Stream_CheckedChanged(object sender, System.EventArgs e)
+        {
+            if (chkStreaming.Checked != Page.Settings.Stream)
+            {
+                Dirty = true;
+            }
+        }
+
+        private void Checksum_CheckedChanged(object sender, System.EventArgs e)
+        {
+            if (chkChecksum.Checked != Page.Settings.Checksum)
+            {
+                Dirty = true;
+            }
+        }
+
+        private void Tie_CheckedChanged(object sender, System.EventArgs e)
+        {
+            if (chkTie.Checked != Page.Settings.Tie)
+            {
+                Dirty = true;
+            }
+        }
+
+        private void AdditionalOptions_Leave(object sender, System.EventArgs e)
+        {
+            if (!txtAdditionalOptions.Text.Equals(Page.Settings.AdditionalOptions))
+            {
+                Dirty = true;
+            }
+        }
+
+        private void ReferencedAssemblies_ItemChecked(object sender, System.Windows.Forms.ItemCheckEventArgs e)
+        {
+            Dirty = true;
         }
     }
 }

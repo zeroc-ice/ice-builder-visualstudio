@@ -106,7 +106,7 @@ namespace IceBuilder
             set;
         }
 
-        public Boolean Ice
+        public Boolean AllowIcePrefix
         {
             get;
             set;
@@ -163,7 +163,7 @@ namespace IceBuilder
                 builder.AppendFileNameIfNotNull(OutputDir);
             }
 
-            if(Ice)
+            if(AllowIcePrefix)
             {
                 builder.AppendSwitch("--ice");
             }
@@ -208,7 +208,7 @@ namespace IceBuilder
             {
                 if(!Depend)
                 {
-                    Log.LogMessage(MessageImportance.Normal,
+                    Log.LogMessage(MessageImportance.High,
                         String.Format(
                             "Compiling {0} -> Generating {1}.{2}",
                             source.GetMetadata("Identity"),
@@ -318,11 +318,11 @@ namespace IceBuilder
 
                 if(warning)
                 {
-                    Log.LogWarning("", "", "", file, line, 0, 0, 0, description);
+                    Log.LogWarning("", "", "", file, line - 1, 0, 0, 0, description);
                 }
                 else
                 {
-                    Log.LogError("", "", "", file, line, 0, 0, 0, description);
+                    Log.LogError("", "", "", file, line - 1, 0, 0, 0, description);
                 }
             }
         }
@@ -358,7 +358,7 @@ namespace IceBuilder
             set;
         }
 
-        public String IncludeDir
+        public String BaseDirectoryForGeneratedInclude
         {
             get;
             set;
@@ -459,7 +459,23 @@ namespace IceBuilder
             bool dependExists = File.Exists(dependFile);
             if(dependExists)
             {
-                dependsDoc.Load(dependFile);
+                try
+                {
+                    dependsDoc.Load(dependFile);
+                }
+                catch (XmlException)
+                {
+                    try
+                    {
+                        File.Delete(dependFile);
+                    }
+                    catch(IOException)
+                    { 
+                    }
+                    Log.LogMessage(MessageImportance.Low,
+                        String.Format("Build required because depend file: {0} has some invalid data",
+                            TaskUtil.MakeRelative(WorkingDirectory, dependFile)));
+                }
             }
             else
             {

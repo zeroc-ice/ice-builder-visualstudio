@@ -39,10 +39,14 @@ namespace IceBuilder
             Microsoft.Build.Evaluation.Project project = null;
             ICollection<Microsoft.Build.Evaluation.Project> projects = 
                 ProjectCollection.GlobalProjectCollection.GetLoadedProjects(path);
-            foreach (Microsoft.Build.Evaluation.Project p in projects)
+
+            if (projects.Count == 0)
             {
-                project = p;
-                break;
+                project = ProjectCollection.GlobalProjectCollection.LoadProject(path);
+            }
+            else
+            {
+                project = projects.First();
             }
             return project;
         }
@@ -158,8 +162,6 @@ namespace IceBuilder
                         project.Xml.InsertAfterChild(iceBuilderTargets, vcTargets);
                         modified = true;
                     }
-
-                    
                 }
                 else if (IsCSharpProject(project))
                 {
@@ -227,6 +229,11 @@ namespace IceBuilder
 
                     RemoveProjectFlavorIfExists(project, IceBuilderProjectFlavorGUID);
                 }
+
+                if (modified)
+                {
+                    project.ReevaluateIfNecessary();
+                }
             }
             return modified;
         }
@@ -236,7 +243,21 @@ namespace IceBuilder
             ProjectPropertyGroupElement group = project.Xml.PropertyGroups.FirstOrDefault(g => g.Label.Equals(label));
             if(group == null)
             {
-                group = project.Xml.AddPropertyGroup();
+                //
+                // Create our property group after the main language targets are imported so we can use the properties
+                // defined in this files.
+                //
+                ProjectImportElement import = project.Xml.Imports.FirstOrDefault(
+                    p => (p.Project.IndexOf("Microsoft.Cpp.targets") != -1 || p.Project.IndexOf("Microsoft.CSharp.targets") != -1));
+                if (import != null)
+                {
+                    group = project.Xml.CreatePropertyGroupElement();
+                    project.Xml.InsertAfterChild(group, import);
+                }
+                else
+                {
+                    group = project.Xml.CreatePropertyGroupElement();
+                }
                 group.Label = label;
             }
 
@@ -293,6 +314,31 @@ namespace IceBuilder
                 i => i.ItemType.Equals(type) && i.EvaluatedInclude.Equals(path) && i.HasMetadata(name));
 
             return item == null ? String.Empty : item.GetMetadataValue(name);
+        }
+
+        //
+        // Set Ice Home and force projects to re evaluate changes in the imported project
+        //
+        public static void SetIceHome(List<EnvDTE.Project> projects, String iceHome, String iceVersion, String iceIntVersion, String iceVersionMM)
+        {
+            foreach (EnvDTE.Project p in projects)
+            {
+                Microsoft.Build.Evaluation.Project project = MSBuildUtils.LoadedProject(p.FullName);
+                ResolvedImport import = project.Imports.FirstOrDefault(i => i.ImportedProject.FullPath.EndsWith("IceBuilder.Common.props"));
+
+                if (import.ImportedProject != null)
+                {
+                    ProjectPropertyGroupElement group = import.ImportedProject.PropertyGroups.FirstOrDefault(g => g.Label.Equals("IceHome"));
+                    if (group != null)
+                    {
+                        group.SetProperty(Package.IceHomeValue, iceHome);
+                        group.SetProperty(Package.IceVersionValue, iceVersion);
+                        group.SetProperty(Package.IceIntVersionValue, iceIntVersion);
+                        group.SetProperty(Package.IceVersionMMValue, iceVersionMM);
+                        project.ReevaluateIfNecessary();
+                    }
+                }
+            }
         }
     }
 }

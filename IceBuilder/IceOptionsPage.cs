@@ -21,11 +21,9 @@ namespace IceBuilder
 {
     [ClassInterface(ClassInterfaceType.AutoDual)]
     [Guid("1D9ECCF3-5D2F-4112-9B25-264596873DC9")]
+    [Category("Projects and Solutions")]
     public class IceOptionsPage : DialogPage
     {
-        [Category("General")]
-        [DisplayName("Ice Home")]
-        [Description("Ice Home")]
         public String IceHome
         {
             get;

@@ -34,6 +34,7 @@ namespace IceBuilder
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.btnAdd = new System.Windows.Forms.Button();
             this.btnEdit = new System.Windows.Forms.Button();
             this.includeList = new System.Windows.Forms.CheckedListBox();
@@ -42,6 +43,7 @@ namespace IceBuilder
             this.btnUp = new System.Windows.Forms.Button();
             this.btnDown = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -75,8 +77,9 @@ namespace IceBuilder
             this.includeList.Name = "includeList";
             this.includeList.Size = new System.Drawing.Size(323, 154);
             this.includeList.TabIndex = 51;
+            this.toolTip1.SetToolTip(this.includeList, "Specifies one or more directories to add to the Slice include path.");
             this.includeList.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.includeList_ItemCheck);
-            this.includeList.SelectedIndexChanged += new System.EventHandler(this.includeList_SelectedIndexChanged);
+            this.includeList.Leave += new System.EventHandler(this.IncludeDirectories_Leave);
             // 
             // btnRemove
             // 
@@ -94,9 +97,9 @@ namespace IceBuilder
             this.lblDescription.AutoSize = true;
             this.lblDescription.Location = new System.Drawing.Point(-3, 1);
             this.lblDescription.Name = "lblDescription";
-            this.lblDescription.Size = new System.Drawing.Size(147, 13);
+            this.lblDescription.Size = new System.Drawing.Size(98, 13);
             this.lblDescription.TabIndex = 57;
-            this.lblDescription.Text = "Additional Include Directories:";
+            this.lblDescription.Text = "Include Directories:";
             // 
             // btnUp
             // 
@@ -141,10 +144,11 @@ namespace IceBuilder
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoSize = true;
             this.Controls.Add(this.groupBox1);
             this.Margin = new System.Windows.Forms.Padding(0);
             this.Name = "IncludeDirectories";
-            this.Size = new System.Drawing.Size(631, 187);
+            this.Size = new System.Drawing.Size(631, 166);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
@@ -161,5 +165,6 @@ namespace IceBuilder
         private System.Windows.Forms.Button btnUp;
         private System.Windows.Forms.Button btnDown;
         private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.ToolTip toolTip1;
     }
 }
