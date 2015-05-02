@@ -23,6 +23,7 @@ namespace IceBuilder
         public UpgradeDialogProgress(int total)
         {
             InitializeComponent();
+            _canceled = false;
             ProgressBar.Maximum = total;
         }
 
@@ -31,10 +32,23 @@ namespace IceBuilder
             Canceled = true; 
         }
 
+        private bool _canceled;
         public bool Canceled
         {
-            get;
-            set;
+            get
+            {
+                lock (this)
+                {
+                    return _canceled;
+                }
+            }
+            set
+            {
+                lock (this)
+                {
+                    _canceled = value;
+                }
+            }
         }
 
         public void ReportProgress(String project, int index)
