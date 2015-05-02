@@ -59,12 +59,12 @@ namespace IceBuilder
 
         public static String GetGeneratedSourceExtension(EnvDTE.Project project)
         {
-            return GetEvaluatedProperty(project, "SourceExt");
+            return GetEvaluatedProperty(project, PropertyNames.SourceExt);
         }
 
         public static String GetGeneratedHeaderExtension(EnvDTE.Project project)
         {
-            return GetEvaluatedProperty(project, "HeaderExt");
+            return GetEvaluatedProperty(project, PropertyNames.HeaderExt);
         }
 
         public static String GetOutputDir(EnvDTE.ProjectItem item)

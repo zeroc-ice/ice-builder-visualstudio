@@ -83,8 +83,8 @@
   </Target>
 
   <Target Name="IceBuilder_Clean" BeforeTargets="Clean">
-    <Delete Files="$([System.IO.Path]::Combine($(IceBuilderOutputDir),%(IceBuilder.FileName).$(SourceExt)))"/>
-    <Delete Files="$([System.IO.Path]::Combine($(IceBuilderOutputDir),%(IceBuilder.FileName).$(HeaderExt)))"/>
+    <Delete Files="$([System.IO.Path]::Combine($(IceBuilderOutputDir),%(IceBuilder.FileName).$(IceBuilderSourceExt)))"/>
+    <Delete Files="$([System.IO.Path]::Combine($(IceBuilderOutputDir),%(IceBuilder.FileName).$(IceBuilderHeaderExt)))"/>
     <Delete Files="$([System.IO.Path]::Combine($(IceBuilderOutputDir),IceBuilder.d))"/>
   </Target>
 </Project>
