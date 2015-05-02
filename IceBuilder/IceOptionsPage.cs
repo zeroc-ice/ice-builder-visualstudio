@@ -24,12 +24,6 @@ namespace IceBuilder
     [Category("Projects and Solutions")]
     public class IceOptionsPage : DialogPage
     {
-        public String IceHome
-        {
-            get;
-            set;
-        }
-
         IceHomeEditor Editor
         {
             get;
@@ -46,23 +40,21 @@ namespace IceBuilder
             get
             {
                 Editor.optionsPage = this;
-                Editor.Initialize();
                 return Editor; 
             }
         }
 
-        public override void SaveSettingsToStorage()
+        protected override void OnApply(DialogPage.PageApplyEventArgs e)
         {
-            if (!Package.Instance.GetIceHome().Equals(IceHome))
+            if (!Package.Instance.GetIceHome().Equals(Editor.IceHome))
             {
-                Package.Instance.SetIceHome(IceHome);
+                Package.Instance.SetIceHome(Editor.IceHome);
             }
         }
 
-        public override void LoadSettingsFromStorage()
+        protected override void OnActivate(CancelEventArgs e)
         {
-            IceHome = Package.Instance.GetIceHome();
-            Editor.ClearErrors();
+            Editor.IceHome = Package.Instance.GetIceHome();
         }
     }
 }

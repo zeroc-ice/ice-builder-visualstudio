@@ -27,39 +27,39 @@ namespace IceBuilder
 
         internal IceOptionsPage optionsPage;
 
-        public void Initialize()
+        public String IceHome
         {
-            txtIceHome.Text = optionsPage.IceHome;
-        }
-
-        public void ClearErrors()
-        {
-            lblInfo.Text = "";
+            get
+            {
+                return txtIceHome.Text;
+            }
+            set
+            {
+                txtIceHome.Text = value;
+                lblInfo.Text = "";
+            }
         }
 
         private void btnIceHome_Click(object sender, EventArgs e)
         {
-            String selectedPath = UIUtil.BrowserFolderDialog(Handle, "Ice Home Location",
+            String selectedPath = UIUtil.BrowserFolderDialog(Handle, "Select Folder",
                 String.IsNullOrEmpty(txtIceHome.Text) ? 
                     Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) : txtIceHome.Text);
 
             lblInfo.Text = "";
-            selectedPath = String.IsNullOrEmpty(selectedPath) ? String.Empty : selectedPath;
 
-            if (!selectedPath.Equals(optionsPage.IceHome))
+            if(!String.IsNullOrEmpty(selectedPath) && !selectedPath.Equals(txtIceHome.Text))
             {
                 if (String.IsNullOrEmpty(selectedPath) ||
                     File.Exists(Path.Combine(selectedPath, "bin", "slice2cpp.exe")) ||
                     File.Exists(Path.Combine(selectedPath, "cpp", "bin", "slice2cpp.exe")))
                 {                 
                     txtIceHome.Text = selectedPath;
-                    optionsPage.IceHome = txtIceHome.Text;
-                    optionsPage.SaveSettingsToStorage();
                 }
                 else
                 {
                     lblInfo.Text =
-                        String.Format("Invalid Ice Home Location:\r\n\"{0}\"", selectedPath);
+                        String.Format("Invalid Ice home directory:\r\n\"{0}\"", selectedPath);
                 }
             }
         }

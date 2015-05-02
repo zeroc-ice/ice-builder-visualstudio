@@ -69,9 +69,9 @@
             this.lblIceHome.AutoSize = true;
             this.lblIceHome.Location = new System.Drawing.Point(0, 0);
             this.lblIceHome.Name = "lblIceHome";
-            this.lblIceHome.Size = new System.Drawing.Size(65, 13);
+            this.lblIceHome.Size = new System.Drawing.Size(97, 13);
             this.lblIceHome.TabIndex = 48;
-            this.lblIceHome.Text = "Ice location:";
+            this.lblIceHome.Text = "Ice home directory:";
             // 
             // IceHomeEditor
             // 
