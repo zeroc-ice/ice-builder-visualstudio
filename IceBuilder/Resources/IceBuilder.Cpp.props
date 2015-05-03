@@ -112,7 +112,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(IceBuilderOutputDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(IceBuilderOutputDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
 </Project>
