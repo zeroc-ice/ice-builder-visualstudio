@@ -37,14 +37,14 @@ namespace IceBuilder
         {
             get
             {
-                lock (this)
+                lock (_lock)
                 {
                     return _canceled;
                 }
             }
             set
             {
-                lock (this)
+                lock (_lock)
                 {
                     _canceled = value;
                 }
@@ -61,5 +61,7 @@ namespace IceBuilder
         {
             Close();
         }
+
+        private Object _lock = new Object();
     }
 }

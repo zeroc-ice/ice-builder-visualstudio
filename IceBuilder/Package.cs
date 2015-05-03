@@ -518,9 +518,11 @@ namespace IceBuilder
         {
             try
             {
+                BuildLogger logger = new BuildLogger(OutputPane);
+                logger.Verbosity = LoggerVerbosity;
                 BuildingProject = project;
                 if (!Builder.Build(project, new BuildCallback(project, OutputPane, ActiveConfiguration),
-                                  new BuildLogger(OutputPane, LoggerVerbosity)))
+                                   logger))
                 {
                     BuildingProject = null;
                 }
@@ -641,7 +643,7 @@ namespace IceBuilder
             String sliceCompiler = GetSliceCompilerPath(null, iceHome);
             if(!File.Exists(sliceCompiler))
             {
-                String message = String.Format("'{-}' not found, review your Ice installation", sliceCompiler);
+                String message = String.Format("'{0}' not found, review your Ice installation", sliceCompiler);
                 OutputPane.OutputTaskItemString(
                     message, 
                     EnvDTE.vsTaskPriority.vsTaskPriorityHigh,

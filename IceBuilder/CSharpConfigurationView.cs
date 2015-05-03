@@ -18,16 +18,7 @@ using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell.Interop;
 using System.IO;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.OLE.Interop;
-using System.Drawing;
-using Microsoft.VisualStudio.Shell.Interop;
 
 namespace IceBuilder
 {

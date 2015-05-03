@@ -31,10 +31,9 @@ namespace IceBuilder
             set;
         }
 
-        public BuildLogger(EnvDTE.OutputWindowPane outputPane, LoggerVerbosity verbosity)
+        public BuildLogger(EnvDTE.OutputWindowPane outputPane)
         {
             OutputPane = outputPane;
-            Verbosity = verbosity;
             IndentLevel = 2;
         }
 

@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.ProgressBar = new System.Windows.Forms.ProgressBar();
-            this.CancelButton = new System.Windows.Forms.Button();
+            this.Cancel = new System.Windows.Forms.Button();
             this.InfoLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
@@ -40,15 +40,15 @@
             this.ProgressBar.Size = new System.Drawing.Size(433, 23);
             this.ProgressBar.TabIndex = 0;
             // 
-            // CancelButton
+            // Cancel
             // 
-            this.CancelButton.Location = new System.Drawing.Point(191, 71);
-            this.CancelButton.Name = "CancelButton";
-            this.CancelButton.Size = new System.Drawing.Size(75, 23);
-            this.CancelButton.TabIndex = 1;
-            this.CancelButton.Text = "Cancel";
-            this.CancelButton.UseVisualStyleBackColor = true;
-            this.CancelButton.Click += new System.EventHandler(this.CancelButton_Clicked);
+            this.Cancel.Location = new System.Drawing.Point(191, 71);
+            this.Cancel.Name = "Cancel";
+            this.Cancel.Size = new System.Drawing.Size(75, 23);
+            this.Cancel.TabIndex = 1;
+            this.Cancel.Text = "Cancel";
+            this.Cancel.UseVisualStyleBackColor = true;
+            this.Cancel.Click += new System.EventHandler(this.CancelButton_Clicked);
             // 
             // InfoLabel
             // 
@@ -63,7 +63,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(457, 100);
             this.Controls.Add(this.InfoLabel);
-            this.Controls.Add(this.CancelButton);
+            this.Controls.Add(this.Cancel);
             this.Controls.Add(this.ProgressBar);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Name = "UpgradeDialogProgress";
@@ -75,7 +75,7 @@
         #endregion
 
         private System.Windows.Forms.ProgressBar ProgressBar;
-        private System.Windows.Forms.Button CancelButton;
+        private System.Windows.Forms.Button Cancel;
         private System.Windows.Forms.Label InfoLabel;
     }
 }

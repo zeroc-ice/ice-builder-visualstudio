@@ -31,7 +31,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(UpgradeDialog));
             this.lblInfo = new System.Windows.Forms.Label();
             this.projectList = new System.Windows.Forms.CheckedListBox();
-            this.CancelButton = new System.Windows.Forms.Button();
+            this.Cancel = new System.Windows.Forms.Button();
             this.OKButton = new System.Windows.Forms.Button();
             this.lblHeader = new System.Windows.Forms.Label();
             this.SuspendLayout();
@@ -57,16 +57,16 @@
             this.projectList.Size = new System.Drawing.Size(594, 304);
             this.projectList.TabIndex = 1;
             // 
-            // CancelButton
+            // Cancel
             // 
-            this.CancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.CancelButton.Location = new System.Drawing.Point(537, 407);
-            this.CancelButton.Name = "CancelButton";
-            this.CancelButton.Size = new System.Drawing.Size(75, 23);
-            this.CancelButton.TabIndex = 2;
-            this.CancelButton.Text = "Cancel";
-            this.CancelButton.UseVisualStyleBackColor = true;
-            this.CancelButton.Click += new System.EventHandler(this.CancelButton_Clicked);
+            this.Cancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.Cancel.Location = new System.Drawing.Point(537, 407);
+            this.Cancel.Name = "Cancel";
+            this.Cancel.Size = new System.Drawing.Size(75, 23);
+            this.Cancel.TabIndex = 2;
+            this.Cancel.Text = "Cancel";
+            this.Cancel.UseVisualStyleBackColor = true;
+            this.Cancel.Click += new System.EventHandler(this.CancelButton_Clicked);
             // 
             // OKButton
             // 
@@ -96,7 +96,7 @@
             this.ClientSize = new System.Drawing.Size(624, 442);
             this.Controls.Add(this.lblHeader);
             this.Controls.Add(this.OKButton);
-            this.Controls.Add(this.CancelButton);
+            this.Controls.Add(this.Cancel);
             this.Controls.Add(this.projectList);
             this.Controls.Add(this.lblInfo);
             this.Name = "UpgradeDialog";
@@ -110,7 +110,7 @@
 
         private System.Windows.Forms.Label lblInfo;
         private System.Windows.Forms.CheckedListBox projectList;
-        private System.Windows.Forms.Button CancelButton;
+        private System.Windows.Forms.Button Cancel;
         private System.Windows.Forms.Button OKButton;
         private System.Windows.Forms.Label lblHeader;
     }

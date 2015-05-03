@@ -16,22 +16,32 @@ using Microsoft.VisualStudio.Shell.Interop;
 namespace IceBuilder
 {
     [Guid("1E2800FE-37C5-4FD3-BC2E-969342EE08AF")]
-    public class PropertyPage : IPropertyPage2, IPropertyPage
+    public class PropertyPage : IPropertyPage2, IPropertyPage, IDisposable
     {
         private CSharpConfigurationView _view;
         public CSharpConfigurationView ConfigurationView
         {
-            get
+            get;
+            set;
+        }
+
+        public PropertyPage()
+        {
+            ConfigurationView = new CSharpConfigurationView(this);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if(ConfigurationView != null)
             {
-                if (_view == null)
-                {
-                    _view = new CSharpConfigurationView(this);
-                }
-                return _view;
-            }
-            set
-            {
-                _view = value;
+                ConfigurationView.Dispose();
+                ConfigurationView = null;
             }
         }
 

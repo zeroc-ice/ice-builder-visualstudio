@@ -171,15 +171,9 @@ namespace IceBuilder
                 reference.SpecificVersion = false;
                 return true;
             }
-            catch (COMException ex)
+            catch (COMException)
             {
             }
-
-            /*MessageBox.Show("Could not locate '" + component + ".dll'.",
-                            "Ice Builder", MessageBoxButtons.OK,
-                            MessageBoxIcon.Error,
-                            MessageBoxDefaultButton.Button1,
-                            (MessageBoxOptions)0);*/
             return false;
         }
 

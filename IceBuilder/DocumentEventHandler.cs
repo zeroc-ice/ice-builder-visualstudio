@@ -137,7 +137,6 @@ namespace IceBuilder
             return null;
         }
 
-        private System.Timers.Timer _buildTimer;
         private HashSet<EnvDTE.Project> _buildProjects = new HashSet<EnvDTE.Project>();
         private uint _cookie;
     }

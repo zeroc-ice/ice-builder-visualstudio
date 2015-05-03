@@ -17,3 +17,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCopyright("Copyright (c) 2009-2015 ZeroC, Inc.")]
 [assembly: AssemblyVersion("4.0.0")]
 [assembly: AssemblyDelaySign(false)]
+[assembly: ComVisibleAttribute(false)]
