@@ -361,6 +361,28 @@ namespace IceBuilder
                     reference.SpecificVersion = false;
                 }
             }
+
+            List<ProjectItem> sliceItems =
+                project.GetItems("None").Where(item => Path.GetExtension(item.UnevaluatedInclude).Equals(".ice")).ToList();
+
+            //
+            // Default output directory has changed
+            //
+            if (String.IsNullOrEmpty(cfg.OutputDir))
+            {
+                project.GetItems("Compile").Where(
+                    item =>
+                    {
+                        return sliceItems.FirstOrDefault(
+                            slice =>
+                            {
+                                return slice.UnevaluatedInclude.Equals(Path.ChangeExtension(item.UnevaluatedInclude, ".ice"));
+                            }) != null;
+                    })
+                .ToList()
+                .ForEach(item => project.RemoveItem(item));
+            }
+
             return true;
         }
 
@@ -513,21 +535,35 @@ namespace IceBuilder
                 }
             }
 
-            ICollection<ProjectItem> items = project.GetItems("None");
-            List<ProjectItem> sliceItems = new List<ProjectItem>();
-            foreach (ProjectItem j in items)
+            List<ProjectItem> sliceItems =
+                project.GetItems("None").Where(item => Path.GetExtension(item.UnevaluatedInclude).Equals(".ice")).ToList();
+
+            //
+            // Default output directory has changed
+            //
+            if(String.IsNullOrEmpty(cfg.OutputDir))
             {
-                if (Path.GetExtension(j.UnevaluatedInclude).Equals(".ice"))
+                foreach (String itemType in new String[] { "ClInclude", "ClCompile" })
                 {
-                    sliceItems.Add(j);
+                    project.GetItems(itemType).Where(
+                        item =>
+                        {
+                            return sliceItems.FirstOrDefault(
+                                slice =>
+                                {
+                                    return slice.UnevaluatedInclude.Equals(Path.ChangeExtension(item.UnevaluatedInclude, ".ice"));
+                                }) != null;
+                        })
+                    .ToList()
+                    .ForEach(item => project.RemoveItem(item));
                 }
             }
 
-            foreach (ProjectItem j in sliceItems)
-            {
-                project.RemoveItem(j);
-                project.AddItem("IceBuilder", j.UnevaluatedInclude);
-            }
+            sliceItems.ForEach(item =>
+                {
+                    project.RemoveItem(item);
+                    project.AddItem("IceBuilder", item.UnevaluatedInclude);
+                });
             return true;
         }
     }
