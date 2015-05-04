@@ -26,6 +26,7 @@
     <Slice2CSharpDependTask
       OutputDir           = "$(IceBuilderOutputDir)"
       WorkingDirectory    = "$(MSBuildProjectDirectory)"
+      DependFile          = "IceBuilder.d"
       Sources             = "@(IceBuilder)">
       
       <Output
@@ -51,6 +52,7 @@
         IncludeDirectories  = "$(IceBuilderIncludeDirectories)"
         AdditionalOptions   = "$(IceBuilderAdditionalOptions)"
         Sources             = "@(_IceBuilder)"
+        DependFile          = "IceBuilder.d"
         Condition           = "'%(_IceBuilder.BuildRequired)' == 'True'"/>
 
     <!-- Compile the Slice files to produce the generated code -->
@@ -67,6 +69,7 @@
         AdditionalOptions   = "$(IceBuilderAdditionalOptions)"
         Sources             = "@(_IceBuilder)"
         Depend              = "true"
+        DependFile          = "IceBuilder.d"
         Condition           = "'$(_IceBuilderUdateDepends)' == 'True'"/>
   </Target>
 

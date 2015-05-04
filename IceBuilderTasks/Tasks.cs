@@ -100,6 +100,13 @@ namespace IceBuilder
             set;
         }
 
+        [Required]
+        public String DependFile
+        {
+            get;
+            set;
+        }
+
         public Boolean Depend
         {
             get;
@@ -155,7 +162,7 @@ namespace IceBuilder
             {
                 builder.AppendSwitch("--depend-xml");
                 builder.AppendSwitch("--depend-file");
-                builder.AppendFileNameIfNotNull(Path.Combine(OutputDir, "IceBuilder.d"));
+                builder.AppendFileNameIfNotNull(Path.Combine(OutputDir, DependFile));
             }
 
             if(!String.IsNullOrEmpty(OutputDir))
@@ -426,6 +433,13 @@ namespace IceBuilder
         }
 
         [Required]
+        public String DependFile
+        {
+            get;
+            set;
+        }
+
+        [Required]
         public String WorkingDirectory
         {
             get;
@@ -465,7 +479,7 @@ namespace IceBuilder
             List<ITaskItem> computed = new List<ITaskItem>();
             UpdateDepends = false;
 
-            String dependFile = Path.Combine(OutputDir, "IceBuilder.d");
+            String dependFile = Path.Combine(OutputDir, DependFile);
             
             XmlDocument dependsDoc = new XmlDocument();
             bool dependExists = File.Exists(dependFile);

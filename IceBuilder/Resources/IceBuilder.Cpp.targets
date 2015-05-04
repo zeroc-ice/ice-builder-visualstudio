@@ -32,6 +32,7 @@
         WorkingDirectory                  = "$(MSBuildProjectDirectory)"
         SourceExt                         = "$(IceBuilderSourceExt)"
         HeaderExt                         = "$(IceBuilderHeaderExt)"
+        DependFile                        = "IceBuilder.d"
         Sources                           = "@(IceBuilder)">
 
       <Output
@@ -60,6 +61,7 @@
         HeaderExt                         = "$(IceBuilderHeaderExt)"
         SourceExt                         = "$(IceBuilderSourceExt)"
         Sources                           = "@(_IceBuilder)"
+        DependFile                        = "IceBuilder.d"
         Condition                         = "'%(_IceBuilder.BuildRequired)' == 'True'"/>
     
     <!-- Update the dependencies -->
@@ -79,6 +81,7 @@
         SourceExt                         = "$(IceBuilderSourceExt)"
         Depend                            = "true"
         Sources                           = "@(_IceBuilder)"
+        DependFile                        = "IceBuilder.d"
         Condition                         = "'$(_IceBuilderUdateDepends)' == 'True'"/>
   </Target>
 
