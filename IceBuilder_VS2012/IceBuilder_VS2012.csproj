@@ -64,11 +64,8 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
+  <Import Project="..\Sign.targets" />
+  <Target Name="Sign" Condition="Exists('$(Certificate)')">
+    <Exec Command="$(SignCommand) ..\IceBuilder\Resources\IceBuilder_VS2012.dll" />
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

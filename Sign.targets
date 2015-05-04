@@ -3,6 +3,6 @@
     <PropertyGroup>
         <TimeStampServer>http://timestamp.verisign.com/scripts/timstamp.dll</TimeStampServer>
     	<SignToolPath Condition="Exists('$(WindowsSDK80Path)bin\x86\signtool.exe')">$(WindowsSDK80Path)bin\x86\signtool.exe</SignToolPath>
-    	<SignCommand Condition="Exists('$(CertFile)')">"$(SignToolPath)" sign /f "$(CertFile)" /p $(CertPassword) /t $(TimeStampServer)</SignCommand>
+    	<SignCommand Condition="Exists('$(Certificate)')">"$(SignToolPath)" sign /f "$(Certificate)" /p $(CertificatePassword) /t $(TimeStampServer)</SignCommand>
     </PropertyGroup>
 </Project>
