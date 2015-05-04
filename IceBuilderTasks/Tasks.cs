@@ -149,6 +149,7 @@ namespace IceBuilder
 
         protected override String GenerateCommandLineCommands()
         {
+            UsageError = false;
             CommandLineBuilder builder = new CommandLineBuilder(false);
             if(Depend)
             {
@@ -242,15 +243,26 @@ namespace IceBuilder
             Log.LogMessage(MessageImportance.Low, message);
         }
 
+        private bool UsageError
+        {
+            get;
+            set;
+        }
+
         protected override void LogEventsFromTextOutput(string singleLine, MessageImportance messageImportance)
         {
-            if (singleLine.IndexOf(String.Format("{0}:", ToolName)) != -1)
+            if (UsageError)
             {
-                int i = singleLine.IndexOf("error:");
-                if (i != -1)
-                {
-                    Log.LogError("", "", "", "", 0, 0, 0, 0, singleLine.Substring(i + 1));
-                }
+                return;
+            }
+
+            int i = singleLine.IndexOf(String.Format("{0}:", ToolName));
+            if(i != -1)
+            {
+                i += (ToolName.Length + 1);
+                Log.LogError("", "", "", "", 0, 0, 0, 0, 
+                    String.Format("{0}: {1}", Path.GetFileName(ToolName), singleLine.Substring(i)));
+                UsageError = true;
             }
             else
             {
@@ -268,7 +280,7 @@ namespace IceBuilder
                 //
                 // Skip the drive letter
                 //
-                int i = s.IndexOf(":");
+                i = s.IndexOf(":");
                 if(i <= 1 && s.Length > i + 1)
                 {
                     i = s.IndexOf(":", i + 1);
