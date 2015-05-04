@@ -4,7 +4,7 @@
   <Rule Name="IceBuilder" PageTemplate="tool" DisplayName="Ice Builder" Order="9" SwitchPrefix="">
 
     <Rule.DataSource>
-      <DataSource Persistence="ProjectFile" ItemType="" HasConfigurationCondition="true" Label="IceBuilder"/>
+      <DataSource Persistence="ProjectFile" ItemType="" Label="IceBuilder" HasConfigurationCondition="true" />
     </Rule.DataSource>
     
     <Rule.Categories>
@@ -123,10 +123,15 @@
       </EnumProperty.DataSource>
     </EnumProperty>
 
-    <StringProperty Name="AdditionalOptions"
-                    DisplayName="Additional Options"
-                    Category="General"
-                    Visible="False"/>
+    <StringProperty DisplayName="Additional Options" 
+                    Name="AdditionalOptions" 
+                    Category="Command Line"
+                    Subtype="AdditionalOptions"
+                    Description="Additional command line options to pass to Slice compiler.">
+      <StringProperty.DataSource>
+        <DataSource Persistence="ProjectFile" ItemType="IceBuilder" Label="" HasConfigurationCondition="false" />
+      </StringProperty.DataSource>
+    </StringProperty>
   </Rule>
   
   <ItemType Name="IceBuilder" DisplayName="Build Slice Files" />
