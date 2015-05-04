@@ -20,9 +20,9 @@ Project files created with the Ice add-in are not compatible with the Ice Builde
 
 ## Ice Home Configuration
 
-In Visual Studio, use `Tools` > `Options` > `Project and Solutions` > `Ice Builder` to view or edit the home directory of the Ice installation or Ice source tree selected by the Ice Builder. For example:
-  Ice home directory = `C:\Program Files (x86)\ZeroC\Ice-3.6.0` (binary distribution)
-  Ice home directory = `C:\users\mike\github\zeroc-ice\ice` (source tree)
+The Ice Builder relies on a specific Ice installation on your system. In Visual Studio, you can view or edit the home directory of this Ice installation through the `Tools` > `Options` > `Project and Solutions` > `Ice Builder` options sheet.
+
+This installation can correspond to a binary distribution, such as `C:\Program Files (x86)\ZeroC\Ice-3.6.0`, or to a source tree, such as`C:\users\mike\github\zeroc-ice\ice`.
   
 ## C++ Usage
 
