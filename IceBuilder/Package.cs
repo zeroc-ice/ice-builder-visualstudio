@@ -447,8 +447,11 @@ namespace IceBuilder
 
             foreach (EnvDTE.Project project in projects)
             {
-                FileTracker.Reap(project);
-                ProjectUtil.SetupGenerated(project);
+                if(DTEUtil.IsIceBuilderEnabled(project))
+                {
+                    FileTracker.Reap(project);
+                    ProjectUtil.SetupGenerated(project);
+                }
             }
         }
 
