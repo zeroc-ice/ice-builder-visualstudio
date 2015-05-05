@@ -286,7 +286,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <VSCTCompile Include="IceVisualStudio.vsct">
+    <VSCTCompile Include="IceBuilder.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
       <SubType>Designer</SubType>
     </VSCTCompile>
