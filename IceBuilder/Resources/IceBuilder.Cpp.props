@@ -121,6 +121,9 @@
       <IceBuilderStream>false</IceBuilderStream>
       <IceBuilderIncludeDirectories>$(IceHome)\slice</IceBuilderIncludeDirectories>
   </PropertyGroup>
+  <PropertyGroup>
+      <LocalDebuggerEnvironment>PATH=$(IceBin);%PATH%$(LocalDebuggerEnvironment)</LocalDebuggerEnvironment>
+  </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(IceBuilderOutputDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
