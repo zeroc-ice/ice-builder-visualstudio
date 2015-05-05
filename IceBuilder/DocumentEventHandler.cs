@@ -28,14 +28,19 @@ namespace IceBuilder
 {
     public class RunningDocumentTableEventHandler : IVsRunningDocTableEvents2
     {
+        public RunningDocumentTableEventHandler(IVsRunningDocumentTable runningDocumentTable)
+        {
+            RunningDocumentTable = runningDocumentTable;
+        }
+
         public void BeginTrack()
         {
-            Package.Instance.IVsRunningDocumentTable.AdviseRunningDocTableEvents(this, out _cookie);
+            RunningDocumentTable.AdviseRunningDocTableEvents(this, out _cookie);
         }
 
         public void EndTrack()
         {
-            Package.Instance.IVsRunningDocumentTable.UnadviseRunningDocTableEvents(_cookie);
+            RunningDocumentTable.UnadviseRunningDocTableEvents(_cookie);
         }
 
         public int OnAfterAttributeChange(uint docCookie, uint grfAttribs)
@@ -123,14 +128,15 @@ namespace IceBuilder
 
             try
             {
-                if (Package.Instance.IVsRunningDocumentTable.GetDocumentInfo(cookie,
-                                                                             out pgrfRDTFlags,
-                                                                             out pdwReadLocks,
-                                                                             out pdwEditLocks,
-                                                                             out pbstrMkDocument,
-                                                                             out ppHier,
-                                                                             out pitemid,
-                                                                             out ppunkDocData) == VSConstants.S_OK)
+                if (RunningDocumentTable.GetDocumentInfo(
+                        cookie,
+                        out pgrfRDTFlags,
+                        out pdwReadLocks,
+                        out pdwEditLocks,
+                        out pbstrMkDocument,
+                        out ppHier,
+                        out pitemid,
+                        out ppunkDocData) == VSConstants.S_OK)
                 {
                     return DTEUtil.GetProjectItem(ppHier, pitemid);
                 }
@@ -143,20 +149,31 @@ namespace IceBuilder
             return null;
         }
 
+        IVsRunningDocumentTable RunningDocumentTable
+        {
+            get;
+            set;
+        }
+
         private HashSet<EnvDTE.Project> _buildProjects = new HashSet<EnvDTE.Project>();
         private uint _cookie;
     }
 
     public class DocumentEventHandler : IVsTrackProjectDocumentsEvents2
     {
+        public DocumentEventHandler(IVsTrackProjectDocuments2 trackProjectDocuments2)
+        {
+            TrackProjectDocuments2 = trackProjectDocuments2;
+        }
+
         public void BeginTrack()
         {
-            Package.Instance.IVsTrackProjectDocuments2.AdviseTrackProjectDocumentsEvents(this, out _cookie);
+            TrackProjectDocuments2.AdviseTrackProjectDocumentsEvents(this, out _cookie);
         }
 
         public void EndTrack()
         {
-            Package.Instance.IVsTrackProjectDocuments2.UnadviseTrackProjectDocumentsEvents(_cookie);
+            TrackProjectDocuments2.UnadviseTrackProjectDocumentsEvents(_cookie);
         }
 
         #region IVsTrackProjectDocumentsEvents2
@@ -367,6 +384,11 @@ namespace IceBuilder
         }
         #endregion IVsTrackProjectDocumentsEvents2
 
+        IVsTrackProjectDocuments2 TrackProjectDocuments2
+        {
+            get;
+            set;
+        }
         
         private uint _cookie = 0;
     }

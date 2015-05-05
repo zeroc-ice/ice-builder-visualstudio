@@ -32,7 +32,7 @@ namespace IceBuilder
         //
         public static String BrowserFolderDialog(IntPtr owner, String title, String initialDirectory)
         {
-            IVsUIShell shell = Package.Instance.IVsUIShell;
+            IVsUIShell shell = Package.Instance.UIShell;
 
             VSBROWSEINFOW[] browseInfo = new VSBROWSEINFOW[1];
             browseInfo[0].lStructSize = (uint)Marshal.SizeOf(typeof(VSBROWSEINFOW));

@@ -64,7 +64,7 @@ namespace IceBuilder
             private set;
         }
 
-        public IVsUIShell IVsUIShell
+        public IVsUIShell UIShell
         {
             get;
             private set;
@@ -88,31 +88,13 @@ namespace IceBuilder
             set;
         }
 
-        public IVsTrackProjectDocuments2 IVsTrackProjectDocuments2
-        {
-            get;
-            private set;
-        }
-
-        public IVsRunningDocumentTable IVsRunningDocumentTable
-        {
-            get;
-            private set;
-        }
-
         public RunningDocumentTableEventHandler RunningDocumentTableEventHandler
         {
             get;
             private set;
         }
 
-        public IVsSolutionBuildManager IVsSolutionBuildManager
-        {
-            get;
-            private set;
-        }
-
-        public IVsMonitorSelection IVsMonitorSelection
+        public IVsMonitorSelection MonitorSelection
         {
             get;
             set;
@@ -373,34 +355,8 @@ namespace IceBuilder
                 DTE2 = (EnvDTE80.DTE2)GetService(typeof(EnvDTE.DTE));
                 IVsSolution = GetService(typeof(SVsSolution)) as IVsSolution;
                 IVsSolution4 = GetService(typeof(SVsSolution)) as IVsSolution4;
-                IVsTrackProjectDocuments2 = GetService(typeof(SVsTrackProjectDocuments)) as IVsTrackProjectDocuments2;
-                DocumentEventHandler = new DocumentEventHandler();
-
-                Assembly assembly = null;
-                if (DTE.Version.StartsWith("11.0"))
-                {
-                    assembly = Assembly.LoadFrom(Path.Combine(ResourcesDirectory, "IceBuilder.VS2012.dll"));
-                }
-                else if (DTE.Version.StartsWith("12.0"))
-                {
-                    assembly = Assembly.LoadFrom(Path.Combine(ResourcesDirectory, "IceBuilder.VS2013.dll"));
-                }
-                else
-                {
-                    assembly = Assembly.LoadFrom(Path.Combine(ResourcesDirectory, "IceBuilder.VS2015.dll"));
-                }
-
-                VCUtil = assembly.GetType("IceBuilder.VCUtilI").GetConstructor(new Type[] { }).Invoke(
-                    new object[] { }) as VCUtil;
-
-                IVsRunningDocumentTable = GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
-                RunningDocumentTableEventHandler = new RunningDocumentTableEventHandler();
-
-                IVsSolutionBuildManager = GetService(typeof(SVsSolutionBuildManager)) as IVsSolutionBuildManager;
-                IVsMonitorSelection = GetGlobalService(typeof(SVsShellMonitorSelection)) as IVsMonitorSelection;
-
-                Builder = new Builder(GetService(typeof(SVsBuildManagerAccessor)) as IVsBuildManagerAccessor2);
-
+                UIShell = Package.Instance.GetService(typeof(SVsUIShell)) as IVsUIShell;
+                MonitorSelection = GetGlobalService(typeof(SVsShellMonitorSelection)) as IVsMonitorSelection;
 
                 // Add our command handlers for menu (commands must exist in the .vsct file)
                 OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
@@ -421,13 +377,6 @@ namespace IceBuilder
                     menuItemRemove.BeforeQueryStatus += removeIceBuilder_BeforeQueryStatus;
                 }
                 this.RegisterProjectFactory(new ProjectFactory());
-
-                //
-                // Subscribe to solution events.
-                //
-                SolutionEventHandler = new SolutionEventHandler();
-                SolutionEventHandler.BeginTrack();
-                Package.Instance.DocumentEventHandler.BeginTrack();
 
                 //
                 // If IceHome isn't set try to locate the latest version installed and use that.
@@ -506,7 +455,38 @@ namespace IceBuilder
                         SetIceHome(iceHome);
                     }
                 }
-                IVsUIShell = Package.Instance.GetService(typeof(SVsUIShell)) as IVsUIShell;
+
+                Assembly assembly = null;
+                if (DTE.Version.StartsWith("11.0"))
+                {
+                    assembly = Assembly.LoadFrom(Path.Combine(ResourcesDirectory, "IceBuilder.VS2012.dll"));
+                }
+                else if (DTE.Version.StartsWith("12.0"))
+                {
+                    assembly = Assembly.LoadFrom(Path.Combine(ResourcesDirectory, "IceBuilder.VS2013.dll"));
+                }
+                else
+                {
+                    assembly = Assembly.LoadFrom(Path.Combine(ResourcesDirectory, "IceBuilder.VS2015.dll"));
+                }
+                VCUtil = assembly.GetType("IceBuilder.VCUtilI").GetConstructor(new Type[] { }).Invoke(
+                    new object[] { }) as VCUtil;
+
+                RunningDocumentTableEventHandler = new RunningDocumentTableEventHandler(
+                    GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable);
+
+                Builder = new Builder(GetService(typeof(SVsBuildManagerAccessor)) as IVsBuildManagerAccessor2);
+
+                //
+                // Subscribe to solution events.
+                //
+                SolutionEventHandler = new SolutionEventHandler();
+                SolutionEventHandler.BeginTrack();
+
+                DocumentEventHandler = new DocumentEventHandler(
+                    GetService(typeof(SVsTrackProjectDocuments)) as IVsTrackProjectDocuments2);
+                DocumentEventHandler.BeginTrack();
+
                 FileTracker = new GeneratedFileTracker();
 
                 BuildEvents = DTE2.Events.BuildEvents;
@@ -581,21 +561,21 @@ namespace IceBuilder
         private void SetCmdUIContext(Guid context, bool enabled)
         {
             uint cookie;
-            ErrorHandler.ThrowOnFailure(IVsMonitorSelection.GetCmdUIContextCookie(ref context, out cookie));
+            ErrorHandler.ThrowOnFailure(MonitorSelection.GetCmdUIContextCookie(ref context, out cookie));
             if(cookie != 0)
             {
-                ErrorHandler.ThrowOnFailure(IVsMonitorSelection.SetCmdUIContext(cookie, (enabled ? 1 : 0)));
+                ErrorHandler.ThrowOnFailure(MonitorSelection.SetCmdUIContext(cookie, (enabled ? 1 : 0)));
             }
         }
 
         private bool IsCmdUIContextActive(Guid context)
         {
             uint cookie;
-            ErrorHandler.ThrowOnFailure(IVsMonitorSelection.GetCmdUIContextCookie(ref context, out cookie));
+            ErrorHandler.ThrowOnFailure(MonitorSelection.GetCmdUIContextCookie(ref context, out cookie));
             int active = 0;
             if(cookie != 0)
             {
-                ErrorHandler.ThrowOnFailure(IVsMonitorSelection.IsCmdUIContextActive(cookie, out active));
+                ErrorHandler.ThrowOnFailure(MonitorSelection.IsCmdUIContextActive(cookie, out active));
             }
             return active != 0; ;
         }
