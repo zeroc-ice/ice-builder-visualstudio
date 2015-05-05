@@ -1,4 +1,4 @@
-﻿namespace IceBuilder
+namespace IceBuilder
 {
     partial class UpgradeDialog
     {
