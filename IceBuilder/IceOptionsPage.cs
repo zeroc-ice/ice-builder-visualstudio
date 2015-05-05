@@ -46,15 +46,28 @@ namespace IceBuilder
 
         protected override void OnApply(DialogPage.PageApplyEventArgs e)
         {
-            if (!Package.Instance.GetIceHome().Equals(Editor.IceHome))
+            try
             {
                 Package.Instance.SetIceHome(Editor.IceHome);
+            }
+            catch (Exception ex)
+            {
+                Package.UnexpectedExceptionWarning(ex);
+                throw;
             }
         }
 
         protected override void OnActivate(CancelEventArgs e)
         {
-            Editor.IceHome = Package.Instance.GetIceHome();
+            try
+            {
+                Editor.IceHome = Package.Instance.GetIceHome();
+            }
+            catch (Exception ex)
+            {
+                Package.UnexpectedExceptionWarning(ex);
+                throw;
+            }
         }
     }
 }

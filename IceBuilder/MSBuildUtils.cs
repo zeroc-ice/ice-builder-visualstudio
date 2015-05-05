@@ -193,9 +193,9 @@ namespace IceBuilder
         public static bool RemoveIceBuilderFromProject(Microsoft.Build.Evaluation.Project project)
         {
             bool modified = false;
-            if(project != null)
+            if (project != null)
             {
-                if(IsCppProject(project))
+                if (IsCppProject(project))
                 {
                     ProjectImportElement iceBuilderProps = project.Xml.Imports.FirstOrDefault(p => p.Project.Equals(IceCppPropsPath));
                     if (iceBuilderProps != null)
@@ -230,9 +230,10 @@ namespace IceBuilder
                     RemoveProjectFlavorIfExists(project, IceBuilderProjectFlavorGUID);
                 }
 
-                if (modified)
+                ProjectPropertyGroupElement group = project.Xml.PropertyGroups.FirstOrDefault(g => g.Label.Equals("IceBuilder"));
+                if (group != null)
                 {
-                    project.ReevaluateIfNecessary();
+                    group.Parent.RemoveChild(group);
                 }
             }
             return modified;

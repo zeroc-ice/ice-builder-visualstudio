@@ -13,11 +13,11 @@ namespace IceBuilder
         public bool SetupSliceFilter(EnvDTE.Project dteProject)
         {
             VCProject project = dteProject.Object as VCProject;
-            foreach(VCFilter f in project.Filters)
+            foreach (VCFilter f in project.Filters)
             {
-                if(f.Name.Equals("Slice Files"))
+                if (f.Name.Equals("Slice Files"))
                 {
-                    if(String.IsNullOrEmpty(f.Filter) || !f.Filter.Equals("ice"))
+                    if (String.IsNullOrEmpty(f.Filter) || !f.Filter.Equals("ice"))
                     {
                         f.Filter = "ice";
                         return true;

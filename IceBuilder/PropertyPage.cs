@@ -49,50 +49,74 @@ namespace IceBuilder
 
         public void Activate(IntPtr parentHandle, RECT[] pRect, int modal)
         {
-            RECT rect = pRect[0];
-            this.ConfigurationView.Initialize(Control.FromHandle(parentHandle),
-                                              Rectangle.FromLTRB(rect.left, rect.top, rect.right, rect.bottom));
+            try
+            {
+                RECT rect = pRect[0];
+                this.ConfigurationView.Initialize(Control.FromHandle(parentHandle),
+                                                  Rectangle.FromLTRB(rect.left, rect.top, rect.right, rect.bottom));
+            }
+            catch (Exception ex)
+            {
+                Package.UnexpectedExceptionWarning(ex);
+                throw;
+            }
         }
 
         public void Apply()
         {
-            Settings.OutputDir = ConfigurationView.OutputDir;
-            Settings.AllowIcePrefix = ConfigurationView.Ice == CheckState.Checked ? true : false;
-            Settings.Checksum = ConfigurationView.Checksum == CheckState.Checked ? true : false;
-            Settings.Stream = ConfigurationView.Streaming == CheckState.Checked ? true : false;
-            Settings.Tie = ConfigurationView.Tie == CheckState.Checked ? true : false;
-            Settings.Underscore = ConfigurationView.Underscores == CheckState.Checked ? true : false;
-            Settings.IncludeDirectories = String.Join(";", ConfigurationView.IncludeDirectories.Values);
-            Settings.AdditionalOptions = ConfigurationView.AdditionalOptions;
-
-            List<String> referencedAssemblies = ConfigurationView.ReferencedAssemblies;
-            foreach (String assembly in ConfigurationView.Assemblies)
+            try
             {
-                if (DTEUtil.HasAssemblyReference(Project, assembly))
+                Settings.OutputDir = ConfigurationView.OutputDir;
+                Settings.AllowIcePrefix = ConfigurationView.Ice == CheckState.Checked ? true : false;
+                Settings.Checksum = ConfigurationView.Checksum == CheckState.Checked ? true : false;
+                Settings.Stream = ConfigurationView.Streaming == CheckState.Checked ? true : false;
+                Settings.Tie = ConfigurationView.Tie == CheckState.Checked ? true : false;
+                Settings.Underscore = ConfigurationView.Underscores == CheckState.Checked ? true : false;
+                Settings.IncludeDirectories = String.Join(";", ConfigurationView.IncludeDirectories.Values);
+                Settings.AdditionalOptions = ConfigurationView.AdditionalOptions;
+
+                List<String> referencedAssemblies = ConfigurationView.ReferencedAssemblies;
+                foreach (String assembly in ConfigurationView.Assemblies)
                 {
-                    if (!referencedAssemblies.Contains(assembly))
+                    if (DTEUtil.HasAssemblyReference(Project, assembly))
                     {
-                        DTEUtil.RemoveAssemblyReference(Project, assembly);
+                        if (!referencedAssemblies.Contains(assembly))
+                        {
+                            DTEUtil.RemoveAssemblyReference(Project, assembly);
+                        }
+                    }
+                    else
+                    {
+                        if (referencedAssemblies.Contains(assembly))
+                        {
+                            DTEUtil.AddAssemblyReference(Project, assembly);
+                        }
                     }
                 }
-                else
-                {
-                    if (referencedAssemblies.Contains(assembly))
-                    {
-                        DTEUtil.AddAssemblyReference(Project, assembly);
-                    }
-                }
+                Settings.Save();
+                ConfigurationView.Dirty = false;
             }
-            Settings.Save();
-            ConfigurationView.Dirty = false;
+            catch (Exception ex)
+            {
+                Package.UnexpectedExceptionWarning(ex);
+                throw;
+            }
         }
 
         public void Deactivate()
         {
-            if(_view != null)
+            try
             {
-                _view.Dispose();
-                _view = null;
+                if(_view != null)
+                {
+                    _view.Dispose();
+                    _view = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                Package.UnexpectedExceptionWarning(ex);
+                throw;
             }
         }
 
@@ -102,15 +126,23 @@ namespace IceBuilder
 
         public void GetPageInfo(PROPPAGEINFO[] pageInfo)
         {
-            PROPPAGEINFO proppageinfo;
-            proppageinfo.cb = (uint)Marshal.SizeOf(typeof(PROPPAGEINFO));
-            proppageinfo.dwHelpContext = 0;
-            proppageinfo.pszDocString = null;
-            proppageinfo.pszHelpFile = null;
-            proppageinfo.pszTitle = "Ice Builder";
-            proppageinfo.SIZE.cx = this.ConfigurationView.Size.Width;
-            proppageinfo.SIZE.cy = this.ConfigurationView.Size.Height;
-            pageInfo[0] = proppageinfo;
+            try
+            {
+                PROPPAGEINFO proppageinfo;
+                proppageinfo.cb = (uint)Marshal.SizeOf(typeof(PROPPAGEINFO));
+                proppageinfo.dwHelpContext = 0;
+                proppageinfo.pszDocString = null;
+                proppageinfo.pszHelpFile = null;
+                proppageinfo.pszTitle = "Ice Builder";
+                proppageinfo.SIZE.cx = this.ConfigurationView.Size.Width;
+                proppageinfo.SIZE.cy = this.ConfigurationView.Size.Height;
+                pageInfo[0] = proppageinfo;
+            }
+            catch (Exception ex)
+            {
+                Package.UnexpectedExceptionWarning(ex);
+                throw;
+            }
         }
 
         public void Help(String pszHelpDir)
@@ -119,14 +151,30 @@ namespace IceBuilder
 
         public int IsPageDirty()
         {
-            return ConfigurationView.Dirty ? VSConstants.S_OK : VSConstants.S_FALSE;
+            try
+            {
+                return ConfigurationView.Dirty ? VSConstants.S_OK : VSConstants.S_FALSE;
+            }
+            catch (Exception ex)
+            {
+                Package.UnexpectedExceptionWarning(ex);
+                throw;
+            }
         }
 
         public void Move(RECT[] pRect)
         {
-            Rectangle rect = Rectangle.FromLTRB(pRect[0].left, pRect[0].top, pRect[0].right, pRect[0].bottom);
-            ConfigurationView.Location = new Point(rect.X, rect.Y);
-            ConfigurationView.Size = new Size(rect.Width, rect.Height);
+            try
+            {
+                Rectangle rect = Rectangle.FromLTRB(pRect[0].left, pRect[0].top, pRect[0].right, pRect[0].bottom);
+                ConfigurationView.Location = new Point(rect.X, rect.Y);
+                ConfigurationView.Size = new Size(rect.Width, rect.Height);
+            }
+            catch (Exception ex)
+            {
+                Package.UnexpectedExceptionWarning(ex);
+                throw;
+            }
         }
 
         public ProjectSettigns Settings
@@ -143,32 +191,40 @@ namespace IceBuilder
 
         public void SetObjects(uint cObjects, Object[] objects)
         {
-            if(objects != null && cObjects > 0)
+            try
             {
-                IVsBrowseObject browse = objects[0] as IVsBrowseObject;
-                if(browse != null)
+                if (objects != null && cObjects > 0)
                 {
-                    IVsHierarchy hier;
-                    uint id;
-                    browse.GetProjectItem(out hier, out id);
-                    Project = DTEUtil.GetProject(hier);
-                    if (Project != null)
+                    IVsBrowseObject browse = objects[0] as IVsBrowseObject;
+                    if (browse != null)
                     {
-                        Settings = new ProjectSettigns(Project);
-                        Settings.Load();
-                        ConfigurationView.OutputDir = Settings.OutputDir;
-                        ConfigurationView.Ice = Settings.AllowIcePrefix ? CheckState.Checked : CheckState.Unchecked;
-                        ConfigurationView.Checksum = Settings.Checksum ? CheckState.Checked : CheckState.Unchecked;
-                        ConfigurationView.Streaming = Settings.Stream ? CheckState.Checked : CheckState.Unchecked;
-                        ConfigurationView.Tie = Settings.Tie ? CheckState.Checked : CheckState.Unchecked;
-                        ConfigurationView.Underscores = Settings.Underscore ? CheckState.Checked : CheckState.Unchecked;
-                        ConfigurationView.IncludeDirectories.Values = new List<String>(
-                            Settings.IncludeDirectories.Split(new char[]{';'}, StringSplitOptions.RemoveEmptyEntries));
-                        ConfigurationView.AdditionalOptions = Settings.AdditionalOptions;
-                        ConfigurationView.LoadReferencedAssemblies();
-                        ConfigurationView.Dirty = false;
+                        IVsHierarchy hier;
+                        uint id;
+                        browse.GetProjectItem(out hier, out id);
+                        Project = DTEUtil.GetProject(hier);
+                        if (Project != null)
+                        {
+                            Settings = new ProjectSettigns(Project);
+                            Settings.Load();
+                            ConfigurationView.OutputDir = Settings.OutputDir;
+                            ConfigurationView.Ice = Settings.AllowIcePrefix ? CheckState.Checked : CheckState.Unchecked;
+                            ConfigurationView.Checksum = Settings.Checksum ? CheckState.Checked : CheckState.Unchecked;
+                            ConfigurationView.Streaming = Settings.Stream ? CheckState.Checked : CheckState.Unchecked;
+                            ConfigurationView.Tie = Settings.Tie ? CheckState.Checked : CheckState.Unchecked;
+                            ConfigurationView.Underscores = Settings.Underscore ? CheckState.Checked : CheckState.Unchecked;
+                            ConfigurationView.IncludeDirectories.Values = new List<String>(
+                                Settings.IncludeDirectories.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries));
+                            ConfigurationView.AdditionalOptions = Settings.AdditionalOptions;
+                            ConfigurationView.LoadReferencedAssemblies();
+                            ConfigurationView.Dirty = false;
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                Package.UnexpectedExceptionWarning(ex);
+                throw;
             }
         }
 
@@ -211,11 +267,19 @@ namespace IceBuilder
 
         public int TranslateAccelerator(MSG[] pMsg)
         {
-            Message message = Message.Create(pMsg[0].hwnd, (int)pMsg[0].message, pMsg[0].wParam, pMsg[0].lParam);
-            int hr = ConfigurationView.ProcessAccelerator(ref message);
-            pMsg[0].lParam = message.LParam;
-            pMsg[0].wParam = message.WParam;
-            return hr;
+            try
+            {
+                Message message = Message.Create(pMsg[0].hwnd, (int)pMsg[0].message, pMsg[0].wParam, pMsg[0].lParam);
+                int hr = ConfigurationView.ProcessAccelerator(ref message);
+                pMsg[0].lParam = message.LParam;
+                pMsg[0].wParam = message.WParam;
+                return hr;
+            }
+            catch (Exception ex)
+            {
+                Package.UnexpectedExceptionWarning(ex);
+                throw;
+            }
         }
 
         #endregion

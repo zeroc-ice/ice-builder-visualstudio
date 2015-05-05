@@ -9,7 +9,6 @@
     
     <Rule.Categories>
       <Category Name="General" DisplayName="General"/>
-      <Category Name="Command Line" DisplayName="Command Line" Subtype="CommandLine"/>
     </Rule.Categories>
 
     <StringProperty Name="IceBuilderOutputDir"
@@ -23,18 +22,7 @@
       </StringProperty.DataSource>
     </StringProperty>
 
-    <!-- Parsing Options -->
-    <StringListProperty Name="IceBuilderIncludeDirectories"
-                        DisplayName="Include Directories"
-                        Description="Specifies one or more directories to add to the Slice include path; use semi-colons (;) as directory separators."
-                        Switch="-I"
-                        Subtype="folder"
-                        Category="General">
-      <StringListProperty.DataSource>
-        <DataSource Persistence="ProjectFile" ItemType="" Label="IceBuilder" HasConfigurationCondition="false" />
-      </StringListProperty.DataSource>
-    </StringListProperty>
-    
+    <!-- Parsing Options -->    
     <BoolProperty Name="IceBuilderAllowIcePrefix"
                   DisplayName="Allow Reserved Ice Identifiers"
                   Description="Allow reserved Ice prefix in Slice identifiers."
@@ -54,6 +42,17 @@
         <DataSource Persistence="ProjectFile" ItemType="" Label="IceBuilder" HasConfigurationCondition="false" />
       </BoolProperty.DataSource>
     </BoolProperty>
+    
+    <StringListProperty Name="IceBuilderIncludeDirectories"
+                    DisplayName="Include Directories"
+                    Description="Specifies one or more directories to add to the Slice include path; use semi-colons (;) as directory separators."
+                    Switch="-I"
+                    Subtype="folder"
+                    Category="General">
+      <StringListProperty.DataSource>
+        <DataSource Persistence="ProjectFile" ItemType="" Label="IceBuilder" HasConfigurationCondition="false" />
+      </StringListProperty.DataSource>
+    </StringListProperty>
 
     <!-- Output Options -->
     <StringProperty Name="IceBuilderBaseDirectoryForGeneratedInclude"
@@ -124,8 +123,8 @@
     </EnumProperty>
 
     <StringProperty DisplayName="Additional Options" 
-                    Name="AdditionalOptions" 
-                    Category="Command Line"
+                    Name="IceBuilderAdditionalOptions" 
+                    Category="General"
                     Subtype="AdditionalOptions"
                     Description="Additional command line options to pass to Slice compiler.">
       <StringProperty.DataSource>

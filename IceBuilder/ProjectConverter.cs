@@ -249,7 +249,7 @@ namespace IceBuilder
             Dispatcher dispatcher = Dispatcher.CurrentDispatcher;
             Thread t = new Thread(() =>
             {
-                for(int i = 0; i < projects.Count; ++i)
+                for (int i = 0; i < projects.Count; ++i)
                 {
                     if (progressCallback.Canceled)
                     {
@@ -274,7 +274,7 @@ namespace IceBuilder
                         Package.Instance.AddIceBuilderToProject(project);
                     }
                     dispatcher.Invoke(
-                        new Action(() => 
+                        new Action(() =>
                             {
                                 progressCallback.ReportProgress(projectName, i);
                             }));

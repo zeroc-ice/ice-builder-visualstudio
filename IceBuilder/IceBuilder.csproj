@@ -23,7 +23,8 @@
     <RootNamespace>IceBuilder</RootNamespace>
     <AssemblyName>IceBuilder</AssemblyName>
     <SignAssembly>false</SignAssembly>
-    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <IncludeAssemblyInVSIXContainer>true</IncludeAssemblyInVSIXContainer>
     <IncludeDebugSymbolsInVSIXContainer>true</IncludeDebugSymbolsInVSIXContainer>
@@ -249,6 +250,9 @@
     <Content Include="Resources\IceBuilder.VS2013.dll">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="Resources\IceBuilder.VS2015.dll">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="Resources\LICENSE.rtf">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
@@ -277,7 +281,6 @@
     <Content Include="Resources\Preview.png">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <None Include="key.snk" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
@@ -319,12 +322,9 @@
   <Target Name="AfterCompile" Condition="Exists('$(Certificate)')" DependsOnTargets="CoreCompile">
     <Exec Command="$(SignCommand) obj\$(Configuration)\IceBuilder.dll" />
   </Target>
-
-  <UsingTask TaskName="IceBuilder.SignTask"
-             AssemblyFile="$(MSBuildThisFileDirectory)\..\SignExtensionTask\bin\$(Configuration)\IceBuilder.SignTask.dll" />
-
-  <Target Name="SignPackage" AfterTargets="CreateVsixContainer">
-    <Message Text="Signing $(TargetVsixContainer)"/>
-    <SignTask PackageFile="$(TargetVsixContainer)" Certificate="$(Certificate)" CertificatePassword="$(CertificatePassword)"/>
+  <UsingTask TaskName="IceBuilder.SignTask" AssemblyFile="$(MSBuildThisFileDirectory)\..\SignExtensionTask\bin\$(Configuration)\IceBuilder.SignTask.dll" />
+  <Target Name="SignPackage" AfterTargets="CreateVsixContainer" Condition="Exists('$(Certificate)')">
+    <Message Text="Signing $(TargetVsixContainer)" />
+    <SignTask PackageFile="$(TargetVsixContainer)" Certificate="$(Certificate)" CertificatePassword="$(CertificatePassword)" />
   </Target>
 </Project>

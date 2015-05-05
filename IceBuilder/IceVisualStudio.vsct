@@ -14,6 +14,7 @@
     <Buttons>
       <Button guid="IceBuilderCommands" id="AddIceBuilder" priority="0x100" type="Button">
         <Parent guid="IceBuilderCommands" id="IceBuilderProjectNode" />
+        <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <ButtonText>Add Ice Builder To Project</ButtonText>
         </Strings>
@@ -21,6 +22,7 @@
       
       <Button guid="IceBuilderCommands" id="RemoveIceBuilder" priority="0x101" type="Button">
         <Parent guid="IceBuilderCommands" id="IceBuilderProjectNode" />
+        <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <ButtonText>Remove Ice Builder From Project</ButtonText>
         </Strings>
@@ -28,6 +30,7 @@
       
       <Button guid="IceBuilderCommands" id="AddIceBuilder" priority="0x100" type="Button">
         <Parent guid="IceBuilderCommands" id="IceBuilderTools" />
+        <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <ButtonText>Add Ice Builder To Project</ButtonText>
         </Strings>
@@ -35,6 +38,7 @@
     
       <Button guid="IceBuilderCommands" id="RemoveIceBuilder" priority="0x101" type="Button">
         <Parent guid="IceBuilderCommands" id="IceBuilderTools" />
+        <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <ButtonText>Remove Ice Builder From Project</ButtonText>
         </Strings>

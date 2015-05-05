@@ -81,7 +81,7 @@ namespace IceBuilder
 
         private void btnEdit_Click(object sender, EventArgs e)
         {
-            if(includeList.SelectedIndex != -1)
+            if (includeList.SelectedIndex != -1)
             {
                 _editingIndex = includeList.SelectedIndex;
                 BeginEditing();

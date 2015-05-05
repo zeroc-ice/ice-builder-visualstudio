@@ -64,6 +64,17 @@
             <IceLib>$(IceHome)\lib\$(Platform)\</IceLib>
             <IceBin>$(IceHome)\bin\$(Platform)\</IceBin>
           </PropertyGroup>
+
+          <!-- Ice 3.6 binary distribution with Visual Sudio 2015 Win32 -->
+          <PropertyGroup Condition="!Exists('$(IceSourceHome)') And '$(Platform)' == 'Win32' And '$(PlatformToolset)' == 'v140'">
+            <IceLib>$(IceHome)\lib\vc140\</IceLib>
+            <IceBin>$(IceHome)\bin\vc140\</IceBin>
+          </PropertyGroup>
+          <!-- Ice 3.6 binary distribution with Visual Sudio 2015 x64 -->
+          <PropertyGroup Condition="!Exists('$(IceSourceHome)') And '$(Platform)' != 'Win32' And '$(PlatformToolset)' == 'v140'">
+            <IceLib>$(IceHome)\lib\vc140\$(Platform)\</IceLib>
+            <IceBin>$(IceHome)\bin\vc140\$(Platform)\</IceBin>
+          </PropertyGroup>
         </When>
       </Choose>
       <!-- Binary distributions include path -->

@@ -65,8 +65,16 @@ namespace IceBuilder
         #region IVsSolutionEvents3
         public int OnAfterCloseSolution(Object pUnkReserved)
         {
-            Package.Instance.RunningDocumentTableEventHandler.EndTrack();
-            Package.Instance.FileTracker.Clear();
+            try
+            {
+                Package.Instance.RunningDocumentTableEventHandler.EndTrack();
+                Package.Instance.FileTracker.Clear();
+            }
+            catch(Exception ex)
+            {
+                Package.UnexpectedExceptionWarning(ex);
+                throw;
+            }
             return 0;
         }
 
@@ -77,9 +85,19 @@ namespace IceBuilder
 
         public int OnAfterLoadProject(IVsHierarchy hierarchyOld, IVsHierarchy hierarchyNew)
         {
-            List<EnvDTE.Project> projects = new List<EnvDTE.Project>();
-            projects.Add(DTEUtil.GetProject(hierarchyNew));
-            Package.Instance.InitializeProjects(projects);
+            try
+            {
+                EnvDTE.Project project = DTEUtil.GetProject(hierarchyNew);
+                if (project != null)
+                {
+                    Package.Instance.InitializeProjects(new List<EnvDTE.Project>(new EnvDTE.Project[] { project }));
+                }
+            }
+            catch (Exception ex)
+            {
+                Package.UnexpectedExceptionWarning(ex);
+                throw;
+            }
             return 0;
         }
 
@@ -105,10 +123,18 @@ namespace IceBuilder
 
         public int OnBeforeCloseProject(IVsHierarchy pHierarchy, int fRemoved)
         {
-            EnvDTE.Project project = DTEUtil.GetProject(pHierarchy);
-            if(project != null)
+            try
             {
-                Package.Instance.FileTracker.Remove(project);
+                EnvDTE.Project project = DTEUtil.GetProject(pHierarchy);
+                if (project != null)
+                {
+                    Package.Instance.FileTracker.Remove(project);
+                }
+            }
+            catch (Exception ex)
+            {
+                Package.UnexpectedExceptionWarning(ex);
+                throw;
             }
             return 0;
         }
@@ -130,7 +156,19 @@ namespace IceBuilder
 
         public int OnBeforeUnloadProject(IVsHierarchy pRealHierarchy, IVsHierarchy pStubHierarchy)
         {
-            Package.Instance.FileTracker.Remove(DTEUtil.GetProject(pRealHierarchy));
+            try
+            {
+                EnvDTE.Project project = DTEUtil.GetProject(pRealHierarchy);
+                if (project != null)
+                {
+                    Package.Instance.FileTracker.Remove(project);
+                }
+            }
+            catch (Exception ex)
+            {
+                Package.UnexpectedExceptionWarning(ex);
+                throw;
+            }
             return 0;
         }
 
