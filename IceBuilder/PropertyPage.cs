@@ -15,9 +15,12 @@ using Microsoft.VisualStudio.Shell.Interop;
 
 namespace IceBuilder
 {
-    [Guid("1E2800FE-37C5-4FD3-BC2E-969342EE08AF")]
+
+    [Guid(PropertyPage.PropertyPageGUID)]
     public class PropertyPage : IPropertyPage2, IPropertyPage, IDisposable
     {
+        public const String PropertyPageGUID = "1E2800FE-37C5-4FD3-BC2E-969342EE08AF";
+
         private CSharpConfigurationView _view;
         public CSharpConfigurationView ConfigurationView
         {
