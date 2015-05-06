@@ -34,15 +34,15 @@ The Ice Builder checks whether Slice files need to be compiled or recompiled eac
 
 ## Migration from the Ice Add-in for Visual Studio
 
-The Ice Builder for Visual Studio replaces the old Ice add-in for Visual Studio. Each time you start Visual Studio with both the Ice Builder extension and the Ice add-in enabled, the Ice Builder will offer to remove the Ice add-in.
+The Ice Builder for Visual Studio replaces the old Ice add-in for Visual Studio. Each time you start Visual Studio with both the Ice Builder extension and the Ice add-in installed, the Ice Builder will offer to remove the Ice add-in.
 
 Project files created with the Ice add-in are not compatible with the Ice Builder. When you open such a project file, the Ice Builder will offer to convert your project's configuration to the Ice Builder format. You should backup your project files first, as this conversion is irreversible.
 
 ## Ice Home Configuration
 
-The Ice Builder relies on a specific Ice installation on your system. In Visual Studio, you can view or edit the home directory of this Ice installation through the `TOOLS` > `Options` > `Project and Solutions` > `Ice Builder` options sheet.
+The Ice Builder relies on a specific Ice installation on your system. In Visual Studio, you can view or edit the home directory of this Ice installation through the `TOOLS` > `Options` > `Project and Solutions` > `Ice Builder` options page.
 
-This installation can correspond to a binary distribution, such as `C:\Program Files (x86)\ZeroC\Ice-3.6.0`, or to a source tree, such as`C:\users\mike\github\zeroc-ice\ice`.
+This installation can correspond to a binary distribution, such as `C:\Program Files (x86)\ZeroC\Ice-3.6.0`, or to a source tree, such as`C:\users\mike\github\zeroc-ice\ice`. When using a source tree, this source tree must be built beforehand with the version of Visual Studio you are currently using.
 
 ## C++ Usage
 
@@ -60,7 +60,7 @@ Follow these steps:
 
 ### Ice Builder Configuration for a C++ Project
 
-The Ice Builder adds an `Ice Builder` sheet to the `Common Properties` of your C++ project:
+The Ice Builder adds an `Ice Builder` property page to the `Common Properties` of your C++ project:
 
 (screenshot)
 
@@ -78,7 +78,7 @@ These properties are the same for all configurations and platforms, and allow yo
 | Generate Helper Functions For Streaming | IceBuilderStream                            | No                         | `--stream`                          |
 | Generate Slice Checksums                | IceBuilderChecksum                          | No                         | `--checksum`                        |
 | Generated Source Extension              | IceBuilderSourceExt                         | .cpp                       | `--source-ext`                      |
-| Additional Options                      | AdditionalOptions                           |                            | (any)                                     |
+| Additional Options                      | IceBuilderAdditionalOptions                 |                            | (any)                                     |
 
 ## C# Usage
 
@@ -111,6 +111,6 @@ These properties are the same for all configurations and platforms, and allow yo
 | Generate Slice checksums                | IceBuilderChecksum           | (unchecked)                | `--checksum`                       |
 | Generate tie classes                    | IceBuilderTie                | (unchecked)                | `--tie`                            |
 | Include directories                     | IceBuilderIncludeDirectories | $(IceHome)\slice           | `-I`                               |
-| Additional options                      | AdditionalOptions            |                            | (any)                              |
+| Additional options                      | IceBuilderAdditionalOptions  |                            | (any)                              |
 
 The Ice Builder adds automatically a reference to the Ice assembly, and allows you to easily add references to more Ice-related assemblies, such as IceGrid or Glacier2. All these references are added with `Specific Version` set to False.
