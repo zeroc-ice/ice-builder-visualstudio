@@ -149,9 +149,14 @@ namespace IceBuilder
             set;
         }
 
-        protected override string GetWorkingDirectory()
+        protected override String GetWorkingDirectory()
         {
             return WorkingDirectory;
+        }
+
+        protected abstract String GeneratedExtensions
+        {
+            get;
         }
 
         protected override String GenerateCommandLineCommands()
@@ -221,7 +226,7 @@ namespace IceBuilder
                             "Compiling {0} -> Generating {1}.{2}",
                             source.GetMetadata("Identity"),
                             TaskUtil.MakeRelative(WorkingDirectory, Path.Combine(OutputDir, source.GetMetadata("Filename"))),
-                            (ToolName.Equals("slice2cpp.exe") ? "[h,cpp]" : "cs")));
+                            GeneratedExtensions));
                 }
             }
             return base.ExecuteTool(pathToTool, responseFileCommands, commandLineCommands);
@@ -351,6 +356,12 @@ namespace IceBuilder
     #region Slice2CppTask
     public class Slice2CppTask : SliceCompilerTask
     {
+        public Slice2CppTask()
+        {
+            HeaderExt = "h";
+            SourceExt = "cpp";
+        }
+
         protected override string ToolName
         {
             get
@@ -382,6 +393,47 @@ namespace IceBuilder
             get;
             set;
         }
+
+        protected override String GeneratedExtensions
+        {
+            get
+            {
+                return String.Format("{0},{1}", HeaderExt, SourceExt);
+            }
+        }
+
+        protected override String GenerateCommandLineCommands()
+        {
+            CommandLineBuilder builder = new CommandLineBuilder(false);
+
+            if (!String.IsNullOrEmpty(DLLExport))
+            {
+                builder.AppendSwitch("--dll-export");
+                builder.AppendFileNameIfNotNull(DLLExport);
+            }
+
+            if (!HeaderExt.Equals("h"))
+            {
+                builder.AppendSwitch("--header-ext");
+                builder.AppendFileNameIfNotNull(HeaderExt);
+            }
+
+            if (!SourceExt.Equals("cpp"))
+            {
+                builder.AppendSwitch("--source-ext");
+                builder.AppendFileNameIfNotNull(SourceExt);
+            }
+
+            if (!String.IsNullOrEmpty(BaseDirectoryForGeneratedInclude))
+            {
+                builder.AppendSwitch("--include-dir");
+                builder.AppendFileNameIfNotNull(BaseDirectoryForGeneratedInclude);
+            }
+            builder.AppendTextUnquoted(" ");
+            builder.AppendTextUnquoted(base.GenerateCommandLineCommands());
+
+            return builder.ToString();
+        }
     }
     #endregion
 
@@ -400,6 +452,14 @@ namespace IceBuilder
         {
             get;
             set;
+        }
+
+        protected override String GeneratedExtensions
+        {
+            get
+            {
+                return "cs";
+            }
         }
 
         protected override String GenerateCommandLineCommands()
