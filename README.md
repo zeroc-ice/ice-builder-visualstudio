@@ -57,7 +57,7 @@ The Ice Builder adds an `Ice Builder` sheet to the `Common Properties` of your C
 These properties are the same for all configurations and platforms, and allow you to specify the parameters passed to `slice2cpp` when compiling the project's Slice files.
 
 | Property           | MSBuild Property Name | Default Value              | Corresponding `slice2cpp` parameter | 
------------------------------------------------------------------------------------------------------------------
+| ------------------ | --------------------- | -------------------------- | ----------------------------------- |
 | Output Directory   | IceBuilderOutputDir   | $(ProjectDir)\generated    | `--output-dir`                      |
 | Allow Reserved Ice Identifiers | IceBuilderAllowIcePrefix | No	        | `--ice`                             |	
 | Allow Underscores In Identifiers | IceBuilderUnderscore	| No            | `--underscore`	                    |
@@ -66,7 +66,7 @@ These properties are the same for all configurations and platforms, and allow yo
 | DLL Export Macro   | IceBuilderDLLExport |                              |	`--dll-export`	                    |
 | Generated Header Extension | IceBuilderHeaderExt | .h                   | `--header-ext`                      |	
 | Generate Helper Functions For Streaming	| IceBuilderStream | No         | `--stream` 	                        |
-| Generate Slice Checksums | IceBuilderChecksum | No |                    | `--checksum`	                      |
+| Generate Slice Checksums | IceBuilderChecksum | No                      | `--checksum`	                      |
 | Generated Source Extension | IceBuilderSourceExt | .cpp                 | `--source-ext`                      |	
 | Additional Options	| AdditionalOptions	   |                            |  (any)                              |
  
