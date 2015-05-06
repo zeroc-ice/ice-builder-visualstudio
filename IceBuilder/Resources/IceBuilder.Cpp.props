@@ -39,60 +39,28 @@
       </ItemGroup>
     </When>
     <!-- Windows C++ application settings-->
-    <When Condition="'$(ApplicationType)' != 'Windows Store'">
-      <!-- Configure the library and binary paths for the given platform and configuration -->
-      <Choose>
-        <!-- 3.6 targets -->
-        <When Condition="'$(IceVersionMM)' == '3.6'">
-          <!-- Ice 3.6 binary distribution with Visual Sudio 2012 Win32 -->
-          <PropertyGroup Condition="!Exists('$(IceSourceHome)') And '$(Platform)' == 'Win32' And '$(PlatformToolset)' == 'v110'">
-            <IceLib>$(IceHome)\lib\vc110\</IceLib>
-            <IceBin>$(IceHome)\bin\vc110\</IceBin>
-          </PropertyGroup>
-          <!-- Ice 3.6 binary distribution with Visual Sudio 2012 x64 -->
-          <PropertyGroup Condition="!Exists('$(IceSourceHome)') And '$(Platform)' != 'Win32' And '$(PlatformToolset)' == 'v110'">
-            <IceLib>$(IceHome)\lib\vc110\$(Platform)\</IceLib>
-            <IceBin>$(IceHome)\bin\vc110\$(Platform)\</IceBin>
-          </PropertyGroup>
-          <!-- Ice 3.6 binary distribution with Visual Sudio 2013 Win32 -->
-          <PropertyGroup Condition="!Exists('$(IceSourceHome)') And '$(Platform)' == 'Win32' And '$(PlatformToolset)' == 'v120'">
-            <IceLib>$(IceHome)\lib\</IceLib>
-            <IceBin>$(IceHome)\bin\</IceBin>
-          </PropertyGroup>
-          <!-- Ice 3.6 binary distribution with Visual Sudio 2013 x64 -->
-          <PropertyGroup Condition="!Exists('$(IceSourceHome)') And '$(Platform)' != 'Win32' And '$(PlatformToolset)' == 'v120'">
-            <IceLib>$(IceHome)\lib\$(Platform)\</IceLib>
-            <IceBin>$(IceHome)\bin\$(Platform)\</IceBin>
-          </PropertyGroup>
-
-          <!-- Ice 3.6 binary distribution with Visual Sudio 2015 Win32 -->
-          <PropertyGroup Condition="!Exists('$(IceSourceHome)') And '$(Platform)' == 'Win32' And '$(PlatformToolset)' == 'v140'">
-            <IceLib>$(IceHome)\lib\vc140\</IceLib>
-            <IceBin>$(IceHome)\bin\vc140\</IceBin>
-          </PropertyGroup>
-          <!-- Ice 3.6 binary distribution with Visual Sudio 2015 x64 -->
-          <PropertyGroup Condition="!Exists('$(IceSourceHome)') And '$(Platform)' != 'Win32' And '$(PlatformToolset)' == 'v140'">
-            <IceLib>$(IceHome)\lib\vc140\$(Platform)\</IceLib>
-            <IceBin>$(IceHome)\bin\vc140\$(Platform)\</IceBin>
-          </PropertyGroup>
-        </When>
-      </Choose>
-      <!-- Binary distributions include path -->
+    <Otherwise>
+      
+      <!-- Ice binary distribution -->
       <PropertyGroup Condition="!Exists('$(IceSourceHome)')">
-        <IceInclude>$(IceHome)\cpp\include\</IceInclude>
+        <IceLib>$(IceHome)\lib\$(IcePlatformToolsetSuffix)</IceLib>
+        <IceBin>$(IceHome)\bin\$(IcePlatformToolsetSuffix)</IceBin>
+        <IceInclude>$(IceHome)\include\</IceInclude>
       </PropertyGroup>
+      
       <!-- Source distributions library, binary and  include paths -->
       <PropertyGroup Condition="Exists('$(IceSourceHome)')">
         <IceInclude>$(IceHome)\cpp\include\</IceInclude>
         <IceBin>$(IceHome)\cpp\bin\</IceBin>
         <IceLib>$(IceHome)\cpp\lib\</IceLib>
       </PropertyGroup>
+      
       <!-- Preprend our settings to C++ configuration settings -->
       <PropertyGroup>
         <IncludePath>$(IceInclude);$(IncludePath)</IncludePath>
         <LibraryPath>$(IceLib);$(LibraryPath)</LibraryPath>
-        <ExecutablePath>$(IceBin);$(ExecutablePath)</ExecutablePath>
       </PropertyGroup>
+      
       <ItemGroup>
         <BuildMacro Include="IceInclude">
           <Value>$(IceInclude)</Value>
@@ -107,7 +75,7 @@
           <EnvironmentVariable>true</EnvironmentVariable>  
         </BuildMacro>
       </ItemGroup>
-    </When>
+    </Otherwise>
   </Choose>
 
   <!-- Default settings for IceBuilder -->
@@ -121,9 +89,21 @@
       <IceBuilderStream>false</IceBuilderStream>
       <IceBuilderIncludeDirectories>$(IceHome)\slice</IceBuilderIncludeDirectories>
   </PropertyGroup>
-  <PropertyGroup>
-      <LocalDebuggerEnvironment>PATH=$(IceBin);%PATH%$(LocalDebuggerEnvironment)</LocalDebuggerEnvironment>
-  </PropertyGroup>
+
+  <!-- Debugger environment settings -->
+  <Choose>
+    <When Condition="$(IceThirdPartyHome) != ''">
+      <PropertyGroup>
+        <LocalDebuggerEnvironment>PATH=$(IceBin);$(IceThirdPartyBin);%PATH%$(LocalDebuggerEnvironment)</LocalDebuggerEnvironment>
+      </PropertyGroup>
+    </When>
+    <Otherwise>
+      <PropertyGroup>
+        <LocalDebuggerEnvironment>PATH=$(IceBin);%PATH%$(LocalDebuggerEnvironment)</LocalDebuggerEnvironment>
+      </PropertyGroup>
+    </Otherwise>
+  </Choose>
+  
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(IceBuilderOutputDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
