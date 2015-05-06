@@ -158,62 +158,6 @@ namespace IceBuilder
                 MSBuildUtils.IsIceBuilderEnabeld(MSBuildUtils.LoadedProject(project.FullName));
         }
 
-        public static bool AddAssemblyReference(EnvDTE.Project project, String component)
-        {
-            VSLangProj.VSProject vsProject = (VSLangProj.VSProject)project.Object;
-            try
-            {
-                VSLangProj80.Reference3 reference = (VSLangProj80.Reference3)vsProject.References.Add(component + ".dll");
-                //
-                // We set SpecificVersion to false so that references still work 
-                // when Ice Home setting is updated.
-                //
-                reference.SpecificVersion = false;
-                return true;
-            }
-            catch (COMException)
-            {
-            }
-            return false;
-        }
-
-        public static bool RemoveAssemblyReference(EnvDTE.Project project, String component)
-        {
-            foreach (VSLangProj.Reference r in ((VSLangProj.VSProject)project.Object).References)
-            {
-                if (r.Name.Equals(component, StringComparison.OrdinalIgnoreCase))
-                {
-                    r.Remove();
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public static bool HasAssemblyReference(EnvDTE.Project project, String component)
-        {
-            foreach (VSLangProj.Reference r in ((VSLangProj.VSProject)project.Object).References)
-            {
-                if (r.Name.Equals(component, StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public static VSLangProj.Reference FindAssemblyReference(EnvDTE.Project project, String component)
-        {
-            foreach (VSLangProj.Reference r in ((VSLangProj.VSProject)project.Object).References)
-            {
-                if (r.Name.Equals(component, StringComparison.OrdinalIgnoreCase))
-                {
-                    return r;
-                }
-            }
-            return null;
-        }
-
         public const string cppProjectGUID = "{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}";
         public const string cppStoreAppProjectGUID = "{BC8A1FFA-BEE3-4634-8014-F334798102B3}";
         public const string csharpProjectGUID = "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}";

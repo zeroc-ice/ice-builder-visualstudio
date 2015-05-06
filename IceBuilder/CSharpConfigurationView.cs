@@ -173,7 +173,7 @@ namespace IceBuilder
                     {
                         String name = Path.GetFileNameWithoutExtension(assembly);
                         referencedAssemblies.Items.Add(name);
-                        if (DTEUtil.HasAssemblyReference(Page.Project, name))
+                        if (ProjectUtil.HasAssemblyReference(Page.Project, name))
                         {
                             referencedAssemblies.SetItemCheckState(referencedAssemblies.Items.Count - 1, CheckState.Checked);
                         }

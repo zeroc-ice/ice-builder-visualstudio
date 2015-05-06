@@ -81,18 +81,18 @@ namespace IceBuilder
                 List<String> referencedAssemblies = ConfigurationView.ReferencedAssemblies;
                 foreach (String assembly in ConfigurationView.Assemblies)
                 {
-                    if (DTEUtil.HasAssemblyReference(Project, assembly))
+                    if (ProjectUtil.HasAssemblyReference(Project, assembly))
                     {
                         if (!referencedAssemblies.Contains(assembly))
                         {
-                            DTEUtil.RemoveAssemblyReference(Project, assembly);
+                            ProjectUtil.RemoveAssemblyReference(Project, assembly);
                         }
                     }
                     else
                     {
                         if (referencedAssemblies.Contains(assembly))
                         {
-                            DTEUtil.AddAssemblyReference(Project, assembly);
+                            ProjectUtil.AddAssemblyReference(Project, assembly);
                         }
                     }
                 }

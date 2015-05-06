@@ -355,7 +355,7 @@ namespace IceBuilder
 
             foreach (String assembly in AssemblyNames)
             {
-                VSLangProj80.Reference3 reference = DTEUtil.FindAssemblyReference(dteProject, assembly) as VSLangProj80.Reference3;
+                VSLangProj80.Reference3 reference = ProjectUtil.FindAssemblyReference(dteProject, assembly) as VSLangProj80.Reference3;
                 if(reference != null)
                 {
                     reference.SpecificVersion = false;
