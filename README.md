@@ -56,20 +56,19 @@ The Ice Builder adds an `Ice Builder` sheet to the `Common Properties` of your C
 
 These properties are the same for all configurations and platforms, and allow you to specify the [parameters](https://doc.zeroc.com/display/Ice/slice2cpp+Command-Line+Options) passed to `slice2cpp` when compiling the project's Slice files.
 
-| Property                                | MSBuild Property Name                       | Default Value              | Corresponding `slice2cpp` parameter |
+| Property                                | MSBuild Property                            | Default Value              | Corresponding `slice2cpp` parameter |
 | --------------------------------------- | ------------------------------------------- | -------------------------- | ----------------------------------- |
 | Output Directory                        | IceBuilderOutputDir                         | $(ProjectDir)\generated    | `--output-dir`                      |
 | Allow Reserved Ice Identifiers          | IceBuilderAllowIcePrefix                    | No                         | `--ice`                             |
 | Allow Underscores In Identifiers        | IceBuilderUnderscore                        | No                         | `--underscore`                      |
-| Include Directories                     | IceBuilderIncludeDirectories                | $(IceHome)\slice           | `-I`                                |
+| Include Directories                     | IceBuilderIncludeDirectories                | $(IceHome)\slice           | `-I`                                      |
 | Base Directory For Generated #include   | IceBuilderBaseDirectory ForGeneratedInclude |                            | `--include-dir`                     |
 | DLL Export Macro                        | IceBuilderDLLExport                         |                            | `--dll-export`                      |
 | Generated Header Extension              | IceBuilderHeaderExt                         | .h                         | `--header-ext`                      |
 | Generate Helper Functions For Streaming | IceBuilderStream                            | No                         | `--stream`                          |
 | Generate Slice Checksums                | IceBuilderChecksum                          | No                         | `--checksum`                        |
 | Generated Source Extension              | IceBuilderSourceExt                         | .cpp                       | `--source-ext`                      |
-| Additional Options                      | AdditionalOptions                           |                            | (any)                               |
-
+| Additional Options                      | AdditionalOptions                           |                            | (any)                                     |
 
 ## C# Usage
 
@@ -93,12 +92,12 @@ The Ice Builder adds an `Ice Builder` tab to the properties of your C# project:
 
 These properties are the same for all configurations and platforms, and allow you to specify the [parameters](https://doc.zeroc.com/display/Ice/slice2cs+Command-Line+Options) passed to `slice2cs` when compiling the project's Slice files.
 
-| Property                                | MSBuild Property Name        | Default Value              | Corresponding `slice2cs` parameter |
+| Property                                | MSBuild Property             | Default Value              | Corresponding `slice2cs` parameter |
 | --------------------------------------- | -----------------------------| -------------------------- | ---------------------------------- |
 | Output directory                        | IceBuilderOutputDir          | $(ProjectDir)\generated    | `--output-dir`                     |
 | Allow reserved Ice identifiers          | IceBuilderAllowIcePrefix     | (unchecked)                | `--ice`                            |
 | Allow underscores in identifiers        | IceBuilderUnderscore         | (unchecked)                | `--underscore`                     |
-| Generate helper functions for streaming | IceBuilderStream             | (unchecked)                | `--stream`                         |
+| Generate helper methods for streaming   | IceBuilderStream             | (unchecked)                | `--stream`                         |
 | Generate Slice checksums                | IceBuilderChecksum           | (unchecked)                | `--checksum`                       |
 | Generate tie classes                    | IceBuilderTie                | (unchecked)                | `--tie`                            |
 | Include directories                     | IceBuilderIncludeDirectories | $(IceHome)\slice           | `-I`                               |
