@@ -2,7 +2,7 @@
 
 The Ice Builder for Visual Studio manages the compilation of Slice (`.ice`) files to C++ and C#. It compiles your Slice files with `slice2cpp` and `slice2cs`, and allows you to specify the parameters provided to these compilers.
 
-The Ice Builder is a Visual Studio extension compatible with Visual Studio 2012, 2013 and 2015. It can also be used with MSBuild, independently of Visual Studio. An Ice installation with `slice2cpp` and `slice2cs` version 3.6.0 or higher is also required. 
+The Ice Builder is a Visual Studio extension compatible with Visual Studio 2012, 2013 and 2015. An Ice installation with `slice2cpp` and `slice2cs` version 3.6.0 or higher is also required.
 
 (toc)
 
