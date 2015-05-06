@@ -150,7 +150,7 @@ namespace IceBuilder
                     if(!HasImport(project, IceCppPropsPath))
                     {
                         ProjectImportElement iceBuilderProps = project.Xml.CreateImportElement(IceCppPropsPath);
-                        ProjectImportElement vcProps = project.Xml.Imports.FirstOrDefault(p => p.Project.IndexOf("Microsoft.Cpp.props") != -1);
+                        ProjectImportElement vcProps = project.Xml.Imports.FirstOrDefault(p => p.Project.IndexOf("Microsoft.Cpp.Default.props") != -1);
                         project.Xml.InsertAfterChild(iceBuilderProps, vcProps);
                         modified = true;
                     }
@@ -168,7 +168,7 @@ namespace IceBuilder
                     if (!HasImport(project, IceCSharpPropsPath))
                     {
                         ProjectImportElement iceBuilderProps = project.Xml.CreateImportElement(IceCSharpPropsPath);
-                        ProjectImportElement vcProps = project.Xml.Imports.FirstOrDefault(p => p.Project.IndexOf("Microsoft.Common.props") != -1);
+                        ProjectImportElement vcProps = project.Xml.Imports.FirstOrDefault(p => p.Project.IndexOf("Microsoft.CSharp.targets") != -1);
                         project.Xml.InsertAfterChild(iceBuilderProps, vcProps);
                         modified = true;
                     }
@@ -176,7 +176,7 @@ namespace IceBuilder
                     if(!HasImport(project, IceCSharpTargetsPath))
                     {
                         ProjectImportElement iceBuilderTargets = project.Xml.CreateImportElement(IceCSharpTargetsPath);
-                        ProjectImportElement vcTargets = project.Xml.Imports.FirstOrDefault(p => p.Project.IndexOf("Microsoft.CSharp.targets") != -1);
+                        ProjectImportElement vcTargets = project.Xml.Imports.FirstOrDefault(p => p.Project.IndexOf("IceBuilder.CSharp.props") != -1);
                         project.Xml.InsertAfterChild(iceBuilderTargets, vcTargets);
                         modified = true;
                     }
@@ -249,7 +249,7 @@ namespace IceBuilder
                 // defined in this files.
                 //
                 ProjectImportElement import = project.Xml.Imports.FirstOrDefault(
-                    p => (p.Project.IndexOf("Microsoft.Cpp.targets") != -1 || p.Project.IndexOf("Microsoft.CSharp.targets") != -1));
+                    p => (p.Project.IndexOf("Microsoft.Cpp.targets") != -1 || p.Project.IndexOf("IceBuilder.CSharp.props") != -1));
                 if (import != null)
                 {
                     group = project.Xml.CreatePropertyGroupElement();
@@ -273,16 +273,12 @@ namespace IceBuilder
             }
         }
 
-        public static String GetProperty(Microsoft.Build.Evaluation.Project project, String label, String name)
+        public static String GetProperty(Microsoft.Build.Evaluation.Project project, String name)
         {
-            ProjectPropertyGroupElement group = project.Xml.PropertyGroups.FirstOrDefault(g => g.Label.Equals(label));
-            if (group != null)
-            { 
-                ProjectPropertyElement property = group.Properties.FirstOrDefault(p => p.Name.Equals(name));
-                if (property != null)
-                {
-                    return property.Value;
-                }
+            ProjectProperty property = project.GetProperty(name);
+            if (property != null)
+            {
+                return property.UnevaluatedValue;
             }
             return String.Empty;
         }
