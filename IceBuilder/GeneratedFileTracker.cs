@@ -15,7 +15,8 @@ namespace IceBuilder
     public class GeneratedFileTracker
     {
         public void Add(EnvDTE.Project project)
-        {            
+        {
+            Remove(project);
             _generated.Add(project.FullName, ProjectUtil.GetGeneratedFiles(project));
         }
 
