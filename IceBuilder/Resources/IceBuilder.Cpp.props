@@ -16,10 +16,10 @@
     <!-- Windows store application settings -->
     <When Condition="'$(ApplicationType)' == 'Windows Store'">
       <PropertyGroup Condition="!Exists('$(IceSourceHome)')">
-        <IceSDKDirectory>$(IceHome)\SDKs\</IceSDKDirectory>
-      </PropertyGroup>
+        <IceSDKDirectoryRoot>$(IceHome)\SDKs\</IceSDKDirectoryRoot>
+    </PropertyGroup>
       <PropertyGroup Condition="Exists('$(IceSourceHome)')">
-        <IceSDKDirectory>$(IceHome)\cpp\SDKs\</IceSDKDirectory>
+        <IceSDKDirectoryRoot>$(IceHome)\cpp\SDKs\</IceSDKDirectoryRoot>
       </PropertyGroup>
       <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
         <ConfigurationPrefix>Debug</ConfigurationPrefix>
@@ -29,9 +29,12 @@
       </PropertyGroup>
       <!-- Set Include, Library and SDK search paths for the given platform and configuration -->
       <PropertyGroup>
-        <IncludePath>$(IceSDKDirectory)\$(TargetPlatformIdentifier)\v$(TargetPlatformVersion)\ExtensionSDKs\Ice\$(IceVersionMM)\Designtime\CommonConfiguration\Neutral\include;$(IncludePath)</IncludePath>
-        <LibraryPath>$(IceSDKDirectory)\$(TargetPlatformIdentifier)\v$(TargetPlatformVersion)\ExtensionSDKs\Ice\$(IceVersionMM)\Designtime\$(ConfigurationPrefix)\$(PlatformTarget);$(LibraryPath)</LibraryPath>
-        <SDKReferenceDirectoryRoot>$(IceSDKDirectory);$(SDKReferenceDirectoryRoot);$(ExtensionSDKDirectoryRoot)</SDKReferenceDirectoryRoot>
+        <IceSDKDirectory>$(IceSDKDirectoryRoot)\$(TargetPlatformIdentifier)\v$(TargetPlatformVersion)\ExtensionSDKs\Ice\$(IceVersionMM)</IceSDKDirectory>
+        <IceInclude>$(IceSDKDirectory)\Designtime\CommonConfiguration\Neutral\include</IceInclude>
+        <IceLib>$(IceSDKDirectory)\Designtime\$(ConfigurationPrefix)\$(PlatformTarget)</IceLib>
+        <IncludePath>$(IceInclude);$(IncludePath)</IncludePath>
+        <LibraryPath>$(IceLib);$(LibraryPath)</LibraryPath>
+        <SDKReferenceDirectoryRoot>$(IceSDKDirectoryRoot);$(SDKReferenceDirectoryRoot);$(ExtensionSDKDirectoryRoot)</SDKReferenceDirectoryRoot>
       </PropertyGroup>
       <!-- Add a reference to the Ice SDK -->
       <ItemGroup>
