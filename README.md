@@ -24,7 +24,7 @@ If you build it from sources, simply double-click on `IceBuilder.vsix` to instal
 
 ## Overview
 
-With the Ice Builder, you can add one or more Slice (`.ice`) file to a Visual Studio project. The Ice Builder will then compile these files by launching `slice2cpp` (for C++ project) or `slice2cs` (for C# projects). All the Slice files in a given project are compiled through a single Slice compiler invocation.
+With the Ice Builder, you can add one or more Slice (`.ice`) files to a Visual Studio project. The Ice Builder will then compile these files by launching `slice2cpp` (for C++ projects) or `slice2cs` (for C# projects). All the Slice files in a given project are compiled through a single Slice compiler invocation.
 
 The Ice Builder compiles and recompiles a Slice file as needed:
 - when the generated C++ or C# source files are missing or older than this Slice file
@@ -64,7 +64,7 @@ The Ice Builder adds an `Ice Builder` property page to the `Common Properties` o
 
 (screenshot)
 
-These properties are the same for all configurations and platforms, and allow you to specify the [parameters](https://doc.zeroc.com/display/Ice/slice2cpp+Command-Line+Options) passed to `slice2cpp` when compiling the project's Slice files.
+These properties are the same for all configurations and platforms, and allow you to specify the [parameters](https://doc.zeroc.com/display/Ice36/slice2cpp+Command-Line+Options) passed to `slice2cpp` when compiling the project's Slice files.
 
 | Property                                | MSBuild Property                            | Default Value              | Corresponding `slice2cpp` parameter |
 | --------------------------------------- | ------------------------------------------- | -------------------------- | ----------------------------------- |
@@ -100,7 +100,7 @@ The Ice Builder adds an `Ice Builder` tab to the properties of your C# project:
 
 (screenshot)
 
-These properties are the same for all configurations and platforms, and allow you to specify the [parameters](https://doc.zeroc.com/display/Ice/slice2cs+Command-Line+Options) passed to `slice2cs` when compiling the project's Slice files.
+These properties are the same for all configurations and platforms, and allow you to specify the [parameters](https://doc.zeroc.com/display/Ice36/slice2cs+Command-Line+Options) passed to `slice2cs` when compiling the project's Slice files.
 
 | Property                                | MSBuild Property             | Default Value              | Corresponding `slice2cs` parameter |
 | --------------------------------------- | -----------------------------| -------------------------- | ---------------------------------- |
@@ -113,4 +113,4 @@ These properties are the same for all configurations and platforms, and allow yo
 | Include directories                     | IceBuilderIncludeDirectories | $(IceHome)\slice           | `-I`                               |
 | Additional options                      | IceBuilderAdditionalOptions  |                            | (any)                              |
 
-The Ice Builder adds automatically a reference to the Ice assembly, and allows you to easily add references to more Ice-related assemblies, such as IceGrid or Glacier2. All these references are added with `Specific Version` set to False.
+The Ice Builder automatically adds a reference to the Ice assembly, and allows you to easily add references to more Ice-related assemblies, such as IceGrid or Glacier2. All these references are added with `Specific Version` set to False.
