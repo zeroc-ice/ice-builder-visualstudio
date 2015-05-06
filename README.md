@@ -62,7 +62,7 @@ These properties are the same for all configurations and platforms, and allow yo
 | Allow Reserved Ice Identifiers | IceBuilderAllowIcePrefix | No	        | `--ice`                             |	
 | Allow Underscores In Identifiers | IceBuilderUnderscore	| No            | `--underscore`	                    |
 | Include Directories	| IceBuilderIncludeDirectories | $(IceHome)\slice   | `-I`                                |
-| Base Directory For Generated #include | IceBuilderBaseDirectoryForGeneratedInclude | | `--include-dir`	      |
+| Base Directory For Generated #include | IceBuilderBaseDirectory ForGeneratedInclude | | `--include-dir`	      |
 | DLL Export Macro   | IceBuilderDLLExport |                              |	`--dll-export`	                    |
 | Generated Header Extension | IceBuilderHeaderExt | .h                   | `--header-ext`                      |	
 | Generate Helper Functions For Streaming	| IceBuilderStream | No         | `--stream` 	                        |
