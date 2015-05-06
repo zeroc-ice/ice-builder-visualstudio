@@ -722,12 +722,23 @@ namespace IceBuilder
                 }
                 else
                 {
-                    ProjectUtil.SetProperty(p, PropertyNames.IncludeDirectories, @"$(IceHome)\slice");
+                    String includeDirectories = ProjectUtil.GetProperty(p, PropertyNames.IncludeDirectories);
+                    if (String.IsNullOrEmpty(includeDirectories))
+                    {
+                        ProjectUtil.SetProperty(p, PropertyNames.IncludeDirectories, @"$(IceHome)\slice");
+                    }
+                    else if(includeDirectories.IndexOf(@"$(IceHome)\slice") == -1)
+                    {
+                        ProjectUtil.SetProperty(p, PropertyNames.IncludeDirectories, 
+                            String.Format(@"$(IceHome)\slice;{0}", includeDirectories));
+                    }
+                    ProjectUtil.AddAssemblyReference(p, "Ice");
                 }
                 p.Save();
+                IVsHierarchy hier = DTEUtil.GetIVsHierarchy(p);
                 Guid projectGUID = Guid.Empty;
-                IVsSolution.GetGuidOfProject(DTEUtil.GetIVsHierarchy(p), out projectGUID);
-                IVsSolution4.UnloadProject(ref projectGUID, (uint)_VSProjectUnloadStatus.UNLOADSTATUS_UnloadedByUser);
+                IVsSolution.GetGuidOfProject(hier, out projectGUID);
+                IVsSolution.CloseSolutionElement((uint)__VSSLNCLOSEOPTIONS.SLNCLOSEOPT_UnloadProject, hier, 0);
                 project.Save();
                 IVsSolution4.ReloadProject(ref projectGUID);
             }
@@ -766,9 +777,33 @@ namespace IceBuilder
                     break;
                 }
             }
+
+
+            ProjectUtil.DeleteItems(p,
+                ProjectUtil.GetGeneratedFiles(p).Aggregate(
+                    new List<String>(),
+                    (items, kv) => 
+                        {
+                            items.AddRange(kv.Value);
+                            return items;
+                        }));
+
+            Directory.GetFiles(GetAssembliesDir(GetIceHome()), "*.dll")
+                .ToList()
+                .ForEach(item =>
+                    {
+                        String name = Path.GetFileNameWithoutExtension(item);
+                        if(ProjectUtil.HasAssemblyReference(p, name))
+                        {
+                            ProjectUtil.RemoveAssemblyReference(p, name);
+                        }
+                    });
+            p.Save();
+
             Guid projectGUID = Guid.Empty;
-            IVsSolution.GetGuidOfProject(DTEUtil.GetIVsHierarchy(p), out projectGUID);
-            IVsSolution4.UnloadProject(ref projectGUID, (uint)_VSProjectUnloadStatus.UNLOADSTATUS_UnloadedByUser);
+            IVsHierarchy hier = DTEUtil.GetIVsHierarchy(p);
+            IVsSolution.GetGuidOfProject(hier, out projectGUID);
+            IVsSolution.CloseSolutionElement((uint)__VSSLNCLOSEOPTIONS.SLNCLOSEOPT_UnloadProject, hier, 0);
             project.Save();
             IVsSolution4.ReloadProject(ref projectGUID);
         }
