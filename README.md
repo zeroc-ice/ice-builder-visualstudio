@@ -54,7 +54,7 @@ The Ice Builder adds an `Ice Builder` sheet to the `Common Properties` of your C
 
 (screenshot)
 
-These properties are the same for all configurations and platforms, and allow you to specify the parameters passed to `slice2cpp` when compiling the project's Slice files.
+These properties are the same for all configurations and platforms, and allow you to specify the [parameters](https://doc.zeroc.com/display/Ice/slice2cpp+Command-Line+Options) passed to `slice2cpp` when compiling the project's Slice files.
 
 | Property           | MSBuild Property Name | Default Value              | Corresponding `slice2cpp` parameter | 
 | ------------------ | --------------------- | -------------------------- | ----------------------------------- |
@@ -75,5 +75,33 @@ These properties are the same for all configurations and platforms, and allow yo
 
 ### Adding Slice Files to a C# Project
 
+Follow these steps:
+
+1. Add the Ice Builder to your C# project by right-clicking on the project and selecting `Add Ice Builder to Project`. Alternatively, you can select the project and use the menu item `TOOLS` > `Add Ice Builder to Project`.
+
+   Adding the Ice Builder creates a `Slice Files` filter in your project.
+
+2. Add one or more Slice (`.ice`) files to your project. While these Slice files can be anywhere, you may want to select a customary location such as the project's home directory or a sub-directory named `slice`. 
+
+3. Review the Ice Builder configuration of your project, as described in the section below. 
+
 ### Ice Builder Configuration for a C# Project
 
+The Ice Builder adds an `Ice Builder` tab to the properties of your C# project:
+
+(screenshot)
+
+These properties are the same for all configurations and platforms, and allow you to specify the [parameters](https://doc.zeroc.com/display/Ice/slice2cs+Command-Line+Options) passed to `slice2cs` when compiling the project's Slice files.
+
+| Property           | MSBuild Property Name | Default Value              | Corresponding `slice2cs` parameter | 
+| ------------------ | --------------------- | -------------------------- | ----------------------------------- |
+| Output directory   | IceBuilderOutputDir   | $(ProjectDir)\generated    | `--output-dir`                      |
+| Allow reserved Ice identifiers | IceBuilderAllowIcePrefix | (unchecked)	| `--ice`                             |	
+| Allow underscores in identifiers | IceBuilderUnderscore	| (unchecked)   | `--underscore`	                    |
+| Generate helper functions for streaming	| IceBuilderStream | (unchecked)| `--stream` 	                        |
+| Generate Slice checksums | IceBuilderChecksum | (unchecked)             | `--checksum`	                      |
+| Generate tie classes | IceBuilderTie | (unchecked)                      | `--tie`                             |
+| Include directories	| IceBuilderIncludeDirectories | $(IceHome)\slice   | `-I`                                |
+| Additional options	| AdditionalOptions	 |                              |  (any)                              |
+
+The Ice Builder adds automatically a reference to the Ice assembly, and allows you to easily add references to more Ice-related assemblies, such as IceGrid or Glacier2. All these references are added with `Specific Version` set to False. 
