@@ -284,7 +284,6 @@ namespace IceBuilder
                     s = s.Substring(WorkingDirectory.Length);
                 }
 
-                bool warning = false;
                 String file = "";
                 int line = 0;
                 String description = "";
@@ -335,22 +334,20 @@ namespace IceBuilder
 
                 if(description.IndexOf("warning:") == 0)
                 {
-                    description = description.Substring("warning:".Length);
                     //
                     // Don't emit warnings while parsing dependencies otherwise
                     // they will appear twices in the Error List and Output.
                     //
                     if(!Depend)
                     {
-                        Log.LogWarning("", "", "", file, line - 1, 0, 0, 0, description);
+                        Log.LogWarning("", "", "", file, line - 1, 0, 0, 0, description.Substring("warning:".Length));
                     }
                 }
                 else if (description.IndexOf("error:") == 0)
                 {
-                    description = description.Substring("error:".Length);
-                    Log.LogError("", "", "", file, line - 1, 0, 0, 0, description);
+                    Log.LogError("", "", "", file, line - 1, 0, 0, 0, description.Substring("error:".Length));
                 }
-                else
+                else if(!String.IsNullOrEmpty(description))
                 {
                     Log.LogError("", "", "", file, line - 1, 0, 0, 0, description);
                 }
