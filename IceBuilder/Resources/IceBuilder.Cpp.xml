@@ -128,7 +128,7 @@
                     Subtype="AdditionalOptions"
                     Description="Additional command line options to pass to Slice compiler.">
       <StringProperty.DataSource>
-        <DataSource Persistence="ProjectFile" ItemType="IceBuilder" Label="" HasConfigurationCondition="false" />
+        <DataSource Persistence="ProjectFile" ItemType="" Label="IceBuilder" HasConfigurationCondition="false" />
       </StringProperty.DataSource>
     </StringProperty>
   </Rule>
