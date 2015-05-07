@@ -327,22 +327,28 @@ namespace IceBuilder
                             }
                         }
 
-                        i = s.IndexOf("warning:");
-                        if(i != -1)
-                        {
-                            warning = true;
-                            if(s.Length > i + 1)
-                            {
-                                s = s.Substring(i + 1);
-                            }
-                        }
+                        
                         description = s.Trim();
+                        description += Environment.NewLine;
                     }
                 }
 
-                if(warning)
+                if(description.IndexOf("warning:") == 0)
                 {
-                    Log.LogWarning("", "", "", file, line - 1, 0, 0, 0, description);
+                    description = description.Substring("warning:".Length);
+                    //
+                    // Don't emit warnings while parsing dependencies otherwise
+                    // they will appear twices in the Error List and Output.
+                    //
+                    if(!Depend)
+                    {
+                        Log.LogWarning("", "", "", file, line - 1, 0, 0, 0, description);
+                    }
+                }
+                else if (description.IndexOf("error:") == 0)
+                {
+                    description = description.Substring("error:".Length);
+                    Log.LogError("", "", "", file, line - 1, 0, 0, 0, description);
                 }
                 else
                 {
