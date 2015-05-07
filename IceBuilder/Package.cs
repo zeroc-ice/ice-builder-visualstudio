@@ -521,7 +521,11 @@ namespace IceBuilder
                 }
                 else
                 {
-                    DTEUtil.GetProjects(DTEUtil.GetSelectedProject(), ref projects);
+                    EnvDTE.Project selected = DTEUtil.GetSelectedProject();
+                    if(selected != null)
+                    {
+                        DTEUtil.GetProjects(selected, ref projects);
+                    }
                 }
 
                 foreach (EnvDTE.Project project in projects)
