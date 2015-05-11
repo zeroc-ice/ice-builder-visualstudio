@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) 2009-2015 ZeroC, Inc. All rights reserved. -->
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <!-- Import IceBuilder common settings -->
   <Import Project="$(MSBuildThisFileDirectory)\IceBuilder.Common.props"/>
@@ -12,6 +12,33 @@
   <UsingTask TaskName="IceBuilder.Slice2CppDependTask"
              AssemblyFile="$(MSBuildThisFileDirectory)IceBuilder.Tasks.dll" />
 
+  <!-- If using a source distribution try to locate the matching third part distribution-->
+  <PropertyGroup Condition="$(IceSourceHome) != '' And $(THIRDPARTY_HOME) == ''">
+    <IceThirdPartyHome>$([MSBuild]::GetRegistryValue("HKEY_LOCAL_MACHINE\SOFTWARE\ZeroC\Ice $(IceVersion) Third Party Packages", "InstallDir"))</IceThirdPartyHome>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(IceSourceHome) != '' And $(THIRDPARTY_HOME) != ''">
+    <IceThirdPartyHome>$(THIRDPARTY_HOME)</IceThirdPartyHome>
+  </PropertyGroup>
+
+  <!-- 3.6 platform toolset suffix -->
+  <PropertyGroup Condition="'$(IceVersionMM)' == '3.6' And '$(Platform)' != 'Win32'">
+    <IcePlatformSuffix>$(Platform)\</IcePlatformSuffix>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(IceVersionMM)' == '3.6' And '$(PlatformToolset)' == 'v110'">
+    <IceToolsetSuffix>vc110\</IceToolsetSuffix>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(IceVersionMM)' == '3.6' And '$(PlatformToolset)' == 'v140'">
+    <IceToolsetSuffix>vc140\</IceToolsetSuffix>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(IceThirdPartyHome)' != ''">
+    <IceThirdPartyLib>$(IceThirdPartyHome)\lib\$(IceToolsetSuffix)$(IcePlatformSuffix)</IceThirdPartyLib>
+    <IceThirdPartyBin>$(IceThirdPartyHome)\bin\$(IceToolsetSuffix)$(IcePlatformSuffix)</IceThirdPartyBin>
+  </PropertyGroup>
+  
   <Choose>
     <!-- Windows store application settings -->
     <When Condition="'$(ApplicationType)' == 'Windows Store'">
@@ -46,8 +73,8 @@
       
       <!-- Ice binary distribution -->
       <PropertyGroup Condition="!Exists('$(IceSourceHome)')">
-        <IceLib>$(IceHome)\lib\$(IcePlatformToolsetSuffix)</IceLib>
-        <IceBin>$(IceHome)\bin\$(IcePlatformToolsetSuffix)</IceBin>
+        <IceLib>$(IceHome)\lib\$(IceToolsetSuffix)$(IcePlatformSuffix)</IceLib>
+        <IceBin>$(IceHome)\bin\$(IceToolsetSuffix)$(IcePlatformSuffix)</IceBin>
         <IceInclude>$(IceHome)\include\</IceInclude>
       </PropertyGroup>
       

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) 2009-2015 ZeroC, Inc. All rights reserved. -->
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
   <PropertyGroup Label="IceHome">
     <IceHome>$(Registry:HKEY_CURRENT_USER\Software\ZeroC\IceBuilder@IceHome)</IceHome>
     <IceVersion>$(Registry:HKEY_CURRENT_USER\Software\ZeroC\IceBuilder@IceVersion)</IceVersion>
@@ -14,84 +14,6 @@
     <IceSourceHome>$(IceHome)</IceSourceHome>
   </PropertyGroup>
 
-  <!-- If using a source distribution try to locate the matching third part distribution-->
-  <Choose>
-    <When Condition="$(IceSourceHome) != ''">
-      <Choose>
-        <When Condition="$(THIRDPARTY_HOME) == ''">
-          <PropertyGroup>
-            <IceThirdPartyHome>$([MSBuild]::GetRegistryValue("HKEY_LOCAL_MACHINE\SOFTWARE\ZeroC\Ice $(IceVersion) Third Party Packages", "InstallDir"))</IceThirdPartyHome>
-          </PropertyGroup>
-        </When>
-        <Otherwise>
-          <PropertyGroup>
-            <IceThirdPartyHome>$(THIRDPARTY_HOME)</IceThirdPartyHome>
-          </PropertyGroup>
-        </Otherwise>
-      </Choose>
-    </When>
-  </Choose>
-
-  <Choose>
-    <!-- 3.6 platform toolset suffix -->
-    <When Condition="'$(IceVersionMM)' == '3.6'">
-      <Choose>
-        <When Condition="'$(Platform)' == 'Win32'">
-          <Choose>
-            <When Condition="'$(PlatformToolset)' == 'v110'">
-              <PropertyGroup>
-                <IcePlatformToolsetSuffix>vc110\</IcePlatformToolsetSuffix>
-              </PropertyGroup>
-            </When>
-
-            <When Condition="'$(PlatformToolset)' == 'v120'">
-              <PropertyGroup>
-                <IcePlatformToolsetSuffix></IcePlatformToolsetSuffix>
-              </PropertyGroup>
-            </When>
-
-            <When Condition="'$(PlatformToolset)' == 'v140'">
-              <PropertyGroup>
-                <IcePlatformToolsetSuffix>vc140\</IcePlatformToolsetSuffix>
-              </PropertyGroup>
-            </When>
-          </Choose>
-        </When>
-
-        <Otherwise>
-          <Choose>
-            <When Condition="'$(PlatformToolset)' == 'v110'">
-              <PropertyGroup>
-                <IcePlatformToolsetSuffix>vc110\$(Platform)\</IcePlatformToolsetSuffix>
-              </PropertyGroup>
-            </When>
-
-            <When Condition="'$(PlatformToolset)' == 'v120'">
-              <PropertyGroup>
-                <IcePlatformToolsetSuffix>$(Platform)\</IcePlatformToolsetSuffix>
-              </PropertyGroup>
-            </When>
-
-            <When Condition="'$(PlatformToolset)' == 'v140'">
-              <PropertyGroup>
-                <IcePlatformToolsetSuffix>vc140\$(Platform)\</IcePlatformToolsetSuffix>
-              </PropertyGroup>
-            </When>
-          </Choose>
-        </Otherwise>
-      </Choose>
-    </When>
-  </Choose>
-  
-  <Choose>
-    <When Condition="$(IceThirdPartyHome) != ''">
-      <PropertyGroup>
-        <IceThirdPartyLib>$(IceThirdPartyHome)\lib\$(IcePlatformToolsetSuffix)</IceThirdPartyLib>
-        <IceThirdPartyBin>$(IceThirdPartyHome)\bin\$(IcePlatformToolsetSuffix)</IceThirdPartyBin>
-      </PropertyGroup>
-    </When>
-  </Choose>
-
   <!-- Source distributions -->
   <PropertyGroup Condition="Exists('$(IceSourceHome)')">
     <IceToolsBin>$(IceHome)\cpp\bin</IceToolsBin>
@@ -101,23 +23,5 @@
   <PropertyGroup Condition="!Exists('$(IceSourceHome)')">
     <IceToolsBin>$(IceHome)\bin</IceToolsBin>
   </PropertyGroup>
-
-  <ItemGroup>
-    <BuildMacro Include="IceHome">
-      <Value>$(IceHome)</Value>
-      <EnvironmentVariable>true</EnvironmentVariable>
-    </BuildMacro>
-    <BuildMacro Include="IceVersion">
-      <Value>$(IceVersion)</Value>
-      <EnvironmentVariable>true</EnvironmentVariable>
-    </BuildMacro>
-    <BuildMacro Include="IceVersionMM">
-      <Value>$(IceVersionMM)</Value>
-      <EnvironmentVariable>true</EnvironmentVariable>
-    </BuildMacro>
-    <BuildMacro Include="IceToolsBin">
-      <Value>$(IceToolsBin)</Value>
-      <EnvironmentVariable>true</EnvironmentVariable>
-    </BuildMacro>
-  </ItemGroup>
+  
 </Project>
