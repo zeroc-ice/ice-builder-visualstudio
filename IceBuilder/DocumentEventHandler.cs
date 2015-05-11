@@ -192,14 +192,18 @@ namespace IceBuilder
                 for (int i = 0; i < projectsLength; ++i)
                 {
                     EnvDTE.Project project = DTEUtil.GetProject(projects[i] as IVsHierarchy);
-                    int j = indices[i]; 
-                    int k = i < (projectsLength - 1) ? indices[i + 1] : filesLength;
-
-                    for (; j < k; ++j)
+                    EnvDTE.Project project = DTEUtil.GetProject(projects[i] as IVsHierarchy);
+                    if (DTEUtil.IsIceBuilderEnabled(project))
                     {
-                        if(ProjectUtil.IsSliceFileName(paths[j]))
+                        int j = indices[i]; 
+                        int k = i < (projectsLength - 1) ? indices[i + 1] : filesLength;
+
+                        for (; j < k; ++j)
                         {
-                            ProjectUtil.AddItems(project, ProjectUtil.GetGeneratedFiles(project, paths[j]));
+                            if(ProjectUtil.IsSliceFileName(paths[j]))
+                            {
+                                ProjectUtil.AddItems(project, ProjectUtil.GetGeneratedFiles(project, paths[j]));
+                            }
                         }
                     }
                 }
@@ -264,14 +268,17 @@ namespace IceBuilder
                 for (int i = 0; i < projectsLength; ++i)
                 {
                     EnvDTE.Project project = DTEUtil.GetProject(projects[i] as IVsHierarchy);
-                    int j = indices[i];
-                    int k = i < (projectsLength - 1) ? indices[i + 1] : filesLength;
-                    for (; j < k; ++j)
+                    if (DTEUtil.IsIceBuilderEnabled(project))
                     {
-                        ProjectUtil.DeleteItems(project, ProjectUtil.GetGeneratedFiles(project, oldNames[j]));
-                        if(ProjectUtil.IsSliceFileName(newNames[j]))
+                        int j = indices[i];
+                        int k = i < (projectsLength - 1) ? indices[i + 1] : filesLength;
+                        for (; j < k; ++j)
                         {
-                            ProjectUtil.AddItems(project, ProjectUtil.GetGeneratedFiles(project, newNames[j]));
+                            ProjectUtil.DeleteItems(project, ProjectUtil.GetGeneratedFiles(project, oldNames[j]));
+                            if (ProjectUtil.IsSliceFileName(newNames[j]))
+                            {
+                                ProjectUtil.AddItems(project, ProjectUtil.GetGeneratedFiles(project, newNames[j]));
+                            }
                         }
                     }
                 }
