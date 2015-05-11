@@ -135,8 +135,7 @@ To build Ice Builder for Visual Studio you need to install the following Visual 
 
 ### Build Instructions
 
-To build the Ice Builder for Visual Studio open IceBuilder.sln solution file using once of the supported
-visual studio versions and build the solution.
+To build the Ice Builder for Visual Studio open IceBuilder.sln solution file using one of the 
 
 After build the Ice Builder extension VSIX package will be placed in the build output directory
 IceBuilder\bin\Debug\IceBuilder.vsix for debug builds and IceBuilder\bin\Release\IceBuilder.vsix
