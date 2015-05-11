@@ -65,7 +65,7 @@
       </StringProperty.DataSource>
     </StringProperty>
 
-    <StringProperty Name="IceBuilderDLLExportMacro"
+    <StringProperty Name="IceBuilderDLLExport"
                     DisplayName="DLL Export Macro"
                     Switch="--dll-export"
                     Category="General"
