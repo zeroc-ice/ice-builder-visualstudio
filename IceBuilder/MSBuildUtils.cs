@@ -150,7 +150,7 @@ namespace IceBuilder
                     if(!HasImport(project, IceCppPropsPath))
                     {
                         ProjectImportElement iceBuilderProps = project.Xml.CreateImportElement(IceCppPropsPath);
-                        ProjectImportElement vcProps = project.Xml.Imports.FirstOrDefault(p => p.Project.IndexOf("Microsoft.Cpp.Default.props") != -1);
+                        ProjectImportElement vcProps = project.Xml.Imports.FirstOrDefault(p => p.Project.IndexOf("Microsoft.Cpp.props") != -1);
                         project.Xml.InsertAfterChild(iceBuilderProps, vcProps);
                         modified = true;
                     }
