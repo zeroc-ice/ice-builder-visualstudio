@@ -192,7 +192,6 @@ namespace IceBuilder
                 for (int i = 0; i < projectsLength; ++i)
                 {
                     EnvDTE.Project project = DTEUtil.GetProject(projects[i] as IVsHierarchy);
-                    EnvDTE.Project project = DTEUtil.GetProject(projects[i] as IVsHierarchy);
                     if (DTEUtil.IsIceBuilderEnabled(project))
                     {
                         int j = indices[i]; 
@@ -202,7 +201,9 @@ namespace IceBuilder
                         {
                             if(ProjectUtil.IsSliceFileName(paths[j]))
                             {
+                                List<String> generated = ProjectUtil.GetGeneratedFiles(project, paths[j]);
                                 ProjectUtil.AddItems(project, ProjectUtil.GetGeneratedFiles(project, paths[j]));
+                                Package.Instance.FileTracker.Add(project, paths[j], generated);
                             }
                         }
                     }
@@ -242,6 +243,7 @@ namespace IceBuilder
                                 ProjectUtil.DeleteItems(project, ProjectUtil.GetGeneratedFiles(project, names[i]));
                             }
                         }
+                        Package.Instance.FileTracker.Reap(project);
                     }
                 }
             }
@@ -277,9 +279,12 @@ namespace IceBuilder
                             ProjectUtil.DeleteItems(project, ProjectUtil.GetGeneratedFiles(project, oldNames[j]));
                             if (ProjectUtil.IsSliceFileName(newNames[j]))
                             {
-                                ProjectUtil.AddItems(project, ProjectUtil.GetGeneratedFiles(project, newNames[j]));
+                                List<String> generated = ProjectUtil.GetGeneratedFiles(project, newNames[j]);
+                                ProjectUtil.AddItems(project, generated);
+                                Package.Instance.FileTracker.Add(project, newNames[j], generated);
                             }
                         }
+                        Package.Instance.FileTracker.Reap(project);
                     }
                 }
             }
