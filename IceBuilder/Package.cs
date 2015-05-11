@@ -648,12 +648,10 @@ namespace IceBuilder
                         if(DTEUtil.IsCppProject(p) || DTEUtil.IsCSharpProject(p))
                         {
                             command.Enabled = !MSBuildUtils.IsIceBuilderEnabeld(MSBuildUtils.LoadedProject(p.FullName));
-                            command.Visible = true;
                         }
                         else
                         {
                             command.Enabled = false;
-                            command.Visible = false;
                         }
                     }
                 }
@@ -682,7 +680,6 @@ namespace IceBuilder
                         else
                         {
                             command.Enabled = false;
-                            command.Visible = false;
                         }
                     }
                 }
