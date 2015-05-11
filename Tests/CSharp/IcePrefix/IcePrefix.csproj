@@ -43,6 +43,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\..\..\..\..\..\..\generated\Test.cs">
+      <Link>Test.cs</Link>
+    </Compile>
     <Compile Include="generated\Test.cs" />
     <Compile Include="IcePrefix.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
