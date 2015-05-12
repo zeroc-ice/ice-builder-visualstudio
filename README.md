@@ -121,26 +121,29 @@ The Ice Builder automatically adds a reference to the Ice assembly, and allows y
 
 ### Build Requirements
 
-To build Ice Builder for Visual Studio you need to install ALL of the following Visual Studio SDKs:
+To build Ice Builder for Visual Studio you will need to:
 
-1. [Visual Studio 2012 SDK](https://www.microsoft.com/en-us/download/details.aspx?id=30668)
-2. [Visual Studio 2013 SDK](https://www.microsoft.com/en-us/download/details.aspx?id=40758)
-3. [Visual Studio 2015 RC SDK](https://www.visualstudio.com/en-us/downloads/visual-studio-2015-downloads-vs.aspx)
+Be running one of the following versions of Visual Studio:
+- Visual Studio 2012
+- Visual Studio 2013
+- Visual Studio 2015 RC
 
-###Visual Studio Supported Versions
+**AND**
+  
+Install ALL of the following Visual Studio SDKs:
+- [Visual Studio 2012 SDK](https://www.microsoft.com/en-us/download/details.aspx?id=30668)
+- [Visual Studio 2013 SDK](https://www.microsoft.com/en-us/download/details.aspx?id=40758)
+- [Visual Studio 2015 RC SDK](https://www.visualstudio.com/en-us/downloads/visual-studio-2015-downloads-vs.aspx)
 
-1. Visual Studio 2012 Professional
-2. Visual Studio 2013 Professional
-3. Visual Studio 2015 RC Professional
 
 ### Build Instructions
 
-To build the Ice Builder for Visual Studio, open the `IceBuilder.sln` solution file using one of the supported Visual Studio versions.
+To build the Ice Builder for Visual Studio, open the `IceBuilder.sln` solution file with Visual Studio.
 
 After building the Ice Builder extension, the VSIX package will be placed in the build output directory
 `IceBuilder\bin\Debug\IceBuilder.vsix` for debug builds, and `IceBuilder\bin\Release\IceBuilder.vsix`
 for release builds.
 
-If you want to build an authenticode signed extension, set the environment variable certficate to 
-the path of your PFX certificate store, and `CertificatePassword` environment variable to the password
+If you want to sign your extension with Authenticode, set the environment variable `Certificate` to 
+the path of your PFX certificate store, and the `CertificatePassword` environment variable to the password
 used by your certificate store.
