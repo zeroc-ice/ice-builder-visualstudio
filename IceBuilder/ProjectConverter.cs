@@ -74,6 +74,21 @@ namespace IceBuilder
 
         class OldConfiguration
         {
+            public OldConfiguration()
+            {
+                Enabled = false;
+                OutputDir = String.Empty;
+                HeaderExt = String.Empty;
+                SourceExt = String.Empty;
+                AdditionalOptions = String.Empty;
+                IncludeDirectories = String.Empty;
+                Ice = false;
+                Stream = false;
+                Checksum = false;
+                Tie = false;
+                DLLExport = String.Empty;
+            }
+
             public bool Enabled
             {
                 get;
@@ -157,40 +172,71 @@ namespace IceBuilder
                             XmlNode userProperties = doc.DocumentElement.SelectSingleNode("/msb:VisualStudio/msb:UserProperties", ns);
                             if (userProperties != null)
                             {
-                                Enabled = userProperties.Attributes[PropertyIce] != null &&
-                                          userProperties.Attributes[PropertyIce].Value.Equals("True");
+                                if(userProperties.Attributes[PropertyIce] != null)
+                                {
+                                    loaded = true;
+                                    Enabled = userProperties.Attributes[PropertyIce].Value.Equals("True");
+                                }
+                                
+                                if(userProperties.Attributes[PropertyIceOutputDir] != null)
+                                {
+                                    loaded = true;
+                                    OutputDir = userProperties.Attributes[PropertyIceOutputDir].Value;
+                                }
+                                
+                                if(userProperties.Attributes[PropertyIceHeaderExt] != null)
+                                {
+                                    loaded = true;
+                                    HeaderExt =  userProperties.Attributes[PropertyIceHeaderExt].Value;
+                                }
+                                
+                                if(userProperties.Attributes[PropertyIceSourceExt] != null)
+                                {
+                                    loaded = true;
+                                    SourceExt = userProperties.Attributes[PropertyIceSourceExt].Value;
+                                }
+                                
+                                if(userProperties.Attributes[PropertyIceExtraOptions] != null)
+                                {
+                                    loaded = true;
+                                    AdditionalOptions = userProperties.Attributes[PropertyIceExtraOptions].Value;
+                                }
 
-                                OutputDir = userProperties.Attributes[PropertyIceOutputDir] != null ?
-                                            userProperties.Attributes[PropertyIceOutputDir].Value : String.Empty;
+                                if(userProperties.Attributes[PropertyIceIncludePath] != null)
+                                {
+                                    loaded = true;
+                                    IncludeDirectories = userProperties.Attributes[PropertyIceIncludePath].Value;
+                                }
 
-                                HeaderExt = userProperties.Attributes[PropertyIceHeaderExt] != null ?
-                                            userProperties.Attributes[PropertyIceHeaderExt].Value : String.Empty;
+                                if(userProperties.Attributes[PropertyIceStreaming] != null)
+                                {
+                                    loaded = true;
+                                    Stream = userProperties.Attributes[PropertyIceStreaming].Value.Equals("True");
+                                }
+                                
+                                if(userProperties.Attributes[PropertyIceChecksum] != null)
+                                {
+                                    loaded = true;
+                                    Checksum = userProperties.Attributes[PropertyIceChecksum].Value.Equals("True");
+                                }
+                                
+                                if(userProperties.Attributes[PropertyIceTie] != null)
+                                {
+                                    loaded = true;
+                                    Tie = userProperties.Attributes[PropertyIceTie].Value.Equals("True");
+                                }
+                                
+                                if(userProperties.Attributes[PropertyIcePrefix] != null)
+                                {
+                                    loaded = true;
+                                    Ice =  userProperties.Attributes[PropertyIcePrefix].Value.Equals("True");
+                                }
 
-                                SourceExt = userProperties.Attributes[PropertyIceSourceExt] != null ?
-                                            userProperties.Attributes[PropertyIceSourceExt].Value : String.Empty;
-
-                                AdditionalOptions = userProperties.Attributes[PropertyIceExtraOptions] != null ?
-                                                    userProperties.Attributes[PropertyIceExtraOptions].Value : String.Empty;
-
-                                IncludeDirectories =
-                                    userProperties.Attributes[PropertyIceIncludePath] != null ?
-                                    userProperties.Attributes[PropertyIceIncludePath].Value : String.Empty;
-
-
-                                Stream = userProperties.Attributes[PropertyIceStreaming] != null &&
-                                         userProperties.Attributes[PropertyIceStreaming].Value.Equals("True");
-
-                                Checksum = userProperties.Attributes[PropertyIceChecksum] != null &&
-                                           userProperties.Attributes[PropertyIceChecksum].Value.Equals("True");
-
-                                Tie = userProperties.Attributes[PropertyIceTie] != null &&
-                                      userProperties.Attributes[PropertyIceTie].Value.Equals("True");
-
-                                Ice = userProperties.Attributes[PropertyIcePrefix] != null &&
-                                      userProperties.Attributes[PropertyIcePrefix].Value.Equals("True");
-
-                                DLLExport = userProperties.Attributes[PropertyIceDllExport] != null ?
-                                            userProperties.Attributes[PropertyIceDllExport].Value : String.Empty;
+                                if(userProperties.Attributes[PropertyIceDllExport] != null)
+                                {
+                                    loaded = true;
+                                    DLLExport = userProperties.Attributes[PropertyIceDllExport].Value;
+                                }
 
                                 if (remove)
                                 {
@@ -207,7 +253,6 @@ namespace IceBuilder
                                         project.Xml.RemoveChild(extension);
                                     }
                                 }
-                                loaded = true;
                                 break;
                             }
                         }

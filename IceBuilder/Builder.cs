@@ -30,7 +30,9 @@ namespace IceBuilder
 
         public bool Build(EnvDTE.Project p, BuildCallback buildCallback, BuildLogger buildLogger)
         {
-            MSBuildProject project = MSBuildUtils.LoadedProject(p.FullName);
+            p.Save();
+            MSBuildProject project = MSBuildUtils.LoadedProject(p.FullName, false);
+
             //
             // We need to set this before we acquire the build resources otherwise Msbuild
             // will not see the changes.
@@ -76,10 +78,11 @@ namespace IceBuilder
                 try
                 {
                     BuildRequestData buildRequest = new BuildRequestData(
-                            project.CreateProjectInstance(),
+                            BuildManager.DefaultBuildManager.GetProjectInstanceForBuild(project),
                             new String[] { "IceBuilder_Compile" },
                             project.ProjectCollection.HostServices,
-                            BuildRequestDataFlags.None);
+                            BuildRequestDataFlags.IgnoreExistingProjectState |
+                            BuildRequestDataFlags.ReplaceExistingProjectInstance);
 
                     BuildSubmission submission = BuildManager.DefaultBuildManager.PendBuildRequest(buildRequest);
                     ErrorHandler.ThrowOnFailure(BuildManagerAccessor.RegisterLogger(submission.SubmissionId, buildLogger));

@@ -969,10 +969,10 @@ namespace IceBuilder
             set;
         }
 
-        private VCUtil VCUtil
+        public VCUtil VCUtil
         {
             get;
-            set;
+            private set;
         }
 
         private Builder Builder

@@ -30,5 +30,29 @@ namespace IceBuilder
             filter.Filter = "ice";
             return true;
         }
+
+        public void AddToFilter(EnvDTE.Project dteProject, String name, String path)
+        {
+            VCProject project = dteProject.Object as VCProject;
+
+            VCFilter filter = null;
+            foreach (VCFilter f in project.Filters)
+            {
+                if (f.Name.Equals(name))
+                {
+                    filter = f;
+                    break;
+                }
+            }
+
+            if (filter != null)
+            {
+                filter.AddFile(path);                
+            }
+            else
+            {
+                project.AddFile(path);
+            }
+        }
     }
 }

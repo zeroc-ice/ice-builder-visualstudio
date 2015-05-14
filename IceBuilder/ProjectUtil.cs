@@ -255,20 +255,6 @@ namespace IceBuilder
             return true;
         }
 
-        public static void AddItems(EnvDTE.Project project, List<String> paths)
-        {
-            foreach (String path in paths)
-            {
-                String directoryName = Path.GetDirectoryName(path);
-                if(!Directory.Exists(directoryName))
-                {
-                    Directory.CreateDirectory(directoryName);
-                }
-                File.Create(path).Dispose();
-                project.ProjectItems.AddFromFile(path);
-            }
-        }
-
         public static void DeleteItems(EnvDTE.Project project, List<String> paths)
         {
             foreach (String path in paths)
@@ -324,7 +310,16 @@ namespace IceBuilder
             }
         }
 
-        private static void SetupGenerated(EnvDTE.Project project, String file)
+        public static void SetupGenerated(EnvDTE.Project project, List<String> files)
+        {
+            foreach (String file in files)
+            {
+                SetupGenerated(project, file);
+            }
+        }
+
+        static List<String> KnownHeaderExtension = new List<String>(new String[] { ".h", ".hpp", ".hh", ".hxx" });
+        public static void SetupGenerated(EnvDTE.Project project, String file)
         {
             List<String> generated = GetGeneratedFiles(project, file);
             foreach (String generatedFile in generated)
@@ -342,7 +337,17 @@ namespace IceBuilder
                 EnvDTE.ProjectItem item = FindProjectItem(generatedFile, project.ProjectItems);
                 if(item == null)
                 {
-                    project.ProjectItems.AddFromFile(generatedFile);  
+                    if (DTEUtil.IsCppProject(project))
+                    {
+                        String filter = KnownHeaderExtension.Contains(
+                            Path.GetExtension(generatedFile)) ? "Header Files" : "Source Files";
+
+                        Package.Instance.VCUtil.AddToFilter(project, filter, generatedFile);
+                    }
+                    else
+                    {
+                        project.ProjectItems.AddFromFile(generatedFile);
+                    }
                 }
             }
             Package.Instance.FileTracker.Add(project, file, generated);

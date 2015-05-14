@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) 2009-2015 ZeroC, Inc. All rights reserved. -->
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-
-  <PropertyGroup Label="IceHome">
+  <Import Project="$(ICE_HOME)\config\Ice.props"
+          Condition="Exists('$(ICE_HOME)\config\Ice.props')"/>
+  <PropertyGroup Label="IceHome" Condition="'$(IceHome)' == ''">
     <IceHome>$(Registry:HKEY_CURRENT_USER\Software\ZeroC\IceBuilder@IceHome)</IceHome>
     <IceVersion>$(Registry:HKEY_CURRENT_USER\Software\ZeroC\IceBuilder@IceVersion)</IceVersion>
     <IceIntVersion>$(Registry:HKEY_CURRENT_USER\Software\ZeroC\IceBuilder@IceIntVersion)</IceIntVersion>

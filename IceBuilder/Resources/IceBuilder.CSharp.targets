@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) 2009-2015 ZeroC, Inc. All rights reserved. -->
-<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <Target Name="IceBuilder_Validate">
     <Error Text="Ice Installation not detected. You may need to update Ice Home in 'Tools > Options > Projects and Solutions > Ice Builder'"

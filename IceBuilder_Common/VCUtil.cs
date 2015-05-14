@@ -15,5 +15,6 @@ namespace IceBuilder
     public interface VCUtil
     {
         bool SetupSliceFilter(EnvDTE.Project project);
+        void AddToFilter(EnvDTE.Project dteProject, String name, String path);
     }
 }

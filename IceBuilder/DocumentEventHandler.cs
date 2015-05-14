@@ -201,9 +201,7 @@ namespace IceBuilder
                         {
                             if(ProjectUtil.IsSliceFileName(paths[j]))
                             {
-                                List<String> generated = ProjectUtil.GetGeneratedFiles(project, paths[j]);
-                                ProjectUtil.AddItems(project, ProjectUtil.GetGeneratedFiles(project, paths[j]));
-                                Package.Instance.FileTracker.Add(project, paths[j], generated);
+                                ProjectUtil.SetupGenerated(project, paths[j]);
                             }
                         }
                     }
@@ -279,9 +277,7 @@ namespace IceBuilder
                             ProjectUtil.DeleteItems(project, ProjectUtil.GetGeneratedFiles(project, oldNames[j]));
                             if (ProjectUtil.IsSliceFileName(newNames[j]))
                             {
-                                List<String> generated = ProjectUtil.GetGeneratedFiles(project, newNames[j]);
-                                ProjectUtil.AddItems(project, generated);
-                                Package.Instance.FileTracker.Add(project, newNames[j], generated);
+                                ProjectUtil.SetupGenerated(project, newNames[j]);
                             }
                         }
                         Package.Instance.FileTracker.Reap(project);
