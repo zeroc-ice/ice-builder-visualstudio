@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <TimeStampServer>http://timestamp.verisign.com/scripts/timstamp.dll</TimeStampServer>
+        <TimeStampServer Condition="'$(SIGN_TIMESTAMPSERVER)' == ''">http://timestamp.verisign.com/scripts/timstamp.dll</TimeStampServer>
     	<SignToolPath Condition="Exists('$(WindowsSDK80Path)bin\x86\signtool.exe')">$(WindowsSDK80Path)bin\x86\signtool.exe</SignToolPath>
-    	<SignCommand Condition="Exists('$(Certificate)')">"$(SignToolPath)" sign /f "$(Certificate)" /p $(CertificatePassword) /t $(TimeStampServer)</SignCommand>
+    	<SignCommand Condition="Exists('$(SIGN_CERTIFICATE)')">"$(SignToolPath)" sign /f "$(SIGN_CERTIFICATE)" /p $(SIGN_PASSWORD) /t $(TimeStampServer)</SignCommand>
     </PropertyGroup>
 </Project>

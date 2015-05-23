@@ -72,14 +72,14 @@ These properties are the same for all configurations and platforms, and allow yo
 | Output Directory                        | IceBuilderOutputDir                         | $(ProjectDir)\generated    | `--output-dir`                      |
 | Allow Reserved Ice Identifiers          | IceBuilderAllowIcePrefix                    | No                         | `--ice`                             |
 | Allow Underscores In Identifiers        | IceBuilderUnderscore                        | No                         | `--underscore`                      |
-| Include Directories                     | IceBuilderIncludeDirectories                | $(IceHome)\slice           | `-I`                                      |
+| Include Directories                     | IceBuilderIncludeDirectories                | $(IceHome)\slice           | `-I`                                |
 | Base Directory For Generated #include   | IceBuilderBaseDirectory ForGeneratedInclude |                            | `--include-dir`                     |
 | DLL Export Macro                        | IceBuilderDLLExport                         |                            | `--dll-export`                      |
 | Generated Header Extension              | IceBuilderHeaderExt                         | .h                         | `--header-ext`                      |
 | Generate Helper Functions For Streaming | IceBuilderStream                            | No                         | `--stream`                          |
 | Generate Slice Checksums                | IceBuilderChecksum                          | No                         | `--checksum`                        |
 | Generated Source Extension              | IceBuilderSourceExt                         | .cpp                       | `--source-ext`                      |
-| Additional Options                      | IceBuilderAdditionalOptions                 |                            | (any)                                     |
+| Additional Options                      | IceBuilderAdditionalOptions                 |                            | (any)                               |
 
 ## C# Usage
 
@@ -144,6 +144,6 @@ After building the Ice Builder extension, the VSIX package will be placed in the
 `IceBuilder\bin\Debug\IceBuilder.vsix` for debug builds, and `IceBuilder\bin\Release\IceBuilder.vsix`
 for release builds.
 
-If you want to sign your extension with Authenticode, set the environment variable `Certificate` to 
-the path of your PFX certificate store, and the `CertificatePassword` environment variable to the password
+If you want to sign your extension with Authenticode, set the environment variable `SIGN_CERTIFICATE` to 
+the path of your PFX certificate store, and the `SIGN_PASSWORD` environment variable to the password
 used by your certificate store.
