@@ -119,42 +119,29 @@ The Ice Builder automatically adds a reference to the Ice assembly, and allows y
 
 ## MSBuild Usage
 
-Ice Builder for Visual Studio uses MSBuild tasks to build Slice files using `slice2cpp' and `slice2cs', this allows you to build Ice Builder enabled projects using msbuild.
+The Ice Builder uses [MSBuild](https://msdn.microsoft.com/en-us/library/dd393574.aspx) tasks to build Slice files using `slice2cpp` and `slice2cs`. As a result, you can build Visual Studio projects that enable Ice Builder directly with MSBuild.
 
-The Ice Builder cofiguration is typically done from Visual Studio, but you can do the same manually by importing the required projects into your project.
+The simplest and most common way to configure Ice Builder is in Visual Studio. You can nevertheless also configure Ice Builder directly in your MSBuild project, by importing two Ice Builder projects into your project.
 
-For a C++ project you need to import this two projects:
+For a C++ project, you need:
 
-1. $(LOCALAPPDATA)\ZeroC\IceBuilder\IceBuilder.Cpp.props - This project define the default settings from Ice Builder C++ projects
-2. $(LOCALAPPDATA)\ZeroC\IceBuilder\IceBuilder.Cpp.targets - This projet define the targets required to build Ice Builder C++ projects
+1. `$(LOCALAPPDATA)\ZeroC\IceBuilder\IceBuilder.Cpp.props` - This project defines the default settings for Ice Builder in C++
+2. `$(LOCALAPPDATA)\ZeroC\IceBuilder\IceBuilder.Cpp.targets` - This projet defines the targets required to build C++ projects with Ice Builder
 
-The order in which projects get imported matters for MSBuild, IceBuilder.Cpp.props depends on common properties defined in Microsoft.Cpp.props and must be imported after this project likewise IceBuilder.Cpp.targets depends on targets defined in Microsoft.Cpp.targets and must be imported after this.
+The import order matters for MSBuild. `IceBuilder.Cpp.props` depends on common properties defined in `Microsoft.Cpp.props` and must be imported after this project. Likewise, `IceBuilder.Cpp.targets` depends on targets defined in `Microsoft.Cpp.targets` and must be imported after this project.
 
-For a C# project you need to import this two projects:
+For a C# project, you need:
 
-1. $(LOCALAPPDATA)\ZeroC\IceBuilder\IceBuilder.CSharp.props - This project define the default settings from Ice Builder C# projects
-2. $(LOCALAPPDATA)\ZeroC\IceBuilder\IceBuilder.CSharp.targets - This projet define the targets required to build Ice Builder C# projects
+1. `$(LOCALAPPDATA)\ZeroC\IceBuilder\IceBuilder.CSharp.props` - This project defines the default settings for Ice Builder in C# projects
+2. `$(LOCALAPPDATA)\ZeroC\IceBuilder\IceBuilder.CSharp.targets` - This project defines the targets required to build C# projects with Ice Builder
 
-Like for C++ the order in which projets are imported is important, in this case both IceBuilder.CSharp.props and IceBuilder.CSharp.targets must be imported after Microsoft.CSharp.targets
+Like for C++, the import order is important. Both `IceBuilder.CSharp.props` and `IceBuilder.CSharp.targets` must be imported after `Microsoft.CSharp.targets`.
 
-For configuring you projects refer to the MSBuild Properties defined in the above sections for C++ and C# project configurations.
+The actual configuration of your C++ or C# project uses the MSBuild Properties listed in the sections above.
 
-To add Slice items to your project you need to include them as IceBuilder items &lt;IceBuilder Include="Hello.ice"/&gt;, note that if you are using MSBuild directly the generated files will not be automatically added to the project and you will need to handle this manually.
+You add Slice files to your project with the `Include` attribute of the `IceBuilder` element, for example `<IceBuilder Include="Hello.ice"/>`. Note that you also need to add the generated files to your project. In C++, with the default settings, you need to add `<ClCompile Include="generated\Hello.cpp"/>` and `<ClInclude Include="generated\Hello.h"\>`. In C#, with the default settings, you need to add `<ClCompile Include="generated\Hello.cs"/>`.
 
-For a C++ based project using the default project settings this will require to add the following items to your projet:
-
-&lt;ClCompile Include="generated\Hello.cpp"/&gt; and &lt;ClInclude Include="generated\Hello.h"/&gt;
-
-For a C# based project using the default project settings this will require to add the following item to your projet:
-
-&lt;ClCompile Include="generated\Hello.cs"/&gt;
-
-
-The Ice Builder targets are setup to be run after the default project compile targets, but you can also use them directly, there are two targets IceBuilder_Compile and IceBuilder_Clean used to compile and clean Slice files respectively.
-
- msbuild MySolution.sln /t:IceBuilder_Compile
-
-The above command will execute the IceBuilder_Compile target on each project of MySolution.sln, refer to [MSBuild documentation](https://msdn.microsoft.com/en-us/library/dd393574.aspx) for more details on how to use it.
+Ice Builder adds two targets, `IceBuilder_Compile` and `IceBuilder_Clean`, that resp. compile and clean Slice files. For example, you can compile the Slice files in all the projects within solution `MySolution.sln` with `msbuild MySolution.sln /t:IceBuilder_Compile`. Please refer to the [Microsoft MSBuild documentation](https://msdn.microsoft.com/en-us/library/dd393574.aspx) for more details about MSBuild.
 
 ## Building Ice Builder from Source
 
