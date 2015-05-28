@@ -312,6 +312,8 @@ namespace IceBuilder
                 CommandLineMode = (bool)value;
             }
 
+            this.RegisterProjectFactory(new ProjectFactory());
+            
             if (!CommandLineMode)
             {
                 ResourcesDirectory = Path.Combine(
@@ -376,7 +378,6 @@ namespace IceBuilder
                     mcs.AddCommand(menuItemRemove);
                     menuItemRemove.BeforeQueryStatus += removeIceBuilder_BeforeQueryStatus;
                 }
-                this.RegisterProjectFactory(new ProjectFactory());
 
                 //
                 // If IceHome isn't set try to locate the latest version installed and use that.
