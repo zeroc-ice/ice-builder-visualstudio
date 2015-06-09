@@ -359,6 +359,7 @@ namespace IceBuilder
             try
             {
                 VSLangProj80.Reference3 reference = (VSLangProj80.Reference3)vsProject.References.Add(component + ".dll");
+                reference.CopyLocal = true;
                 //
                 // We set SpecificVersion to false so that references still work 
                 // when Ice Home setting is updated.
