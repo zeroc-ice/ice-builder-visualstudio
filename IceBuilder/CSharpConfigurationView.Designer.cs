@@ -45,6 +45,7 @@ namespace IceBuilder
             this.btnOutputDirectoryBrowse = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.label7 = new System.Windows.Forms.Label();
             this.referencedAssemblies = new System.Windows.Forms.CheckedListBox();
             this.label4 = new System.Windows.Forms.Label();
             this.txtAdditionalOptions = new System.Windows.Forms.TextBox();
@@ -55,10 +56,9 @@ namespace IceBuilder
             this.chkStreaming = new System.Windows.Forms.CheckBox();
             this.chkChecksum = new System.Windows.Forms.CheckBox();
             this.chkTie = new System.Windows.Forms.CheckBox();
+            this.includeDirectories = new IceBuilder.IncludeDirectories();
             this.groupBoxGeneral = new System.Windows.Forms.GroupBox();
             this.tooltip = new System.Windows.Forms.ToolTip(this.components);
-            this.label7 = new System.Windows.Forms.Label();
-            this.includeDirectories = new IceBuilder.IncludeDirectories();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBoxGeneral.SuspendLayout();
@@ -156,6 +156,15 @@ namespace IceBuilder
             this.groupBox2.Size = new System.Drawing.Size(640, 528);
             this.groupBox2.TabIndex = 50;
             this.groupBox2.TabStop = false;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(9, 380);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(210, 13);
+            this.label7.TabIndex = 55;
+            this.label7.Text = "Add references to the following assemblies:";
             // 
             // referencedAssemblies
             // 
@@ -255,12 +264,24 @@ namespace IceBuilder
             this.chkTie.AutoSize = true;
             this.chkTie.Location = new System.Drawing.Point(9, 88);
             this.chkTie.Name = "chkTie";
-            this.chkTie.Size = new System.Drawing.Size(128, 17);
+            this.chkTie.Size = new System.Drawing.Size(122, 17);
             this.chkTie.TabIndex = 45;
-            this.chkTie.Text = "Generate TIE classes";
+            this.chkTie.Text = "Generate tie classes";
             this.tooltip.SetToolTip(this.chkTie, "Generate TIE classes.");
             this.chkTie.UseVisualStyleBackColor = true;
             this.chkTie.CheckStateChanged += new System.EventHandler(this.Tie_CheckedChanged);
+            // 
+            // includeDirectories
+            // 
+            this.includeDirectories.AutoSize = true;
+            this.includeDirectories.InitialValues = ((System.Collections.Generic.List<string>)(resources.GetObject("includeDirectories.InitialValues")));
+            this.includeDirectories.Location = new System.Drawing.Point(12, 105);
+            this.includeDirectories.Margin = new System.Windows.Forms.Padding(0);
+            this.includeDirectories.Name = "includeDirectories";
+            this.includeDirectories.PropertyPage = null;
+            this.includeDirectories.Size = new System.Drawing.Size(631, 158);
+            this.includeDirectories.TabIndex = 46;
+            this.includeDirectories.Values = ((System.Collections.Generic.List<string>)(resources.GetObject("includeDirectories.Values")));
             // 
             // groupBoxGeneral
             // 
@@ -277,27 +298,6 @@ namespace IceBuilder
             this.groupBoxGeneral.Size = new System.Drawing.Size(665, 617);
             this.groupBoxGeneral.TabIndex = 5;
             this.groupBoxGeneral.TabStop = false;
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(9, 380);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(210, 13);
-            this.label7.TabIndex = 55;
-            this.label7.Text = "Add references to the following assemblies:";
-            // 
-            // includeDirectories
-            // 
-            this.includeDirectories.AutoSize = true;
-            this.includeDirectories.InitialValues = ((System.Collections.Generic.List<string>)(resources.GetObject("includeDirectories.InitialValues")));
-            this.includeDirectories.Location = new System.Drawing.Point(12, 105);
-            this.includeDirectories.Margin = new System.Windows.Forms.Padding(0);
-            this.includeDirectories.Name = "includeDirectories";
-            this.includeDirectories.PropertyPage = null;
-            this.includeDirectories.Size = new System.Drawing.Size(631, 158);
-            this.includeDirectories.TabIndex = 46;
-            this.includeDirectories.Values = ((System.Collections.Generic.List<string>)(resources.GetObject("includeDirectories.Values")));
             // 
             // CSharpConfigurationView
             // 
