@@ -64,7 +64,7 @@ Follow these steps:
 
 The Ice Builder adds an `Ice Builder` property page to the `Common Properties` of your C++ project:
 
-(screenshot)
+![Alt text](https://github.com/zeroc-ice/ice-builder-visualstudio/raw/master/Screenshots/cpp-property-page.png)
 
 These properties are the same for all configurations and platforms, and allow you to specify the [parameters](https://doc.zeroc.com/display/Ice36/slice2cpp+Command-Line+Options) passed to `slice2cpp` when compiling the project's Slice files.
 
@@ -100,7 +100,7 @@ Follow these steps:
 
 The Ice Builder adds an `Ice Builder` tab to the properties of your C# project:
 
-(screenshot)
+![Alt text](https://github.com/zeroc-ice/ice-builder-visualstudio/raw/master/Screenshots/csharp-property-page.png)
 
 These properties are the same for all configurations and platforms, and allow you to specify the [parameters](https://doc.zeroc.com/display/Ice36/slice2cs+Command-Line+Options) passed to `slice2cs` when compiling the project's Slice files.
 
