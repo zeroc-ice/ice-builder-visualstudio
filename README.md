@@ -141,7 +141,7 @@ The actual configuration of your C++ or C# project uses the MSBuild Properties l
 
 You add Slice files to your project with the `Include` attribute of the `IceBuilder` element, for example `<IceBuilder Include="Hello.ice"/>`. Note that you also need to add the generated files to your project. In C++, with the default settings, you need to add `<ClCompile Include="generated\Hello.cpp"/>` and `<ClInclude Include="generated\Hello.h"\>`. In C#, with the default settings, you need to add `<ClCompile Include="generated\Hello.cs"/>`.
 
-Ice Builder adds two targets, `IceBuilder_Compile` and `IceBuilder_Clean`, that resp. compile and clean Slice files. For example, you can compile the Slice files in all the projects within solution `MySolution.sln` with `msbuild MySolution.sln /t:IceBuilder_Compile`. Please refer to the [Microsoft MSBuild documentation](https://msdn.microsoft.com/en-us/library/dd393574.aspx) for more details about MSBuild.
+Ice Builder adds two targets, `IceBuilder_Compile` and `IceBuilder_Clean`, that resp. compile and clean Slice files. For example, you can compile the Slice files in a project `MyProject` within solution `MySolution.sln` with `msbuild MySolution.sln /t:MyProject:IceBuilder_Compile`. Please refer to the [Microsoft MSBuild documentation](https://msdn.microsoft.com/en-us/library/dd393574.aspx) for more details about MSBuild.
 
 ## Building Ice Builder from Source
 
