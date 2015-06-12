@@ -39,7 +39,7 @@ namespace IceBuilder
         null,
         null,
         @"..\Templates\Projects")]
-
+ 
     public sealed class Package : Microsoft.VisualStudio.Shell.Package
     {
         #region Visual Studio Services
@@ -114,6 +114,12 @@ namespace IceBuilder
         }
 
         public GeneratedFileTracker FileTracker
+        {
+            get;
+            private set;
+        }
+
+        public EnvDTE.DTEEvents DTEEvents
         {
             get;
             private set;
@@ -371,6 +377,7 @@ namespace IceBuilder
                 }
 
                 DTE2 = (EnvDTE80.DTE2)GetService(typeof(EnvDTE.DTE));
+                DTEEvents = DTE.Events.DTEEvents;
                 IVsSolution = GetService(typeof(SVsSolution)) as IVsSolution;
                 IVsSolution4 = GetService(typeof(SVsSolution)) as IVsSolution4;
                 UIShell = Package.Instance.GetService(typeof(SVsUIShell)) as IVsUIShell;
@@ -396,12 +403,26 @@ namespace IceBuilder
                 }
 
                 //
-                // If IceHome isn't set try to locate the latest version installed and use that.
+                // If IceHome isn't set or is set to an invlid location, try to 
+                // locate the latest version installed and use that.
                 //
                 Version version = null;
                 Version latest = null;
                 String iceHome = null;
-                if (String.IsNullOrEmpty(GetIceHome()))
+                bool updateIceHome = true;
+                try
+                {
+                    if (File.Exists(Path.Combine(GetIceHome(), "bin", "slice2cpp.exe")) ||
+                        File.Exists(Path.Combine(GetIceHome(), "cpp", "bin", "slice2cpp.exe")))
+                    {
+                        updateIceHome = false;
+                    }
+                }
+                catch (ArgumentException)
+                { 
+                }
+
+                if(updateIceHome)
                 {
                     using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"Software\ZeroC"))
                     {
@@ -479,6 +500,18 @@ namespace IceBuilder
                     {
                         SetIceHome(iceHome);
                     }
+                    else
+                    {
+                        if (MessageBox.Show(
+                                "The selected Ice home directory does not exist or is not " +
+                                "an Ice installation. Please provide a correct Ice home directory.", 
+                                "Ice Builder - Incorrect Ice home", 
+                                MessageBoxButtons.OKCancel,
+                                MessageBoxIcon.Information) == DialogResult.OK)
+                        {
+                            DTEEvents.OnStartupComplete += ShowIceOptionsPage;
+                        }
+                    }
                 }
 
                 Assembly assembly = null;
@@ -518,8 +551,13 @@ namespace IceBuilder
                 BuildEvents.OnBuildBegin += BuildEvents_OnBuildBegin;
                 BuildEvents.OnBuildDone += BuildEvents_OnBuildDone;
 
-                DTE2.Events.DTEEvents.OnStartupComplete += AddinRemoval;
+                DTEEvents.OnStartupComplete += AddinRemoval;
             }
+        }
+
+        void ShowIceOptionsPage()
+        {
+            ShowOptionPage(typeof(IceOptionsPage));
         }
 
         private void BuildEvents_OnBuildBegin(EnvDTE.vsBuildScope scope, EnvDTE.vsBuildAction action)
