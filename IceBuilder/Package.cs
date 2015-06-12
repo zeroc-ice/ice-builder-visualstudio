@@ -178,7 +178,23 @@ namespace IceBuilder
 
                 try
                 {
-                    v = Version.Parse(GetSliceCompilerVersion(value));
+                    String compiler = GetSliceCompilerVersion(value);
+                    if(String.IsNullOrEmpty(compiler))
+                    {
+                        string err = "Unable to find a valid Ice installation in `" + value + "'";
+
+                        MessageBox.Show(err, 
+                                        "Ice Builder",
+                                        MessageBoxButtons.OK, 
+                                        MessageBoxIcon.Error, 
+                                        MessageBoxDefaultButton.Button1,
+                                        (MessageBoxOptions)0);
+                        return;
+                    }
+                    else
+                    {
+                        v = Version.Parse(compiler);
+                    }
                 }
                 catch (System.Exception ex)
                 {

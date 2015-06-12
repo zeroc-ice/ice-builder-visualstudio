@@ -48,7 +48,14 @@ namespace IceBuilder
         {
             try
             {
-                Package.Instance.SetIceHome(Editor.IceHome);
+                if(Editor.SetIceHome(Editor.IceHome))
+                {
+                    Package.Instance.SetIceHome(Editor.IceHome);
+                }
+                else
+                {
+                    e.ApplyBehavior = ApplyKind.CancelNoNavigate;
+                }
             }
             catch (Exception ex)
             {

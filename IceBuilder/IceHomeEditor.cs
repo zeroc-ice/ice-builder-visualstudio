@@ -40,6 +40,27 @@ namespace IceBuilder
             }
         }
 
+        public bool SetIceHome(String path)
+        {
+            if (!String.IsNullOrEmpty(path))
+            {
+                if (String.IsNullOrEmpty(path) ||
+                    File.Exists(Path.Combine(path, "bin", "slice2cpp.exe")) ||
+                    File.Exists(Path.Combine(path, "cpp", "bin", "slice2cpp.exe")))
+                {
+                    txtIceHome.Text = path;
+                    return true;
+                }
+                else
+                {
+                    lblInfo.Text =
+                        String.Format("Invalid Ice home directory:\r\n\"{0}\"", path);
+                    return false;
+                }
+            }
+            return true;
+        }
+
         private void btnIceHome_Click(object sender, EventArgs e)
         {
             String selectedPath = UIUtil.BrowserFolderDialog(Handle, "Select Folder",
@@ -48,20 +69,7 @@ namespace IceBuilder
 
             lblInfo.Text = "";
 
-            if(!String.IsNullOrEmpty(selectedPath) && !selectedPath.Equals(txtIceHome.Text))
-            {
-                if (String.IsNullOrEmpty(selectedPath) ||
-                    File.Exists(Path.Combine(selectedPath, "bin", "slice2cpp.exe")) ||
-                    File.Exists(Path.Combine(selectedPath, "cpp", "bin", "slice2cpp.exe")))
-                {                 
-                    txtIceHome.Text = selectedPath;
-                }
-                else
-                {
-                    lblInfo.Text =
-                        String.Format("Invalid Ice home directory:\r\n\"{0}\"", selectedPath);
-                }
-            }
+            SetIceHome(selectedPath);
         }
     }
 }
