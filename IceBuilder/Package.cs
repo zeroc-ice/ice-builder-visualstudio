@@ -424,8 +424,16 @@ namespace IceBuilder
 
                                     String installDir = value.ToString();
 
-                                    if (!File.Exists(Path.Combine(installDir, "bin", "slice2cpp.exe")))
+                                    try
                                     {
+                                        if (!File.Exists(Path.Combine(installDir, "bin", "slice2cpp.exe")))
+                                        {
+                                            continue;
+                                        }
+                                    }
+                                    catch (ArgumentException)
+                                    {
+                                        // Could happen if install dir is null or has invalid characters
                                         continue;
                                     }
 
