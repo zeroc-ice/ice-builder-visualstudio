@@ -122,19 +122,20 @@
 
   <!-- Debugger environment settings -->
   <Choose>
+    <When Condition="Exists('$(IceHome)\cpp\third-party-packages\ThirdParty.props')">
+      <Import Project="$(ICE_HOME)\config\Ice.props"/>
+    </When>
     <When Condition="$(IceThirdPartyHome) != ''">
       <PropertyGroup>
-        <Path>$(IceBin);$(IceThirdPartyBin);$(Path)</Path>
-        <LocalDebuggerEnvironment>PATH=$(Path);$(LocalDebuggerEnvironment)</LocalDebuggerEnvironment>
+        <Path>$(IceThirdPartyBin);$(Path)</Path>
       </PropertyGroup>
     </When>
-    <Otherwise>
-      <PropertyGroup>
-        <Path>$(IceBin);$(Path)</Path>
-        <LocalDebuggerEnvironment>PATH=$(Path);$(LocalDebuggerEnvironment)</LocalDebuggerEnvironment>
-      </PropertyGroup>
-    </Otherwise>
   </Choose>
+
+  <PropertyGroup>
+    <Path>$(IceBin);$(Path)</Path>
+    <LocalDebuggerEnvironment>PATH=$(Path);$(LocalDebuggerEnvironment)</LocalDebuggerEnvironment>
+  </PropertyGroup>
   
   <ItemDefinitionGroup>
     <ClCompile>
