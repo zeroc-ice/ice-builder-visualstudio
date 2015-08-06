@@ -57,7 +57,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="AfterBuild" DependsOnTargets="Sign"/>
   <Import Project="..\Sign.targets" />
-  <Target Name="Sign" Condition="Exists('$(Certificate)')">
+  <Target Name="Sign" Condition="Exists('$(SIGN_CERTIFICATE)')">
     <Exec Command="$(SignCommand) ..\IceBuilder\Resources\AddinRemoval.exe" />
   </Target>
 </Project>
