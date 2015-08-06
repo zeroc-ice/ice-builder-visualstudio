@@ -54,9 +54,21 @@
       <PropertyGroup Condition="'$(Configuration)' == 'Release'">
         <ConfigurationPrefix>Retail</ConfigurationPrefix>
       </PropertyGroup>
+      <PropertyGroup>
+        <IceExtensionSDKsDirectory>$(IceSDKDirectoryRoot)\$(TargetPlatformIdentifier)\v$(TargetPlatformVersion)\ExtensionSDKs</IceExtensionSDKsDirectory>
+      </PropertyGroup>
+      <PropertyGroup Condition="'$(TargetPlatformIdentifier)' == 'Windows' And Exists('$(IceExtensionSDKsDirectory)\Ice\$(IceVersionMM)\SDKManifest.xml')">
+        <IceSDKName>Ice</IceSDKName>
+      </PropertyGroup>
+      <PropertyGroup Condition="'$(TargetPlatformIdentifier)' == 'Windows' And Exists('$(IceExtensionSDKsDirectory)\Ice.WinRT\$(IceVersionMM)\SDKManifest.xml')">
+        <IceSDKName>Ice.WinRT</IceSDKName>
+      </PropertyGroup>
+      <PropertyGroup Condition="'$(TargetPlatformIdentifier)' == 'UAP' And Exists('$(IceExtensionSDKsDirectory)\Ice.UAP\$(IceVersionMM)\SDKManifest.xml')">
+        <IceSDKName>Ice.UAP</IceSDKName>
+      </PropertyGroup>
       <!-- Set Include, Library and SDK search paths for the given platform and configuration -->
       <PropertyGroup>
-        <IceSDKDirectory>$(IceSDKDirectoryRoot)\$(TargetPlatformIdentifier)\v$(TargetPlatformVersion)\ExtensionSDKs\Ice\$(IceVersionMM)</IceSDKDirectory>
+        <IceSDKDirectory>$(IceExtensionSDKsDirectory)\$(IceSDKName)\$(IceVersionMM)</IceSDKDirectory>
         <IceInclude>$(IceSDKDirectory)\Designtime\CommonConfiguration\Neutral\include</IceInclude>
         <IceLib>$(IceSDKDirectory)\Designtime\$(ConfigurationPrefix)\$(PlatformTarget)</IceLib>
         <IncludePath>$(IceInclude);$(IncludePath)</IncludePath>
@@ -65,7 +77,7 @@
       </PropertyGroup>
       <!-- Add a reference to the Ice SDK -->
       <ItemGroup>
-        <SDKReference Include="Ice, Version=$(IceVersionMM)" />
+        <SDKReference Include="$(IceSDKName), Version=$(IceVersionMM)"/>
       </ItemGroup>
     </When>
     <!-- Windows C++ application settings-->
@@ -119,27 +131,23 @@
       <IceBuilderStream>false</IceBuilderStream>
       <IceBuilderIncludeDirectories>$(IceHome)\slice</IceBuilderIncludeDirectories>
   </PropertyGroup>
-
-  <!-- Debugger environment settings -->
-  <Choose>
-    <When Condition="Exists('$(IceHome)\cpp\third-party-packages\ThirdParty.props')">
-      <Import Project="$(ICE_HOME)\config\Ice.props"/>
-    </When>
-    <When Condition="$(IceThirdPartyHome) != ''">
-      <PropertyGroup>
-        <Path>$(IceThirdPartyBin);$(Path)</Path>
-      </PropertyGroup>
-    </When>
-  </Choose>
-
-  <PropertyGroup>
-    <Path>$(IceBin);$(Path)</Path>
-    <LocalDebuggerEnvironment>PATH=$(Path);$(LocalDebuggerEnvironment)</LocalDebuggerEnvironment>
-  </PropertyGroup>
   
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(IceBuilderOutputDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
+
+  <!-- Debugger environment settings -->
+  <Import Project="$(IceHome)\cpp\third-party-packages\ThirdParty.props"
+          Condition="Exists('$(IceHome)\cpp\third-party-packages\ThirdParty.props')"/>
+
+  <PropertyGroup Condition="$(IceThirdPartyHome) != ''">
+    <Path>$(IceThirdPartyBin);$(Path)</Path>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Path>$(IceBin);$(Path)</Path>
+    <LocalDebuggerEnvironment>PATH=$(Path);$(LocalDebuggerEnvironment)</LocalDebuggerEnvironment>
+  </PropertyGroup>
 </Project>
