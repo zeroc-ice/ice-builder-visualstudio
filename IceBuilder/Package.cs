@@ -292,8 +292,15 @@ namespace IceBuilder
 
         public void InitializeProjects()
         {
-            OutputPane.Clear();
-            InitializeProjects(DTEUtil.GetProjects(DTE.Solution));
+            //
+            // Postpone project initialization until the AddIn has been
+            // removed.
+            //
+            if(!File.Exists(AddinPath))
+            {
+                OutputPane.Clear();
+                InitializeProjects(DTEUtil.GetProjects(DTE.Solution));
+            }
         }
 
         public void InitializeProjects(List<EnvDTE.Project> projects)
@@ -502,14 +509,20 @@ namespace IceBuilder
                     }
                     else
                     {
-                        if (MessageBox.Show(
-                                "The selected Ice home directory does not exist or is not " +
-                                "an Ice installation. Please provide a correct Ice home directory.", 
-                                "Ice Builder - Incorrect Ice home", 
-                                MessageBoxButtons.OKCancel,
-                                MessageBoxIcon.Information) == DialogResult.OK)
+                        //
+                        // Postpone the setting of Ice home until the add-in has been removed.
+                        //
+                        if(!File.Exists(AddinPath))
                         {
-                            DTEEvents.OnStartupComplete += ShowIceOptionsPage;
+                            if (MessageBox.Show(
+                                    "The selected Ice home directory does not exist or is not " +
+                                    "an Ice installation. Please provide a correct Ice home directory.", 
+                                    "Ice Builder - Incorrect Ice home", 
+                                    MessageBoxButtons.OKCancel,
+                                    MessageBoxIcon.Information) == DialogResult.OK)
+                            {
+                                DTEEvents.OnStartupComplete += ShowIceOptionsPage;
+                            }
                         }
                     }
                 }
@@ -551,7 +564,10 @@ namespace IceBuilder
                 BuildEvents.OnBuildBegin += BuildEvents_OnBuildBegin;
                 BuildEvents.OnBuildDone += BuildEvents_OnBuildDone;
 
-                DTEEvents.OnStartupComplete += AddinRemoval;
+                if(File.Exists(AddIn.Path))
+                {
+                    DTEEvents.OnStartupComplete += AddinRemoval;
+                }
             }
         }
 
@@ -1125,6 +1141,12 @@ namespace IceBuilder
         {
             "3.6.0"
         };
+
+        public static readonly String AddinPath = Path.Combine(
+            System.Environment.GetEnvironmentVariable("ALLUSERSPROFILE"),
+                (DTE.Version.StartsWith("11.0") ?
+                    "Microsoft\\VisualStudio\\11.0\\Addins\\Ice-VS2012.AddIn" :
+                    "Microsoft\\VisualStudio\\12.0\\Addins\\Ice-VS2013.AddIn"));
     }
 
     static class PkgCmdIDList
