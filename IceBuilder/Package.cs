@@ -329,6 +329,29 @@ namespace IceBuilder
             private set;
         }
 
+        public String AddinPath
+        {
+            get
+            { 
+                if(DTE.Version.StartsWith("11.0"))
+                {
+                    return Path.Combine(
+                        System.Environment.GetEnvironmentVariable("ALLUSERSPROFILE"),
+                        "Microsoft\\VisualStudio\\11.0\\Addins\\Ice-VS2012.AddIn");
+                }
+                else if(DTE.Version.StartsWith("12.0"))
+                {
+                    return Path.Combine(
+                        System.Environment.GetEnvironmentVariable("ALLUSERSPROFILE"),
+                        "Microsoft\\VisualStudio\\12.0\\Addins\\Ice-VS2013.AddIn");   
+                }
+                else
+                {
+                    return String.Empty;
+                }
+            }
+        }
+
         protected override void Initialize()
         {
             base.Initialize();
@@ -361,6 +384,7 @@ namespace IceBuilder
                                         { 
                                             "IceBuilder.Common.props",
                                             "IceBuilder.Cpp.props",
+                                            "Ice.3.6.0.Cpp.props",
                                             "IceBuilder.Cpp.targets",
                                             "IceBuilder.Cpp.xml",
                                             "IceBuilder.CSharp.props",
@@ -564,7 +588,7 @@ namespace IceBuilder
                 BuildEvents.OnBuildBegin += BuildEvents_OnBuildBegin;
                 BuildEvents.OnBuildDone += BuildEvents_OnBuildDone;
 
-                if(File.Exists(AddIn.Path))
+                if(File.Exists(AddinPath))
                 {
                     DTEEvents.OnStartupComplete += AddinRemoval;
                 }
@@ -1141,12 +1165,6 @@ namespace IceBuilder
         {
             "3.6.0"
         };
-
-        public static readonly String AddinPath = Path.Combine(
-            System.Environment.GetEnvironmentVariable("ALLUSERSPROFILE"),
-                (DTE.Version.StartsWith("11.0") ?
-                    "Microsoft\\VisualStudio\\11.0\\Addins\\Ice-VS2012.AddIn" :
-                    "Microsoft\\VisualStudio\\12.0\\Addins\\Ice-VS2013.AddIn"));
     }
 
     static class PkgCmdIDList
