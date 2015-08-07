@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) 2009-2015 ZeroC, Inc. All rights reserved. -->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- This file is imported when using Ice 3.6.0 with C++ projects -->
+  <!-- If using a source distribution try to locate the matching third part distribution-->
+  <PropertyGroup Condition="$(IceSourceHome) != '' And $(THIRDPARTY_HOME) == ''">
+    <IceThirdPartyHome>$([MSBuild]::GetRegistryValue("HKEY_LOCAL_MACHINE\SOFTWARE\ZeroC\Ice $(IceVersion) Third Party Packages", "InstallDir"))</IceThirdPartyHome>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(IceSourceHome) != '' And $(THIRDPARTY_HOME) != ''">
+    <IceThirdPartyHome>$(THIRDPARTY_HOME)</IceThirdPartyHome>
+  </PropertyGroup>
+
+  <!-- platform toolset suffix -->
+  <PropertyGroup Condition="'$(Platform)' != 'Win32'">
+    <IcePlatformSuffix>$(Platform)\</IcePlatformSuffix>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(PlatformToolset)' == 'v110'">
+    <IceToolsetSuffix>vc110\</IceToolsetSuffix>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(PlatformToolset)' == 'v140'">
+    <IceToolsetSuffix>vc140\</IceToolsetSuffix>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(IceThirdPartyHome)' != ''">
+    <IceThirdPartyLib>$(IceThirdPartyHome)\lib\$(IceToolsetSuffix)$(IcePlatformSuffix)</IceThirdPartyLib>
+    <IceThirdPartyBin>$(IceThirdPartyHome)\bin\$(IceToolsetSuffix)$(IcePlatformSuffix)</IceThirdPartyBin>
+  </PropertyGroup>
+  
+  <Choose>
+    <!-- Windows store application settings -->
+    <When Condition="'$(ApplicationType)' == 'Windows Store'">
+      <!-- Set Include, Library and SDK search paths for the given platform and configuration -->
+      <PropertyGroup>
+        <IceSDKName>Ice</IceSDKName>
+      </PropertyGroup>
+    </When>
+    <!-- Windows C++ application settings-->
+    <Otherwise>
+      
+      <!-- Ice binary distribution -->
+      <PropertyGroup Condition="!Exists('$(IceSourceHome)')">
+        <IceLib>$(IceHome)\lib\$(IceToolsetSuffix)$(IcePlatformSuffix)</IceLib>
+        <IceBin>$(IceHome)\bin\$(IceToolsetSuffix)$(IcePlatformSuffix)</IceBin>
+        <IceInclude>$(IceHome)\include\</IceInclude>
+      </PropertyGroup>
+      
+      <!-- Source distributions library, binary and  include paths -->
+      <PropertyGroup Condition="Exists('$(IceSourceHome)')">
+        <IceInclude>$(IceHome)\cpp\include\</IceInclude>
+        <IceBin>$(IceHome)\cpp\bin\</IceBin>
+        <IceLib>$(IceHome)\cpp\lib\</IceLib>
+      </PropertyGroup>
+      
+      <!-- Preprend our settings to C++ configuration settings -->
+      <PropertyGroup>
+        <IncludePath>$(IceInclude);$(IncludePath)</IncludePath>
+        <LibraryPath>$(IceLib);$(LibraryPath)</LibraryPath>
+      </PropertyGroup>
+    </Otherwise>
+  </Choose>
+
+  <!-- Debugger environment settings -->
+  <PropertyGroup Condition="$(IceThirdPartyHome) != ''">
+    <Path>$(IceThirdPartyBin);$(Path)</Path>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Path>$(IceBin);$(Path)</Path>
+  </PropertyGroup>
+</Project>

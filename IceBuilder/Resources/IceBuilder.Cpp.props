@@ -12,39 +12,22 @@
   <UsingTask TaskName="IceBuilder.Slice2CppDependTask"
              AssemblyFile="$(MSBuildThisFileDirectory)IceBuilder.Tasks.dll" />
 
-  <!-- If using a source distribution try to locate the matching third part distribution-->
-  <PropertyGroup Condition="$(IceSourceHome) != '' And $(THIRDPARTY_HOME) == ''">
-    <IceThirdPartyHome>$([MSBuild]::GetRegistryValue("HKEY_LOCAL_MACHINE\SOFTWARE\ZeroC\Ice $(IceVersion) Third Party Packages", "InstallDir"))</IceThirdPartyHome>
-  </PropertyGroup>
+  <!-- Import settings from the Ice distribution -->
+  <Import Project="$(IceHome)\config\Ice.Cpp.props"
+          Condition="Exists('$(IceHome)\config\Ice.Cpp.props')"/>
 
-  <PropertyGroup Condition="$(IceSourceHome) != '' And $(THIRDPARTY_HOME) != ''">
-    <IceThirdPartyHome>$(THIRDPARTY_HOME)</IceThirdPartyHome>
-  </PropertyGroup>
+  <Import Project="$(IceHome)\cpp\config\Ice.Cpp.props"
+          Condition="Exists('$(IceHome)\cpp\config\Ice.Cpp.props')"/>
 
-  <!-- 3.6 platform toolset suffix -->
-  <PropertyGroup Condition="'$(IceVersionMM)' == '3.6' And '$(Platform)' != 'Win32'">
-    <IcePlatformSuffix>$(Platform)\</IcePlatformSuffix>
-  </PropertyGroup>
+  <Import Project="$(MSBuildThisFileDirectory)\Ice.$(IceVersion).Cpp.props"
+          Condition="Exists('$(MSBuildThisFileDirectory)\Ice.$(IceVersion).Cpp.props')"/>  
 
-  <PropertyGroup Condition="'$(IceVersionMM)' == '3.6' And '$(PlatformToolset)' == 'v110'">
-    <IceToolsetSuffix>vc110\</IceToolsetSuffix>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(IceVersionMM)' == '3.6' And '$(PlatformToolset)' == 'v140'">
-    <IceToolsetSuffix>vc140\</IceToolsetSuffix>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(IceThirdPartyHome)' != ''">
-    <IceThirdPartyLib>$(IceThirdPartyHome)\lib\$(IceToolsetSuffix)$(IcePlatformSuffix)</IceThirdPartyLib>
-    <IceThirdPartyBin>$(IceThirdPartyHome)\bin\$(IceToolsetSuffix)$(IcePlatformSuffix)</IceThirdPartyBin>
-  </PropertyGroup>
-  
   <Choose>
     <!-- Windows store application settings -->
     <When Condition="'$(ApplicationType)' == 'Windows Store'">
       <PropertyGroup Condition="!Exists('$(IceSourceHome)')">
         <IceSDKDirectoryRoot>$(IceHome)\SDKs\</IceSDKDirectoryRoot>
-    </PropertyGroup>
+      </PropertyGroup>
       <PropertyGroup Condition="Exists('$(IceSourceHome)')">
         <IceSDKDirectoryRoot>$(IceHome)\cpp\SDKs\</IceSDKDirectoryRoot>
       </PropertyGroup>
@@ -54,20 +37,10 @@
       <PropertyGroup Condition="'$(Configuration)' == 'Release'">
         <ConfigurationPrefix>Retail</ConfigurationPrefix>
       </PropertyGroup>
-      <PropertyGroup>
-        <IceExtensionSDKsDirectory>$(IceSDKDirectoryRoot)\$(TargetPlatformIdentifier)\v$(TargetPlatformVersion)\ExtensionSDKs</IceExtensionSDKsDirectory>
-      </PropertyGroup>
-      <PropertyGroup Condition="'$(TargetPlatformIdentifier)' == 'Windows' And Exists('$(IceExtensionSDKsDirectory)\Ice\$(IceVersionMM)\SDKManifest.xml')">
-        <IceSDKName>Ice</IceSDKName>
-      </PropertyGroup>
-      <PropertyGroup Condition="'$(TargetPlatformIdentifier)' == 'Windows' And Exists('$(IceExtensionSDKsDirectory)\Ice.WinRT\$(IceVersionMM)\SDKManifest.xml')">
-        <IceSDKName>Ice.WinRT</IceSDKName>
-      </PropertyGroup>
-      <PropertyGroup Condition="'$(TargetPlatformIdentifier)' == 'UAP' And Exists('$(IceExtensionSDKsDirectory)\Ice.UAP\$(IceVersionMM)\SDKManifest.xml')">
-        <IceSDKName>Ice.UAP</IceSDKName>
-      </PropertyGroup>
+
       <!-- Set Include, Library and SDK search paths for the given platform and configuration -->
       <PropertyGroup>
+        <IceExtensionSDKsDirectory>$(IceSDKDirectoryRoot)\$(TargetPlatformIdentifier)\v$(TargetPlatformVersion)\ExtensionSDKs</IceExtensionSDKsDirectory>
         <IceSDKDirectory>$(IceExtensionSDKsDirectory)\$(IceSDKName)\$(IceVersionMM)</IceSDKDirectory>
         <IceInclude>$(IceSDKDirectory)\Designtime\CommonConfiguration\Neutral\include</IceInclude>
         <IceLib>$(IceSDKDirectory)\Designtime\$(ConfigurationPrefix)\$(PlatformTarget)</IceLib>
@@ -75,6 +48,7 @@
         <LibraryPath>$(IceLib);$(LibraryPath)</LibraryPath>
         <SDKReferenceDirectoryRoot>$(IceSDKDirectoryRoot);$(SDKReferenceDirectoryRoot);$(ExtensionSDKDirectoryRoot)</SDKReferenceDirectoryRoot>
       </PropertyGroup>
+
       <!-- Add a reference to the Ice SDK -->
       <ItemGroup>
         <SDKReference Include="$(IceSDKName), Version=$(IceVersionMM)"/>
@@ -82,27 +56,6 @@
     </When>
     <!-- Windows C++ application settings-->
     <Otherwise>
-      
-      <!-- Ice binary distribution -->
-      <PropertyGroup Condition="!Exists('$(IceSourceHome)')">
-        <IceLib>$(IceHome)\lib\$(IceToolsetSuffix)$(IcePlatformSuffix)</IceLib>
-        <IceBin>$(IceHome)\bin\$(IceToolsetSuffix)$(IcePlatformSuffix)</IceBin>
-        <IceInclude>$(IceHome)\include\</IceInclude>
-      </PropertyGroup>
-      
-      <!-- Source distributions library, binary and  include paths -->
-      <PropertyGroup Condition="Exists('$(IceSourceHome)')">
-        <IceInclude>$(IceHome)\cpp\include\</IceInclude>
-        <IceBin>$(IceHome)\cpp\bin\</IceBin>
-        <IceLib>$(IceHome)\cpp\lib\</IceLib>
-      </PropertyGroup>
-      
-      <!-- Preprend our settings to C++ configuration settings -->
-      <PropertyGroup>
-        <IncludePath>$(IceInclude);$(IncludePath)</IncludePath>
-        <LibraryPath>$(IceLib);$(LibraryPath)</LibraryPath>
-      </PropertyGroup>
-      
       <ItemGroup>
         <BuildMacro Include="IceInclude">
           <Value>$(IceInclude)</Value>
@@ -139,15 +92,7 @@
   </ItemDefinitionGroup>
 
   <!-- Debugger environment settings -->
-  <Import Project="$(IceHome)\cpp\third-party-packages\ThirdParty.props"
-          Condition="Exists('$(IceHome)\cpp\third-party-packages\ThirdParty.props')"/>
-
-  <PropertyGroup Condition="$(IceThirdPartyHome) != ''">
-    <Path>$(IceThirdPartyBin);$(Path)</Path>
-  </PropertyGroup>
-
   <PropertyGroup>
-    <Path>$(IceBin);$(Path)</Path>
     <LocalDebuggerEnvironment>PATH=$(Path);$(LocalDebuggerEnvironment)</LocalDebuggerEnvironment>
   </PropertyGroup>
 </Project>

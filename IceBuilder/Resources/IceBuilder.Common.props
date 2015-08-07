@@ -20,7 +20,7 @@
     <IceToolsBin>$(IceHome)\cpp\bin</IceToolsBin>
   </PropertyGroup>
 
-  <!-- Source distributions -->
+  <!-- Binary distributions -->
   <PropertyGroup Condition="!Exists('$(IceSourceHome)')">
     <IceToolsBin>$(IceHome)\bin</IceToolsBin>
   </PropertyGroup>
