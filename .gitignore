@@ -226,3 +226,8 @@ pip-log.txt
 # Executables
 *.exe
 *.dll
+
+#
+# Nuget packages diretory
+#
+packages

@@ -233,9 +233,6 @@
     <Content Include="Resources\AddinRemoval.exe">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="Resources\IceBuilder.Common.dll">
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
     <Content Include="Resources\IceBuilder.Cpp.xml">
       <SubType>Designer</SubType>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -265,6 +262,7 @@
     </Content>
     <Content Include="Resources\IceBuilder.Common.props">
       <IncludeInVSIX>true</IncludeInVSIX>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="Resources\IceBuilder.CSharp.props">
       <SubType>Designer</SubType>
@@ -278,6 +276,9 @@
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Resources\Preview.png">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Resources\Ice.3.6.0.Cpp.props">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <None Include="source.extension.vsixmanifest">
@@ -321,9 +322,8 @@
   <Target Name="AfterCompile" Condition="Exists('$(SIGN_CERTIFICATE)')" DependsOnTargets="CoreCompile">
     <Exec Command="$(SignCommand) obj\$(Configuration)\IceBuilder.dll" />
   </Target>
-  <UsingTask TaskName="IceBuilder.SignTask" AssemblyFile="$(MSBuildThisFileDirectory)\..\SignExtensionTask\bin\$(Configuration)\IceBuilder.SignTask.dll" />
   <Target Name="SignPackage" AfterTargets="CreateVsixContainer" Condition="Exists('$(SIGN_CERTIFICATE)')">
     <Message Text="Signing $(TargetVsixContainer)" />
-    <SignTask PackageFile="$(TargetVsixContainer)" Certificate="$(SIGN_CERTIFICATE)" CertificatePassword="$(SIGN_PASSWORD)" />
+    <Exec Command="$(VsixSignCommand) $(TargetVsixContainer)" />
   </Target>
 </Project>

@@ -45,7 +45,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\Sign.targets" />
-  <Target Name="Sign" Condition="Exists('$(SIGN_CERTIFICATE)')">
-    <Exec Command="$(SignCommand) ..\IceBuilder\Resources\IceBuilderTasks.dll" />
+  <Target Name="AfterBuild" Condition="Exists('$(SIGN_CERTIFICATE)')">
+    <Exec Command="$(SignCommand) ..\IceBuilder\Resources\IceBuilder.Tasks.dll" />
   </Target>
 </Project>
