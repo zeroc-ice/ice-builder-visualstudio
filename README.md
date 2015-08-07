@@ -44,7 +44,7 @@ Project files created with the Ice add-in are not compatible with the Ice Builde
 
 The Ice Builder relies on a specific Ice installation on your system. In Visual Studio, you can view or edit the home directory of this Ice installation through the `TOOLS` > `Options` > `Project and Solutions` > `Ice Builder` options page.
 
-This installation can correspond to a binary distribution, such as `C:\Program Files (x86)\ZeroC\Ice-3.6.0`, or to a source tree, such as`C:\users\mike\github\zeroc-ice\ice`. When using a source tree, this source tree must be built beforehand with the version of Visual Studio you are currently using.
+This installation can correspond to a binary distribution, such as `C:\Program Files (x86)\ZeroC\Ice-3.6.1`, or to a source tree, such as`C:\users\mike\github\zeroc-ice\ice`. When using a source tree, this source tree must be built beforehand with the version of Visual Studio you are currently using.
 
 ## C++ Usage
 
@@ -152,14 +152,14 @@ To build Ice Builder for Visual Studio you will need to:
 Be running one of the following versions of Visual Studio:
 - Visual Studio 2012
 - Visual Studio 2013
-- Visual Studio 2015 RC
+- Visual Studio 2015
 
 **AND**
   
-Install ALL of the following Visual Studio SDKs:
+Install ALL the following Visual Studio SDKs:
 - [Visual Studio 2012 SDK](https://www.microsoft.com/en-us/download/details.aspx?id=30668)
 - [Visual Studio 2013 SDK](https://www.microsoft.com/en-us/download/details.aspx?id=40758)
-- [Visual Studio 2015 RC SDK](https://www.visualstudio.com/en-us/downloads/visual-studio-2015-downloads-vs.aspx)
+- [Visual Studio 2015 SDK](https://msdn.microsoft.com/en-us/library/bb166441.aspx)
 
 
 ### Build Instructions
