@@ -267,14 +267,18 @@ namespace IceBuilder
 
         public static void TryUpgrade(List<EnvDTE.Project> projects)
         {
-            String solutionDir = Path.GetDirectoryName(Package.Instance.DTE2.Solution.FullName);
+            String baseDir = String.Empty;
+            if(!String.IsNullOrEmpty(Package.Instance.DTE2.Solution.FullName))
+            {
+                baseDir = Path.GetDirectoryName(Package.Instance.DTE2.Solution.FullName);
+            }
             Dictionary<String, EnvDTE.Project> upgradeProjects = new Dictionary<String, EnvDTE.Project>();
             foreach (EnvDTE.Project project in projects)
             {
                 if (new OldConfiguration().Load(MSBuildUtils.LoadedProject(project.FullName), false))
                 {
                     upgradeProjects.Add(
-                        FileUtil.RelativePath(solutionDir, project.FullName),
+                        FileUtil.RelativePath(baseDir, project.FullName),
                         project);
                 }
             }

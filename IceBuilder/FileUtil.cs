@@ -17,12 +17,12 @@ namespace IceBuilder
     {
         public static string RelativePath(string mainDirPath, string absoluteFilePath)
         {
-            if (absoluteFilePath == null)
+            if (String.IsNullOrEmpty(absoluteFilePath))
             {
                 return "";
             }
 
-            if (mainDirPath == null)
+            if (String.IsNullOrEmpty(mainDirPath))
             {
                 return absoluteFilePath;
             }
