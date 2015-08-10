@@ -20,58 +20,7 @@
           Condition="Exists('$(IceHome)\cpp\config\Ice.Cpp.props')"/>
 
   <Import Project="$(MSBuildThisFileDirectory)\Ice.$(IceVersion).Cpp.props"
-          Condition="Exists('$(MSBuildThisFileDirectory)\Ice.$(IceVersion).Cpp.props')"/>  
-
-  <Choose>
-    <!-- Windows store application settings -->
-    <When Condition="'$(ApplicationType)' == 'Windows Store'">
-      <PropertyGroup Condition="!Exists('$(IceSourceHome)')">
-        <IceSDKDirectoryRoot>$(IceHome)\SDKs\</IceSDKDirectoryRoot>
-      </PropertyGroup>
-      <PropertyGroup Condition="Exists('$(IceSourceHome)')">
-        <IceSDKDirectoryRoot>$(IceHome)\cpp\SDKs\</IceSDKDirectoryRoot>
-      </PropertyGroup>
-      <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-        <ConfigurationPrefix>Debug</ConfigurationPrefix>
-      </PropertyGroup>
-      <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-        <ConfigurationPrefix>Retail</ConfigurationPrefix>
-      </PropertyGroup>
-
-      <!-- Set Include, Library and SDK search paths for the given platform and configuration -->
-      <PropertyGroup>
-        <IceExtensionSDKsDirectory>$(IceSDKDirectoryRoot)\$(TargetPlatformIdentifier)\v$(TargetPlatformVersion)\ExtensionSDKs</IceExtensionSDKsDirectory>
-        <IceSDKDirectory>$(IceExtensionSDKsDirectory)\$(IceSDKName)\$(IceVersionMM)</IceSDKDirectory>
-        <IceInclude>$(IceSDKDirectory)\Designtime\CommonConfiguration\Neutral\include</IceInclude>
-        <IceLib>$(IceSDKDirectory)\Designtime\$(ConfigurationPrefix)\$(PlatformTarget)</IceLib>
-        <IncludePath>$(IceInclude);$(IncludePath)</IncludePath>
-        <LibraryPath>$(IceLib);$(LibraryPath)</LibraryPath>
-        <SDKReferenceDirectoryRoot>$(IceSDKDirectoryRoot);$(SDKReferenceDirectoryRoot);$(ExtensionSDKDirectoryRoot)</SDKReferenceDirectoryRoot>
-      </PropertyGroup>
-
-      <!-- Add a reference to the Ice SDK -->
-      <ItemGroup>
-        <SDKReference Include="$(IceSDKName), Version=$(IceVersionMM)"/>
-      </ItemGroup>
-    </When>
-    <!-- Windows C++ application settings-->
-    <Otherwise>
-      <ItemGroup>
-        <BuildMacro Include="IceInclude">
-          <Value>$(IceInclude)</Value>
-          <EnvironmentVariable>true</EnvironmentVariable>
-        </BuildMacro>
-        <BuildMacro Include="IceLib">
-          <Value>$(IceLib)</Value>
-          <EnvironmentVariable>true</EnvironmentVariable>
-        </BuildMacro>
-        <BuildMacro Include="IceBin">
-          <Value>$(IceBin)</Value>
-          <EnvironmentVariable>true</EnvironmentVariable>  
-        </BuildMacro>
-      </ItemGroup>
-    </Otherwise>
-  </Choose>
+          Condition="Exists('$(MSBuildThisFileDirectory)\Ice.$(IceVersion).Cpp.props')"/> 
 
   <!-- Default settings for IceBuilder -->
   <PropertyGroup Label="IceBuilder">
