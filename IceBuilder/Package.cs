@@ -892,16 +892,19 @@ namespace IceBuilder
                             return items;
                         }));
 
-            Directory.GetFiles(GetAssembliesDir(GetIceHome()), "*.dll")
-                .ToList()
-                .ForEach(item =>
-                    {
-                        String name = Path.GetFileNameWithoutExtension(item);
-                        if(ProjectUtil.HasAssemblyReference(p, name))
+            if(DTEUtil.IsCSharpProject(p))
+            {
+                Directory.GetFiles(GetAssembliesDir(GetIceHome()), "*.dll")
+                    .ToList()
+                    .ForEach(item =>
                         {
-                            ProjectUtil.RemoveAssemblyReference(p, name);
-                        }
-                    });
+                            String name = Path.GetFileNameWithoutExtension(item);
+                            if (ProjectUtil.HasAssemblyReference(p, name))
+                            {
+                                ProjectUtil.RemoveAssemblyReference(p, name);
+                            }
+                        });
+            }
             p.Save();
 
             Guid projectGUID = Guid.Empty;
