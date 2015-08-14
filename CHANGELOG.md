@@ -1,5 +1,19 @@
 ## Changes in Ice Builder for Visual Studio 4.1.0
 
+- Refactor WinRT project property sheet properties
+
+- Fixed an issue that can cause a null pointer exception when
+  disabling the builder for a WinRT based project.
+
+- Fixed an issue that could cause a null pointer exception when
+  opening a project without a solution.
+
+- Fixed an issue that cause project properties were not correctly
+  evaluated after the builder was added because MSBuild was using
+  a cached project.
+
+## Changes in Ice Builder for Visual Studio 4.1.0
+
 - Source builds of Ice C++ 3.6 now use Nuget to download and install C/C++ third-party 
   dependencies such as bzip2, expat and mcpp. When you set your Ice home directory (in
   Ice Builder) to point to such a source distribution, the Ice Builder automatically adds
