@@ -24,5 +24,4 @@
   <PropertyGroup Condition="!Exists('$(IceSourceHome)')">
     <IceToolsBin>$(IceHome)\bin</IceToolsBin>
   </PropertyGroup>
-  
 </Project>
