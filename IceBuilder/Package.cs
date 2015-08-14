@@ -913,6 +913,7 @@ namespace IceBuilder
             IVsSolution.GetGuidOfProject(hier, out projectGUID);
             IVsSolution.CloseSolutionElement((uint)__VSSLNCLOSEOPTIONS.SLNCLOSEOPT_UnloadProject, hier, 0);
             project.Save();
+            ProjectCollection.GlobalProjectCollection.UnloadProject(project);
             IVsSolution4.ReloadProject(ref projectGUID);
         }
 
