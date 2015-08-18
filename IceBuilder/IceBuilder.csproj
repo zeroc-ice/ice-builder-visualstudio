@@ -272,6 +272,7 @@
       <IncludeInVSIX>true</IncludeInVSIX>
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="Resources\Package.ico" />
     <Content Include="Resources\Package.png">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>

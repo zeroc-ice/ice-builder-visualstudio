@@ -118,12 +118,15 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="110" xml:space="preserve">
-    <value>IceVisualStudio</value>
+    <value>Ice Builder</value>
   </data>
   <data name="112" xml:space="preserve">
-    <value />
+    <value>Ice Builder manages the compilation of Slice (.ice) files to C++ and C#. It compiles your Slice files with slice2cpp and slice2cs, and allows you to specify the parameters provided to these compilers.</value>
   </data>
   <data name="113" xml:space="preserve">
     <value>Projects and Solutions</value>
+  </data>
+  <data name="400" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\Package.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>
