@@ -1,3 +1,9 @@
+## Changes in Ice Builder for Visual Studio 4.1.2
+
+- Rebuild the builder with Visual Studio 2012 update 5, this fixes
+  an issue with adding Slice files to C++ projects that affects,
+  Visual Studio 2012 update 4 builds.
+
 ## Changes in Ice Builder for Visual Studio 4.1.1
 
 - Refactor WinRT project property sheet properties.
