@@ -844,7 +844,14 @@ namespace IceBuilder
                 IVsSolution.GetGuidOfProject(hier, out projectGUID);
                 IVsSolution.CloseSolutionElement((uint)__VSSLNCLOSEOPTIONS.SLNCLOSEOPT_UnloadProject, hier, 0);
                 project.Save();
-                ProjectCollection.GlobalProjectCollection.UnloadProject(project);
+                try
+                {
+                    ProjectCollection.GlobalProjectCollection.UnloadProject(project);
+                }
+                catch(System.Exception)
+                {
+                    //expected if the project is not in the global project collection
+                }
                 IVsSolution4.ReloadProject(ref projectGUID);
             }
         }
@@ -913,7 +920,14 @@ namespace IceBuilder
             IVsSolution.GetGuidOfProject(hier, out projectGUID);
             IVsSolution.CloseSolutionElement((uint)__VSSLNCLOSEOPTIONS.SLNCLOSEOPT_UnloadProject, hier, 0);
             project.Save();
-            ProjectCollection.GlobalProjectCollection.UnloadProject(project);
+            try
+            {
+                ProjectCollection.GlobalProjectCollection.UnloadProject(project);
+            }
+            catch(System.Exception)
+            {
+                //expected if the project is not in the global project collection
+            }
             IVsSolution4.ReloadProject(ref projectGUID);
         }
 
