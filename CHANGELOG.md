@@ -1,3 +1,27 @@
+## Changes in Ice Builder for Visual Studio 4.2.0
+
+- Ice Builder now allows building Ice 3.7 distribution
+
+- Stating with this version when the Output Directory for C++ projects contains an
+  MSBuild property that expand to different values for each configuration, the
+  project will include a generated file for each configuration and setup Exclude
+  From Build property, to just build the file for the matching configuration.
+
+- MSbuild tasks for building Ice for PHP and Ice for Python are now included with
+  Ice Builder.
+
+- C++ projects have a new property `IceBuilderHeaderOutputDir` that allow to set
+  a separate directory for generated headers.
+
+- Whenever Slice files are automatically compiled can now be configured in the
+  builder options. The default is to not compile Slice files automatically this
+  make project loading faster.
+
+  See Tools > Options > Projects and Solutions > Ice Builder" in Visual Studio
+
+- Visual Studio 2015 is now required to build Ice Builder, but the extension can
+  still be used with Visual Studio 2012 and Visual Studio 2013.
+
 ## Changes in Ice Builder for Visual Studio 4.1.2
 
 - Rebuild the builder with Visual Studio 2012 update 5, this fixes

@@ -17,6 +17,7 @@ using MSBuildProject = Microsoft.Build.Evaluation.Project;
 using System.Windows.Threading;
 using System.Threading;
 using Microsoft.Win32.SafeHandles;
+using System.Collections.Generic;
 
 namespace IceBuilder
 {
@@ -28,10 +29,10 @@ namespace IceBuilder
             Dispatcher = Dispatcher.CurrentDispatcher;
         }
 
-        public bool Build(EnvDTE.Project p, BuildCallback buildCallback, BuildLogger buildLogger)
+        public bool Build(IVsProject p, BuildCallback buildCallback, BuildLogger buildLogger)
         {
-            p.Save();
-            MSBuildProject project = MSBuildUtils.LoadedProject(p.FullName, false);
+            ProjectUtil.SaveProject(p);
+            MSBuildProject project = MSBuildUtils.LoadedProject(ProjectUtil.GetProjectFullPath(p), false);
 
             //
             // We need to set this before we acquire the build resources otherwise Msbuild
@@ -72,13 +73,16 @@ namespace IceBuilder
             }
             else
             {
-                Package.Instance.FileTracker.Reap(p);
-                ProjectUtil.SetupGenerated(p);
-                
                 try
                 {
+                    Dictionary<string, string> properties = new Dictionary<string, string>();
+                    properties["Platform"] = buildCallback.SolutionConfiguration.PlatformName;
+                    properties["Configuration"] = buildCallback.SolutionConfiguration.Name;
+
                     BuildRequestData buildRequest = new BuildRequestData(
-                            BuildManager.DefaultBuildManager.GetProjectInstanceForBuild(project),
+                            ProjectUtil.GetProjectFullPath(p),
+                            properties,
+                            null,
                             new String[] { "IceBuilder_Compile" },
                             project.ProjectCollection.HostServices,
                             BuildRequestDataFlags.IgnoreExistingProjectState |
@@ -132,7 +136,7 @@ namespace IceBuilder
 
     public class BuildCallback
     {
-        public BuildCallback(EnvDTE.Project project, EnvDTE.OutputWindowPane outputPane, 
+        public BuildCallback(IVsProject project, EnvDTE.OutputWindowPane outputPane, 
                       EnvDTE80.SolutionConfiguration2 solutionConfiguration)
         {
             
@@ -157,7 +161,7 @@ namespace IceBuilder
             Package.Instance.BuildDone();
         }
 
-        EnvDTE.Project Project
+        IVsProject Project
         {
             get;
             set;
@@ -169,7 +173,7 @@ namespace IceBuilder
             set;
         }
 
-        EnvDTE80.SolutionConfiguration2 SolutionConfiguration
+        public EnvDTE80.SolutionConfiguration2 SolutionConfiguration
         {
             get;
             set;

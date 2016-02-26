@@ -1,6 +1,6 @@
 // **********************************************************************
 //
-// Copyright (c) 2009-2015 ZeroC, Inc. All rights reserved.
+// Copyright (c) 2009-2016 ZeroC, Inc. All rights reserved.
 //
 // **********************************************************************
 
@@ -139,7 +139,7 @@ namespace IceBuilder
                 project.Xml.Imports.FirstOrDefault(p => p.Project.IndexOf("Microsoft.CSharp.targets") != -1) != null;
         }
 
-        public static bool IsIceBuilderEnabeld(Microsoft.Build.Evaluation.Project project)
+        public static bool IsIceBuilderEnabled(Microsoft.Build.Evaluation.Project project)
         {
             bool value = false;
             if (IsCppProject(project))
@@ -293,11 +293,7 @@ namespace IceBuilder
         public static String GetProperty(Microsoft.Build.Evaluation.Project project, String name)
         {
             ProjectProperty property = project.GetProperty(name);
-            if (property != null)
-            {
-                return property.UnevaluatedValue;
-            }
-            return String.Empty;
+            return property != null ? property.UnevaluatedValue : String.Empty;
         }
 
         public static String GetEvaluatedProperty(Microsoft.Build.Evaluation.Project project, String name)
@@ -305,51 +301,29 @@ namespace IceBuilder
             return project.GetPropertyValue(name);
         }
 
-        public static String GetEvaluatedMetadata(Microsoft.Build.Evaluation.Project project, String type, String name)
-        {
-            ProjectItemDefinition item = null;
-            ProjectMetadata metadata = null;
-            if (project.ItemDefinitions.TryGetValue("IceBuilder", out item))
-            {
-                metadata = item.Metadata.FirstOrDefault(m => m.Name.Equals(name));
-            }
-            else
-            {
-                metadata =
-                    project.AllEvaluatedItemDefinitionMetadata.FirstOrDefault(
-                        m => m.ItemType.Equals("IceBuilder") && m.Name.Equals(name));
-            }
-            return metadata == null ? String.Empty : metadata.EvaluatedValue;
-        }
-
-        public static String GetEvaluatedMetadata(Microsoft.Build.Evaluation.Project project, String type, String path, String name)
-        {
-            ProjectItem item = project.AllEvaluatedItems.FirstOrDefault(
-                i => i.ItemType.Equals(type) && i.EvaluatedInclude.Equals(path) && i.HasMetadata(name));
-
-            return item == null ? String.Empty : item.GetMetadataValue(name);
-        }
-
         //
         // Set Ice Home and force projects to re evaluate changes in the imported project
         //
-        public static void SetIceHome(List<EnvDTE.Project> projects, String iceHome, String iceVersion, String iceIntVersion, String iceVersionMM)
+        public static void SetIceHome(List<IVsProject> projects, String iceHome, String iceVersion, String iceIntVersion, String iceVersionMM)
         {
-            foreach (EnvDTE.Project p in projects)
+            foreach (IVsProject p in projects)
             {
-                Microsoft.Build.Evaluation.Project project = MSBuildUtils.LoadedProject(p.FullName);
-                ResolvedImport import = project.Imports.FirstOrDefault(i => i.ImportedProject.FullPath.EndsWith("IceBuilder.Common.props"));
-
-                if (import.ImportedProject != null)
+                if(DTEUtil.IsIceBuilderEnabled(p) != IceBuilderProjectType.None)
                 {
-                    ProjectPropertyGroupElement group = import.ImportedProject.PropertyGroups.FirstOrDefault(g => g.Label.Equals("IceHome"));
-                    if (group != null)
+                    Microsoft.Build.Evaluation.Project project = MSBuildUtils.LoadedProject(ProjectUtil.GetProjectFullPath(p));
+                    ResolvedImport import = project.Imports.FirstOrDefault(i => i.ImportedProject.FullPath.EndsWith("IceBuilder.Common.props"));
+
+                    if (import.ImportedProject != null)
                     {
-                        group.SetProperty(Package.IceHomeValue, iceHome);
-                        group.SetProperty(Package.IceVersionValue, iceVersion);
-                        group.SetProperty(Package.IceIntVersionValue, iceIntVersion);
-                        group.SetProperty(Package.IceVersionMMValue, iceVersionMM);
-                        project.ReevaluateIfNecessary();
+                        ProjectPropertyGroupElement group = import.ImportedProject.PropertyGroups.FirstOrDefault(g => g.Label.Equals("IceHome"));
+                        if (group != null)
+                        {
+                            group.SetProperty(Package.IceHomeValue, iceHome);
+                            group.SetProperty(Package.IceVersionValue, iceVersion);
+                            group.SetProperty(Package.IceIntVersionValue, iceIntVersion);
+                            group.SetProperty(Package.IceVersionMMValue, iceVersionMM);
+                            project.ReevaluateIfNecessary();
+                        }
                     }
                 }
             }

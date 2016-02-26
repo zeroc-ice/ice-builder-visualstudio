@@ -1,20 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) 2009-2015 ZeroC, Inc. All rights reserved. -->
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003"
+         DefaultTargets="Compile">
 
   <!-- Import IceBuilder schema -->
   <ItemGroup>
-    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)$(MSBuildThisFileName).xml" />
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)IceBuilder.Cpp.xml" />
     <AvailableItemName Include="IceBuilder"/>
   </ItemGroup>
-
-  <PropertyGroup Condition="'$(IceToolsBin)' == '' And Exists('$(IceHome)\cpp\bin')">
-    <IceToolsBin>$(IceHome)\cpp\bin</IceToolsBin>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(IceToolsBin)' == '' And Exists('$(IceHome)\bin')">
-    <IceToolsBin>$(IceHome)\bin</IceToolsBin>
-  </PropertyGroup>
 
   <Target Name="IceBuilder_Validate">
     <Error Text="Ice Installation not detected. Please update Ice Home in 'Tools > Options > Projects and Solutions > Ice Builder'"
@@ -23,17 +16,12 @@
     <Error Text="The selected Ice home directory does not exist or is not an Ice installation. Please update Ice Home in 'Tools > Options > Projects and Solutions > Ice Builder'"
            Condition="!Exists('$(IceHome)')" />
 
-    <Error Text="The selected C++ Runtime Library is not supported by Ice; Ice requires /MD or /MDd."
-           Condition="'%(ClCompile.RuntimeLibrary)' != 'MultiThreadedDebugDLL' And
-                      '%(ClCompile.RuntimeLibrary)' != 'MultiThreadedDLL' "/>
-
     <Error Text="the Ice Builder requires Ice Version 3.6 or later but $(IceHome) is version $(IceVersion.Replace('.51', 'b'))"
            Condition="'$(IceIntVersion)' &lt; '30600' Or '$(IceIntVersion)' == '30651'" File=""/>
   </Target>
 
   <Target Name="IceBuilder_Compile"
-          DependsOnTargets="IceBuilder_Validate"
-          BeforeTargets="CLCompile">
+          DependsOnTargets="IceBuilder_Validate">
 
     <MakeDir Directories="$(IceBuilderOutputDir)" Condition="!Exists('$(IceBuilderOutputDir)')"/>
 
@@ -60,7 +48,7 @@
     <!-- Compile the Slice files to produce the generated code -->
     <Slice2CppTask
         IceHome                           = "$(IceHome)"
-        IceToolsBin                       = "$(IceToolsBin)"
+        PlatformToolset                   = "$(PlatformToolset)"
         OutputDir                         = "$(IceBuilderOutputDir)"
         HeaderOutputDir                   = "$(IceBuilderHeaderOutputDir)"
         WorkingDirectory                  = "$(MSBuildProjectDirectory)"
@@ -81,7 +69,7 @@
     <!-- Update the dependencies -->
     <Slice2CppTask
         IceHome                           = "$(IceHome)"
-        IceToolsBin                       = "$(IceToolsBin)"
+        PlatformToolset                   = "$(PlatformToolset)"
         OutputDir                         = "$(IceBuilderOutputDir)"
         HeaderOutputDir                   = "$(IceBuilderHeaderOutputDir)"
         WorkingDirectory                  = "$(MSBuildProjectDirectory)"
@@ -101,7 +89,7 @@
         Condition                         = "'$(_IceBuilderUdateDepends)' == 'True'"/>
   </Target>
 
-  <Target Name="IceBuilder_Clean" BeforeTargets="Clean">
+  <Target Name="IceBuilder_Clean">
     <Delete Files="$([System.IO.Path]::Combine($(IceBuilderOutputDir),%(IceBuilder.FileName).$(IceBuilderSourceExt)))"/>
     <Delete Files="$([System.IO.Path]::Combine($(IceBuilderOutputDir),%(IceBuilder.FileName).$(IceBuilderHeaderExt)))"
             Condition="'$(IceBuilderHeaderOutputDir)' == ''"/>
@@ -109,4 +97,8 @@
             Condition="'$(IceBuilderHeaderOutputDir)' != ''"/>
     <Delete Files="$([System.IO.Path]::Combine($(IceBuilderOutputDir),IceBuilder.d))"/>
   </Target>
+
+  <Target Name="Compile" DependsOnTargets="IceBuilder_Compile"></Target>
+  <Target Name="Build" DependsOnTargets="IceBuilder_Compile"></Target>
+  <Target Name="Clean" DependsOnTargets="IceBuilder_Clean"></Target>
 </Project>

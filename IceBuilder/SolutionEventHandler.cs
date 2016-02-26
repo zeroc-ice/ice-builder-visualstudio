@@ -1,6 +1,6 @@
 // **********************************************************************
 //
-// Copyright (c) 2009-2015 ZeroC, Inc. All rights reserved.
+// Copyright (c) 2009-2016 ZeroC, Inc. All rights reserved.
 //
 // **********************************************************************
 
@@ -30,8 +30,16 @@ namespace IceBuilder
         #region IVsSolutionLoadEvents
         public int OnAfterBackgroundSolutionLoadComplete()
         {
-            Package.Instance.RunningDocumentTableEventHandler.BeginTrack();
-            Package.Instance.InitializeProjects();
+            try
+            {
+                Package.Instance.RunningDocumentTableEventHandler.BeginTrack();
+                Package.Instance.InitializeProjects();
+            }
+            catch(System.Exception ex)
+            {
+                Package.UnexpectedExceptionWarning(ex);
+                throw;
+            }
             return 0;
         }
 
@@ -87,10 +95,10 @@ namespace IceBuilder
         {
             try
             {
-                EnvDTE.Project project = DTEUtil.GetProject(hierarchyNew);
+                IVsProject project = hierarchyNew as IVsProject;
                 if (project != null)
                 {
-                    Package.Instance.InitializeProjects(new List<EnvDTE.Project>(new EnvDTE.Project[] { project }));
+                    Package.Instance.InitializeProjects(new List<IVsProject>(new IVsProject[] { project }));
                 }
             }
             catch (Exception ex)
@@ -125,10 +133,13 @@ namespace IceBuilder
         {
             try
             {
-                EnvDTE.Project project = DTEUtil.GetProject(pHierarchy);
+                IVsProject project = pHierarchy as IVsProject;
                 if (project != null)
                 {
-                    Package.Instance.FileTracker.Remove(project);
+                    if(DTEUtil.IsIceBuilderEnabled(project) != IceBuilderProjectType.None)
+                    {
+                        Package.Instance.FileTracker.Remove(ProjectUtil.GetProjectFullPath(project));
+                    }
                 }
             }
             catch (Exception ex)
@@ -158,10 +169,10 @@ namespace IceBuilder
         {
             try
             {
-                EnvDTE.Project project = DTEUtil.GetProject(pRealHierarchy);
+                IVsProject project = pRealHierarchy as IVsProject;
                 if (project != null)
                 {
-                    Package.Instance.FileTracker.Remove(project);
+                    Package.Instance.FileTracker.Remove(ProjectUtil.GetProjectFullPath(project));
                 }
             }
             catch (Exception ex)

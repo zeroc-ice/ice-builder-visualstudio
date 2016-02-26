@@ -1,13 +1,12 @@
 // **********************************************************************
 //
-// Copyright (c) 2009-2015 ZeroC, Inc. All rights reserved.
+// Copyright (c) 2009-2016 ZeroC, Inc. All rights reserved.
 //
 // **********************************************************************
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Windows.Threading;
 using System.Windows.Forms;
@@ -15,8 +14,8 @@ using System.IO;
 
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Construction;
-using Microsoft.Build.Execution;
-using Microsoft.Build.Framework;
+using Microsoft.VisualStudio.Shell.Interop;
+
 
 using System.Xml;
 
@@ -265,21 +264,23 @@ namespace IceBuilder
             }
         }
 
-        public static void TryUpgrade(List<EnvDTE.Project> projects)
+        public static void TryUpgrade(List<IVsProject> projects)
         {
             String baseDir = String.Empty;
             if(!String.IsNullOrEmpty(Package.Instance.DTE2.Solution.FullName))
             {
                 baseDir = Path.GetDirectoryName(Package.Instance.DTE2.Solution.FullName);
             }
-            Dictionary<String, EnvDTE.Project> upgradeProjects = new Dictionary<String, EnvDTE.Project>();
-            foreach (EnvDTE.Project project in projects)
+            Dictionary<String, IVsProject> upgradeProjects = new Dictionary<String, IVsProject>();
+            foreach (IVsProject project in projects)
             {
-                if (new OldConfiguration().Load(MSBuildUtils.LoadedProject(project.FullName), false))
+                if(DTEUtil.IsCppProject(project) || DTEUtil.IsCSharpProject(project))
                 {
-                    upgradeProjects.Add(
-                        FileUtil.RelativePath(baseDir, project.FullName),
-                        project);
+                    String fullName = ProjectUtil.GetProjectFullPath(project);
+                    if(new OldConfiguration().Load(MSBuildUtils.LoadedProject(fullName), false))
+                    {
+                        upgradeProjects.Add(FileUtil.RelativePath(baseDir, fullName), project);
+                    }
                 }
             }
 
@@ -292,7 +293,7 @@ namespace IceBuilder
             }
         }
 
-        public static void Upgrade(List<EnvDTE.Project> projects, UpgradeProgressCallback progressCallback)
+        public static void Upgrade(List<IVsProject> projects, UpgradeProgressCallback progressCallback)
         {
             String solutionDir = Path.GetDirectoryName(Package.Instance.DTE2.Solution.FullName);
             Dispatcher dispatcher = Dispatcher.CurrentDispatcher;
@@ -305,18 +306,19 @@ namespace IceBuilder
                         break;
                     }
 
-                    EnvDTE.Project project = projects[i];
-                    String projectName = FileUtil.RelativePath(solutionDir, project.FullName);
+                    IVsProject project = projects[i];
+                    String projectName = FileUtil.RelativePath(solutionDir, ProjectUtil.GetProjectFullPath(project));
                     if (Upgrade(project))
                     {
-                        if (project.Globals != null)
+                        EnvDTE.Project p = DTEUtil.GetProject(project as IVsHierarchy);
+                        if (p.Globals != null)
                         {
                             foreach (String name in ProjectConverter.OldPropertyNames)
                             {
-                                if (project.Globals.get_VariableExists(name))
+                                if (p.Globals.get_VariableExists(name))
                                 {
-                                    project.Globals[name] = String.Empty;
-                                    project.Globals.set_VariablePersists(name, false);
+                                    p.Globals[name] = String.Empty;
+                                    p.Globals.set_VariablePersists(name, false);
                                 }
                             }
                         }
@@ -333,10 +335,10 @@ namespace IceBuilder
             t.Start();
         }
 
-        public static bool Upgrade(EnvDTE.Project project)
+        public static bool Upgrade(IVsProject project)
         {
             OldConfiguration oldConfiguration = new OldConfiguration();
-            Microsoft.Build.Evaluation.Project msbuildProject = MSBuildUtils.LoadedProject(project.FullName);
+            Microsoft.Build.Evaluation.Project msbuildProject = MSBuildUtils.LoadedProject(ProjectUtil.GetProjectFullPath(project));
 
             if (oldConfiguration.Load(msbuildProject, true))
             {
@@ -346,7 +348,7 @@ namespace IceBuilder
                 }
                 else if (DTEUtil.IsCSharpProject(project))
                 {
-                    return UpgradeCSharpConfiguration(project, msbuildProject, oldConfiguration);
+                    return UpgradeCSharpConfiguration(DTEUtil.GetProject(project as IVsHierarchy), msbuildProject, oldConfiguration);
                 }
             }
             return false;

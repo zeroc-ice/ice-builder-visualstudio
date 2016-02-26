@@ -1,6 +1,6 @@
 // **********************************************************************
 //
-// Copyright (c) 2009-2015 ZeroC, Inc. All rights reserved.
+// Copyright (c) 2009-2016 ZeroC, Inc. All rights reserved.
 //
 // **********************************************************************
 
@@ -17,17 +17,89 @@ using Microsoft.VisualStudio.Shell.Interop;
 
 namespace IceBuilder
 {
+    public enum IceBuilderProjectType
+    {
+        None,
+        CppProjectType,
+        CsharpProjectType
+    }
+
     public class DTEUtil
     {
-        public static IVsHierarchy GetIVsHierarchy(EnvDTE.Project project)
+        public static List<IVsProject> GetProjects()
         {
-            IVsHierarchy hierarchy = null;
-            Package.Instance.IVsSolution.GetProjectOfUniqueName(project.UniqueName, out hierarchy);
-            return hierarchy;
+            IEnumHierarchies enumHierarchies;
+            Guid guid = Guid.Empty;
+            uint flags = (uint) __VSENUMPROJFLAGS.EPF_ALLPROJECTS;
+            ErrorHandler.ThrowOnFailure(Package.Instance.IVsSolution.GetProjectEnum(flags, guid, out enumHierarchies));
+
+            List<IVsProject> projects = new List<IVsProject>();
+
+            IVsHierarchy[] hierarchies = new IVsHierarchy[1];
+            uint sz;
+            do
+            {
+                ErrorHandler.ThrowOnFailure(enumHierarchies.Next(1, hierarchies, out sz));
+                if (sz > 0)
+                {
+                    projects.Add(hierarchies[0] as IVsProject);
+                }
+            }
+            while(sz == 1);
+            return projects;
         }
 
-        public static EnvDTE.Project GetSelectedProject()
+        public static void GetSubProjects(IVsProject p, ref List<IVsProject> projects)
         {
+            GetSubProjects((IVsHierarchy)p, VSConstants.VSITEMID_ROOT, ref projects);
+        }
+
+        public static void GetSubProjects(IVsHierarchy h, uint itemId, ref List<IVsProject> projects)
+        {
+            IntPtr nestedValue = IntPtr.Zero;
+            uint nestedId = 0;
+            Guid nestedGuid = typeof(IVsHierarchy).GUID;
+            int result = h.GetNestedHierarchy(itemId, ref nestedGuid, out nestedValue, out nestedId);
+            if (ErrorHandler.Succeeded(result) && nestedValue != IntPtr.Zero && nestedId == VSConstants.VSITEMID_ROOT)
+            {
+                // Get the nested hierachy
+                IVsProject project = System.Runtime.InteropServices.Marshal.GetObjectForIUnknown(nestedValue) as IVsProject;
+                System.Runtime.InteropServices.Marshal.Release(nestedValue);
+                if(project != null)
+                {
+                    projects.Add(project);
+                    GetSubProjects(project, ref projects);
+                }
+            }
+            else
+            {
+                // Get the first visible child node
+                object value;
+                result = h.GetProperty(itemId, (int)__VSHPROPID.VSHPROPID_FirstVisibleChild, out value);
+                while (result == VSConstants.S_OK && value != null)
+                {
+                    if(value is int && (uint)(int)value == VSConstants.VSITEMID_NIL)
+                    {
+                        // No more nodes
+                        break;
+                    }
+                    else
+                    {
+                        uint child = Convert.ToUInt32(value);
+
+                        GetSubProjects(h, child, ref projects);
+
+                        // Get the next visible sibling node
+                        value = null;
+                        result = h.GetProperty(child, (int)__VSHPROPID.VSHPROPID_NextVisibleSibling, out value);
+                    }
+                }
+            }
+        }
+
+        public static IVsProject GetSelectedProject()
+        {
+            IVsHierarchy hier = null;
             Microsoft.VisualStudio.Shell.ServiceProvider sp = new Microsoft.VisualStudio.Shell.ServiceProvider(
                 Package.Instance.DTE as Microsoft.VisualStudio.OLE.Interop.IServiceProvider);
             IVsMonitorSelection selectionMonitor = sp.GetService(typeof(IVsMonitorSelection)) as IVsMonitorSelection;
@@ -35,39 +107,27 @@ namespace IceBuilder
             //
             // There isn't an open project.
             //
-            if(selectionMonitor == null)
+            if (selectionMonitor != null)
             {
-                return null;
-            }
+                IntPtr ppHier;
+                uint pitemid;
+                IVsMultiItemSelect ppMIS;
+                IntPtr ppSC;
+                ErrorHandler.ThrowOnFailure(selectionMonitor.GetCurrentSelection(out ppHier, out pitemid, out ppMIS, out ppSC));
 
-            EnvDTE.Project project = null;
-            IntPtr ppHier;
-            uint pitemid;
-            IVsMultiItemSelect ppMIS;
-            IntPtr ppSC;
-            if (ErrorHandler.Failed(selectionMonitor.GetCurrentSelection(out ppHier, out pitemid, out ppMIS, out ppSC)))
-            {
-                return null;
-            }
 
-            if (ppHier != IntPtr.Zero)
-            {
-                IVsHierarchy hier = (IVsHierarchy)Marshal.GetObjectForIUnknown(ppHier);
-                Marshal.Release(ppHier);
-                object obj;
-                hier.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_ExtObject, out obj);
-                if (obj != null)
+                if (ppHier != IntPtr.Zero)
                 {
-                    project = obj as EnvDTE.Project;
+                    hier = (IVsHierarchy)Marshal.GetObjectForIUnknown(ppHier);
+                    Marshal.Release(ppHier);
+                }
+
+                if (ppSC != IntPtr.Zero)
+                {
+                    Marshal.Release(ppSC);
                 }
             }
-
-            if (ppSC != IntPtr.Zero)
-            {
-                Marshal.Release(ppSC);
-            }
-
-            return project;
+            return hier as IVsProject;
         }
 
         public static EnvDTE.Project GetProject(IVsHierarchy hierarchy)
@@ -90,77 +150,41 @@ namespace IceBuilder
             return obj as EnvDTE.ProjectItem;
         }
 
-        public static List<EnvDTE.Project> GetProjects(Solution solution)
+        public static bool IsCppProject(IVsProject project)
         {
-            List<EnvDTE.Project> projects = new List<EnvDTE.Project>();
-            foreach (EnvDTE.Project p in solution.Projects)
-            {
-                if (String.IsNullOrEmpty(p.Kind) || p.Kind.Equals(unloadedProjectGUID))
-                {
-                    continue;
-                }
-
-                if(projects.Contains(p))
-                {
-                    continue;
-                }
-                GetProjects(p, ref projects);
-            }
-            return projects;
+            Guid type = ProjectUtil.GetProjecTypeGuid(project);
+            return type.Equals(cppProjectGUID) || type.Equals(cppStoreAppProjectGUID);
         }
 
-        public static void GetProjects(EnvDTE.Project project, ref List<EnvDTE.Project> projects)
+        public static bool IsCSharpProject(IVsProject project)
         {
-            if (String.IsNullOrEmpty(project.Kind) || project.Kind.Equals(unloadedProjectGUID))
-            {
-                return;
-            }
+            return ProjectUtil.GetProjecTypeGuid(project).Equals(csharpProjectGUID);
+        }
 
-            if(project.Kind == EnvDTE80.ProjectKinds.vsProjectKindSolutionFolder)
+        public static IceBuilderProjectType IsIceBuilderEnabled(IVsProject project)
+        {
+            if (project != null)
             {
-                foreach (ProjectItem item in project.ProjectItems)
+                IceBuilderProjectType type = IsCppProject(project) ? IceBuilderProjectType.CppProjectType :
+                                             IsCSharpProject(project) ? IceBuilderProjectType.CsharpProjectType : IceBuilderProjectType.None;
+                if (type != IceBuilderProjectType.None)
                 {
-                    EnvDTE.Project p = item.Object as EnvDTE.Project;
-                    if (p != null)
+                    if (MSBuildUtils.IsIceBuilderEnabled(MSBuildUtils.LoadedProject(ProjectUtil.GetProjectFullPath(project))))
                     {
-                        GetProjects(p, ref projects);
+                        return type;
                     }
                 }
-                return;
             }
-
-            if (project.Kind == cppProjectGUID ||
-                project.Kind == csharpProjectGUID ||
-                project.Kind == cppStoreAppProjectGUID)
-            {
-                if (!projects.Contains(project))
-                {
-                    projects.Add(project);
-                }
-            }
+            return IceBuilderProjectType.None;
         }
 
-        public static bool IsCppProject(EnvDTE.Project project)
-        {
-            return project != null && project.Kind != null &&
-                (project.Kind.Equals(cppProjectGUID) || project.Kind.Equals(cppStoreAppProjectGUID));
-        }
-
-        public static bool IsCSharpProject(EnvDTE.Project project)
-        {
-            return project != null && project.Kind != null && project.Kind.Equals(csharpProjectGUID);
-        }
-
-        public static bool IsIceBuilderEnabled(EnvDTE.Project project)
-        {
-            return project != null && !String.IsNullOrEmpty(project.FullName) && 
-                (IsCppProject(project) || IsCSharpProject(project)) &&
-                MSBuildUtils.IsIceBuilderEnabeld(MSBuildUtils.LoadedProject(project.FullName));
-        }
-
-        public const string cppProjectGUID = "{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}";
-        public const string cppStoreAppProjectGUID = "{BC8A1FFA-BEE3-4634-8014-F334798102B3}";
-        public const string csharpProjectGUID = "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}";
-        public const string unloadedProjectGUID = "{67294A52-A4F0-11D2-AA88-00C04F688DDE}";
+        public static readonly Guid cppProjectGUID = 
+            new Guid("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}");
+        public static readonly Guid cppStoreAppProjectGUID = 
+            new Guid("{BC8A1FFA-BEE3-4634-8014-F334798102B3}");
+        public static readonly Guid csharpProjectGUID = 
+            new Guid("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}");
+        public static readonly Guid unloadedProjectGUID = 
+            new Guid("{67294A52-A4F0-11D2-AA88-00C04F688DDE}");
     }
 }

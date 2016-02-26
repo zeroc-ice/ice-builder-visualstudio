@@ -1,6 +1,6 @@
 // **********************************************************************
 //
-// Copyright (c) 2009-2015 ZeroC, Inc. All rights reserved.
+// Copyright (c) 2009-2016 ZeroC, Inc. All rights reserved.
 //
 // **********************************************************************
 
@@ -81,18 +81,19 @@ namespace IceBuilder
                 List<String> referencedAssemblies = ConfigurationView.ReferencedAssemblies;
                 foreach (String assembly in ConfigurationView.Assemblies)
                 {
-                    if (ProjectUtil.HasAssemblyReference(Project, assembly))
+                    EnvDTE.Project p = DTEUtil.GetProject(Project as IVsHierarchy);
+                    if (ProjectUtil.HasAssemblyReference(p, assembly))
                     {
                         if (!referencedAssemblies.Contains(assembly))
                         {
-                            ProjectUtil.RemoveAssemblyReference(Project, assembly);
+                            ProjectUtil.RemoveAssemblyReference(p, assembly);
                         }
                     }
                     else
                     {
                         if (referencedAssemblies.Contains(assembly))
                         {
-                            ProjectUtil.AddAssemblyReference(Project, assembly);
+                            ProjectUtil.AddAssemblyReference(p, assembly);
                         }
                     }
                 }
@@ -186,7 +187,7 @@ namespace IceBuilder
             private set;
         }
 
-        public EnvDTE.Project Project
+        public IVsProject Project
         {
             get;
             private set;
@@ -204,7 +205,7 @@ namespace IceBuilder
                         IVsHierarchy hier;
                         uint id;
                         browse.GetProjectItem(out hier, out id);
-                        Project = DTEUtil.GetProject(hier);
+                        Project = hier as IVsProject;
                         if (Project != null)
                         {
                             Settings = new ProjectSettigns(Project);

@@ -6,7 +6,7 @@
     <Rule.DataSource>
       <DataSource Persistence="ProjectFile" ItemType="" Label="IceBuilder" HasConfigurationCondition="true" />
     </Rule.DataSource>
-    
+
     <Rule.Categories>
       <Category Name="General" DisplayName="General"/>
     </Rule.Categories>
@@ -22,7 +22,17 @@
       </StringProperty.DataSource>
     </StringProperty>
 
-    <!-- Parsing Options -->    
+    <StringProperty Name="IceBuilderHeaderOutputDir"
+                    DisplayName="Header Output Directory"
+                    Description="Directory where generated headers will be moved after build."
+                    Subtype="folder"
+                    Category="General">
+      <StringProperty.DataSource>
+        <DataSource Persistence="ProjectFile" ItemType="" Label="IceBuilder" HasConfigurationCondition="false" />
+      </StringProperty.DataSource>
+    </StringProperty>
+
+    <!-- Parsing Options -->
     <BoolProperty Name="IceBuilderAllowIcePrefix"
                   DisplayName="Allow Reserved Ice Identifiers"
                   Description="Allow reserved Ice prefix in Slice identifiers."
@@ -42,7 +52,7 @@
         <DataSource Persistence="ProjectFile" ItemType="" Label="IceBuilder" HasConfigurationCondition="false" />
       </BoolProperty.DataSource>
     </BoolProperty>
-    
+
     <StringListProperty Name="IceBuilderIncludeDirectories"
                     DisplayName="Include Directories"
                     Description="Specifies one or more directories to add to the Slice include path; use semi-colons (;) as directory separators."
@@ -95,7 +105,7 @@
       </BoolProperty.DataSource>
     </BoolProperty>
 
-    <EnumProperty Name="IceBuilderHeaderExt" 
+    <EnumProperty Name="IceBuilderHeaderExt"
                   DisplayName="Generated Header Extension"
                   Description="Use extension instead of default `h' header extension."
                   Category="General"
@@ -109,7 +119,7 @@
       </EnumProperty.DataSource>
     </EnumProperty>
 
-    <EnumProperty Name="IceBuilderSourceExt" 
+    <EnumProperty Name="IceBuilderSourceExt"
                   DisplayName="Generated Source Extension"
                   Description="Use extension instead of default `cpp' source extension."
                   Category="General"
@@ -122,8 +132,8 @@
       </EnumProperty.DataSource>
     </EnumProperty>
 
-    <StringProperty DisplayName="Additional Options" 
-                    Name="IceBuilderAdditionalOptions" 
+    <StringProperty DisplayName="Additional Options"
+                    Name="IceBuilderAdditionalOptions"
                     Category="General"
                     Subtype="AdditionalOptions"
                     Description="Additional command line options to pass to Slice compiler.">
@@ -132,7 +142,7 @@
       </StringProperty.DataSource>
     </StringProperty>
   </Rule>
-  
+
   <ItemType Name="IceBuilder" DisplayName="Build Slice Files" />
   <FileExtension Name="*.ice" ContentType="IceBuilder" />
   <ContentType Name="IceBuilder" DisplayName="Build Slice Files" ItemType="IceBuilder" />

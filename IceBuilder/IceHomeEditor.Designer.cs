@@ -32,6 +32,7 @@ namespace IceBuilder
             this.btnIceHome = new System.Windows.Forms.Button();
             this.lblInfo = new System.Windows.Forms.Label();
             this.lblIceHome = new System.Windows.Forms.Label();
+            this.autoBuild = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // txtIceHome
@@ -59,9 +60,9 @@ namespace IceBuilder
             // 
             this.lblInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.lblInfo.Location = new System.Drawing.Point(0, 41);
+            this.lblInfo.Location = new System.Drawing.Point(0, 73);
             this.lblInfo.Name = "lblInfo";
-            this.lblInfo.Size = new System.Drawing.Size(315, 61);
+            this.lblInfo.Size = new System.Drawing.Size(315, 29);
             this.lblInfo.TabIndex = 51;
             // 
             // lblIceHome
@@ -73,17 +74,28 @@ namespace IceBuilder
             this.lblIceHome.TabIndex = 48;
             this.lblIceHome.Text = "Ice home directory:";
             // 
+            // autoBuild
+            // 
+            this.autoBuild.AutoSize = true;
+            this.autoBuild.Location = new System.Drawing.Point(3, 53);
+            this.autoBuild.Name = "autoBuild";
+            this.autoBuild.Size = new System.Drawing.Size(113, 17);
+            this.autoBuild.TabIndex = 53;
+            this.autoBuild.Text = "Build automatically";
+            this.autoBuild.UseVisualStyleBackColor = true;
+            // 
             // IceHomeEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.autoBuild);
+            this.Controls.Add(this.lblInfo);
             this.Controls.Add(this.txtIceHome);
             this.Controls.Add(this.lblIceHome);
             this.Controls.Add(this.btnIceHome);
-            this.Controls.Add(this.lblInfo);
             this.Margin = new System.Windows.Forms.Padding(0);
             this.Name = "IceHomeEditor";
-            this.Size = new System.Drawing.Size(319, 102);
+            this.Size = new System.Drawing.Size(319, 211);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -95,5 +107,6 @@ namespace IceBuilder
         private System.Windows.Forms.Button btnIceHome;
         private System.Windows.Forms.Label lblInfo;
         private System.Windows.Forms.Label lblIceHome;
+        private System.Windows.Forms.CheckBox autoBuild;
     }
 }

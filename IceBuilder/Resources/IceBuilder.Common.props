@@ -1,27 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) 2009-2015 ZeroC, Inc. All rights reserved. -->
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(ICE_HOME)\config\Ice.props"
-          Condition="Exists('$(ICE_HOME)\config\Ice.props')"/>
-  <PropertyGroup Label="IceHome" Condition="'$(IceHome)' == ''">
-    <IceHome>$(Registry:HKEY_CURRENT_USER\Software\ZeroC\IceBuilder@IceHome)</IceHome>
-    <IceVersion>$(Registry:HKEY_CURRENT_USER\Software\ZeroC\IceBuilder@IceVersion)</IceVersion>
-    <IceIntVersion>$(Registry:HKEY_CURRENT_USER\Software\ZeroC\IceBuilder@IceIntVersion)</IceIntVersion>
-    <IceVersionMM>$(Registry:HKEY_CURRENT_USER\Software\ZeroC\IceBuilder@IceVersionMM)</IceVersionMM>
-  </PropertyGroup>
 
-  <!-- Check if IceHome denotes a source distribution -->
-  <PropertyGroup Condition="Exists('$(IceHome)\cpp\bin')">
-    <IceSourceHome>$(IceHome)</IceSourceHome>
-  </PropertyGroup>
+    <!-- if ICE_HOME is set and IceHome is not set we set IceHome to ICE_HOME
+         this will be later used to load settings from the Ice distribution pointed
+         by IceHome -->
+    <PropertyGroup Label="IceHome" Condition="'$(IceHome)' == ''">
+        <IceHome>$(ICE_HOME)</IceHome>
+    </PropertyGroup>
 
-  <!-- Source distributions -->
-  <PropertyGroup Condition="Exists('$(IceSourceHome)')">
-    <IceToolsBin>$(IceHome)\cpp\bin</IceToolsBin>
-  </PropertyGroup>
+    <Import Project="$(IceHome)\config\Ice.props" Condition="Exists('$(IceHome)\config\Ice.props')"/>
 
-  <!-- Binary distributions -->
-  <PropertyGroup Condition="!Exists('$(IceSourceHome)')">
-    <IceToolsBin>$(IceHome)\bin</IceToolsBin>
-  </PropertyGroup>
+    <PropertyGroup Label="IceHome" Condition="'$(IceHome)' == ''">
+        <IceHome>$(Registry:HKEY_CURRENT_USER\Software\ZeroC\IceBuilder@IceHome)</IceHome>
+        <IceVersion>$(Registry:HKEY_CURRENT_USER\Software\ZeroC\IceBuilder@IceVersion)</IceVersion>
+        <IceIntVersion>$(Registry:HKEY_CURRENT_USER\Software\ZeroC\IceBuilder@IceIntVersion)</IceIntVersion>
+        <IceVersionMM>$(Registry:HKEY_CURRENT_USER\Software\ZeroC\IceBuilder@IceVersionMM)</IceVersionMM>
+    </PropertyGroup>
+
+    <!-- Check if IceHome denotes a source distribution -->
+    <PropertyGroup Condition="Exists('$(IceHome)\cpp\bin')">
+        <IceSourceHome>$(IceHome)</IceSourceHome>
+    </PropertyGroup>
 </Project>

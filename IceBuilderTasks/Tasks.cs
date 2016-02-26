@@ -1,19 +1,15 @@
 // **********************************************************************
 //
-// Copyright (c) 2009-2015 ZeroC, Inc. All rights reserved.
+// Copyright (c) 2009-2016 ZeroC, Inc. All rights reserved.
 //
 // **********************************************************************
 
 #region using
 using System;
-using System.Diagnostics;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
 
-using System.Text;
 using System.Xml;
-using System.Xml.XPath;
 
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
@@ -68,10 +64,6 @@ namespace IceBuilder
     #region SliceCompilerTask
     public abstract class SliceCompilerTask : ToolTask
     {
-        public SliceCompilerTask()
-        {
-        }
-
         [Required]
         public String WorkingDirectory
         {
@@ -81,6 +73,13 @@ namespace IceBuilder
 
         [Required]
         public String IceHome
+        {
+            get;
+            set;
+        }
+
+        [Required]
+        public String IceToolsBin
         {
             get;
             set;
@@ -154,44 +153,53 @@ namespace IceBuilder
             return WorkingDirectory;
         }
 
+        protected virtual String GetGeneratedPath(ITaskItem item, String outputDir, String ext)
+        {
+            return Path.Combine(
+                outputDir,
+                Path.GetFileName(Path.ChangeExtension(item.GetMetadata("Identity"), ext)));
+        }
+
         protected abstract String GeneratedExtensions
         {
             get;
         }
 
+        protected abstract void TraceGenerated();
+
         protected override String GenerateCommandLineCommands()
         {
             UsageError = false;
             CommandLineBuilder builder = new CommandLineBuilder(false);
-            if(Depend)
+            if (Depend)
             {
                 builder.AppendSwitch("--depend-xml");
                 builder.AppendSwitch("--depend-file");
                 builder.AppendFileNameIfNotNull(Path.Combine(OutputDir, DependFile));
             }
 
-            if(!String.IsNullOrEmpty(OutputDir))
+            if (!String.IsNullOrEmpty(OutputDir))
             {
                 builder.AppendSwitch("--output-dir");
                 builder.AppendFileNameIfNotNull(OutputDir);
             }
 
-            if(AllowIcePrefix)
+            if (AllowIcePrefix)
             {
                 builder.AppendSwitch("--ice");
             }
 
-            if(Underscore)
+            if (Underscore)
             {
                 builder.AppendSwitch("--underscore");
             }
 
-            if(Stream)
+            if (Stream)
             {
                 builder.AppendSwitch("--stream");
             }
 
-            if(Checksum)
+            if (Checksum)
             {
                 builder.AppendSwitch("--checksum");
             }
@@ -204,7 +212,7 @@ namespace IceBuilder
                 }
             }
 
-            if(!String.IsNullOrEmpty(AdditionalOptions))
+            if (!String.IsNullOrEmpty(AdditionalOptions))
             {
                 builder.AppendTextUnquoted(" ");
                 builder.AppendTextUnquoted(AdditionalOptions);
@@ -217,35 +225,22 @@ namespace IceBuilder
 
         protected override int ExecuteTool(string pathToTool, string responseFileCommands, string commandLineCommands)
         {
-            foreach (ITaskItem source in Sources)
+            if (!Depend)
             {
-                if(!Depend)
-                {
-                    Log.LogMessage(MessageImportance.High,
-                        String.Format(
-                            "Compiling {0} -> Generating {1}.{2}",
-                            source.GetMetadata("Identity"),
-                            TaskUtil.MakeRelative(WorkingDirectory, Path.Combine(OutputDir, source.GetMetadata("Filename"))),
-                            GeneratedExtensions));
-                }
+                TraceGenerated();
             }
             return base.ExecuteTool(pathToTool, responseFileCommands, commandLineCommands);
         }
 
         protected override string GenerateFullPathToTool()
         {
-            List<String> paths = new List<String>(new String[]
-                    {
-                        Path.Combine(IceHome, "bin", ToolName),
-                        Path.Combine(IceHome, "cpp", "bin", ToolName)
-                    });
-
-            String path = paths.FirstOrDefault(p => File.Exists(p));
-            if(String.IsNullOrEmpty(path))
+            String home = IceHome;
+            String path = Path.Combine(IceToolsBin, ToolName);
+            if (!File.Exists(path))
             {
                 const String message =
                     "Slice compiler `{0}' not found. Review Ice Home setting in Visual Studio 'Tool > Options > Ice'";
-                Log.LogError(String.Format(message, ToolName));
+                Log.LogError(String.Format(message, path));
             }
             return path;
         }
@@ -269,17 +264,17 @@ namespace IceBuilder
             }
 
             int i = singleLine.IndexOf(String.Format("{0}:", ToolName));
-            if(i != -1)
+            if (i != -1)
             {
                 i += (ToolName.Length + 1);
-                Log.LogError("", "", "", "", 0, 0, 0, 0, 
+                Log.LogError("", "", "", "", 0, 0, 0, 0,
                     String.Format("{0}: {1}", Path.GetFileName(ToolName), singleLine.Substring(i)));
                 UsageError = true;
             }
             else
             {
                 String s = singleLine.Trim();
-                if(s.StartsWith(WorkingDirectory))
+                if (s.StartsWith(WorkingDirectory))
                 {
                     s = s.Substring(WorkingDirectory.Length);
                 }
@@ -292,30 +287,30 @@ namespace IceBuilder
                 // Skip the drive letter
                 //
                 i = s.IndexOf(":");
-                if(i <= 1 && s.Length > i + 1)
+                if (i <= 1 && s.Length > i + 1)
                 {
                     i = s.IndexOf(":", i + 1);
                 }
 
-                if(i != -1)
+                if (i != -1)
                 {
                     file = Path.GetFullPath(s.Substring(0, i).Trim().Trim('"'));
-                    if(file.IndexOf(WorkingDirectory) != -1)
+                    if (file.IndexOf(WorkingDirectory) != -1)
                     {
                         file = file.Substring(WorkingDirectory.Length)
                                    .Trim(Path.DirectorySeparatorChar);
                     }
 
-                    if(s.Length > i + 1)
+                    if (s.Length > i + 1)
                     {
                         s = s.Substring(i + 1);
 
                         i = s.IndexOf(":");
                         if (i != -1)
                         {
-                            if(Int32.TryParse(s.Substring(0, i), out line))
+                            if (Int32.TryParse(s.Substring(0, i), out line))
                             {
-                                if(s.Length > i + 1)
+                                if (s.Length > i + 1)
                                 {
                                     s = s.Substring(i + 1);
                                 }
@@ -326,19 +321,19 @@ namespace IceBuilder
                             }
                         }
 
-                        
+
                         description = s.Trim();
                         description += Environment.NewLine;
                     }
                 }
 
-                if(description.IndexOf("warning:") == 0)
+                if (description.IndexOf("warning:") == 0)
                 {
                     //
                     // Don't emit warnings while parsing dependencies otherwise
                     // they will appear twices in the Error List and Output.
                     //
-                    if(!Depend)
+                    if (!Depend)
                     {
                         Log.LogWarning("", "", "", file, line - 1, 0, 0, 0, description.Substring("warning:".Length));
                     }
@@ -347,7 +342,7 @@ namespace IceBuilder
                 {
                     Log.LogError("", "", "", file, line - 1, 0, 0, 0, description.Substring("error:".Length));
                 }
-                else if(!String.IsNullOrEmpty(description))
+                else if (!String.IsNullOrEmpty(description))
                 {
                     Log.LogError("", "", "", file, line - 1, 0, 0, 0, description);
                 }
@@ -371,6 +366,12 @@ namespace IceBuilder
             {
                 return "slice2cpp.exe";
             }
+        }
+
+        public String HeaderOutputDir
+        {
+            get;
+            set;
         }
 
         public String DLLExport
@@ -437,6 +438,50 @@ namespace IceBuilder
 
             return builder.ToString();
         }
+
+        protected override void TraceGenerated()
+        {
+            foreach (ITaskItem source in Sources)
+            {
+                String message = String.Format("Compiling {0} Generating -> ", source.GetMetadata("Identity"));
+                message += TaskUtil.MakeRelative(WorkingDirectory, GetGeneratedPath(source, OutputDir, SourceExt));
+                message += " and ";
+                message += TaskUtil.MakeRelative(WorkingDirectory,
+                    GetGeneratedPath(source, String.IsNullOrEmpty(HeaderOutputDir) ? OutputDir : HeaderOutputDir, HeaderExt));
+                Log.LogMessage(MessageImportance.High, message);
+            }
+        }
+
+        protected override int ExecuteTool(string pathToTool, string responseFileCommands, string commandLineCommands)
+        {
+            int status = base.ExecuteTool(pathToTool, responseFileCommands, commandLineCommands);
+            if (!String.IsNullOrEmpty(HeaderOutputDir) && !Depend && status == 0)
+            {
+                if (!Directory.Exists(HeaderOutputDir))
+                {
+                    Directory.CreateDirectory(HeaderOutputDir);
+                }
+                foreach (ITaskItem source in Sources)
+                {
+                    String sourceH = GetGeneratedPath(source, OutputDir, HeaderExt);
+                    String targetH = GetGeneratedPath(source, HeaderOutputDir, HeaderExt);
+                    if (!File.Exists(targetH) || new FileInfo(targetH).LastWriteTime < new FileInfo(sourceH).LastWriteTime)
+                    {
+                        if(File.Exists(targetH))
+                        {
+                            File.Delete(targetH);
+                        }
+                        File.Move(sourceH, targetH);
+                    }
+
+                    if(File.Exists(sourceH))
+                    {
+                        File.Delete(sourceH);
+                    }
+                }
+            }
+            return status;
+        }
     }
     #endregion
 
@@ -465,12 +510,80 @@ namespace IceBuilder
             }
         }
 
+        protected override void TraceGenerated()
+        {
+            foreach (ITaskItem source in Sources)
+            {
+                String message = String.Format("Compiling {0} Generating -> ", source.GetMetadata("Identity"));
+                message += TaskUtil.MakeRelative(WorkingDirectory, GetGeneratedPath(source, OutputDir, ".cs"));
+                Log.LogMessage(MessageImportance.High, message);
+            }
+        }
+
         protected override String GenerateCommandLineCommands()
         {
             CommandLineBuilder builder = new CommandLineBuilder();
             if (Tie)
             {
                 builder.AppendSwitch("--tie ");
+            }
+            builder.AppendTextUnquoted(String.Format(" {0}", base.GenerateCommandLineCommands()));
+            return builder.ToString();
+        }
+    }
+    #endregion
+
+    #region Slice2PhpTask
+    public class Slice2PhpTask : SliceCompilerTask
+    {
+        protected override String ToolName
+        {
+            get
+            {
+                return "slice2php.exe";
+            }
+        }
+
+        public Boolean All
+        {
+            get;
+            set;
+        }
+
+        public Boolean Namespace
+        {
+            get;
+            set;
+        }
+
+        protected override String GeneratedExtensions
+        {
+            get
+            {
+                return "php";
+            }
+        }
+
+        protected override void TraceGenerated()
+        {
+            foreach (ITaskItem source in Sources)
+            {
+                String message = String.Format("Compiling {0} Generating -> ", source.GetMetadata("Identity"));
+                message += TaskUtil.MakeRelative(WorkingDirectory, GetGeneratedPath(source, OutputDir, ".php"));
+                Log.LogMessage(MessageImportance.High, message);
+            }
+        }
+
+        protected override String GenerateCommandLineCommands()
+        {
+            CommandLineBuilder builder = new CommandLineBuilder();
+            if (All)
+            {
+                builder.AppendSwitch("--all ");
+            }
+            if (Namespace)
+            {
+                builder.AppendSwitch("--namespace ");
             }
             builder.AppendTextUnquoted(String.Format(" {0}", base.GenerateCommandLineCommands()));
             return builder.ToString();
@@ -528,14 +641,14 @@ namespace IceBuilder
             get;
         }
 
-        protected String GetGeneratedPath(ITaskItem item, String outputDir, String ext)
+        abstract protected ITaskItem[] GeneratedItems(ITaskItem source);
+
+        protected virtual String GetGeneratedPath(ITaskItem item, String outputDir, String ext)
         {
             return Path.Combine(
                 outputDir,
                 Path.GetFileName(Path.ChangeExtension(item.GetMetadata("Identity"), ext)));
         }
-
-        abstract protected ITaskItem[] GeneratedItems(ITaskItem source);
 
         public override bool Execute()
         {
@@ -543,10 +656,10 @@ namespace IceBuilder
             UpdateDepends = false;
 
             String dependFile = Path.Combine(OutputDir, DependFile);
-            
+
             XmlDocument dependsDoc = new XmlDocument();
             bool dependExists = File.Exists(dependFile);
-            if(dependExists)
+            if (dependExists)
             {
                 try
                 {
@@ -558,8 +671,8 @@ namespace IceBuilder
                     {
                         File.Delete(dependFile);
                     }
-                    catch(IOException)
-                    { 
+                    catch (IOException)
+                    {
                     }
                     Log.LogMessage(MessageImportance.Low,
                         String.Format("Build required because depend file: {0} has some invalid data",
@@ -573,10 +686,10 @@ namespace IceBuilder
                                   TaskUtil.MakeRelative(WorkingDirectory, dependFile)));
             }
 
-            foreach(ITaskItem source in Sources)
+            foreach (ITaskItem source in Sources)
             {
                 bool skip = true;
-                if(!dependExists)
+                if (!dependExists)
                 {
                     skip = false;
                 }
@@ -586,7 +699,7 @@ namespace IceBuilder
                 ITaskItem[] generatedItems = GeneratedItems(source);
 
                 FileInfo sourceInfo = new FileInfo(source.GetMetadata("FullPath"));
-                if(!sourceInfo.Exists)
+                if (!sourceInfo.Exists)
                 {
                     Log.LogMessage(MessageImportance.Low,
                         String.Format("Build required because source: {0} doesn't exists",
@@ -659,12 +772,21 @@ namespace IceBuilder
 
                 if (skip)
                 {
-                    Log.LogMessage(MessageImportance.Normal,
-                        String.Format(
-                            "Skipping {0} -> {1}.{2} up to date",
-                            source.GetMetadata("Identity"),
-                            TaskUtil.MakeRelative(WorkingDirectory, Path.Combine(OutputDir, source.GetMetadata("Filename"))),
-                            (ToolName.Equals("slice2cpp.exe") ? "[h,cpp] are" : "cs is")));
+                    String message = String.Format("Skipping {0} -> ", source.GetMetadata("Identity"));
+                    message += generatedItems[0].GetMetadata("Identity");
+                    if(generatedItems.Length > 1)
+                    {
+                        message += " and ";
+                        message += generatedItems[1].GetMetadata("Identity");
+                        message += " are ";
+                    }
+                    else
+                    {
+                        message += " is ";
+                    }
+                    message += "up to date";
+
+                    Log.LogMessage(MessageImportance.Normal, message);
                 }
 
                 ITaskItem computedSource = new TaskItem(source.ItemSpec);
@@ -672,7 +794,7 @@ namespace IceBuilder
                 computedSource.SetMetadata("BuildRequired", skip ? "False" : "True");
                 computed.Add(computedSource);
 
-                if(!UpdateDepends && !skip)
+                if (!UpdateDepends && !skip)
                 {
                     UpdateDepends = true;
                 }
@@ -700,6 +822,12 @@ namespace IceBuilder
             set;
         }
 
+        public String HeaderOutputDir
+        {
+            get;
+            set;
+        }
+
         protected override string ToolName
         {
             get
@@ -713,7 +841,7 @@ namespace IceBuilder
             return new ITaskItem[]
                 {
                     new TaskItem(GetGeneratedPath(source, OutputDir, SourceExt)),
-                    new TaskItem(GetGeneratedPath(source, OutputDir, HeaderExt)),
+                    new TaskItem(GetGeneratedPath(source, String.IsNullOrEmpty(HeaderOutputDir) ? OutputDir : HeaderOutputDir, HeaderExt)),
                 };
         }
     }
@@ -737,6 +865,183 @@ namespace IceBuilder
                     new TaskItem(GetGeneratedPath(source, OutputDir, ".cs")),
                 };
         }
+
+    }
+    #endregion
+
+    #region Slice2PhpDependTask
+    public class Slice2PhpDependTask : SliceDependTask
+    {
+        protected override string ToolName
+        {
+            get
+            {
+                return "slice2php.exe";
+            }
+        }
+
+        protected override ITaskItem[] GeneratedItems(ITaskItem source)
+        {
+            return new ITaskItem[]
+                {
+                    new TaskItem(GetGeneratedPath(source, OutputDir, ".php")),
+                };
+        }
+
+    }
+    #endregion
+
+    #region Slice2PythonTask
+    public class Slice2PythonTask : SliceCompilerTask
+    {
+        protected override String ToolName
+        {
+            get
+            {
+                if(Slice2Py.EndsWith(".py"))
+                {
+                    return Path.Combine(PythonHome, "python.exe");
+                }
+                else
+                {
+                    return Slice2Py;
+                }
+            }
+        }
+
+        [Required]
+        public String PythonHome
+        {
+            get;
+            set;
+        }
+
+        [Required]
+        public String Slice2Py
+        {
+            get;
+            set;
+        }
+
+        public String Prefix
+        {
+            get;
+            set;
+        }
+
+        public Boolean NoPackage
+        {
+            get;
+            set;
+        }
+
+        protected override String GeneratedExtensions
+        {
+            get
+            {
+                return "py";
+            }
+        }
+
+        protected override String GetGeneratedPath(ITaskItem item, String outputDir, String ext)
+        {
+            String generatedFileName = String.Format("{0}_ice.py ", item.GetMetadata("Filename"));
+            if(!String.IsNullOrEmpty(Prefix))
+            {
+                generatedFileName = Prefix + generatedFileName;
+            }
+            return Path.Combine(outputDir, generatedFileName);
+        }
+
+        protected override void TraceGenerated()
+        {
+            foreach (ITaskItem source in Sources)
+            {
+                String message = String.Format("Compiling {0} Generating -> ", source.GetMetadata("Identity"));
+                message += TaskUtil.MakeRelative(WorkingDirectory, GetGeneratedPath(source, OutputDir, GeneratedExtensions));
+                Log.LogMessage(MessageImportance.High, message);
+            }
+        }
+
+        protected override String GenerateCommandLineCommands()
+        {
+            CommandLineBuilder builder = new CommandLineBuilder();
+            if(Slice2Py.EndsWith(".py"))
+            {
+                builder.AppendFileNameIfNotNull(Slice2Py);
+            }
+
+            if (!String.IsNullOrEmpty(Prefix))
+            {
+                builder.AppendSwitch("--prefix");
+                builder.AppendFileNameIfNotNull(Prefix);
+            }
+            if(NoPackage)
+            {
+                builder.AppendSwitch("--no-package");
+            }
+            builder.AppendTextUnquoted(String.Format(" {0}", base.GenerateCommandLineCommands()));
+            return builder.ToString();
+        }
+    }
+    #endregion
+
+    #region Slice2PythonDependTask
+    public class Slice2PythonDependTask : SliceDependTask
+    {
+        [Required]
+        public String PythonHome
+        {
+            get;
+            set;
+        }
+
+        [Required]
+        public String Slice2Py
+        {
+            get;
+            set;
+        }
+
+        public String Prefix
+        {
+            get;
+            set;
+        }
+
+        protected override string ToolName
+        {
+            get
+            {
+                if (Slice2Py.EndsWith(".py"))
+                {
+                    return Path.Combine(PythonHome, "python.exe");
+                }
+                else
+                {
+                    return Slice2Py;
+                }
+            }
+        }
+
+        protected override String GetGeneratedPath(ITaskItem item, String outputDir, String ext)
+        {
+            String generatedFileName = String.Format("{0}_ice.py ", item.GetMetadata("Filename"));
+            if (!String.IsNullOrEmpty(Prefix))
+            {
+                generatedFileName = Prefix + generatedFileName;
+            }
+            return Path.Combine(outputDir, generatedFileName);
+        }
+
+        protected override ITaskItem[] GeneratedItems(ITaskItem source)
+        {
+            return new ITaskItem[]
+                {
+                    new TaskItem(GetGeneratedPath(source, OutputDir, ".py")),
+                };
+        }
+
     }
     #endregion
 }

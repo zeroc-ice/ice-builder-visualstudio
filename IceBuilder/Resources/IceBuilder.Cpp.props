@@ -5,7 +5,7 @@
   <!-- Import IceBuilder common settings -->
   <Import Project="$(MSBuildThisFileDirectory)\IceBuilder.Common.props"/>
 
-  <!-- Import our custom MSbuild tasks used to build Ice C++ projects -->
+  <!-- Import our custom MSbuild tasks used to build Ice for C++ projects -->
   <UsingTask TaskName="IceBuilder.Slice2CppTask"
              AssemblyFile="$(MSBuildThisFileDirectory)IceBuilder.Tasks.dll" />
 
@@ -20,23 +20,50 @@
           Condition="Exists('$(IceHome)\cpp\config\Ice.Cpp.props')"/>
 
   <Import Project="$(MSBuildThisFileDirectory)\Ice.$(IceVersion).Cpp.props"
-          Condition="Exists('$(MSBuildThisFileDirectory)\Ice.$(IceVersion).Cpp.props')"/> 
+          Condition="Exists('$(MSBuildThisFileDirectory)\Ice.$(IceVersion).Cpp.props')"/>
 
   <!-- Default settings for IceBuilder -->
-  <PropertyGroup Label="IceBuilder">
-      <IceBuilderOutputDir>$(ProjectDir)\generated</IceBuilderOutputDir>
-      <IceBuilderHeaderExt>h</IceBuilderHeaderExt>
-      <IceBuilderSourceExt>cpp</IceBuilderSourceExt>
-      <IceBuilderAllowIcePrefix>false</IceBuilderAllowIcePrefix>
-      <IceBuilderUnderscore>false</IceBuilderUnderscore>
-      <IceBuilderChecksum>false</IceBuilderChecksum>
-      <IceBuilderStream>false</IceBuilderStream>
-      <IceBuilderIncludeDirectories>$(IceHome)\slice</IceBuilderIncludeDirectories>
+  <PropertyGroup Label="IceBuilder" Condition="'$(IceBuilderOutputDir)' == ''">
+      <IceBuilderOutputDir>$(MSBuildProjectDirectory)\generated</IceBuilderOutputDir>
   </PropertyGroup>
-  
-  <ItemDefinitionGroup>
+
+  <PropertyGroup Label="IceBuilder" Condition="'$(IceBuilderHeaderExt)' == ''">
+      <IceBuilderHeaderExt>h</IceBuilderHeaderExt>
+  </PropertyGroup>
+
+  <PropertyGroup Label="IceBuilder" Condition="'$(IceBuilderSourceExt)' == ''">
+      <IceBuilderSourceExt>cpp</IceBuilderSourceExt>
+  </PropertyGroup>
+
+  <PropertyGroup Label="IceBuilder" Condition="'$(IceBuilderAllowIcePrefix)' == ''">
+      <IceBuilderAllowIcePrefix>false</IceBuilderAllowIcePrefix>
+  </PropertyGroup>
+
+  <PropertyGroup Label="IceBuilder" Condition="'$(IceBuilderUnderscore)' == ''">
+      <IceBuilderUnderscore>false</IceBuilderUnderscore>
+  </PropertyGroup>
+
+  <PropertyGroup Label="IceBuilder" Condition="'$(IceBuilderChecksum)' == ''">
+      <IceBuilderChecksum>false</IceBuilderChecksum>
+  </PropertyGroup>
+
+  <PropertyGroup Label="IceBuilder" Condition="'$(IceBuilderStream)' == ''">
+      <IceBuilderStream>false</IceBuilderStream>
+  </PropertyGroup>
+
+  <PropertyGroup Label="IceBuilder">
+      <IceBuilderIncludeDirectories>$(IceHome)\slice;%(IceBuilderIncludeDirectories)</IceBuilderIncludeDirectories>
+  </PropertyGroup>
+
+  <ItemDefinitionGroup Condition="'$(IceBuilderHeaderOutputDir)' == '' And '$(IceBuilderBaseDirectoryForGeneratedInclude)' == ''">
     <ClCompile>
       <AdditionalIncludeDirectories>$(IceBuilderOutputDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+
+  <ItemDefinitionGroup Condition="'$(IceBuilderHeaderOutputDir)' != '' And '$(IceBuilderBaseDirectoryForGeneratedInclude)' == ''">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(IceBuilderHeaderOutputDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
 

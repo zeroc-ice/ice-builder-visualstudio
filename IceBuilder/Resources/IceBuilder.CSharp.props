@@ -5,14 +5,14 @@
   <!-- Import IceBuilder common settings -->
   <Import Project="$(MSBuildThisFileDirectory)\IceBuilder.Common.props"/>
   
-  <!-- Import our custom MSbuild tasks used to build Ice C++ projects -->
+  <!-- Import our custom MSbuild tasks used to build Ice for CSharp projects -->
   <UsingTask TaskName="IceBuilder.Slice2CSharpTask"
              AssemblyFile="$(MSBuildThisFileDirectory)IceBuilder.Tasks.dll" />
 
   <UsingTask TaskName="IceBuilder.Slice2CSharpDependTask"
              AssemblyFile="$(MSBuildThisFileDirectory)IceBuilder.Tasks.dll" />
 
-  <PropertyGroup Label="IceBuilder">
-    <IceBuilderOutputDir>$(ProjectDir)\generated</IceBuilderOutputDir>
+  <PropertyGroup Label="IceBuilder" Condition="'$(IceBuilderOutputDir)' == ''">
+    <IceBuilderOutputDir>$(MSBuildProjectDirectory)\generated</IceBuilderOutputDir>
   </PropertyGroup>
 </Project>

@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 
 using Microsoft.VisualStudio.VCProjectEngine;
 
@@ -31,27 +29,81 @@ namespace IceBuilder
             return true;
         }
 
-        public void AddToFilter(EnvDTE.Project dteProject, String name, String path)
+        public VCFilter FindOrCreateFilter(VCFilter parent, String name)
         {
-            VCProject project = dteProject.Object as VCProject;
+            foreach (VCFilter f in parent.Filters)
+            {
+                if(f.Name.Equals(name))
+                {
+                    return f;
+                }
+            }
+            return parent.AddFilter(name);
+        }
 
-            VCFilter filter = null;
-            foreach (VCFilter f in project.Filters)
+        public VCFilter FindOrCreateFilter(VCProject parent, String name)
+        {
+            foreach(VCFilter f in parent.Filters)
             {
                 if (f.Name.Equals(name))
                 {
-                    filter = f;
-                    break;
+                    return f;
                 }
             }
+            return parent.AddFilter(name);
+        }
 
-            if (filter != null)
+        public String Evaluate(EnvDTE.Configuration dteConfig, String value)
+        {
+            EnvDTE.Project dteProject = dteConfig.Owner as EnvDTE.Project;
+            VCProject project = dteProject.Object as VCProject;
+            VCConfiguration config = project.Configurations.Item(dteConfig.ConfigurationName + "|" + dteConfig.PlatformName);
+            return config.Evaluate(value);
+        }
+
+        public void AddGeneratedFiles(EnvDTE.Project dteProject, EnvDTE.Configuration config, String filterName, List<String> paths, bool generatedFilesPerConfiguration)
+        {
+            VCProject project = dteProject.Object as VCProject;
+
+            VCFilter filter = FindOrCreateFilter(project, filterName);
+            if(generatedFilesPerConfiguration)
             {
-                filter.AddFile(path);                
+                filter = FindOrCreateFilter(filter, config.PlatformName);
+                filter = FindOrCreateFilter(filter, config.ConfigurationName);
             }
-            else
+
+            String configurationName = config.ConfigurationName;
+            String platformName = config.PlatformName;
+
+            foreach (String path in paths)
             {
-                project.AddFile(path);
+                VCFile file = filter.AddFile(path);
+
+                //
+                // Exclude the file from all other configurations
+                //
+                if(generatedFilesPerConfiguration)
+                {
+                    foreach (VCFileConfiguration c in file.FileConfigurations)
+                    {
+                        if (!c.ProjectConfiguration.ConfigurationName.Equals(configurationName) || 
+                            !c.ProjectConfiguration.Platform.Name.Equals(platformName))
+                        {
+                            c.ExcludedFromBuild = true;
+                        }
+                    }
+                }
+
+                try
+                {
+                    //
+                    // Remove the file otherwise it will be considered up to date.
+                    //
+                    File.Delete(path);
+                }
+                catch (Exception)
+                {
+                }
             }
         }
     }

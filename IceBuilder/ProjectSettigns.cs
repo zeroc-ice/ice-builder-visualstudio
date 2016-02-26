@@ -1,20 +1,17 @@
 // **********************************************************************
 //
-// Copyright (c) 2009-2015 ZeroC, Inc. All rights reserved.
+// Copyright (c) 2009-2016 ZeroC, Inc. All rights reserved.
 //
 // **********************************************************************
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace IceBuilder
 {
     public class ProjectSettigns
     {
-        public ProjectSettigns(EnvDTE.Project project)
+        public ProjectSettigns(IVsProject project)
         {
             Project = project;
         }
@@ -91,7 +88,7 @@ namespace IceBuilder
             set;
         }
 
-        private EnvDTE.Project Project
+        private IVsProject Project
         {
             get;
             set;

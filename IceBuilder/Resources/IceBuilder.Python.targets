@@ -26,41 +26,47 @@
       <IceBuilder Include="@(None)" Condition="'%(Extension)'=='.ice'"/>
     </ItemGroup>
   </Target>
-  
+
   <Target Name="IceBuilder_Compile"
          DependsOnTargets="IceBuilder_Validate;IceBuilder_Prepare"
-         BeforeTargets="CoreCompile">
+         BeforeTargets="Build">
     <Message Text="Ice Builder Compile started"/>
     <MakeDir Directories="$(IceBuilderOutputDir)" Condition="!Exists('$(IceBuilderOutputDir)')"/>
-    
+
     <!-- First we check dependencies and decide what must be rebuild -->
-    <Slice2CSharpDependTask
+    <Slice2PythonDependTask
       OutputDir           = "$(IceBuilderOutputDir)"
+      Prefix              = "$(IceBuilderPrefix)"
+      PythonHome          = "$(PythonHome)"
+      Slice2Py            = "$(Slice2Py)"
       WorkingDirectory    = "$(MSBuildProjectDirectory)"
       DependFile          = "IceBuilder.d"
       Sources             = "@(IceBuilder)">
-      
+
       <Output
-        ItemName          = "_IceBuilder" 
+        ItemName          = "_IceBuilder"
         TaskParameter     = "ComputedSources"/>
 
       <Output
         PropertyName      = "_IceBuilderUdateDepends"
         TaskParameter     = "UpdateDepends"/>
-      
-    </Slice2CSharpDependTask>
-    
+
+    </Slice2PythonDependTask>
+
     <!-- Compile the Slice files to produce the generated code -->
-    <Slice2CSharpTask 
+    <Slice2PythonTask
         IceHome             = "$(IceHome)"
         IceToolsBin         = "$(IceToolsBin)"
+        PythonHome          = "$(PythonHome)"
+        Slice2Py            = "$(Slice2Py)"
+        Prefix              = "$(IceBuilderPrefix)"
         OutputDir           = "$(IceBuilderOutputDir)"
         WorkingDirectory    = "$(MSBuildProjectDirectory)"
         AllowIcePrefix      = "$(IceBuilderAllowIcePrefix)"
         Underscore          = "$(IceBuilderUnderscore)"
         Stream              = "$(IceBuilderStream)"
         Checksum            = "$(IceBuilderChecksum)"
-        Tie                 = "$(IceBuilderTie)"
+        NoPackage           = "$(IceBuilderNoPackage)"
         IncludeDirectories  = "$(IceBuilderIncludeDirectories)"
         AdditionalOptions   = "$(IceBuilderAdditionalOptions)"
         Sources             = "@(_IceBuilder)"
@@ -68,16 +74,19 @@
         Condition           = "'%(_IceBuilder.BuildRequired)' == 'True'"/>
 
     <!-- Update the dependencies -->
-    <Slice2CSharpTask 
+    <Slice2PythonTask
         IceHome             = "$(IceHome)"
         IceToolsBin         = "$(IceToolsBin)"
+        PythonHome          = "$(PythonHome)"
+        Slice2Py            = "$(Slice2Py)"
+        Prefix              = "$(IceBuilderPrefix)"
         OutputDir           = "$(IceBuilderOutputDir)"
         WorkingDirectory    = "$(MSBuildProjectDirectory)"
         AllowIcePrefix      = "$(IceBuilderAllowIcePrefix)"
         Underscore          = "$(IceBuilderUnderscore)"
         Stream              = "$(IceBuilderStream)"
         Checksum            = "$(IceBuilderChecksum)"
-        Tie                 = "$(IceBuilderTie)"
+        NoPackage           = "$(IceBuilderNoPackage)"
         IncludeDirectories  = "$(IceBuilderIncludeDirectories)"
         AdditionalOptions   = "$(IceBuilderAdditionalOptions)"
         Sources             = "@(_IceBuilder)"
@@ -87,7 +96,7 @@
   </Target>
 
   <Target Name="IceBuilder_Clean" BeforeTargets="Clean" DependsOnTargets="IceBuilder_Prepare">
-    <Delete Files="$([System.IO.Path]::Combine($(IceBuilderOutputDir),%(IceBuilder.Filename).cs))"/>
+    <Delete Files="$([System.IO.Path]::Combine($(IceBuilderOutputDir),$(IceBuilderPrefix)%(IceBuilder.Filename)_ice.py))"/>
     <Delete Files="$([System.IO.Path]::Combine($(IceBuilderOutputDir),IceBuilder.d))"/>
   </Target>
 </Project>

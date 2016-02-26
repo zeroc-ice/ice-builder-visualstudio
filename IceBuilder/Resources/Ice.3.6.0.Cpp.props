@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) 2009-2015 ZeroC, Inc. All rights reserved. -->
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-
   <!-- This file is imported when using Ice 3.6.0 with C++ projects -->
   <!-- If using a source distribution try to locate the matching third part distribution-->
   <PropertyGroup Condition="$(IceSourceHome) != '' And $(THIRDPARTY_HOME) == ''">
@@ -29,7 +28,7 @@
     <IceThirdPartyLib>$(IceThirdPartyHome)\lib\$(IceToolsetSuffix)$(IcePlatformSuffix)</IceThirdPartyLib>
     <IceThirdPartyBin>$(IceThirdPartyHome)\bin\$(IceToolsetSuffix)$(IcePlatformSuffix)</IceThirdPartyBin>
   </PropertyGroup>
-  
+
   <Choose>
     <!-- Windows store application settings -->
     <When Condition="'$(ApplicationType)' == 'Windows Store'">
@@ -53,7 +52,7 @@
       <PropertyGroup Condition="Exists('$(IceSourceHome)')">
         <IceSDKDirectoryRoot>$(IceHome)\cpp\SDKs\$(IceSDKPrefix)\</IceSDKDirectoryRoot>
       </PropertyGroup>
-      
+
       <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
         <ConfigurationPrefix>Debug</ConfigurationPrefix>
       </PropertyGroup>
@@ -80,21 +79,23 @@
     </When>
     <!-- Windows C++ application settings-->
     <Otherwise>
-      
+
       <!-- Ice binary distribution -->
       <PropertyGroup Condition="!Exists('$(IceSourceHome)')">
         <IceLib>$(IceHome)\lib\$(IceToolsetSuffix)$(IcePlatformSuffix)</IceLib>
         <IceBin>$(IceHome)\bin\$(IceToolsetSuffix)$(IcePlatformSuffix)</IceBin>
+        <IceToolsBin>$(IceHome)\bin</IceToolsBin>
         <IceInclude>$(IceHome)\include\</IceInclude>
       </PropertyGroup>
-      
+
       <!-- Source distributions library, binary and  include paths -->
       <PropertyGroup Condition="Exists('$(IceSourceHome)')">
         <IceInclude>$(IceHome)\cpp\include\</IceInclude>
         <IceBin>$(IceHome)\cpp\bin\</IceBin>
+        <IceToolsBin>$(IceHome)\cpp\bin</IceToolsBin>
         <IceLib>$(IceHome)\cpp\lib\</IceLib>
       </PropertyGroup>
-      
+
       <!-- Preprend our settings to C++ configuration settings -->
       <PropertyGroup>
         <IncludePath>$(IceInclude);$(IncludePath)</IncludePath>
@@ -113,7 +114,7 @@
         </BuildMacro>
         <BuildMacro Include="IceBin">
           <Value>$(IceBin)</Value>
-          <EnvironmentVariable>true</EnvironmentVariable>  
+          <EnvironmentVariable>true</EnvironmentVariable>
         </BuildMacro>
       </ItemGroup>
     </Otherwise>

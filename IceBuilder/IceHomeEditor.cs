@@ -1,6 +1,6 @@
 // **********************************************************************
 //
-// Copyright (c) 2009-2015 ZeroC, Inc. All rights reserved.
+// Copyright (c) 2009-2016 ZeroC, Inc. All rights reserved.
 //
 // **********************************************************************
 
@@ -46,7 +46,10 @@ namespace IceBuilder
             {
                 if (String.IsNullOrEmpty(path) ||
                     File.Exists(Path.Combine(path, "bin", "slice2cpp.exe")) ||
-                    File.Exists(Path.Combine(path, "cpp", "bin", "slice2cpp.exe")))
+                    File.Exists(Path.Combine(path, "cpp", "bin", "slice2cpp.exe")) ||
+                    File.Exists(Path.Combine(path, "cpp", "config", "Ice.props")) ||
+                    File.Exists(Path.Combine(path, "config", "Ice.props")) ||
+                    File.Exists(Path.Combine(path, "build", "native", "Ice.props")))
                 {
                     txtIceHome.Text = path;
                     return true;
@@ -70,6 +73,18 @@ namespace IceBuilder
             lblInfo.Text = "";
 
             SetIceHome(selectedPath);
+        }
+
+        public bool AutoBuilding
+        {
+            set
+            {
+                autoBuild.Checked = value;
+            }
+            get
+            {
+                return autoBuild.Checked;
+            }
         }
     }
 }

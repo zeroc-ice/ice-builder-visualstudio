@@ -1,6 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Templates", "Templates", "{077FF067-76D0-4C84-8DEF-37D8BDEF5515}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{75072990-876D-48AE-98E4-ACDC1D482F4A}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\packages.config = .nuget\packages.config
+	EndProjectSection
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IceBuilder", "IceBuilder\IceBuilder.csproj", "{026808B3-0ACF-4F7C-A3B7-3A3866363E2B}"
 	ProjectSection(ProjectDependencies) = postProject
 		{92CBD919-8F0D-477E-813E-880BAD8236FD} = {92CBD919-8F0D-477E-813E-880BAD8236FD}
@@ -11,8 +20,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IceBuilder", "IceBuilder\Ic
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpSliceItemTemplate", "IceBuilderTemplates\CSharpSliceItemTemplate\CSharpSliceItemTemplate.csproj", "{6D243563-186E-4FCC-B1FC-74E97B9A5942}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Templates", "Templates", "{077FF067-76D0-4C84-8DEF-37D8BDEF5515}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VCSliceItemTemplate", "IceBuilderTemplates\VCSliceItemTemplate\VCSliceItemTemplate.csproj", "{5B778A54-EFB1-4085-9CA2-49C83AC352B5}"
 EndProject
@@ -27,11 +34,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AddinRemoval", "AddinRemoval\AddinRemoval.csproj", "{FACD0CED-15AB-4756-8424-6F857B3DC379}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IceBuilder_VS2015", "IceBuilder_VS2015\IceBuilder_VS2015.csproj", "{C14FE348-5198-4CFD-9316-C548622E5419}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{75072990-876D-48AE-98E4-ACDC1D482F4A}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\packages.config = .nuget\packages.config
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

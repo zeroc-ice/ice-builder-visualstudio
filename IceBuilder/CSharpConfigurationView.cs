@@ -1,6 +1,6 @@
 // **********************************************************************
 //
-// Copyright (c) 2009-2015 ZeroC, Inc. All rights reserved.
+// Copyright (c) 2009-2016 ZeroC, Inc. All rights reserved.
 //
 // **********************************************************************
 
@@ -173,7 +173,7 @@ namespace IceBuilder
                     {
                         String name = Path.GetFileNameWithoutExtension(assembly);
                         referencedAssemblies.Items.Add(name);
-                        if (ProjectUtil.HasAssemblyReference(Page.Project, name))
+                        if (ProjectUtil.HasAssemblyReference(DTEUtil.GetProject(Page.Project as IVsHierarchy), name))
                         {
                             referencedAssemblies.SetItemCheckState(referencedAssemblies.Items.Count - 1, CheckState.Checked);
                         }
@@ -221,7 +221,7 @@ namespace IceBuilder
 
         private void btnOutputDirectoryBrowse_Click(object sender, EventArgs e)
         {
-            String projectDir = Path.GetFullPath(Path.GetDirectoryName(Page.Project.FullName));
+            String projectDir = Path.GetFullPath(Path.GetDirectoryName(ProjectUtil.GetProjectFullPath(Page.Project)));
             String selectedPath = UIUtil.BrowserFolderDialog(Handle, "Output Directory", projectDir);
             if (!String.IsNullOrEmpty(selectedPath))
             {

@@ -22,6 +22,7 @@ namespace IceBuilder
         //
         // C++ properties
         //
+        public static readonly String HeaderOutputDir = "IceBuilderHeaderOutputDir";
         public static readonly String HeaderExt = "IceBuilderHeaderExt";
         public static readonly String SourceExt = "IceBuilderSourceExt";
         public static readonly String DLLExport = "IceBuilderDLLExport";

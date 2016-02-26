@@ -1,12 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace IceBuilder
 {
@@ -19,7 +15,7 @@ namespace IceBuilder
 
         private void OKButton_Clicked(object sender, EventArgs e)
         {
-            List<EnvDTE.Project> selected = SelectedProjets;
+            List<IVsProject> selected = SelectedProjets;
             UpgradeDialogProgress proggressDialog = new UpgradeDialogProgress(selected.Count);
             ProjectConverter.Upgrade(selected, proggressDialog);
             proggressDialog.StartPosition = FormStartPosition.CenterParent;
@@ -32,8 +28,8 @@ namespace IceBuilder
             Close();
         }
 
-        Dictionary<String, EnvDTE.Project> _projects;
-        public Dictionary<String, EnvDTE.Project> Projects
+        Dictionary<String, IVsProject> _projects;
+        public Dictionary<String, IVsProject> Projects
         {
             get
             {
@@ -59,11 +55,11 @@ namespace IceBuilder
             }
         }
 
-        public List<EnvDTE.Project> SelectedProjets
+        public List<IVsProject> SelectedProjets
         {
             get
             {
-                List<EnvDTE.Project> values = new List<EnvDTE.Project>();
+                List<IVsProject> values = new List<IVsProject>();
                 foreach (object o in projectList.CheckedItems)
                 {
                     values.Add(Projects[o.ToString()]);

@@ -1,6 +1,6 @@
 // **********************************************************************
 //
-// Copyright (c) 2009-2015 ZeroC, Inc. All rights reserved.
+// Copyright (c) 2009-2016 ZeroC, Inc. All rights reserved.
 //
 // **********************************************************************
 
@@ -15,6 +15,7 @@ namespace IceBuilder
     public interface VCUtil
     {
         bool SetupSliceFilter(EnvDTE.Project project);
-        void AddToFilter(EnvDTE.Project dteProject, String name, String path);
+        void AddGeneratedFiles(EnvDTE.Project dteProject, EnvDTE.Configuration config, String filterName, List<String> paths, bool generatedFilesPerConfiguration);
+        String Evaluate(EnvDTE.Configuration config, String value);
     }
 }

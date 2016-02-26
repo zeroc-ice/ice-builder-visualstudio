@@ -71,6 +71,7 @@ These properties are the same for all configurations and platforms, and allow yo
 | Property                                | MSBuild Property                            | Default Value              | Corresponding `slice2cpp` parameter |
 | --------------------------------------- | ------------------------------------------- | -------------------------- | ----------------------------------- |
 | Output Directory                        | IceBuilderOutputDir                         | $(ProjectDir)\generated    | `--output-dir`                      |
+| Header Output Directory                 | IceBuilderHeaderOutputDir                   | $(IceBuilderOutputDir)     | (none)                              |
 | Allow Reserved Ice Identifiers          | IceBuilderAllowIcePrefix                    | No                         | `--ice`                             |
 | Allow Underscores In Identifiers        | IceBuilderUnderscore                        | No                         | `--underscore`                      |
 | Include Directories                     | IceBuilderIncludeDirectories                | $(IceHome)\slice           | `-I`                                |
@@ -147,15 +148,10 @@ Ice Builder adds two targets, `IceBuilder_Compile` and `IceBuilder_Clean`, that 
 
 ### Build Requirements
 
-To build Ice Builder for Visual Studio you will need to:
-
-Be running one of the following versions of Visual Studio:
-- Visual Studio 2012
-- Visual Studio 2013
-- Visual Studio 2015
+To build Ice Builder for Visual Studio you will need Visual Studio 2015:
 
 **AND**
-  
+
 Install ALL the following Visual Studio SDKs:
 - [Visual Studio 2012 SDK](https://www.microsoft.com/en-us/download/details.aspx?id=30668)
 - [Visual Studio 2013 SDK](https://www.microsoft.com/en-us/download/details.aspx?id=40758)
@@ -170,6 +166,6 @@ After building the Ice Builder extension, the VSIX package will be placed in the
 `IceBuilder\bin\Debug\IceBuilder.vsix` for debug builds, and `IceBuilder\bin\Release\IceBuilder.vsix`
 for release builds.
 
-If you want to sign your extension with Authenticode, set the environment variable `SIGN_CERTIFICATE` to 
+If you want to sign your extension with Authenticode, set the environment variable `SIGN_CERTIFICATE` to
 the path of your PFX certificate store, and the `SIGN_PASSWORD` environment variable to the password
 used by your certificate store.

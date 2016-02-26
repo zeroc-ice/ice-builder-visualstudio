@@ -1,6 +1,6 @@
 // **********************************************************************
 //
-// Copyright (c) 2009-2015 ZeroC, Inc. All rights reserved.
+// Copyright (c) 2009-2016 ZeroC, Inc. All rights reserved.
 //
 // **********************************************************************
 
@@ -56,6 +56,8 @@ namespace IceBuilder
                 {
                     e.ApplyBehavior = ApplyKind.CancelNoNavigate;
                 }
+
+                Package.Instance.SetAutoBuilding(Editor.AutoBuilding);
             }
             catch (Exception ex)
             {
@@ -69,6 +71,7 @@ namespace IceBuilder
             try
             {
                 Editor.IceHome = Package.Instance.GetIceHome();
+                Editor.AutoBuilding = Package.Instance.AutoBuilding;
             }
             catch (Exception ex)
             {

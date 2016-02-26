@@ -1,6 +1,6 @@
 // **********************************************************************
 //
-// Copyright (c) 2009-2015 ZeroC, Inc. All rights reserved.
+// Copyright (c) 2009-2016 ZeroC, Inc. All rights reserved.
 //
 // **********************************************************************
 
@@ -70,14 +70,16 @@ namespace IceBuilder
         {
             try
             {
-                ProjectItem item = GetProjectItemFromDocumentCookie(docCookie);
-                if(item != null )
+                if (Package.Instance.AutoBuilding)
                 {
-                    if (item.ContainingProject != null && DTEUtil.IsIceBuilderEnabled(item.ContainingProject) &&
-                       !String.IsNullOrEmpty(item.Name) && ProjectUtil.IsSliceFileName(item.Name))
+                    IVsProject project = null;
+                    uint item = 0;
+                    String path = null;
+                    GetDocumentInfo(docCookie, ref project, ref item, ref path);
+                    if (DTEUtil.IsIceBuilderEnabled(project) != IceBuilderProjectType.None &&
+                        ProjectUtil.IsSliceFileName(path))
                     {
-                        Package.Instance.QueueProjectsForBuilding(
-                            new List<EnvDTE.Project>(new EnvDTE.Project[]{item.ContainingProject}));
+                        Package.Instance.QueueProjectsForBuilding(new List<IVsProject>(new IVsProject[] { project }));
                     }
                 }
             }
@@ -95,10 +97,20 @@ namespace IceBuilder
             {
                 if(fFirstShow != 0)
                 {
-                    ProjectItem item = GetProjectItemFromDocumentCookie(docCookie);
-                    if(ProjectUtil.IsGeneratedItem(item))
+                    IVsProject project = null;
+                    uint item = 0;
+                    String path = null;
+                    GetDocumentInfo(docCookie, ref project, ref item, ref path);
+                    if(project != null && !String.IsNullOrEmpty(path))
                     {
-                        item.Document.ReadOnly = true;
+                        if(Package.Instance.FileTracker.Contains(ProjectUtil.GetProjectFullPath(project), path))
+                        {
+                            EnvDTE.ProjectItem i = ProjectUtil.GetProjectItem(project, item);
+                            if (i != null)
+                            {
+                                i.Document.ReadOnly = true;
+                            }
+                        }
                     }
                 }
             }
@@ -116,7 +128,7 @@ namespace IceBuilder
             return 0;
         }
 
-        private EnvDTE.ProjectItem GetProjectItemFromDocumentCookie(uint cookie)
+        private void GetDocumentInfo(uint cookie, ref IVsProject project, ref uint item, ref string path)
         {
             uint pgrfRDTFlags;
             uint pdwReadLocks;
@@ -126,27 +138,19 @@ namespace IceBuilder
             uint pitemid;
             IntPtr ppunkDocData;
 
-            try
-            {
-                if (RunningDocumentTable.GetDocumentInfo(
-                        cookie,
-                        out pgrfRDTFlags,
-                        out pdwReadLocks,
-                        out pdwEditLocks,
-                        out pbstrMkDocument,
-                        out ppHier,
-                        out pitemid,
-                        out ppunkDocData) == VSConstants.S_OK)
-                {
-                    return DTEUtil.GetProjectItem(ppHier, pitemid);
-                }
-            }
-            catch (Exception ex)
-            {
-                Package.UnexpectedExceptionWarning(ex);
-                throw;
-            }
-            return null;
+            ErrorHandler.ThrowOnFailure(RunningDocumentTable.GetDocumentInfo(
+                    cookie,
+                    out pgrfRDTFlags,
+                    out pdwReadLocks,
+                    out pdwEditLocks,
+                    out pbstrMkDocument,
+                    out ppHier,
+                    out pitemid,
+                    out ppunkDocData));
+
+            project = ppHier as IVsProject;
+            path = pbstrMkDocument;
+            item = pitemid;
         }
 
         IVsRunningDocumentTable RunningDocumentTable
@@ -185,23 +189,25 @@ namespace IceBuilder
         }
 
         public int OnAfterAddFilesEx(int projectsLength, int filesLength, IVsProject[] projects, int[] indices,
-                                     string[] paths, VSADDFILEFLAGS[] rgFlags)
+                                     string[] names, VSADDFILEFLAGS[] rgFlags)
         {
             try
             {
                 for (int i = 0; i < projectsLength; ++i)
                 {
-                    EnvDTE.Project project = DTEUtil.GetProject(projects[i] as IVsHierarchy);
-                    if (DTEUtil.IsIceBuilderEnabled(project))
+                    IVsProject project = projects[i];
+                    IceBuilderProjectType projectType = DTEUtil.IsIceBuilderEnabled(project);
+                    if (projectType != IceBuilderProjectType.None)
                     {
-                        int j = indices[i]; 
+                        int j = indices[i];
                         int k = i < (projectsLength - 1) ? indices[i + 1] : filesLength;
-
                         for (; j < k; ++j)
                         {
-                            if(ProjectUtil.IsSliceFileName(paths[j]))
+                            String path = names[i];
+                            if (ProjectUtil.IsSliceFileName(path))
                             {
-                                ProjectUtil.SetupGenerated(project, paths[j]);
+                                ProjectUtil.SetupGenerated(project, projectType);
+                                break;
                             }
                         }
                     }
@@ -227,21 +233,23 @@ namespace IceBuilder
         {
             try
             {
-                for(int i = 0; i < projectsLength; ++i)
+                for (int i = 0; i < projectsLength; ++i)
                 {
-                    EnvDTE.Project project = DTEUtil.GetProject(projects[i] as IVsHierarchy);
-                    if (DTEUtil.IsIceBuilderEnabled(project))
+                    IVsProject project = projects[i];
+                    IceBuilderProjectType projectType = DTEUtil.IsIceBuilderEnabled(project);
+                    if (projectType != IceBuilderProjectType.None)
                     {
                         int j = indices[i];
                         int k = i < (projectsLength - 1) ? indices[i + 1] : filesLength;
                         for (; j < k; ++j)
                         {
-                            if(ProjectUtil.IsSliceFileName(names[j]))
+                            String path = names[i];
+                            if (ProjectUtil.IsSliceFileName(path))
                             {
-                                ProjectUtil.DeleteItems(project, ProjectUtil.GetGeneratedFiles(project, names[i]));
+                                ProjectUtil.SetupGenerated(project, projectType);
+                                break;
                             }
                         }
-                        Package.Instance.FileTracker.Reap(project);
                     }
                 }
             }
@@ -267,20 +275,22 @@ namespace IceBuilder
             {
                 for (int i = 0; i < projectsLength; ++i)
                 {
-                    EnvDTE.Project project = DTEUtil.GetProject(projects[i] as IVsHierarchy);
-                    if (DTEUtil.IsIceBuilderEnabled(project))
+                    IVsProject project = projects[i];
+                    IceBuilderProjectType projectType = DTEUtil.IsIceBuilderEnabled(project);
+                    if (projectType != IceBuilderProjectType.None)
                     {
                         int j = indices[i];
                         int k = i < (projectsLength - 1) ? indices[i + 1] : filesLength;
                         for (; j < k; ++j)
                         {
-                            ProjectUtil.DeleteItems(project, ProjectUtil.GetGeneratedFiles(project, oldNames[j]));
-                            if (ProjectUtil.IsSliceFileName(newNames[j]))
+                            String oldPath = oldNames[i];
+                            String newPath = newNames[j];
+                            if (ProjectUtil.IsSliceFileName(oldPath) || ProjectUtil.IsSliceFileName(newPath))
                             {
-                                ProjectUtil.SetupGenerated(project, newNames[j]);
+                                ProjectUtil.SetupGenerated(project, projectType);
+                                break;
                             }
                         }
-                        Package.Instance.FileTracker.Reap(project);
                     }
                 }
             }
@@ -306,23 +316,25 @@ namespace IceBuilder
             return 0;
         }
 
-        public int OnQueryAddFiles(IVsProject p, int length, string[] files,
+        public int OnQueryAddFiles(IVsProject project, int length, string[] files,
                                    VSQUERYADDFILEFLAGS[] rgFlags, VSQUERYADDFILERESULTS[] pSummaryResult,
                                    VSQUERYADDFILERESULTS[] rgResults)
         {
             try
             {
-                EnvDTE.Project project = DTEUtil.GetProject(p as IVsHierarchy);
-                if (DTEUtil.IsIceBuilderEnabled(project))
+                if(files.Any(f => ProjectUtil.IsSliceFileName(f)))
                 {
-                    for (int i = 0; i < length; ++i)
+                    IceBuilderProjectType projectType = DTEUtil.IsIceBuilderEnabled(project);
+                    if (projectType != IceBuilderProjectType.None)
                     {
-                        String path = files[i];
-                        if(Path.GetExtension(path).Equals(".ice"))
+                        for (int i = 0; i < length; ++i)
                         {
-                            if (!ProjectUtil.CheckGenerateFileIsValid(project, path))
+                            if (ProjectUtil.IsSliceFileName(files[i]))
                             {
-                                pSummaryResult[i] = VSQUERYADDFILERESULTS.VSQUERYADDFILERESULTS_AddNotOK;
+                                if (!ProjectUtil.CheckGenerateFileIsValid(project, projectType, files[i]))
+                                {
+                                    pSummaryResult[i] = VSQUERYADDFILERESULTS.VSQUERYADDFILERESULTS_AddNotOK;
+                                }
                             }
                         }
                     }
@@ -360,22 +372,21 @@ namespace IceBuilder
             return 0;
         }
 
-        public int OnQueryRenameFiles(IVsProject ivsProject, int filesLength, string[] oldNames, string[] newNames,
+        public int OnQueryRenameFiles(IVsProject project, int filesLength, string[] oldNames, string[] newNames,
                                       VSQUERYRENAMEFILEFLAGS[] rgFlags, VSQUERYRENAMEFILERESULTS[] pSummaryResult,
                                       VSQUERYRENAMEFILERESULTS[] rgResults)
         {
             try
             {
-                EnvDTE.Project project = DTEUtil.GetProject(ivsProject as IVsHierarchy);
-                if(DTEUtil.IsIceBuilderEnabled(project))
+                IceBuilderProjectType projectType = DTEUtil.IsIceBuilderEnabled(project);
+                if (projectType != IceBuilderProjectType.None)
                 {
                     for(int i = 0; i < filesLength; ++i)
                     {
-                        if(Path.GetExtension(oldNames[i]).Equals(".ice") && 
-                           Path.GetExtension(newNames[i]).Equals(".ice"))
+                        if(ProjectUtil.IsSliceFileName(newNames[i]))
                         {
 
-                            if(!ProjectUtil.CheckGenerateFileIsValid(project, newNames[i]))
+                            if(!ProjectUtil.CheckGenerateFileIsValid(project, projectType, newNames[i]))
                             {
                                 rgResults[i] = VSQUERYRENAMEFILERESULTS.VSQUERYRENAMEFILERESULTS_RenameNotOK;
                             }

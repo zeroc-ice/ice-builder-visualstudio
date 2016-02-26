@@ -1,7 +1,7 @@
 
 // **********************************************************************
 //
-// Copyright (c) 2009-2015 ZeroC, Inc. All rights reserved.
+// Copyright (c) 2009-2016 ZeroC, Inc. All rights reserved.
 //
 // **********************************************************************
 
@@ -229,7 +229,7 @@ namespace IceBuilder
 
         private void btnSelectInclude_Clicked(object sender, EventArgs e)
         {
-            String projectDir = Path.GetFullPath(Path.GetDirectoryName(PropertyPage.Project.FullName)); ;
+            String projectDir = Path.GetFullPath(Path.GetDirectoryName(ProjectUtil.GetProjectFullPath(PropertyPage.Project))); ;
             String selectedPath = UIUtil.BrowserFolderDialog(Handle, "Slice Include Directory",
                 String.IsNullOrEmpty(_editingIncludeDir) ? projectDir : _editingIncludeDir);
 
@@ -292,7 +292,7 @@ namespace IceBuilder
                 String path = includeList.Items[e.Index].ToString();
                 if (!String.IsNullOrEmpty(path) && path.IndexOf('$') == -1)
                 {
-                    String projectDir = Path.GetFullPath(Path.GetDirectoryName(PropertyPage.Project.FullName));
+                    String projectDir = Path.GetFullPath(Path.GetDirectoryName(ProjectUtil.GetProjectFullPath(PropertyPage.Project)));
                     bool absolute = Path.IsPathRooted(path);
 
                     if(e.NewValue == CheckState.Unchecked)
