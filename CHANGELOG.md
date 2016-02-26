@@ -13,7 +13,7 @@
   the generated C++ header files into a separate directory.
 
 - Added ability to enable or disable the automatic compilation of Slice files.
-  See Tools > Options > Projects and Solutions > Ice Builder in Visual Studio
+  See `Tools > Options > Projects and Solutions > Ice Builder in Visual Studio`.
   Automatic Slice file compilation is disabled by default, which speeds up
   the loading of solutions with many projects.
 
