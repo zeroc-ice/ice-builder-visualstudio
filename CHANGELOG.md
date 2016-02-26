@@ -1,26 +1,24 @@
 ## Changes in Ice Builder for Visual Studio 4.2.0
 
-- Ice Builder now allows building Ice 3.7 distribution
+- Added support for building the Ice 3.7 source distribution. 
 
-- Stating with this version when the Output Directory for C++ projects contains an
-  MSBuild property that expand to different values for each configuration, the
-  project will include a generated file for each configuration and setup Exclude
-  From Build property, to just build the file for the matching configuration.
+- Starting with this release, when the Output Directory for a C++ project contains a
+  MSBuild property that expands to different values for each configuration, the
+  project includes generated files in each configuration and set the Exclude
+  From Build property to build these generated C++ files only for the target configuration.
 
-- MSbuild tasks for building Ice for PHP and Ice for Python are now included with
-  Ice Builder.
+- Added MSbuild tasks to build Ice for PHP and Ice for Python.
 
-- C++ projects have a new property `IceBuilderHeaderOutputDir` that allow to set
-  a separate directory for generated headers.
+- C++ projects have a new property `IceBuilderHeaderOutputDir` that allows to move
+  the generated C++ header files into a separate directory.
 
-- Whenever Slice files are automatically compiled can now be configured in the
-  builder options. The default is to not compile Slice files automatically this
-  make project loading faster.
+- Added ability to enable or disable the automatic compilation of Slice files.
+  See Tools > Options > Projects and Solutions > Ice Builder in Visual Studio
+  Automatic Slice file compilation is disabled by default, which speeds up
+  the loading of solutions with many projects.
 
-  See Tools > Options > Projects and Solutions > Ice Builder" in Visual Studio
-
-- Visual Studio 2015 is now required to build Ice Builder, but the extension can
-  still be used with Visual Studio 2012 and Visual Studio 2013.
+- Visual Studio 2015 is now required to build the Ice Builder, but the resulting 
+  extension remain usable with Visual Studio 2012 and Visual Studio 2013.
 
 ## Changes in Ice Builder for Visual Studio 4.1.2
 
