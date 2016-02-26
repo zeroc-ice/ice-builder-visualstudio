@@ -6,6 +6,6 @@
     	<SignCommand Condition="Exists('$(SIGN_CERTIFICATE)')">"$(SignToolPath)" sign /f "$(SIGN_CERTIFICATE)" /p $(SIGN_PASSWORD) /t $(TimeStampServer)</SignCommand>
     	<VsixSignTool Condition="Exists('$(MSBuildThisFileDirectory)packages\Microsoft.VSSDK.Vsixsigntool.6.3.9600-pre\tools\vssdk\vsixsigntool.exe')">$(MSBuildThisFileDirectory)packages\Microsoft.VSSDK.Vsixsigntool.6.3.9600-pre\tools\vssdk\vsixsigntool.exe</VsixSignTool>
     	<sha1>64 67 62 0b b4 7e 98 02  51 c4 87 7e 38 af cd bb 4c 36 1c 53</sha1>
-    	<VsixSignCommand Condition="Exists('$(SIGN_CERTIFICATE)')">$(VsixSignTool) sign /f $(SIGN_CERTIFICATE) /p $(SIGN_PASSWORD) /sha1 "$(sha1)"</VsixSignCommand>
+    	<VsixSignCommand Condition="Exists('$(SIGN_CERTIFICATE)')">$(VsixSignTool) sign /f $(SIGN_CERTIFICATE) /p $(SIGN_PASSWORD) /sha1 "$(sha1)" /fd SHA1</VsixSignCommand>
     </PropertyGroup>
 </Project>
