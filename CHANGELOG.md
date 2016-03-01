@@ -1,6 +1,11 @@
+## Changes in Ice Builder for Visual Studio 4.2.1
+
+- Fixed an issue that could cause a null pointer exception when
+  reading the extension settings.
+
 ## Changes in Ice Builder for Visual Studio 4.2.0
 
-- Added support for building the Ice 3.7 source distribution. 
+- Added support for building the Ice 3.7 source distribution.
 
 - Starting with this release, when the Output Directory for a C++ project contains a
   MSBuild property that expands to different values for each configuration, the
@@ -17,7 +22,7 @@
   Automatic Slice file compilation is disabled by default, which speeds up
   the loading of solutions with many projects.
 
-- Visual Studio 2015 is now required to build the Ice Builder, but the resulting 
+- Visual Studio 2015 is now required to build the Ice Builder, but the resulting
   extension remain usable with Visual Studio 2012 and Visual Studio 2013.
 
 ## Changes in Ice Builder for Visual Studio 4.1.2

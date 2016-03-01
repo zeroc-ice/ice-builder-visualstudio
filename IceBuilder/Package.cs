@@ -174,7 +174,15 @@ namespace IceBuilder
 
         private bool GetAutoBuilding()
         {
-            return 1 == (int)Microsoft.Win32.Registry.GetValue(IceHomeKey, IceAutoBuilding, 0);
+            try
+            {
+                return 1 == (int)Microsoft.Win32.Registry.GetValue(IceHomeKey, IceAutoBuilding, 0);
+            }
+            catch(System.NullReferenceException)
+            {
+                // Key doesn't exists use the default value
+                return false;
+            }
         }
         public Guid OutputPaneGUID = new Guid("CE9BFDCD-5AFD-4A77-BD40-75E0E1E5162C");
 
