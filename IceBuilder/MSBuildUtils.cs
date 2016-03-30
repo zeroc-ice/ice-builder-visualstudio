@@ -35,34 +35,31 @@ namespace IceBuilder
             "$(LOCALAPPDATA)\\ZeroC\\IceBuilder\\IceBuilder.CSharp.targets";
 
 
-        public static Microsoft.Build.Evaluation.Project LoadedProject(String path)
-        {
-            return LoadedProject(path, true);
-        }
+        static readonly ProjectCollection cppProjectColletion = new ProjectCollection();
 
-        public static Microsoft.Build.Evaluation.Project LoadedProject(String path, bool cached)
+        public static Microsoft.Build.Evaluation.Project LoadedProject(String path, bool cpp, bool cached)
         {
             Microsoft.Build.Evaluation.Project project = null;
-            ICollection<Microsoft.Build.Evaluation.Project> projects = 
-                ProjectCollection.GlobalProjectCollection.GetLoadedProjects(path);
+            ProjectCollection collection = cpp ? cppProjectColletion : ProjectCollection.GlobalProjectCollection;
+            ICollection<Microsoft.Build.Evaluation.Project> projects = collection.GetLoadedProjects(path);
 
 
             if (projects.Count == 0)
             {
-                project = new Microsoft.Build.Evaluation.Project(path);
+                project = collection.LoadProject(path);
             }
             else
             {
                 project = projects.First();
-                if(!cached)
+                if(cpp && !cached)
                 {
                     //
                     // That is required to get C++ project properties re-evaluated
                     // with Visual Studio 2013 and Visual Studio 2015
                     //
-                    ProjectCollection.GlobalProjectCollection.UnloadProject(project);
-                    ProjectCollection.GlobalProjectCollection.UnloadAllProjects();
-                    project = ProjectCollection.GlobalProjectCollection.LoadProject(path);
+                    collection.UnloadProject(project);
+                    collection.UnloadAllProjects();
+                    project = collection.LoadProject(path);
                 }
             }
             return project;
@@ -310,7 +307,7 @@ namespace IceBuilder
             {
                 if(DTEUtil.IsIceBuilderEnabled(p) != IceBuilderProjectType.None)
                 {
-                    Microsoft.Build.Evaluation.Project project = MSBuildUtils.LoadedProject(ProjectUtil.GetProjectFullPath(p));
+                    Microsoft.Build.Evaluation.Project project = MSBuildUtils.LoadedProject(ProjectUtil.GetProjectFullPath(p), DTEUtil.IsCppProject(p), true);
                     ResolvedImport import = project.Imports.FirstOrDefault(i => i.ImportedProject.FullPath.EndsWith("IceBuilder.Common.props"));
 
                     if (import.ImportedProject != null)

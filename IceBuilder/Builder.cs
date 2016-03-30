@@ -31,8 +31,7 @@ namespace IceBuilder
 
         public bool Build(IVsProject p, BuildCallback buildCallback, BuildLogger buildLogger)
         {
-            ProjectUtil.SaveProject(p);
-            MSBuildProject project = MSBuildUtils.LoadedProject(ProjectUtil.GetProjectFullPath(p), false);
+            MSBuildProject project = MSBuildUtils.LoadedProject(ProjectUtil.GetProjectFullPath(p), DTEUtil.IsCppProject(p), false);
 
             //
             // We need to set this before we acquire the build resources otherwise Msbuild
@@ -76,7 +75,8 @@ namespace IceBuilder
                 try
                 {
                     Dictionary<string, string> properties = new Dictionary<string, string>();
-                    properties["Platform"] = buildCallback.SolutionConfiguration.PlatformName;
+                    String platform = buildCallback.SolutionConfiguration.PlatformName;
+                    properties["Platform"] = platform.Equals("Any CPU") ? "AnyCPU" : platform;
                     properties["Configuration"] = buildCallback.SolutionConfiguration.Name;
 
                     BuildRequestData buildRequest = new BuildRequestData(

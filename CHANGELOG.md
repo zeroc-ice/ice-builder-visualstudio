@@ -1,3 +1,14 @@
+## Changes in Ice Builder for Visual Studio 4.2.2
+
+- Fixed an issue that could cause an COMException when accessing the project
+  GUID.
+
+- Fixed an issue in saving C# project settings.
+
+- Fixed an issue where setting the "Build Automatically" option introduced in
+  version 4.2.0 could result in a InvalidOperationException exception being
+  throw.
+
 ## Changes in Ice Builder for Visual Studio 4.2.1
 
 - Fixed an issue that could cause a null pointer exception when

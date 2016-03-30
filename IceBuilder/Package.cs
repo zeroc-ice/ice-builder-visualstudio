@@ -243,6 +243,13 @@ namespace IceBuilder
 
                     Microsoft.Win32.Registry.SetValue(IceCSharpAssembleyKey, "", GetAssembliesDir(value),
                                                       Microsoft.Win32.RegistryValueKind.String);
+
+                    ICollection<Microsoft.Build.Evaluation.Project> projects =
+                        Microsoft.Build.Evaluation.ProjectCollection.GlobalProjectCollection.GetLoadedProjects(props);
+                    if(projects.Count > 0)
+                    {
+                        Microsoft.Build.Evaluation.ProjectCollection.GlobalProjectCollection.UnloadProject(p);
+                    }
                 }
                 else
                 {
@@ -346,6 +353,7 @@ namespace IceBuilder
             else if (!Building && BuildingProject == null)
             {
                 IVsProject p = _buildProjects.ElementAt(0);
+                ProjectUtil.SaveProject(p);
                 ProjectUtil.SetupGenerated(p, DTEUtil.IsIceBuilderEnabled(p));
                 if (BuildProject(p))
                 {
@@ -380,10 +388,9 @@ namespace IceBuilder
 
                 if (projectType != IceBuilderProjectType.None)
                 {
-                    EnvDTE.Project p = DTEUtil.GetProject(project as IVsHierarchy);
                     if (projectType == IceBuilderProjectType.CppProjectType)
                     {
-                        VCUtil.SetupSliceFilter(p);
+                        VCUtil.SetupSliceFilter(DTEUtil.GetProject(project as IVsHierarchy));
                     }
                     if (AutoBuilding)
                     {
@@ -839,7 +846,8 @@ namespace IceBuilder
                     {
                         if(DTEUtil.IsCppProject(p) || DTEUtil.IsCSharpProject(p))
                         {
-                            command.Enabled = !MSBuildUtils.IsIceBuilderEnabled(MSBuildUtils.LoadedProject(ProjectUtil.GetProjectFullPath(p)));
+                            command.Enabled = !MSBuildUtils.IsIceBuilderEnabled(MSBuildUtils.LoadedProject(
+                                ProjectUtil.GetProjectFullPath(p), DTEUtil.IsCppProject(p), true));
                         }
                         else
                         {
@@ -867,7 +875,7 @@ namespace IceBuilder
                     {
                         if (DTEUtil.IsCppProject(p) || DTEUtil.IsCSharpProject(p))
                         {
-                            command.Enabled = MSBuildUtils.IsIceBuilderEnabled(MSBuildUtils.LoadedProject(ProjectUtil.GetProjectFullPath(p)));
+                            command.Enabled = MSBuildUtils.IsIceBuilderEnabled(MSBuildUtils.LoadedProject(ProjectUtil.GetProjectFullPath(p), DTEUtil.IsCppProject(p), true));
                         }
                         else
                         {
@@ -906,7 +914,7 @@ namespace IceBuilder
 
         public void AddIceBuilderToProject(IVsProject p)
         {
-            Microsoft.Build.Evaluation.Project project = MSBuildUtils.LoadedProject(ProjectUtil.GetProjectFullPath(p));
+            Microsoft.Build.Evaluation.Project project = MSBuildUtils.LoadedProject(ProjectUtil.GetProjectFullPath(p), DTEUtil.IsCppProject(p), true);
             if (MSBuildUtils.AddIceBuilderToProject(project))
             {
                 if (DTEUtil.IsCppProject(p))
@@ -969,7 +977,7 @@ namespace IceBuilder
         private void RemoveIceBuilderFromProject(IVsProject p)
         {
             String path = ProjectUtil.GetProjectFullPath(p);
-            Microsoft.Build.Evaluation.Project project = MSBuildUtils.LoadedProject(path);
+            Microsoft.Build.Evaluation.Project project = MSBuildUtils.LoadedProject(path, DTEUtil.IsCppProject(p), true);
             MSBuildUtils.RemoveIceBuilderFromProject(project);
             foreach (IVsProject p1 in _buildProjects)
             { 

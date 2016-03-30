@@ -169,7 +169,9 @@ namespace IceBuilder
                                              IsCSharpProject(project) ? IceBuilderProjectType.CsharpProjectType : IceBuilderProjectType.None;
                 if (type != IceBuilderProjectType.None)
                 {
-                    if (MSBuildUtils.IsIceBuilderEnabled(MSBuildUtils.LoadedProject(ProjectUtil.GetProjectFullPath(project))))
+                    if (MSBuildUtils.IsIceBuilderEnabled(MSBuildUtils.LoadedProject(ProjectUtil.GetProjectFullPath(project), 
+                                                                                    DTEUtil.IsCppProject(project), 
+                                                                                    true)))
                     {
                         return type;
                     }

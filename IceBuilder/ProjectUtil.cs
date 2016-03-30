@@ -26,14 +26,17 @@ namespace IceBuilder
             IVsHierarchy hierarchy = project as IVsHierarchy;
             if(hierarchy != null)
             {
-                Guid type;
-                ErrorHandler.ThrowOnFailure(hierarchy.GetGuidProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_TypeGuid, out type));
-                return type;
+                try
+                {
+                    Guid type;
+                    ErrorHandler.ThrowOnFailure(hierarchy.GetGuidProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_TypeGuid, out type));
+                    return type;
+                }
+                catch(Exception)
+                {
+                }
             }
-            else
-            {
-                return new Guid();
-            }
+            return new Guid();
         }
         public static void SaveProject(IVsProject project)
         {
@@ -234,13 +237,13 @@ namespace IceBuilder
 
         public static String GetProperty(IVsProject project, String name, String defaultValue)
         {
-            String value = MSBuildUtils.GetProperty(MSBuildUtils.LoadedProject(GetProjectFullPath(project)), name);
+            String value = MSBuildUtils.GetProperty(MSBuildUtils.LoadedProject(GetProjectFullPath(project), DTEUtil.IsCppProject(project), true), name);
             return String.IsNullOrEmpty(value) ? defaultValue : value;
         }
 
         public static void SetProperty(IVsProject project, String name, String value)
         {
-            MSBuildUtils.SetProperty(MSBuildUtils.LoadedProject(GetProjectFullPath(project)), "IceBuilder", name, value);
+            MSBuildUtils.SetProperty(MSBuildUtils.LoadedProject(GetProjectFullPath(project), DTEUtil.IsCppProject(project), true), "IceBuilder", name, value);
         }
 
         public static String GetEvaluatedProperty(IVsProject project, String name)
@@ -250,7 +253,7 @@ namespace IceBuilder
 
         public static String GetEvaluatedProperty(IVsProject project, String name, String defaultValue)
         {
-            String value = MSBuildUtils.GetEvaluatedProperty(MSBuildUtils.LoadedProject(GetProjectFullPath(project)), name);
+            String value = MSBuildUtils.GetEvaluatedProperty(MSBuildUtils.LoadedProject(GetProjectFullPath(project), DTEUtil.IsCppProject(project), true), name);
             return String.IsNullOrEmpty(value) ? defaultValue : value;
         }
 
@@ -547,6 +550,11 @@ namespace IceBuilder
         {
             if(type == IceBuilderProjectType.CppProjectType)
             {
+                //
+                // This will ensure that property reads don't use a cached project.
+                //
+                MSBuildUtils.LoadedProject(ProjectUtil.GetProjectFullPath(project), true, false);
+
                 List<CppGeneratedFileSet> generated = GetCppGeneratedFiles(project);
                 foreach(CppGeneratedFileSet fileset in generated)
                 {

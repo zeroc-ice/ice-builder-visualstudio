@@ -294,5 +294,13 @@ namespace IceBuilder
         {
             Dirty = true;
         }
+
+        private void txtOutputDir_TextChanged(object sender, EventArgs e)
+        {
+            if (!txtOutputDir.Text.Equals(Page.Settings.OutputDir))
+            {
+                Dirty = true;
+            }
+        }
     }
 }

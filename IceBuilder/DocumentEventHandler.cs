@@ -114,10 +114,9 @@ namespace IceBuilder
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Package.UnexpectedExceptionWarning(ex);
-                throw;
+                // Could happend with some document types
             }
             return 0;
         }

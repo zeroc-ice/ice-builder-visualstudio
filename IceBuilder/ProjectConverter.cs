@@ -277,7 +277,7 @@ namespace IceBuilder
                 if(DTEUtil.IsCppProject(project) || DTEUtil.IsCSharpProject(project))
                 {
                     String fullName = ProjectUtil.GetProjectFullPath(project);
-                    if(new OldConfiguration().Load(MSBuildUtils.LoadedProject(fullName), false))
+                    if(new OldConfiguration().Load(MSBuildUtils.LoadedProject(fullName, DTEUtil.IsCppProject(project), true), false))
                     {
                         upgradeProjects.Add(FileUtil.RelativePath(baseDir, fullName), project);
                     }
@@ -338,7 +338,7 @@ namespace IceBuilder
         public static bool Upgrade(IVsProject project)
         {
             OldConfiguration oldConfiguration = new OldConfiguration();
-            Microsoft.Build.Evaluation.Project msbuildProject = MSBuildUtils.LoadedProject(ProjectUtil.GetProjectFullPath(project));
+            Microsoft.Build.Evaluation.Project msbuildProject = MSBuildUtils.LoadedProject(ProjectUtil.GetProjectFullPath(project), DTEUtil.IsCppProject(project), true);
 
             if (oldConfiguration.Load(msbuildProject, true))
             {

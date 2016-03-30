@@ -56,9 +56,9 @@ namespace IceBuilder
             this.chkStreaming = new System.Windows.Forms.CheckBox();
             this.chkChecksum = new System.Windows.Forms.CheckBox();
             this.chkTie = new System.Windows.Forms.CheckBox();
-            this.includeDirectories = new IceBuilder.IncludeDirectories();
             this.groupBoxGeneral = new System.Windows.Forms.GroupBox();
             this.tooltip = new System.Windows.Forms.ToolTip(this.components);
+            this.includeDirectories = new IceBuilder.IncludeDirectories();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBoxGeneral.SuspendLayout();
@@ -117,6 +117,7 @@ namespace IceBuilder
             this.txtOutputDir.Size = new System.Drawing.Size(323, 20);
             this.txtOutputDir.TabIndex = 17;
             this.tooltip.SetToolTip(this.txtOutputDir, "Directory where generated files are created.");
+            this.txtOutputDir.TextChanged += new System.EventHandler(this.txtOutputDir_TextChanged);
             this.txtOutputDir.Leave += new System.EventHandler(this.OutputDirectory_Leave);
             // 
             // btnOutputDirectoryBrowse
@@ -271,18 +272,6 @@ namespace IceBuilder
             this.chkTie.UseVisualStyleBackColor = true;
             this.chkTie.CheckStateChanged += new System.EventHandler(this.Tie_CheckedChanged);
             // 
-            // includeDirectories
-            // 
-            this.includeDirectories.AutoSize = true;
-            this.includeDirectories.InitialValues = ((System.Collections.Generic.List<string>)(resources.GetObject("includeDirectories.InitialValues")));
-            this.includeDirectories.Location = new System.Drawing.Point(12, 105);
-            this.includeDirectories.Margin = new System.Windows.Forms.Padding(0);
-            this.includeDirectories.Name = "includeDirectories";
-            this.includeDirectories.PropertyPage = null;
-            this.includeDirectories.Size = new System.Drawing.Size(631, 158);
-            this.includeDirectories.TabIndex = 46;
-            this.includeDirectories.Values = ((System.Collections.Generic.List<string>)(resources.GetObject("includeDirectories.Values")));
-            // 
             // groupBoxGeneral
             // 
             this.groupBoxGeneral.AutoSize = true;
@@ -298,6 +287,18 @@ namespace IceBuilder
             this.groupBoxGeneral.Size = new System.Drawing.Size(665, 617);
             this.groupBoxGeneral.TabIndex = 5;
             this.groupBoxGeneral.TabStop = false;
+            // 
+            // includeDirectories
+            // 
+            this.includeDirectories.AutoSize = true;
+            this.includeDirectories.InitialValues = ((System.Collections.Generic.List<string>)(resources.GetObject("includeDirectories.InitialValues")));
+            this.includeDirectories.Location = new System.Drawing.Point(12, 105);
+            this.includeDirectories.Margin = new System.Windows.Forms.Padding(0);
+            this.includeDirectories.Name = "includeDirectories";
+            this.includeDirectories.PropertyPage = null;
+            this.includeDirectories.Size = new System.Drawing.Size(631, 158);
+            this.includeDirectories.TabIndex = 46;
+            this.includeDirectories.Values = ((System.Collections.Generic.List<string>)(resources.GetObject("includeDirectories.Values")));
             // 
             // CSharpConfigurationView
             // 
