@@ -1,3 +1,7 @@
+## Changes in Ice Builder for Visual Studio 4.2.3
+
+- Added support for reading CSharp settings from Ice distribution.
+
 ## Changes in Ice Builder for Visual Studio 4.2.2
 
 - Fixed an issue that could cause an COMException when accessing the project
