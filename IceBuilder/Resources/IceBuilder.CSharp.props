@@ -4,13 +4,20 @@
 
   <!-- Import IceBuilder common settings -->
   <Import Project="$(MSBuildThisFileDirectory)\IceBuilder.Common.props"/>
-  
+
   <!-- Import our custom MSbuild tasks used to build Ice for CSharp projects -->
   <UsingTask TaskName="IceBuilder.Slice2CSharpTask"
              AssemblyFile="$(MSBuildThisFileDirectory)IceBuilder.Tasks.dll" />
 
   <UsingTask TaskName="IceBuilder.Slice2CSharpDependTask"
              AssemblyFile="$(MSBuildThisFileDirectory)IceBuilder.Tasks.dll" />
+
+  <!-- Import settings from the Ice distribution -->
+  <Import Project="$(IceHome)\config\Ice.CSharp.props"
+          Condition="Exists('$(IceHome)\config\Ice.CSharp.props')"/>
+
+  <Import Project="$(IceHome)\csharp\config\Ice.CSharp.props"
+          Condition="Exists('$(IceHome)\csharp\config\Ice.CSharp.props')"/>
 
   <PropertyGroup Label="IceBuilder" Condition="'$(IceBuilderOutputDir)' == ''">
     <IceBuilderOutputDir>$(MSBuildProjectDirectory)\generated</IceBuilderOutputDir>
