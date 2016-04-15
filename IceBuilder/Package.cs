@@ -977,8 +977,7 @@ namespace IceBuilder
         private void RemoveIceBuilderFromProject(IVsProject p)
         {
             String path = ProjectUtil.GetProjectFullPath(p);
-            Microsoft.Build.Evaluation.Project project = MSBuildUtils.LoadedProject(path, DTEUtil.IsCppProject(p), true);
-            MSBuildUtils.RemoveIceBuilderFromProject(project);
+
             foreach (IVsProject p1 in _buildProjects)
             { 
                 if(path.Equals(ProjectUtil.GetProjectFullPath(p1)))
@@ -987,7 +986,6 @@ namespace IceBuilder
                     break;
                 }
             }
-
 
             ProjectUtil.DeleteItems(
                 ProjectUtil.GetGeneratedFiles(p).Aggregate(
@@ -1011,6 +1009,9 @@ namespace IceBuilder
                             }
                         });
             }
+
+            Microsoft.Build.Evaluation.Project project = MSBuildUtils.LoadedProject(path, DTEUtil.IsCppProject(p), true);
+            MSBuildUtils.RemoveIceBuilderFromProject(project);
             ProjectUtil.SaveProject(p);
 
             Guid projectGUID = Guid.Empty;

@@ -51,7 +51,27 @@ namespace IceBuilder
 
         public static void GetSubProjects(IVsProject p, ref List<IVsProject> projects)
         {
-            GetSubProjects((IVsHierarchy)p, VSConstants.VSITEMID_ROOT, ref projects);
+            IVsHierarchy h = p as IVsHierarchy;
+            // Get the first visible child node
+            object value;
+            int result = h.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_FirstVisibleChild, out value);
+            while (ErrorHandler.Succeeded(result))
+            {
+                if (value is int && (uint)(int)value == VSConstants.VSITEMID_NIL)
+                {
+                    // No more nodes
+                    break;
+                }
+                else
+                {
+                    uint child = Convert.ToUInt32(value);
+                    GetSubProjects(h, child, ref projects);
+
+                    // Get the next visible sibling node
+                    value = null;
+                    result = h.GetProperty(child, (int)__VSHPROPID.VSHPROPID_NextVisibleSibling, out value);
+                }
+            }
         }
 
         public static void GetSubProjects(IVsHierarchy h, uint itemId, ref List<IVsProject> projects)
@@ -60,7 +80,7 @@ namespace IceBuilder
             uint nestedId = 0;
             Guid nestedGuid = typeof(IVsHierarchy).GUID;
             int result = h.GetNestedHierarchy(itemId, ref nestedGuid, out nestedValue, out nestedId);
-            if (ErrorHandler.Succeeded(result) && nestedValue != IntPtr.Zero && nestedId == VSConstants.VSITEMID_ROOT)
+            if(ErrorHandler.Succeeded(result) && nestedValue != IntPtr.Zero && nestedId == VSConstants.VSITEMID_ROOT)
             {
                 // Get the nested hierachy
                 IVsProject project = System.Runtime.InteropServices.Marshal.GetObjectForIUnknown(nestedValue) as IVsProject;
@@ -69,30 +89,6 @@ namespace IceBuilder
                 {
                     projects.Add(project);
                     GetSubProjects(project, ref projects);
-                }
-            }
-            else
-            {
-                // Get the first visible child node
-                object value;
-                result = h.GetProperty(itemId, (int)__VSHPROPID.VSHPROPID_FirstVisibleChild, out value);
-                while (result == VSConstants.S_OK && value != null)
-                {
-                    if(value is int && (uint)(int)value == VSConstants.VSITEMID_NIL)
-                    {
-                        // No more nodes
-                        break;
-                    }
-                    else
-                    {
-                        uint child = Convert.ToUInt32(value);
-
-                        GetSubProjects(h, child, ref projects);
-
-                        // Get the next visible sibling node
-                        value = null;
-                        result = h.GetProperty(child, (int)__VSHPROPID.VSHPROPID_NextVisibleSibling, out value);
-                    }
                 }
             }
         }

@@ -1,3 +1,11 @@
+## Changes in Ice Builder for Visual Studio 4.2.4
+
+- Fixed a bug that could cause a NullReferenceException when removing the
+  builder from a project.
+
+- Fixed a bug that could cause a System.OverflowException when building a
+  solution where some projects failed to load.
+
 ## Changes in Ice Builder for Visual Studio 4.2.3
 
 - Added support for reading CSharp settings from Ice distribution.
