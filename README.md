@@ -46,7 +46,7 @@ The Ice Builder relies on a specific Ice installation on your system. In Visual 
 
 This installation can correspond to a binary distribution, such as `C:\Program Files (x86)\ZeroC\Ice-3.6.1`, or to a source tree, such as`C:\users\mike\github\zeroc-ice\ice`.
 
-The upcoming Ice 3.7.0 Nuget packages override the Ice Home global setting by set the IceHome MSBuild property before the Ice Builder property file is included, in this case when a project install an Ice Nuget package the project will used this Ice distribution instead of the Ice distribution referenced in the Ice Home global setting. Note that this is a per project setting so other projects in the same solution that doesn't install the Ice Nuget packages will still depend on the global Ice Home setting.
+Note that the global Ice Home setting will be ignored when a project uses the upcoming Nuget packages for Ice 3.7.0. Installing an Ice Nuget package for a project automatically configures that project to use the Ice distribution from the Nuget package. This is a per-project setting, therefore other projects that do not install an Ice Nuget package will still use the global Ice Home setting.
 
 ## C++ Usage
 
