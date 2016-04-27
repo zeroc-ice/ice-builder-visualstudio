@@ -1,3 +1,9 @@
+## Changes in Ice Builder for Visual Studio 4.3.0
+
+- Add support to use Ice Builder with the upcoming Ice 3.7.0 Nuget packages.
+
+- Improve the layout of the CSharp configuration dialog.
+
 ## Changes in Ice Builder for Visual Studio 4.2.4
 
 - Fixed a bug that could cause a NullReferenceException when removing the

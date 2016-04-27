@@ -79,6 +79,7 @@ namespace IceBuilder
                 Settings.AdditionalOptions = ConfigurationView.AdditionalOptions;
 
                 List<String> referencedAssemblies = ConfigurationView.ReferencedAssemblies;
+                String iceHome = ProjectUtil.GetEvaluatedProperty(Project, "IceHome");
                 foreach (String assembly in ConfigurationView.Assemblies)
                 {
                     EnvDTE.Project p = DTEUtil.GetProject(Project as IVsHierarchy);
@@ -93,7 +94,7 @@ namespace IceBuilder
                     {
                         if (referencedAssemblies.Contains(assembly))
                         {
-                            ProjectUtil.AddAssemblyReference(p, assembly);
+                            ProjectUtil.AddAssemblyReference(p, iceHome, assembly);
                         }
                     }
                 }

@@ -225,11 +225,19 @@ namespace IceBuilder
 
         protected override int ExecuteTool(string pathToTool, string responseFileCommands, string commandLineCommands)
         {
-            if (!Depend)
+            try
             {
-                TraceGenerated();
+                if (!Depend)
+                {
+                    TraceGenerated();
+                }
+                return base.ExecuteTool(pathToTool, responseFileCommands, commandLineCommands);
             }
-            return base.ExecuteTool(pathToTool, responseFileCommands, commandLineCommands);
+            catch(Exception ex)
+            {
+                Log.LogError(ex.ToString());
+                throw;
+            }
         }
 
         protected override string GenerateFullPathToTool()
@@ -454,33 +462,41 @@ namespace IceBuilder
 
         protected override int ExecuteTool(string pathToTool, string responseFileCommands, string commandLineCommands)
         {
-            int status = base.ExecuteTool(pathToTool, responseFileCommands, commandLineCommands);
-            if (!String.IsNullOrEmpty(HeaderOutputDir) && !Depend && status == 0)
+            try
             {
-                if (!Directory.Exists(HeaderOutputDir))
+                int status = base.ExecuteTool(pathToTool, responseFileCommands, commandLineCommands);
+                if (!String.IsNullOrEmpty(HeaderOutputDir) && !Depend && status == 0)
                 {
-                    Directory.CreateDirectory(HeaderOutputDir);
-                }
-                foreach (ITaskItem source in Sources)
-                {
-                    String sourceH = GetGeneratedPath(source, OutputDir, HeaderExt);
-                    String targetH = GetGeneratedPath(source, HeaderOutputDir, HeaderExt);
-                    if (!File.Exists(targetH) || new FileInfo(targetH).LastWriteTime < new FileInfo(sourceH).LastWriteTime)
+                    if (!Directory.Exists(HeaderOutputDir))
                     {
-                        if(File.Exists(targetH))
+                        Directory.CreateDirectory(HeaderOutputDir);
+                    }
+                    foreach (ITaskItem source in Sources)
+                    {
+                        String sourceH = GetGeneratedPath(source, OutputDir, HeaderExt);
+                        String targetH = GetGeneratedPath(source, HeaderOutputDir, HeaderExt);
+                        if (!File.Exists(targetH) || new FileInfo(targetH).LastWriteTime < new FileInfo(sourceH).LastWriteTime)
                         {
-                            File.Delete(targetH);
+                            if (File.Exists(targetH))
+                            {
+                                File.Delete(targetH);
+                            }
+                            File.Move(sourceH, targetH);
                         }
-                        File.Move(sourceH, targetH);
-                    }
 
-                    if(File.Exists(sourceH))
-                    {
-                        File.Delete(sourceH);
+                        if (File.Exists(sourceH))
+                        {
+                            File.Delete(sourceH);
+                        }
                     }
                 }
+                return status;
             }
-            return status;
+            catch(Exception ex)
+            {
+                Log.LogError(ex.ToString());
+                throw;
+            }
         }
     }
     #endregion
@@ -652,155 +668,159 @@ namespace IceBuilder
 
         public override bool Execute()
         {
-            List<ITaskItem> computed = new List<ITaskItem>();
-            UpdateDepends = false;
-
-            String dependFile = Path.Combine(OutputDir, DependFile);
-
-            XmlDocument dependsDoc = new XmlDocument();
-            bool dependExists = File.Exists(dependFile);
-            if (dependExists)
+            try
             {
-                try
-                {
-                    dependsDoc.Load(dependFile);
-                }
-                catch (XmlException)
+                List<ITaskItem> computed = new List<ITaskItem>();
+                UpdateDepends = false;
+
+                String dependFile = Path.Combine(OutputDir, DependFile);
+
+                XmlDocument dependsDoc = new XmlDocument();
+                bool dependExists = File.Exists(dependFile);
+                if (dependExists)
                 {
                     try
                     {
-                        File.Delete(dependFile);
+                        dependsDoc.Load(dependFile);
                     }
-                    catch (IOException)
+                    catch (XmlException)
                     {
+                        try
+                        {
+                            File.Delete(dependFile);
+                        }
+                        catch (IOException)
+                        {
+                        }
+                        Log.LogMessage(MessageImportance.Low,
+                            String.Format("Build required because depend file: {0} has some invalid data",
+                                TaskUtil.MakeRelative(WorkingDirectory, dependFile)));
                     }
-                    Log.LogMessage(MessageImportance.Low,
-                        String.Format("Build required because depend file: {0} has some invalid data",
-                            TaskUtil.MakeRelative(WorkingDirectory, dependFile)));
                 }
-            }
-            else
-            {
-                Log.LogMessage(MessageImportance.Low,
-                    String.Format("Build required because depend file: {0} doesn't exists",
-                                  TaskUtil.MakeRelative(WorkingDirectory, dependFile)));
-            }
-
-            foreach (ITaskItem source in Sources)
-            {
-                bool skip = true;
-                if (!dependExists)
-                {
-                    skip = false;
-                }
-                Log.LogMessage(MessageImportance.Low,
-                    String.Format("Computing dependencies for {0}", source.GetMetadata("Identity")));
-
-                ITaskItem[] generatedItems = GeneratedItems(source);
-
-                FileInfo sourceInfo = new FileInfo(source.GetMetadata("FullPath"));
-                if (!sourceInfo.Exists)
+                else
                 {
                     Log.LogMessage(MessageImportance.Low,
-                        String.Format("Build required because source: {0} doesn't exists",
-                            source.GetMetadata("Identity")));
-                    skip = false;
+                        String.Format("Build required because depend file: {0} doesn't exists",
+                                      TaskUtil.MakeRelative(WorkingDirectory, dependFile)));
                 }
 
-                FileInfo generatedInfo = null;
-
-                if (skip)
+                foreach (ITaskItem source in Sources)
                 {
-                    foreach (ITaskItem item in generatedItems)
+                    bool skip = true;
+                    if (!dependExists)
                     {
-                        generatedInfo = new FileInfo(item.GetMetadata("FullPath"));
-                        if (!generatedInfo.Exists)
-                        {
-                            Log.LogMessage(MessageImportance.Low,
-                                String.Format("Build required because generated: {0} doesn't exists",
-                                    TaskUtil.MakeRelative(WorkingDirectory, generatedInfo.FullName)));
-                            skip = false;
-                            break;
-                        }
-                        else if (sourceInfo.LastWriteTime.ToFileTime() > generatedInfo.LastWriteTime.ToFileTime())
-                        {
-                            Log.LogMessage(MessageImportance.Low,
-                                String.Format("Build required because source: {0} is older than target {1}",
-                                    source.GetMetadata("Identity"),
-                                    TaskUtil.MakeRelative(WorkingDirectory, generatedInfo.FullName)));
-                            skip = false;
-                            break;
-                        }
+                        skip = false;
                     }
-                }
+                    Log.LogMessage(MessageImportance.Low,
+                        String.Format("Computing dependencies for {0}", source.GetMetadata("Identity")));
 
-                if (skip)
-                {
-                    XmlNodeList depends = dependsDoc.DocumentElement.SelectNodes(
-                                String.Format("/dependencies/source[@name='{0}']/dependsOn", source.GetMetadata("Identity")));
-                    if (depends != null)
+                    ITaskItem[] generatedItems = GeneratedItems(source);
+
+                    FileInfo sourceInfo = new FileInfo(source.GetMetadata("FullPath"));
+                    if (!sourceInfo.Exists)
                     {
-                        List<String> dependPaths = new List<String>();
-                        foreach (XmlNode depend in depends)
-                        {
-                            dependPaths.Add(depend.Attributes["name"].Value);
-                        }
+                        Log.LogMessage(MessageImportance.Low,
+                            String.Format("Build required because source: {0} doesn't exists",
+                                source.GetMetadata("Identity")));
+                        skip = false;
+                    }
 
-                        foreach (String path in dependPaths)
+                    FileInfo generatedInfo = null;
+
+                    if (skip)
+                    {
+                        foreach (ITaskItem item in generatedItems)
                         {
-                            FileInfo dependencyInfo = new FileInfo(path);
-                            if (!dependencyInfo.Exists)
+                            generatedInfo = new FileInfo(item.GetMetadata("FullPath"));
+                            if (!generatedInfo.Exists)
                             {
-                                skip = false;
                                 Log.LogMessage(MessageImportance.Low,
-                                String.Format("Build required because dependency: {0} doesn't exists",
-                                    TaskUtil.MakeRelative(WorkingDirectory, dependencyInfo.FullName)));
+                                    String.Format("Build required because generated: {0} doesn't exists",
+                                        TaskUtil.MakeRelative(WorkingDirectory, generatedInfo.FullName)));
+                                skip = false;
                                 break;
                             }
-                            else if (dependencyInfo.LastWriteTime > generatedInfo.LastWriteTime)
+                            else if (sourceInfo.LastWriteTime.ToFileTime() > generatedInfo.LastWriteTime.ToFileTime())
                             {
-                                skip = false;
                                 Log.LogMessage(MessageImportance.Low,
-                                String.Format("Build required because source: {0} is older than target {1}",
-                                    source.GetMetadata("Identity"),
-                                    TaskUtil.MakeRelative(WorkingDirectory, dependencyInfo.FullName)));
+                                    String.Format("Build required because source: {0} is older than target {1}",
+                                        source.GetMetadata("Identity"),
+                                        TaskUtil.MakeRelative(WorkingDirectory, generatedInfo.FullName)));
+                                skip = false;
                                 break;
                             }
                         }
                     }
-                }
 
-                if (skip)
-                {
-                    String message = String.Format("Skipping {0} -> ", source.GetMetadata("Identity"));
-                    message += generatedItems[0].GetMetadata("Identity");
-                    if(generatedItems.Length > 1)
+                    if (skip)
                     {
-                        message += " and ";
-                        message += generatedItems[1].GetMetadata("Identity");
-                        message += " are ";
+                        XmlNodeList depends = dependsDoc.DocumentElement.SelectNodes(
+                                    String.Format("/dependencies/source[@name='{0}']/dependsOn", source.GetMetadata("Identity")));
+                        if (depends != null)
+                        {
+                            List<String> dependPaths = new List<String>();
+                            foreach (XmlNode depend in depends)
+                            {
+                                String path = depend.Attributes["name"].Value;
+                                FileInfo dependencyInfo = new FileInfo(path);
+                                if (!dependencyInfo.Exists)
+                                {
+                                    skip = false;
+                                    Log.LogMessage(MessageImportance.Low,
+                                    String.Format("Build required because dependency: {0} doesn't exists",
+                                        TaskUtil.MakeRelative(WorkingDirectory, dependencyInfo.FullName)));
+                                    break;
+                                }
+                                else if (dependencyInfo.LastWriteTime > generatedInfo.LastWriteTime)
+                                {
+                                    skip = false;
+                                    Log.LogMessage(MessageImportance.Low,
+                                    String.Format("Build required because source: {0} is older than target {1}",
+                                        source.GetMetadata("Identity"),
+                                        TaskUtil.MakeRelative(WorkingDirectory, dependencyInfo.FullName)));
+                                    break;
+                                }
+                            }
+                        }
                     }
-                    else
+
+                    if (skip)
                     {
-                        message += " is ";
+                        String message = String.Format("Skipping {0} -> ", source.GetMetadata("Identity"));
+                        message += generatedItems[0].GetMetadata("Identity");
+                        if (generatedItems.Length > 1)
+                        {
+                            message += " and ";
+                            message += generatedItems[1].GetMetadata("Identity");
+                            message += " are ";
+                        }
+                        else
+                        {
+                            message += " is ";
+                        }
+                        message += "up to date";
+
+                        Log.LogMessage(MessageImportance.Normal, message);
                     }
-                    message += "up to date";
 
-                    Log.LogMessage(MessageImportance.Normal, message);
+                    ITaskItem computedSource = new TaskItem(source.ItemSpec);
+                    source.CopyMetadataTo(computedSource);
+                    computedSource.SetMetadata("BuildRequired", skip ? "False" : "True");
+                    computed.Add(computedSource);
+
+                    if (!UpdateDepends && !skip)
+                    {
+                        UpdateDepends = true;
+                    }
                 }
-
-                ITaskItem computedSource = new TaskItem(source.ItemSpec);
-                source.CopyMetadataTo(computedSource);
-                computedSource.SetMetadata("BuildRequired", skip ? "False" : "True");
-                computed.Add(computedSource);
-
-                if (!UpdateDepends && !skip)
-                {
-                    UpdateDepends = true;
-                }
+                ComputedSources = computed.ToArray();
+                return true;
             }
-            ComputedSources = computed.ToArray();
-            return true;
+            catch(Exception ex)
+            {
+                Log.LogError(ex.ToString());
+                throw;
+            }
         }
     }
     #endregion

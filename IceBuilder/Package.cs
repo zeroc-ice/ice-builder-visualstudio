@@ -42,6 +42,19 @@ namespace IceBuilder
  
     public sealed class Package : Microsoft.VisualStudio.Shell.Package
     {
+
+        public static readonly string[] CppLibNames =
+        {
+            "Freeze", "Glacier2", "Ice", "IceBox", "IceGrid", "IcePatch2",
+            "IceSSL", "IceStorm", "IceUtil", "IceXML"
+        };
+
+        public static readonly string[] AssemblyNames =
+        {
+            "Glacier2", "Ice", "IceBox", "IceDiscovery", "IceLocatorDiscovery",
+            "IceGrid", "IcePatch2", "IceSSL", "IceStorm"
+        };
+
         #region Visual Studio Services
 
         public IVsShell Shell
@@ -186,6 +199,32 @@ namespace IceBuilder
         }
         public Guid OutputPaneGUID = new Guid("CE9BFDCD-5AFD-4A77-BD40-75E0E1E5162C");
 
+
+        private static void TryRemoveAssemblyFolderExKey()
+        { 
+            Microsoft.Win32.RegistryKey key = null;
+            try
+            {
+                key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(
+                   @"Software\Microsoft\.NETFramework\v2.0.50727\AssemblyFoldersEx");
+
+                if (key.GetSubKeyNames().Contains("Ice"))
+                {
+                    key.DeleteSubKey("Ice");
+                }
+            }
+            catch(Exception)
+            {
+            }
+            finally
+            {
+                if(key != null)
+                {
+                    key.Close();
+                }
+            }
+        }
+
         public void SetIceHome(String value)
         {
             if (String.IsNullOrEmpty(value))
@@ -201,9 +240,8 @@ namespace IceBuilder
                                                   Microsoft.Win32.RegistryValueKind.String);
                 Microsoft.Win32.Registry.SetValue(IceHomeKey, IceVersionMMValue, "",
                                                   Microsoft.Win32.RegistryValueKind.String);
-                Microsoft.Win32.Registry.SetValue(IceCSharpAssembleyKey, "", "",
-                                                  Microsoft.Win32.RegistryValueKind.String);
 
+                TryRemoveAssemblyFolderExKey();
 
                 MSBuildUtils.SetIceHome(DTEUtil.GetProjects(), "", "", "", "");
                 return;
@@ -213,6 +251,18 @@ namespace IceBuilder
                 String props = File.Exists(Path.Combine(value, "config", "Ice.props")) ? Path.Combine(value, "config", "Ice.props") :
                                File.Exists(Path.Combine(value, "cpp", "config", "Ice.props")) ? Path.Combine(value, "cpp", "config", "Ice.props") :
                                File.Exists(Path.Combine(value, "build", "native", "Ice.props")) ? Path.Combine(value, "build", "native", "Ice.props") : null;
+
+                if(String.IsNullOrEmpty(props) && Directory.Exists(value))
+                {
+                    foreach(String d in Directory.EnumerateDirectories(value))
+                    {
+                        if (File.Exists(Path.Combine(d, "build", String.Format("{0}.props", Path.GetFileName(d)))))
+                        {
+                            props = Path.Combine(d, "build", String.Format("{0}.props", Path.GetFileName(d)));
+                            break;
+                        }
+                    }
+                }
 
                 if (!String.IsNullOrEmpty(props))
                 {
@@ -241,15 +291,14 @@ namespace IceBuilder
 
                     MSBuildUtils.SetIceHome(DTEUtil.GetProjects(), value, version, intVersion, mmVersion);
 
-                    Microsoft.Win32.Registry.SetValue(IceCSharpAssembleyKey, "", GetAssembliesDir(value),
-                                                      Microsoft.Win32.RegistryValueKind.String);
-
                     ICollection<Microsoft.Build.Evaluation.Project> projects =
                         Microsoft.Build.Evaluation.ProjectCollection.GlobalProjectCollection.GetLoadedProjects(props);
                     if(projects.Count > 0)
                     {
                         Microsoft.Build.Evaluation.ProjectCollection.GlobalProjectCollection.UnloadProject(p);
                     }
+
+                    TryRemoveAssemblyFolderExKey();
                 }
                 else
                 {
@@ -301,29 +350,44 @@ namespace IceBuilder
 
                     MSBuildUtils.SetIceHome(DTEUtil.GetProjects(), value, v.ToString(), iceIntVersion, iceVersionMM);
 
-                    Microsoft.Win32.Registry.SetValue(IceCSharpAssembleyKey, "", GetAssembliesDir(value),
-                                                      Microsoft.Win32.RegistryValueKind.String);
+                    TryRemoveAssemblyFolderExKey();
                 }
             }
         }
 
-        public String GetAssembliesDir(String iceHome)
+        public String GetAssembliesDir(IVsProject project)
         {
-            if (File.Exists(Path.Combine(iceHome, "Assemblies", "Ice.dll")))
+            String iceHome = GetIceHome(project);
+            if (Directory.Exists(Path.Combine(iceHome, "Assemblies")))
             {
                 return Path.Combine(iceHome, "Assemblies");
             }
-            else if (File.Exists(Path.Combine(iceHome, "csharp", "Assemblies", "Ice.dll")))
+            else if (Directory.Exists(Path.Combine(iceHome, "csharp", "Assemblies")))
             {
                 return Path.Combine(iceHome, "csharp", "Assemblies");
+            }
+            else if(Directory.Exists(Path.Combine(iceHome, "lib")))
+            {
+                return Path.Combine(iceHome, "lib");
             }
             return String.Empty;
         }
 
-        public String GetIceHome()
+        public String GetIceHome(IVsProject project = null)
         {
-            Object value = Microsoft.Win32.Registry.GetValue(IceHomeKey, IceHomeValue, "");
-            return value == null ? String.Empty : value.ToString();
+            String iceHome = String.Empty;
+            if(project != null)
+            {
+                iceHome = ProjectUtil.GetEvaluatedProperty(project, IceHomeValue);
+            }
+
+            if(String.IsNullOrEmpty(iceHome))
+            {
+                Object value = Microsoft.Win32.Registry.GetValue(IceHomeKey, IceHomeValue, "");
+                iceHome = value == null ? String.Empty : value.ToString();
+            }
+
+            return iceHome;
         }
 
         public void QueueProjectsForBuilding(ICollection<IVsProject> projects)
@@ -392,6 +456,11 @@ namespace IceBuilder
                     {
                         VCUtil.SetupSliceFilter(DTEUtil.GetProject(project as IVsHierarchy));
                     }
+                    else
+                    {
+                        ProjectUtil.UpgradReferencesHintPath(DTEUtil.GetProject(project as IVsHierarchy));
+                    }
+
                     if (AutoBuilding)
                     {
                         sliceProjects.Add(project);
@@ -532,23 +601,8 @@ namespace IceBuilder
                 Version version = null;
                 Version latest = null;
                 String iceHome = null;
-                bool updateIceHome = true;
-                try
-                {
-                    if (File.Exists(Path.Combine(GetIceHome(), "bin", "slice2cpp.exe")) ||
-                        File.Exists(Path.Combine(GetIceHome(), "cpp", "bin", "slice2cpp.exe")) ||
-                        File.Exists(Path.Combine(GetIceHome(), "config", "Ice.props")) ||
-                        File.Exists(Path.Combine(GetIceHome(), "cpp", "config", "Ice.props")) ||
-                        File.Exists(Path.Combine(GetIceHome(), "build", "native", "Ice.props")))
-                    {
-                        updateIceHome = false;
-                    }
-                }
-                catch (ArgumentException)
-                { 
-                }
 
-                if(updateIceHome)
+                if(String.IsNullOrEmpty(GetIceHome()))
                 {
                     using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"Software\ZeroC"))
                     {
@@ -622,27 +676,9 @@ namespace IceBuilder
                         }
                     }
 
-                    if (iceHome != null)
+                    if(iceHome != null)
                     {
                         SetIceHome(iceHome);
-                    }
-                    else
-                    {
-                        //
-                        // Postpone the setting of Ice home until the add-in has been removed.
-                        //
-                        if(!File.Exists(AddinPath))
-                        {
-                            if (MessageBox.Show(
-                                    "The selected Ice home directory does not exist or is not " +
-                                    "an Ice installation. Please provide a correct Ice home directory.", 
-                                    "Ice Builder - Incorrect Ice home", 
-                                    MessageBoxButtons.OKCancel,
-                                    MessageBoxIcon.Information) == DialogResult.OK)
-                            {
-                                DTEEvents.OnStartupComplete += ShowIceOptionsPage;
-                            }
-                        }
                     }
                 }
 
@@ -688,11 +724,6 @@ namespace IceBuilder
                     DTEEvents.OnStartupComplete += AddinRemoval;
                 }
             }
-        }
-
-        void ShowIceOptionsPage()
-        {
-            ShowOptionPage(typeof(IceOptionsPage));
         }
 
         private void BuildEvents_OnBuildBegin(EnvDTE.vsBuildScope scope, EnvDTE.vsBuildAction action)
@@ -914,10 +945,12 @@ namespace IceBuilder
 
         public void AddIceBuilderToProject(IVsProject p)
         {
-            Microsoft.Build.Evaluation.Project project = MSBuildUtils.LoadedProject(ProjectUtil.GetProjectFullPath(p), DTEUtil.IsCppProject(p), true);
+            String projectPath = ProjectUtil.GetProjectFullPath(p);
+            bool cppProject = DTEUtil.IsCppProject(p);
+            Microsoft.Build.Evaluation.Project project = MSBuildUtils.LoadedProject(projectPath, cppProject, true);
             if (MSBuildUtils.AddIceBuilderToProject(project))
             {
-                if (DTEUtil.IsCppProject(p))
+                if(cppProject)
                 {
                     VCUtil.SetupSliceFilter(DTEUtil.GetProject(p as IVsHierarchy));
                 }
@@ -933,8 +966,8 @@ namespace IceBuilder
                         ProjectUtil.SetProperty(p, PropertyNames.IncludeDirectories, 
                             String.Format(@"$(IceHome)\slice;{0}", includeDirectories));
                     }
-                    ProjectUtil.AddAssemblyReference(DTEUtil.GetProject(p as IVsHierarchy), "Ice");
                 }
+
                 ProjectUtil.SaveProject(p);
                 IVsHierarchy hier = p as IVsHierarchy;
                 Guid projectGUID = Guid.Empty;
@@ -950,6 +983,13 @@ namespace IceBuilder
                     //expected if the project is not in the global project collection
                 }
                 IVsSolution4.ReloadProject(ref projectGUID);
+
+                if(!cppProject)
+                {
+                    IVsProject p1 = DTEUtil.GetProject(projectPath);
+                    ProjectUtil.AddAssemblyReference(DTEUtil.GetProject(p1 as IVsHierarchy), 
+                                                     ProjectUtil.GetEvaluatedProperty(p1, "IceHome"), "Ice");
+                }
             }
         }
 
@@ -998,16 +1038,14 @@ namespace IceBuilder
 
             if(DTEUtil.IsCSharpProject(p))
             {
-                Directory.GetFiles(GetAssembliesDir(GetIceHome()), "*.dll")
-                    .ToList()
-                    .ForEach(item =>
-                        {
-                            String name = Path.GetFileNameWithoutExtension(item);
-                            if (ProjectUtil.HasAssemblyReference(DTEUtil.GetProject(p as IVsHierarchy), name))
-                            {
-                                ProjectUtil.RemoveAssemblyReference(DTEUtil.GetProject(p as IVsHierarchy), name);
-                            }
-                        });
+                VSLangProj.References references = ProjectUtil.GetProjectRererences(DTEUtil.GetProject(p as IVsHierarchy));
+                foreach(VSLangProj.Reference r in references)
+                {
+                    if (Package.AssemblyNames.Contains(r.Name))
+                    {
+                        r.Remove();
+                    }
+                }
             }
 
             Microsoft.Build.Evaluation.Project project = MSBuildUtils.LoadedProject(path, DTEUtil.IsCppProject(p), true);

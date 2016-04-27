@@ -189,7 +189,6 @@ namespace IceBuilder
                 _txtInclude.Width = includeList.Width - 50;
                 _txtInclude.Parent = includeList;
                 _txtInclude.KeyUp += new KeyEventHandler(txtInclude_KeyUp);
-                groupBox1.Controls.Add(_txtInclude);
 
                 _btnSelectInclude = new Button();
                 _btnSelectInclude.Text = "...";
@@ -198,7 +197,6 @@ namespace IceBuilder
                 _btnSelectInclude.Width = 50;
                 _btnSelectInclude.Height = _txtInclude.Height;
                 _btnSelectInclude.Click += new EventHandler(btnSelectInclude_Clicked);
-                groupBox1.Controls.Add(_btnSelectInclude);
 
 
                 _txtInclude.Show();
@@ -257,11 +255,7 @@ namespace IceBuilder
                 }
 
                 String path = _txtInclude.Text;
-
-                groupBox1.Controls.Remove(_txtInclude);
                 _txtInclude = null;
-
-                groupBox1.Controls.Remove(_btnSelectInclude);
                 _btnSelectInclude = null;
 
                 if (save)

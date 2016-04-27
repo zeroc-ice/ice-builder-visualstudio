@@ -42,15 +42,13 @@ namespace IceBuilder
             this.lblDescription = new System.Windows.Forms.Label();
             this.btnUp = new System.Windows.Forms.Button();
             this.btnDown = new System.Windows.Forms.Button();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnAdd
             // 
             this.btnAdd.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.btnAdd.Location = new System.Drawing.Point(553, 4);
+            this.btnAdd.Location = new System.Drawing.Point(436, 3);
             this.btnAdd.Name = "btnAdd";
             this.btnAdd.Size = new System.Drawing.Size(75, 23);
             this.btnAdd.TabIndex = 52;
@@ -61,7 +59,7 @@ namespace IceBuilder
             // btnEdit
             // 
             this.btnEdit.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.btnEdit.Location = new System.Drawing.Point(553, 27);
+            this.btnEdit.Location = new System.Drawing.Point(436, 26);
             this.btnEdit.Name = "btnEdit";
             this.btnEdit.Size = new System.Drawing.Size(75, 23);
             this.btnEdit.TabIndex = 53;
@@ -73,7 +71,7 @@ namespace IceBuilder
             // 
             this.includeList.FormattingEnabled = true;
             this.includeList.HorizontalScrollbar = true;
-            this.includeList.Location = new System.Drawing.Point(224, 4);
+            this.includeList.Location = new System.Drawing.Point(107, 3);
             this.includeList.Name = "includeList";
             this.includeList.Size = new System.Drawing.Size(323, 154);
             this.includeList.TabIndex = 51;
@@ -84,7 +82,7 @@ namespace IceBuilder
             // btnRemove
             // 
             this.btnRemove.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.btnRemove.Location = new System.Drawing.Point(553, 50);
+            this.btnRemove.Location = new System.Drawing.Point(436, 49);
             this.btnRemove.Name = "btnRemove";
             this.btnRemove.Size = new System.Drawing.Size(75, 23);
             this.btnRemove.TabIndex = 54;
@@ -95,7 +93,7 @@ namespace IceBuilder
             // lblDescription
             // 
             this.lblDescription.AutoSize = true;
-            this.lblDescription.Location = new System.Drawing.Point(-3, 1);
+            this.lblDescription.Location = new System.Drawing.Point(3, 3);
             this.lblDescription.Name = "lblDescription";
             this.lblDescription.Size = new System.Drawing.Size(98, 13);
             this.lblDescription.TabIndex = 57;
@@ -104,7 +102,7 @@ namespace IceBuilder
             // btnUp
             // 
             this.btnUp.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.btnUp.Location = new System.Drawing.Point(553, 73);
+            this.btnUp.Location = new System.Drawing.Point(436, 72);
             this.btnUp.Name = "btnUp";
             this.btnUp.Size = new System.Drawing.Size(75, 23);
             this.btnUp.TabIndex = 55;
@@ -115,7 +113,7 @@ namespace IceBuilder
             // btnDown
             // 
             this.btnDown.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.btnDown.Location = new System.Drawing.Point(553, 96);
+            this.btnDown.Location = new System.Drawing.Point(436, 95);
             this.btnDown.Name = "btnDown";
             this.btnDown.Size = new System.Drawing.Size(75, 23);
             this.btnDown.TabIndex = 56;
@@ -123,35 +121,23 @@ namespace IceBuilder
             this.btnDown.UseVisualStyleBackColor = true;
             this.btnDown.Click += new System.EventHandler(this.btnDown_Click);
             // 
-            // groupBox1
-            // 
-            this.groupBox1.Controls.Add(this.includeList);
-            this.groupBox1.Controls.Add(this.btnAdd);
-            this.groupBox1.Controls.Add(this.btnDown);
-            this.groupBox1.Controls.Add(this.btnEdit);
-            this.groupBox1.Controls.Add(this.btnUp);
-            this.groupBox1.Controls.Add(this.lblDescription);
-            this.groupBox1.Controls.Add(this.btnRemove);
-            this.groupBox1.Location = new System.Drawing.Point(0, 0);
-            this.groupBox1.Margin = new System.Windows.Forms.Padding(0);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Padding = new System.Windows.Forms.Padding(0);
-            this.groupBox1.Size = new System.Drawing.Size(631, 158);
-            this.groupBox1.TabIndex = 58;
-            this.groupBox1.TabStop = false;
-            // 
             // IncludeDirectories
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.Controls.Add(this.groupBox1);
+            this.Controls.Add(this.btnAdd);
+            this.Controls.Add(this.btnDown);
+            this.Controls.Add(this.includeList);
+            this.Controls.Add(this.btnEdit);
+            this.Controls.Add(this.btnUp);
+            this.Controls.Add(this.lblDescription);
+            this.Controls.Add(this.btnRemove);
             this.Margin = new System.Windows.Forms.Padding(0);
             this.Name = "IncludeDirectories";
-            this.Size = new System.Drawing.Size(631, 166);
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
+            this.Size = new System.Drawing.Size(514, 160);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -164,7 +150,6 @@ namespace IceBuilder
         private System.Windows.Forms.Label lblDescription;
         private System.Windows.Forms.Button btnUp;
         private System.Windows.Forms.Button btnDown;
-        private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.ToolTip toolTip1;
     }
 }

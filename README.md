@@ -44,7 +44,9 @@ Project files created with the Ice add-in are not compatible with the Ice Builde
 
 The Ice Builder relies on a specific Ice installation on your system. In Visual Studio, you can view or edit the home directory of this Ice installation through the `TOOLS` > `Options` > `Project and Solutions` > `Ice Builder` options page.
 
-This installation can correspond to a binary distribution, such as `C:\Program Files (x86)\ZeroC\Ice-3.6.1`, or to a source tree, such as`C:\users\mike\github\zeroc-ice\ice`. When using a source tree, this source tree must be built beforehand with the version of Visual Studio you are currently using.
+This installation can correspond to a binary distribution, such as `C:\Program Files (x86)\ZeroC\Ice-3.6.1`, or to a source tree, such as`C:\users\mike\github\zeroc-ice\ice`.
+
+The upcoming Ice 3.7.0 Nuget packages override the Ice Home global setting by set the IceHome MSBuild property before the Ice Builder property file is included, in this case when a project install an Ice Nuget package the project will used this Ice distribution instead of the Ice distribution referenced in the Ice Home global setting. Note that this is a per project setting so other projects in the same solution that doesn't install the Ice Nuget packages will still depend on the global Ice Home setting.
 
 ## C++ Usage
 

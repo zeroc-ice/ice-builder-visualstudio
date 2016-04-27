@@ -59,18 +59,6 @@ namespace IceBuilder
             PropertyProjectVersion
         };
 
-        private static readonly string[] CppLibNames =
-        {
-            "Freeze", "Glacier2", "Ice", "IceBox", "IceGrid", "IcePatch2", 
-            "IceSSL", "IceStorm", "IceUtil", "IceXML" 
-        };
-
-        private static readonly string[] AssemblyNames =
-        {
-            "Glacier2", "Ice", "IceBox", "IceDiscovery", "IceLocatorDiscovery", 
-            "IceGrid", "IcePatch2", "IceSSL", "IceStorm"
-        };
-
         class OldConfiguration
         {
             public OldConfiguration()
@@ -404,7 +392,7 @@ namespace IceBuilder
                 propertyGroup.AddProperty(PropertyNames.Tie, "True");
             }
 
-            foreach (String assembly in AssemblyNames)
+            foreach (String assembly in Package.AssemblyNames)
             {
                 VSLangProj80.Reference3 reference = ProjectUtil.FindAssemblyReference(dteProject, assembly) as VSLangProj80.Reference3;
                 if(reference != null)
@@ -558,7 +546,7 @@ namespace IceBuilder
                         if (metaData != null)
                         {
                             List<String> values = new List<String>(metaData.Value.Split(new char[] { ';' }));
-                            foreach (String name in CppLibNames)
+                            foreach (String name in Package.CppLibNames)
                             {
                                 values.Remove(String.Format("{0}.lib", name));
                                 values.Remove(String.Format("{0}d.lib", name));

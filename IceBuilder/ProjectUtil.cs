@@ -18,6 +18,24 @@ namespace IceBuilder
 {
     public class ProjectUtil
     {
+        public static Guid GetProjecGuid(IVsProject project)
+        {
+            IVsHierarchy hierarchy = project as IVsHierarchy;
+            if (hierarchy != null)
+            {
+                try
+                {
+                    Guid guid;
+                    ErrorHandler.ThrowOnFailure(hierarchy.GetGuidProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_ProjectIDGuid, out guid));
+                    return guid;
+                }
+                catch (Exception)
+                {
+                }
+            }
+            return new Guid();
+        }
+
         //
         // Get the Guid that idenifies the type of the project
         //
@@ -517,7 +535,6 @@ namespace IceBuilder
                 }
             }
         }
-
         public static void SetupGenerated(IVsProject project, EnvDTE.Configuration configuration, String filter, List<string> files, bool generatedFilesPerConfiguration)
         {
             List<string> missing = new List<string>();
@@ -602,24 +619,121 @@ namespace IceBuilder
             }
         }
 
-        public static bool AddAssemblyReference(EnvDTE.Project project, String component)
+        public static bool AddAssemblyReference(EnvDTE.Project project, String iceHome, String component)
         {
+            String path = String.Format("{0}.dll", component);
+            String hintPath = null;
+            if(File.Exists(Path.Combine(iceHome, "lib", path)))
+            {
+                path = Path.Combine(iceHome, "lib", path);
+                hintPath = FileUtil.RelativePath(Path.GetDirectoryName(project.FullName), path);
+            }
             VSLangProj.VSProject vsProject = (VSLangProj.VSProject)project.Object;
             try
             {
-                VSLangProj80.Reference3 reference = (VSLangProj80.Reference3)vsProject.References.Add(component + ".dll");
-                reference.CopyLocal = true;
-                //
-                // We set SpecificVersion to false so that references still work
-                // when Ice Home setting is updated.
-                //
-                reference.SpecificVersion = false;
+                VSLangProj80.Reference3 reference = (VSLangProj80.Reference3)vsProject.References.Add(path);
+                TrySetCopyLocal(reference);
+                TrySetSpecificVersion(reference);
+                TrySetHintPath(reference);
                 return true;
             }
             catch (COMException)
             {
             }
             return false;
+        }
+
+        private static void TrySetCopyLocal(VSLangProj80.Reference3 reference)
+        {
+            //
+            // Always set copy local to true for references that we add
+            //
+            try
+            {
+                //
+                // In order to properly write this to MSBuild in ALL cases, we have to trigger the Property Change
+                // notification with a new value of "true". However, "true" is the default value, so in order to
+                // cause a notification to fire, we have to set it to false and then back to true
+                //
+                reference.CopyLocal = false;
+                reference.CopyLocal = true;
+            }
+            catch (NotSupportedException)
+            {
+            }
+            catch (NotImplementedException)
+            {
+            }
+            catch (COMException)
+            {
+            }
+        }
+
+        private static void TrySetSpecificVersion(VSLangProj80.Reference3 reference)
+        {
+            //
+            // Allways set SpecificVersion to false so that references still work
+            // when Ice Home setting is updated.
+            //
+            try
+            {
+                reference.SpecificVersion = true;
+                reference.SpecificVersion = false;
+            }
+            catch (NotSupportedException)
+            {
+            }
+            catch (NotImplementedException)
+            {
+            }
+            catch (COMException)
+            {
+            }
+        }
+
+        public static VSLangProj.References GetProjectRererences(EnvDTE.Project project)
+        {
+            return ((VSLangProj.VSProject)project.Object).References;
+        }
+
+        public static void UpgradReferencesHintPath(EnvDTE.Project project)
+        {
+            foreach(VSLangProj80.Reference3 r in GetProjectRererences(project))
+            {
+                if(Package.AssemblyNames.Contains(r.Name))
+                {
+                    TrySetHintPath(r);
+                }
+            }
+        }
+
+        private static void TrySetHintPath(VSLangProj80.Reference3 reference)
+        {
+            try
+            {
+                Microsoft.Build.Evaluation.Project project = 
+                    MSBuildUtils.LoadedProject(reference.ContainingProject.FullName, false, false);
+
+                Microsoft.Build.Evaluation.ProjectItem item =
+                    project.AllEvaluatedItems.FirstOrDefault(i =>
+                                i.ItemType.Equals("Reference") && 
+                                i.EvaluatedInclude.Split(",".ToCharArray()).ElementAt(0).Equals(reference.Name)
+                            );
+                if(item != null)
+                {
+                    item.SetMetadataValue("HintPath", Path.Combine("$(IceAssembliesDir)", 
+                                                                   String.Format("{0}.dll", reference.Name)));
+                }
+            }
+            catch (NotSupportedException)
+            {
+            }
+            catch (NotImplementedException)
+            {
+            }
+            catch (COMException)
+            {
+            }
         }
 
         public static bool RemoveAssemblyReference(EnvDTE.Project project, String component)

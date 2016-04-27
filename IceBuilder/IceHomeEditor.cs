@@ -56,8 +56,64 @@ namespace IceBuilder
                 }
                 else
                 {
+                    String reason = String.Empty;
+                    //
+                    // With Ice >= 3.7 the binary distribution is a collection of nuget packages,
+                    // look for the property sheet in the build directory
+                    //
+                    try
+                    {
+                        foreach (String d in Directory.EnumerateDirectories(path))
+                        {
+                            String props = Path.Combine(d, "build", String.Format("{0}.props", Path.GetFileName(d)));
+                            if (File.Exists(props))
+                            {
+                                try
+                                {
+                                    Microsoft.Build.Evaluation.Project p = new Microsoft.Build.Evaluation.Project(props);
+                                    try
+                                    {
+                                        if (!String.IsNullOrEmpty(p.GetPropertyValue(Package.IceHomeValue)))
+                                        {
+                                            txtIceHome.Text = path;
+                                            return true;
+                                        }
+                                    }
+                                    finally
+                                    {
+                                        ICollection<Microsoft.Build.Evaluation.Project> projects =
+                                            Microsoft.Build.Evaluation.ProjectCollection.GlobalProjectCollection.GetLoadedProjects(props);
+                                        if (projects.Count > 0)
+                                        {
+                                            Microsoft.Build.Evaluation.ProjectCollection.GlobalProjectCollection.UnloadProject(p);
+                                        }
+                                    }                                    
+                                }
+                                catch(Exception)
+                                {
+                                }
+                            }
+                        }
+                    }
+                    catch(DirectoryNotFoundException)
+                    {
+                        reason = "path is invalid, such as referring to an unmapped drive.";
+                    }
+                    catch(System.Security.SecurityException)
+                    {
+                        reason = "The caller does not have the required permission.";
+                    }
+                    catch(UnauthorizedAccessException)
+                    {
+                        reason = "The caller does not have the required permission.";
+                    }
+                    catch(IOException)
+                    {
+                        reason = "path is a file name.";
+                    }
+
                     lblInfo.Text =
-                        String.Format("Invalid Ice home directory:\r\n\"{0}\"", path);
+                        String.Format("Invalid Ice home directory:\r\n\"{0}\"\r\n{1}", path, reason);
                     return false;
                 }
             }

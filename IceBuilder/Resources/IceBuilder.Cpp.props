@@ -5,6 +5,7 @@
   <!-- Import IceBuilder common settings -->
   <Import Project="$(MSBuildThisFileDirectory)\IceBuilder.Common.props"/>
 
+
   <!-- Import our custom MSbuild tasks used to build Ice for C++ projects -->
   <UsingTask TaskName="IceBuilder.Slice2CppTask"
              AssemblyFile="$(MSBuildThisFileDirectory)IceBuilder.Tasks.dll" />
@@ -12,15 +13,26 @@
   <UsingTask TaskName="IceBuilder.Slice2CppDependTask"
              AssemblyFile="$(MSBuildThisFileDirectory)IceBuilder.Tasks.dll" />
 
-  <!-- Import settings from the Ice distribution -->
-  <Import Project="$(IceHome)\config\Ice.Cpp.props"
-          Condition="Exists('$(IceHome)\config\Ice.Cpp.props')"/>
+  <!-- Import settings from the Ice distribution, If the project is using a nuget package those
+       are already imported and we avoid to import the settings twice -->
+  <ImportGroup Condition="'$(IceNugetPackageVersion)' == ''">
 
-  <Import Project="$(IceHome)\cpp\config\Ice.Cpp.props"
-          Condition="Exists('$(IceHome)\cpp\config\Ice.Cpp.props')"/>
+    <!-- With Ice 3.6.0 settings are in the builder directory -->
+    <Import Project="$(MSBuildThisFileDirectory)\Ice.$(IceVersion).Cpp.props"
+            Condition="Exists('$(MSBuildThisFileDirectory)\Ice.$(IceVersion).Cpp.props')"/>
 
-  <Import Project="$(MSBuildThisFileDirectory)\Ice.$(IceVersion).Cpp.props"
-          Condition="Exists('$(MSBuildThisFileDirectory)\Ice.$(IceVersion).Cpp.props')"/>
+    <!-- With Ice 3.6 binary distribution >= 3.6.1 settings are in the Ice Home config directory -->
+    <Import Project="$(IceHome)\config\Ice.Cpp.props"
+            Condition="Exists('$(IceHome)\config\Ice.Cpp.props')"/>
+
+    <!-- With Ice source distribution the settings are in the cpp config directory -->
+    <Import Project="$(IceHome)\cpp\config\Ice.Cpp.props"
+            Condition="Exists('$(IceHome)\cpp\config\Ice.Cpp.props')"/>
+
+    <!-- With Ice 3.7.0 binary distribution settings are in nuget the package build directory -->
+    <Import Project="$(IceHome)\zeroc.ice.$(DefaultPlatformToolset)\build\zeroc.ice.$(DefaultPlatformToolset).props"
+            Condition="Exists('$(IceHome)\zeroc.ice.$(DefaultPlatformToolset)\build\zeroc.ice.$(DefaultPlatformToolset).props')"/>
+  </ImportGroup>
 
   <!-- Default settings for IceBuilder -->
   <PropertyGroup Label="IceBuilder" Condition="'$(IceBuilderOutputDir)' == ''">

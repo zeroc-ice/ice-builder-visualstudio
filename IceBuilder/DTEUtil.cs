@@ -26,6 +26,12 @@ namespace IceBuilder
 
     public class DTEUtil
     {
+        public static IVsProject GetProject(String path)
+        {
+            List<IVsProject> projects = GetProjects();
+            return projects.FirstOrDefault(p => ProjectUtil.GetProjectFullPath(p).Equals(path));
+        }
+
         public static List<IVsProject> GetProjects()
         {
             IEnumHierarchies enumHierarchies;

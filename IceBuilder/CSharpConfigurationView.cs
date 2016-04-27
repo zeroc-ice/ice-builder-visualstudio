@@ -30,18 +30,11 @@ namespace IceBuilder
             set;
         }
 
-        private String AssembliesDir
-        {
-            get;
-            set;
-        }
-
         public CSharpConfigurationView(PropertyPage page)
         {
             Page = page;
             InitializeComponent();
             includeDirectories.PropertyPage = Page;
-            AssembliesDir = Package.Instance.GetAssembliesDir(Package.Instance.GetIceHome());
         }
 
         public virtual void Initialize(Control parent, Rectangle rect)
@@ -164,11 +157,12 @@ namespace IceBuilder
 
         public void LoadReferencedAssemblies()
         {
-            if (!String.IsNullOrEmpty(AssembliesDir))
+            String assembliesDir = Package.Instance.GetAssembliesDir(Page.Project);
+            if (!String.IsNullOrEmpty(assembliesDir))
             {
                 try
                 {
-                    String[] assemblies = Directory.GetFiles(AssembliesDir, "*.dll");
+                    String[] assemblies = Directory.GetFiles(assembliesDir, "*.dll");
                     foreach (String assembly in assemblies)
                     {
                         String name = Path.GetFileNameWithoutExtension(assembly);
