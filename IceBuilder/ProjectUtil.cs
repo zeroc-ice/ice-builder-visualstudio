@@ -619,15 +619,9 @@ namespace IceBuilder
             }
         }
 
-        public static bool AddAssemblyReference(EnvDTE.Project project, String iceHome, String component)
+        public static bool AddAssemblyReference(EnvDTE.Project project, String assembliesDir, String component)
         {
-            String path = String.Format("{0}.dll", component);
-            String hintPath = null;
-            if(File.Exists(Path.Combine(iceHome, "lib", path)))
-            {
-                path = Path.Combine(iceHome, "lib", path);
-                hintPath = FileUtil.RelativePath(Path.GetDirectoryName(project.FullName), path);
-            }
+            String path = Path.Combine(assembliesDir, String.Format("{0}.dll", component));
             VSLangProj.VSProject vsProject = (VSLangProj.VSProject)project.Object;
             try
             {

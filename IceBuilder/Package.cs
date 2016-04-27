@@ -988,7 +988,7 @@ namespace IceBuilder
                 {
                     IVsProject p1 = DTEUtil.GetProject(projectPath);
                     ProjectUtil.AddAssemblyReference(DTEUtil.GetProject(p1 as IVsHierarchy), 
-                                                     ProjectUtil.GetEvaluatedProperty(p1, "IceHome"), "Ice");
+                                                     ProjectUtil.GetEvaluatedProperty(p1, "IceAssembliesDir"), "Ice");
                 }
             }
         }
