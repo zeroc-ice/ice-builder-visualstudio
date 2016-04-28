@@ -200,13 +200,13 @@ namespace IceBuilder
         public Guid OutputPaneGUID = new Guid("CE9BFDCD-5AFD-4A77-BD40-75E0E1E5162C");
 
 
-        private static void TryRemoveAssemblyFolderExKey()
+        private static void TryRemoveAssemblyFoldersExKey()
         { 
             Microsoft.Win32.RegistryKey key = null;
             try
             {
                 key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(
-                   @"Software\Microsoft\.NETFramework\v2.0.50727\AssemblyFoldersEx");
+                   @"Software\Microsoft\.NETFramework\v2.0.50727\AssemblyFoldersEx", true);
 
                 if (key.GetSubKeyNames().Contains("Ice"))
                 {
@@ -241,16 +241,17 @@ namespace IceBuilder
                 Microsoft.Win32.Registry.SetValue(IceHomeKey, IceVersionMMValue, "",
                                                   Microsoft.Win32.RegistryValueKind.String);
 
-                TryRemoveAssemblyFolderExKey();
+                TryRemoveAssemblyFoldersExKey();
 
                 MSBuildUtils.SetIceHome(DTEUtil.GetProjects(), "", "", "", "");
                 return;
             }
             else
             {
-                String props = File.Exists(Path.Combine(value, "config", "Ice.props")) ? Path.Combine(value, "config", "Ice.props") :
-                               File.Exists(Path.Combine(value, "cpp", "config", "Ice.props")) ? Path.Combine(value, "cpp", "config", "Ice.props") :
-                               File.Exists(Path.Combine(value, "build", "native", "Ice.props")) ? Path.Combine(value, "build", "native", "Ice.props") : null;
+                String props =
+                    new string[] { Path.Combine(value, "config", "Ice.props"),
+                                   Path.Combine(value,"cpp", "config", "Ice.props")}.FirstOrDefault(path => File.Exists(path) );
+                    
 
                 if(String.IsNullOrEmpty(props) && Directory.Exists(value))
                 {
@@ -291,14 +292,15 @@ namespace IceBuilder
 
                     MSBuildUtils.SetIceHome(DTEUtil.GetProjects(), value, version, intVersion, mmVersion);
 
+                    Microsoft.Win32.Registry.SetValue(IceCSharpAssembleyKey, "", GetAssembliesDir(),
+                                                      Microsoft.Win32.RegistryValueKind.String);
+
                     ICollection<Microsoft.Build.Evaluation.Project> projects =
                         Microsoft.Build.Evaluation.ProjectCollection.GlobalProjectCollection.GetLoadedProjects(props);
                     if(projects.Count > 0)
                     {
                         Microsoft.Build.Evaluation.ProjectCollection.GlobalProjectCollection.UnloadProject(p);
                     }
-
-                    TryRemoveAssemblyFolderExKey();
                 }
                 else
                 {
@@ -350,12 +352,13 @@ namespace IceBuilder
 
                     MSBuildUtils.SetIceHome(DTEUtil.GetProjects(), value, v.ToString(), iceIntVersion, iceVersionMM);
 
-                    TryRemoveAssemblyFolderExKey();
+                    Microsoft.Win32.Registry.SetValue(IceCSharpAssembleyKey, "", GetAssembliesDir(),
+                                                      Microsoft.Win32.RegistryValueKind.String);
                 }
             }
         }
 
-        public String GetAssembliesDir(IVsProject project)
+        public String GetAssembliesDir(IVsProject project = null)
         {
             String iceHome = GetIceHome(project);
             if (Directory.Exists(Path.Combine(iceHome, "Assemblies")))
