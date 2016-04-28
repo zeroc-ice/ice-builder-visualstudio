@@ -5,11 +5,6 @@ VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Templates", "Templates", "{077FF067-76D0-4C84-8DEF-37D8BDEF5515}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{75072990-876D-48AE-98E4-ACDC1D482F4A}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\packages.config = .nuget\packages.config
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IceBuilder", "IceBuilder\IceBuilder.csproj", "{026808B3-0ACF-4F7C-A3B7-3A3866363E2B}"
 	ProjectSection(ProjectDependencies) = postProject
 		{92CBD919-8F0D-477E-813E-880BAD8236FD} = {92CBD919-8F0D-477E-813E-880BAD8236FD}
