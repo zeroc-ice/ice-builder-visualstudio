@@ -5,7 +5,6 @@
   <!-- Import IceBuilder common settings -->
   <Import Project="$(MSBuildThisFileDirectory)\IceBuilder.Common.props"/>
 
-
   <!-- Import our custom MSbuild tasks used to build Ice for C++ projects -->
   <UsingTask TaskName="IceBuilder.Slice2CppTask"
              AssemblyFile="$(MSBuildThisFileDirectory)IceBuilder.Tasks.dll" />
@@ -29,7 +28,7 @@
     <Import Project="$(IceHome)\cpp\config\Ice.Cpp.props"
             Condition="Exists('$(IceHome)\cpp\config\Ice.Cpp.props')"/>
 
-    <!-- With Ice 3.7.0 binary distribution settings are in nuget the package build directory -->
+    <!-- With Ice 3.7.0 binary distribution settings are in the Nuget package build directory -->
     <Import Project="$(IceHome)\zeroc.ice.$(DefaultPlatformToolset)\build\zeroc.ice.$(DefaultPlatformToolset).props"
             Condition="Exists('$(IceHome)\zeroc.ice.$(DefaultPlatformToolset)\build\zeroc.ice.$(DefaultPlatformToolset).props')"/>
   </ImportGroup>
@@ -60,7 +59,7 @@
   </PropertyGroup>
 
   <PropertyGroup Label="IceBuilder" Condition="'$(IceBuilderStream)' == ''">
-      <IceBuilderStream>false</IceBuilderStream>
+    <IceBuilderStream>false</IceBuilderStream>
   </PropertyGroup>
 
   <PropertyGroup Label="IceBuilder">
@@ -82,5 +81,11 @@
   <!-- Debugger environment settings -->
   <PropertyGroup>
     <LocalDebuggerEnvironment>PATH=$(Path);$(LocalDebuggerEnvironment)</LocalDebuggerEnvironment>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(IceIntVersion)' &lt; '30700'">
+    <IceToolsPath Condition="'$(IceToolsPath)' == '' And Exists('$(IceHome)\cpp\bin')">$(IceHome)\cpp\bin</IceToolsPath>
+    <IceToolsPath Condition="'$(IceToolsPath)' == '' And Exists('$(IceHome)\bin')">$(IceHome)\bin</IceToolsPath>
+    <IceToolsBin Condition="'$(IceToolsBin)' == ''">$(IceToolsPath)</IceToolsBin>
   </PropertyGroup>
 </Project>

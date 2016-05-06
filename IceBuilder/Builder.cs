@@ -75,9 +75,9 @@ namespace IceBuilder
                 try
                 {
                     Dictionary<string, string> properties = new Dictionary<string, string>();
-                    String platform = buildCallback.SolutionConfiguration.PlatformName;
+                    String platform = buildCallback.ProjectConfiguration.PlatformName;
                     properties["Platform"] = platform.Equals("Any CPU") ? "AnyCPU" : platform;
-                    properties["Configuration"] = buildCallback.SolutionConfiguration.Name;
+                    properties["Configuration"] = buildCallback.ProjectConfiguration.ConfigurationName;
 
                     BuildRequestData buildRequest = new BuildRequestData(
                             ProjectUtil.GetProjectFullPath(p),
@@ -102,7 +102,7 @@ namespace IceBuilder
                                 buildCallback.EndBuild(submission.BuildResult.OverallResult == BuildResultCode.Success);
                             }));
                         }, null);
-                    
+
                     return true;
                 }
                 catch (Exception)
@@ -136,13 +136,14 @@ namespace IceBuilder
 
     public class BuildCallback
     {
-        public BuildCallback(IVsProject project, EnvDTE.OutputWindowPane outputPane, 
-                      EnvDTE80.SolutionConfiguration2 solutionConfiguration)
+        public BuildCallback(IVsProject project, EnvDTE.OutputWindowPane outputPane,
+                      EnvDTE.Configuration projectConfiguration)
         {
-            
+
             Project = project;
             OutputPane = outputPane;
-            SolutionConfiguration = solutionConfiguration;
+            ProjectConfiguration = projectConfiguration;
+            
         }
 
         public void BeginBuild()
@@ -150,8 +151,8 @@ namespace IceBuilder
             OutputPane.OutputString(
             String.Format("------ Ice Builder Build started: Project: {0}, Configuration: {1} {2} ------\n",
                 ProjectUtil.GetProjectName(Project),
-                SolutionConfiguration.Name,
-                SolutionConfiguration.PlatformName));
+                ProjectConfiguration.ConfigurationName,
+                ProjectConfiguration.PlatformName));
         }
 
         public void EndBuild(bool succeed)
@@ -173,7 +174,7 @@ namespace IceBuilder
             set;
         }
 
-        public EnvDTE80.SolutionConfiguration2 SolutionConfiguration
+        public EnvDTE.Configuration ProjectConfiguration
         {
             get;
             set;

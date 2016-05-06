@@ -13,12 +13,12 @@
            Condition="'$(IceIntVersion)' &lt; '30600' Or '$(IceIntVersion)' == '30651'" File=""/>
   </Target>
 
-  <PropertyGroup Condition="'$(IceToolsBin)' == '' And Exists('$(IceHome)\cpp\bin')">
-    <IceToolsBin>$(IceHome)\cpp\bin</IceToolsBin>
+  <PropertyGroup Condition="'$(IceToolsPath)' == '' And Exists('$(IceHome)\cpp\bin')">
+    <IceToolsPath>$(IceHome)\cpp\bin</IceToolsPath>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(IceToolsBin)' == '' And Exists('$(IceHome)\bin')">
-    <IceToolsBin>$(IceHome)\bin</IceToolsBin>
+  <PropertyGroup Condition="'$(IceToolsPath)' == '' And Exists('$(IceHome)\bin')">
+    <IceToolsPath>$(IceHome)\bin</IceToolsPath>
   </PropertyGroup>
 
   <Target Name="IceBuilder_Prepare">
@@ -30,14 +30,40 @@
   <Target Name="IceBuilder_Compile"
          DependsOnTargets="IceBuilder_Validate;IceBuilder_Prepare"
          BeforeTargets="Build">
-    <Message Text="Ice Builder Compile started"/>
-    <MakeDir Directories="$(IceBuilderOutputDir)" Condition="!Exists('$(IceBuilderOutputDir)')"/>
 
+    <CreateProperty Value="$(IceBuilderOutputDir)\IceBuilder.d" Condition="'$(IceBuilderDependFile)' == ''">
+      <Output TaskParameter="Value" PropertyName="IceBuilderDependFile" />
+    </CreateProperty>
+
+    <CreateProperty Value="$(IceBuilderOutputDir)\IceBuilder.command.log" Condition="'$(IceBuilderCommandLog)' == ''">
+      <Output TaskParameter="Value" PropertyName="IceBuilderCommandLog" />
+    </CreateProperty>
+
+    <MakeDir Directories="$(IceBuilderOutputDir)"/>
+    <MakeDir Directories="$([System.IO.Path]::GetDirectoryName('$(IceBuilderDependFile)'))"/>
+    <MakeDir Directories="$([System.IO.Path]::GetDirectoryName('$(IceBuilderCommandLog)'))"/>
+
+    <WriteLinesToFile
+          File="$(IceBuilderCommandLog)"
+          Lines="Ice Home: $(IceHome);
+                 Ice Tools Path: $(IceToolsPath);
+                 Output Dir: $(IceBuilderOutputDir);
+                 Allow Ice Prefix: $(IceBuilderAllowIcePrefix);
+                 Underscore: $(IceBuilderUnderscore);
+                 Checksum: $(IceBuilderChecksum);
+                 All: $(IceBuilderAll);
+                 Namespace: $(IceBuilderNamespace);
+                 Include Directories: $(IceBuilderIncludeDirectories);
+                 Additional Options: $(IceBuilderAdditionalOptions)"
+          Overwrite="true"/>
+    
     <!-- First we check dependencies and decide what must be rebuild -->
     <Slice2PhpDependTask
       OutputDir           = "$(IceBuilderOutputDir)"
       WorkingDirectory    = "$(MSBuildProjectDirectory)"
-      DependFile          = "IceBuilder.d"
+      SliceCompiler       = "$(IceToolsPath)/slice2php.exe"
+      DependFile          = "$(IceBuilderDependFile)"
+      CommandLog          = "$(IceBuilderCommandLog)"
       Sources             = "@(IceBuilder)">
 
       <Output
@@ -53,7 +79,7 @@
     <!-- Compile the Slice files to produce the generated code -->
     <Slice2PhpTask
         IceHome             = "$(IceHome)"
-        IceToolsBin         = "$(IceToolsBin)"
+        IceToolsPath        = "$(IceToolsPath)"
         OutputDir           = "$(IceBuilderOutputDir)"
         WorkingDirectory    = "$(MSBuildProjectDirectory)"
         AllowIcePrefix      = "$(IceBuilderAllowIcePrefix)"
@@ -64,14 +90,14 @@
         Namespace           = "$(IceBuilderNamespace)"
         IncludeDirectories  = "$(IceBuilderIncludeDirectories)"
         AdditionalOptions   = "$(IceBuilderAdditionalOptions)"
+        DependFile          = "$(IceBuilderDependFile)"
         Sources             = "@(_IceBuilder)"
-        DependFile          = "IceBuilder.d"
         Condition           = "'%(_IceBuilder.BuildRequired)' == 'True'"/>
 
     <!-- Update the dependencies -->
     <Slice2PhpTask
         IceHome             = "$(IceHome)"
-        IceToolsBin         = "$(IceToolsBin)"
+        IceToolsPath        = "$(IceToolsPath)"
         OutputDir           = "$(IceBuilderOutputDir)"
         WorkingDirectory    = "$(MSBuildProjectDirectory)"
         AllowIcePrefix      = "$(IceBuilderAllowIcePrefix)"
@@ -82,14 +108,16 @@
         Namespace           = "$(IceBuilderNamespace)"
         IncludeDirectories  = "$(IceBuilderIncludeDirectories)"
         AdditionalOptions   = "$(IceBuilderAdditionalOptions)"
+        DependFile          = "$(IceBuilderDependFile)"
         Sources             = "@(_IceBuilder)"
         Depend              = "true"
-        DependFile          = "IceBuilder.d"
         Condition           = "'$(_IceBuilderUdateDepends)' == 'True'"/>
   </Target>
 
   <Target Name="IceBuilder_Clean" BeforeTargets="Clean" DependsOnTargets="IceBuilder_Prepare">
     <Delete Files="$([System.IO.Path]::Combine($(IceBuilderOutputDir),%(IceBuilder.Filename).php))"/>
-    <Delete Files="$([System.IO.Path]::Combine($(IceBuilderOutputDir),IceBuilder.d))"/>
+    <Delete Files="$(IceBuilderDependFile)"/>
+    <Delete Files="$(IceBuilderCommandLog)"/>
+    <Delete Files="$([System.IO.Path]::ChangeExtension('$(IceBuilderCommandLog)', '.0.log'))"/>
   </Target>
 </Project>

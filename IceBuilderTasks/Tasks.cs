@@ -79,7 +79,7 @@ namespace IceBuilder
         }
 
         [Required]
-        public String IceToolsBin
+        public String IceToolsPath
         {
             get;
             set;
@@ -175,7 +175,7 @@ namespace IceBuilder
             {
                 builder.AppendSwitch("--depend-xml");
                 builder.AppendSwitch("--depend-file");
-                builder.AppendFileNameIfNotNull(Path.Combine(OutputDir, DependFile));
+                builder.AppendFileNameIfNotNull(DependFile);
             }
 
             if (!String.IsNullOrEmpty(OutputDir))
@@ -243,7 +243,7 @@ namespace IceBuilder
         protected override string GenerateFullPathToTool()
         {
             String home = IceHome;
-            String path = Path.Combine(IceToolsBin, ToolName);
+            String path = Path.Combine(IceToolsPath, ToolName);
             if (!File.Exists(path))
             {
                 const String message =
@@ -625,7 +625,7 @@ namespace IceBuilder
         }
 
         [Required]
-        public String DependFile
+        public String SliceCompiler
         {
             get;
             set;
@@ -633,6 +633,20 @@ namespace IceBuilder
 
         [Required]
         public String WorkingDirectory
+        {
+            get;
+            set;
+        }
+
+        [Required]
+        public String DependFile
+        {
+            get;
+            set;
+        }
+
+        [Required]
+        public String CommandLog
         {
             get;
             set;
@@ -652,11 +666,6 @@ namespace IceBuilder
             private set;
         }
 
-        protected abstract String ToolName
-        {
-            get;
-        }
-
         abstract protected ITaskItem[] GeneratedItems(ITaskItem source);
 
         protected virtual String GetGeneratedPath(ITaskItem item, String outputDir, String ext)
@@ -673,44 +682,74 @@ namespace IceBuilder
                 List<ITaskItem> computed = new List<ITaskItem>();
                 UpdateDepends = false;
 
-                String dependFile = Path.Combine(OutputDir, DependFile);
+                //
+                // Compare the command log files to detect changes in build options.
+                //
+                String log0 = String.Format(CommandLog);
+                String log1 = String.Format(Path.ChangeExtension(CommandLog, ".0.log"));
+                bool logChanged = false;
+                if(!File.Exists(log1))
+                {
+                    logChanged = true;
+                    Log.LogMessage(MessageImportance.Low,
+                        String.Format("Build required because command log file: {0} doesn't exists",
+                                      TaskUtil.MakeRelative(WorkingDirectory, log1)));
+                }
+                else if(!FileCompare(log0, log1))
+                {
+                    logChanged = true;
+                    Log.LogMessage(
+                        MessageImportance.Low, "Build required because builder options changed");
+                }
+
+                if(File.Exists(log1))
+                {
+                    File.Delete(log1);
+                }
+                File.Move(log0, log1);
+
+                FileInfo sliceCompiler = new FileInfo(SliceCompiler);
 
                 XmlDocument dependsDoc = new XmlDocument();
-                bool dependExists = File.Exists(dependFile);
-                if (dependExists)
+                bool dependExists = File.Exists(DependFile);
+
+                //
+                // If command log file changed we don't need to compute dependencies as all
+                // files must be rebuild
+                //
+                if(!logChanged)
                 {
-                    try
-                    {
-                        dependsDoc.Load(dependFile);
-                    }
-                    catch (XmlException)
+                    if (dependExists)
                     {
                         try
                         {
-                            File.Delete(dependFile);
+                            dependsDoc.Load(DependFile);
                         }
-                        catch (IOException)
+                        catch (XmlException)
                         {
+                            try
+                            {
+                                File.Delete(DependFile);
+                            }
+                            catch (IOException)
+                            {
+                            }
+                            Log.LogMessage(MessageImportance.Low,
+                                String.Format("Build required because depend file: {0} has some invalid data",
+                                    TaskUtil.MakeRelative(WorkingDirectory, DependFile)));
                         }
-                        Log.LogMessage(MessageImportance.Low,
-                            String.Format("Build required because depend file: {0} has some invalid data",
-                                TaskUtil.MakeRelative(WorkingDirectory, dependFile)));
                     }
-                }
-                else
-                {
-                    Log.LogMessage(MessageImportance.Low,
-                        String.Format("Build required because depend file: {0} doesn't exists",
-                                      TaskUtil.MakeRelative(WorkingDirectory, dependFile)));
+                    else
+                    {
+                        Log.LogMessage(MessageImportance.Low,
+                            String.Format("Build required because depend file: {0} doesn't exists",
+                                          TaskUtil.MakeRelative(WorkingDirectory, DependFile)));
+                    }
                 }
 
                 foreach (ITaskItem source in Sources)
                 {
-                    bool skip = true;
-                    if (!dependExists)
-                    {
-                        skip = false;
-                    }
+                    bool skip = !logChanged && dependExists;
                     Log.LogMessage(MessageImportance.Low,
                         String.Format("Computing dependencies for {0}", source.GetMetadata("Identity")));
 
@@ -726,6 +765,27 @@ namespace IceBuilder
                     }
 
                     FileInfo generatedInfo = null;
+                    //
+                    // Check if the Slice compiler is older than the source file
+                    //
+                    if(skip)
+                    {
+                        foreach (ITaskItem item in generatedItems)
+                        {
+                            generatedInfo = new FileInfo(item.GetMetadata("FullPath"));
+
+                            if (generatedInfo.Exists &&
+                                sliceCompiler.LastWriteTime.ToFileTime() > generatedInfo.LastWriteTime.ToFileTime())
+                            {
+                                Log.LogMessage(MessageImportance.Low,
+                                        String.Format("Build required because target: {0} is older than Slice compiler: {1}",
+                                            TaskUtil.MakeRelative(WorkingDirectory, generatedInfo.FullName),
+                                            Path.GetFileName(SliceCompiler)));
+                                skip = false;
+                                break;
+                            }
+                        }
+                    }
 
                     if (skip)
                     {
@@ -775,7 +835,7 @@ namespace IceBuilder
                                 {
                                     skip = false;
                                     Log.LogMessage(MessageImportance.Low,
-                                    String.Format("Build required because source: {0} is older than target {1}",
+                                    String.Format("Build required because source: {0} is older than target: {1}",
                                         source.GetMetadata("Identity"),
                                         TaskUtil.MakeRelative(WorkingDirectory, dependencyInfo.FullName)));
                                     break;
@@ -808,10 +868,7 @@ namespace IceBuilder
                     computedSource.SetMetadata("BuildRequired", skip ? "False" : "True");
                     computed.Add(computedSource);
 
-                    if (!UpdateDepends && !skip)
-                    {
-                        UpdateDepends = true;
-                    }
+                    UpdateDepends = UpdateDepends || !skip;
                 }
                 ComputedSources = computed.ToArray();
                 return true;
@@ -821,6 +878,51 @@ namespace IceBuilder
                 Log.LogError(ex.ToString());
                 throw;
             }
+        }
+
+        private bool FileCompare(String file1, String file2)
+        {
+            FileStream fs1 = new FileStream(file1, FileMode.Open);
+            FileStream fs2 = new FileStream(file2, FileMode.Open);
+            int file1byte;
+            int file2byte;
+            try
+            {
+                // Check the file sizes. If they are not the same, the files
+                // are not the same.
+                if (fs1.Length != fs2.Length)
+                {
+                    // Close the file
+                    fs1.Close();
+                    fs2.Close();
+
+                    // Return false to indicate files are different
+                    return false;
+                }
+
+                // Read and compare a byte from each file until either a
+                // non-matching set of bytes is found or until the end of
+                // file1 is reached.
+                do
+                {
+                    // Read one byte from each file.
+                    file1byte = fs1.ReadByte();
+                    file2byte = fs2.ReadByte();
+                }
+                while ((file1byte == file2byte) && (file1byte != -1));
+
+
+            }
+            finally
+            {
+                fs1.Close();
+                fs2.Close();
+            }
+
+            // Return the success of the comparison. "file1byte" is
+            // equal to "file2byte" at this point only if the files are
+            // the same.
+            return ((file1byte - file2byte) == 0);
         }
     }
     #endregion
@@ -848,14 +950,6 @@ namespace IceBuilder
             set;
         }
 
-        protected override string ToolName
-        {
-            get
-            {
-                return "slice2cpp.exe";
-            }
-        }
-
         protected override ITaskItem[] GeneratedItems(ITaskItem source)
         {
             return new ITaskItem[]
@@ -870,14 +964,6 @@ namespace IceBuilder
     #region Slice2CSharpDependTask
     public class Slice2CSharpDependTask : SliceDependTask
     {
-        protected override string ToolName
-        {
-            get
-            {
-                return "slice2cs.exe";
-            }
-        }
-
         protected override ITaskItem[] GeneratedItems(ITaskItem source)
         {
             return new ITaskItem[]
@@ -892,14 +978,6 @@ namespace IceBuilder
     #region Slice2PhpDependTask
     public class Slice2PhpDependTask : SliceDependTask
     {
-        protected override string ToolName
-        {
-            get
-            {
-                return "slice2php.exe";
-            }
-        }
-
         protected override ITaskItem[] GeneratedItems(ITaskItem source)
         {
             return new ITaskItem[]
@@ -918,26 +996,12 @@ namespace IceBuilder
         {
             get
             {
-                if(Slice2Py.EndsWith(".py"))
-                {
-                    return Path.Combine(PythonHome, "python.exe");
-                }
-                else
-                {
-                    return Slice2Py;
-                }
+                return "slice2py.exe";
             }
         }
 
         [Required]
         public String PythonHome
-        {
-            get;
-            set;
-        }
-
-        [Required]
-        public String Slice2Py
         {
             get;
             set;
@@ -986,11 +1050,6 @@ namespace IceBuilder
         protected override String GenerateCommandLineCommands()
         {
             CommandLineBuilder builder = new CommandLineBuilder();
-            if(Slice2Py.EndsWith(".py"))
-            {
-                builder.AppendFileNameIfNotNull(Slice2Py);
-            }
-
             if (!String.IsNullOrEmpty(Prefix))
             {
                 builder.AppendSwitch("--prefix");
@@ -1016,32 +1075,10 @@ namespace IceBuilder
             set;
         }
 
-        [Required]
-        public String Slice2Py
-        {
-            get;
-            set;
-        }
-
         public String Prefix
         {
             get;
             set;
-        }
-
-        protected override string ToolName
-        {
-            get
-            {
-                if (Slice2Py.EndsWith(".py"))
-                {
-                    return Path.Combine(PythonHome, "python.exe");
-                }
-                else
-                {
-                    return Slice2Py;
-                }
-            }
         }
 
         protected override String GetGeneratedPath(ITaskItem item, String outputDir, String ext)

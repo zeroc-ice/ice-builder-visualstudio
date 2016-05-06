@@ -84,7 +84,7 @@
       <PropertyGroup Condition="!Exists('$(IceSourceHome)')">
         <IceLib>$(IceHome)\lib\$(IceToolsetSuffix)$(IcePlatformSuffix)</IceLib>
         <IceBin>$(IceHome)\bin\$(IceToolsetSuffix)$(IcePlatformSuffix)</IceBin>
-        <IceToolsBin>$(IceHome)\bin</IceToolsBin>
+        <IceToolsPath>$(IceHome)\bin</IceToolsPath>
         <IceInclude>$(IceHome)\include\</IceInclude>
       </PropertyGroup>
 
@@ -92,7 +92,7 @@
       <PropertyGroup Condition="Exists('$(IceSourceHome)')">
         <IceInclude>$(IceHome)\cpp\include\</IceInclude>
         <IceBin>$(IceHome)\cpp\bin\</IceBin>
-        <IceToolsBin>$(IceHome)\cpp\bin</IceToolsBin>
+        <IceToolsPath>$(IceHome)\cpp\bin</IceToolsPath>
         <IceLib>$(IceHome)\cpp\lib\</IceLib>
       </PropertyGroup>
 

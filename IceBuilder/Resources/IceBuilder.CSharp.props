@@ -38,4 +38,10 @@
   <PropertyGroup Label="IceBuilder" Condition="'$(IceBuilderOutputDir)' == ''">
     <IceBuilderOutputDir>$(MSBuildProjectDirectory)\generated</IceBuilderOutputDir>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(IceIntVersion)' &lt; '30700'">
+    <IceToolsPath Condition="'$(IceToolsPath)' == '' And Exists('$(IceHome)\cpp\bin')">$(IceHome)\cpp\bin</IceToolsPath>
+    <IceToolsPath Condition="'$(IceToolsPath)' == '' And Exists('$(IceHome)\bin')">$(IceHome)\bin</IceToolsPath>
+    <IceToolsBin Condition="'$(IceToolsBin)' == ''">$(IceToolsPath)</IceToolsBin>
+  </PropertyGroup>
 </Project>

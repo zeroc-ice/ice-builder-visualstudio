@@ -448,6 +448,33 @@ namespace IceBuilder
 
             List<IVsProject> projects = DTEUtil.GetProjects();
 
+            foreach (IVsProject project in projects)
+            {
+                IceBuilderProjectType projectType = DTEUtil.IsIceBuilderEnabled(project);
+                if (projectType != IceBuilderProjectType.None)
+                {
+                    Microsoft.Build.Evaluation.Project p = MSBuildUtils.LoadedProject(
+                                ProjectUtil.GetProjectFullPath(project), projectType == IceBuilderProjectType.CppProjectType, true);
+                    if (MSBuildUtils.UpgradeProjectImports(p))
+                    {
+                        IVsHierarchy hier = project as IVsHierarchy;
+                        Guid projectGUID = Guid.Empty;
+                        IVsSolution.GetGuidOfProject(hier, out projectGUID);
+                        IVsSolution.CloseSolutionElement((uint)__VSSLNCLOSEOPTIONS.SLNCLOSEOPT_UnloadProject, hier, 0);
+                        p.Save();
+                        try
+                        {
+                            ProjectCollection.GlobalProjectCollection.UnloadProject(p);
+                        }
+                        catch (System.Exception)
+                        {
+                            //expected if the project is not in the global project collection
+                        }
+                        IVsSolution4.ReloadProject(ref projectGUID);
+                    }
+                }
+            }
+            projects = DTEUtil.GetProjects();
             List<IVsProject> sliceProjects = new List<IVsProject>();
             foreach (IVsProject project in projects)
             {
@@ -463,7 +490,7 @@ namespace IceBuilder
                     {
                         ProjectUtil.UpgradReferencesHintPath(DTEUtil.GetProject(project as IVsHierarchy));
                     }
-
+                    
                     if (AutoBuilding)
                     {
                         sliceProjects.Add(project);
@@ -854,7 +881,8 @@ namespace IceBuilder
                 BuildLogger logger = new BuildLogger(OutputPane);
                 logger.Verbosity = LoggerVerbosity;
                 BuildingProject = project;
-                if (!Builder.Build(project, new BuildCallback(project, OutputPane, ActiveConfiguration),
+                if (!Builder.Build(project, new BuildCallback(project, OutputPane, 
+                    DTEUtil.GetProject(project as IVsHierarchy).ConfigurationManager.ActiveConfiguration),
                                    logger))
                 {
                     BuildingProject = null;
@@ -950,7 +978,8 @@ namespace IceBuilder
         {
             String projectPath = ProjectUtil.GetProjectFullPath(p);
             bool cppProject = DTEUtil.IsCppProject(p);
-            Microsoft.Build.Evaluation.Project project = MSBuildUtils.LoadedProject(projectPath, cppProject, true);
+            ProjectUtil.SaveProject(p);
+            Microsoft.Build.Evaluation.Project project = MSBuildUtils.LoadedProject(projectPath, cppProject, false);
             if (MSBuildUtils.AddIceBuilderToProject(project))
             {
                 if(cppProject)
@@ -987,7 +1016,7 @@ namespace IceBuilder
                 }
                 IVsSolution4.ReloadProject(ref projectGUID);
 
-                if(!cppProject)
+                if (!cppProject)
                 {
                     IVsProject p1 = DTEUtil.GetProject(projectPath);
                     ProjectUtil.AddAssemblyReference(DTEUtil.GetProject(p1 as IVsHierarchy), 

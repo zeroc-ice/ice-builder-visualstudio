@@ -128,15 +128,15 @@ The simplest and most common way to configure Ice Builder is in Visual Studio. Y
 
 For a C++ project, you need:
 
-1. `$(LOCALAPPDATA)\ZeroC\IceBuilder\IceBuilder.Cpp.props` - This project defines the default settings for Ice Builder in C++
-2. `$(LOCALAPPDATA)\ZeroC\IceBuilder\IceBuilder.Cpp.targets` - This projet defines the targets required to build C++ projects with Ice Builder
+1. `<Ice Builder Install Path>\Resources\IceBuilder.Cpp.props` - This project defines the default settings for Ice Builder in C++
+2. `<Ice Builder Install Path>\Resources\IceBuilder.Cpp.targets` - This projet defines the targets required to build C++ projects with Ice Builder
 
 The import order matters for MSBuild. `IceBuilder.Cpp.props` depends on common properties defined in `Microsoft.Cpp.props` and must be imported after this project. Likewise, `IceBuilder.Cpp.targets` depends on targets defined in `Microsoft.Cpp.targets` and must be imported after this project.
 
 For a C# project, you need:
 
-1. `$(LOCALAPPDATA)\ZeroC\IceBuilder\IceBuilder.CSharp.props` - This project defines the default settings for Ice Builder in C# projects
-2. `$(LOCALAPPDATA)\ZeroC\IceBuilder\IceBuilder.CSharp.targets` - This project defines the targets required to build C# projects with Ice Builder
+1. `<Ice Builder Install Path>\Resources\IceBuilder.CSharp.props` - This project defines the default settings for Ice Builder in C# projects
+2. `<Ice Builder Install Path>\Resources\IceBuilder.CSharp.targets` - This project defines the targets required to build C# projects with Ice Builder
 
 Like for C++, the import order is important. Both `IceBuilder.CSharp.props` and `IceBuilder.CSharp.targets` must be imported after `Microsoft.CSharp.targets`.
 
