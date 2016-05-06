@@ -1,17 +1,14 @@
 ## Changes in Ice Builder for Visual Studio 4.3.1
 
-- Improve build dependencies to consider Ice Builder options, generated
-  source files are considered outdated if the build options changes since
-  last build.
+- Improve build dependencies to consider Ice Builder options, generated source
+  files are considered outdated if the build options changes since the last build.
 
-- Improve build dependencies to consider the Slice compiler build date, if
-  Slice source files are older than the Slice compiler the corresponding
-  generated files are considered outdated.
+- Improve build dependencies to consider the Slice compiler build date, if generated
+  source files are older than the Slice compiler the files are considered outdated.
 
-- Change the way how Ice Builder projects are imported when configuring a
-  project to use the builder, files are now imported directly from the install
-  location rather than requiring the builder to copy them under local app data
-  directory.
+- Change the way how Ice Builder projects are imported when configuring a project
+  to use the builder, files are now imported directly from the install location rather
+  than requiring the builder to copy them under local app data directory.
 
 - Fixed a bug that can cause build to fail when a solution is configured to use
   "Mixed Platforms".
