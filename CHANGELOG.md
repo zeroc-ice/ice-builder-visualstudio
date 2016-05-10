@@ -1,3 +1,8 @@
+## Changes in Ice Builder for Visual Studio 4.3.2
+
+- Fixed a bug that cause Slice files not being compiled after a project was
+  clean.
+
 ## Changes in Ice Builder for Visual Studio 4.3.1
 
 - Improve build dependencies to consider Ice Builder options, generated source
