@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Install" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+<!-- Custom task to query the installed VS extensions -->
+<UsingTask TaskName="ListExtensions"
+           TaskFactory="CodeTaskFactory"
+           AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
+    <ParameterGroup>
+        <Version ParameterType="System.String" Required="true"/>
+        <Status ParameterType="System.String" Required="true"/>
+        <Identity ParameterType="System.String" Required="true"/>
+        <Paths ParameterType="System.String[]" Output="true" />
+    </ParameterGroup>
+    <Task>
+        <Reference Include="System" />
+        <Reference Include="mscorlib"/>
+        <Using Namespace="Microsoft.Win32"/>
+        <Code Type="Fragment" Language="cs">
+            <![CDATA[
+            using(RegistryKey k = Registry.CurrentUser.OpenSubKey(
+                String.Format("Software\\Microsoft\\VisualStudio\\{0}\\ExtensionManager\\{1}", Version, Status)))
+            {
+                List<String> paths = new List<String>();
+                if(k != null)
+                {
+                    foreach(string v in k.GetValueNames())
+                    {
+                        if(v.StartsWith(Identity))
+                        {
+                            paths.Add(k.GetValue(v).ToString());
+                        }
+                    }
+                }
+                Paths = paths.ToArray();
+            }
+            ]]>
+        </Code>
+    </Task>
+</UsingTask>
+
+<PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <VSIXFile Condition=" '$(VSIXFile)' == '' ">..\IceBuilder\bin\$(Configuration)\IceBuilder.vsix</VSIXFile>
+    <Identity Condition=" '$(Identity)' == '' ">ef9502be-dbc2-4568-a846-02b8e42d04c2</Identity>
+</PropertyGroup>
+
+<ItemGroup>
+    <VS Include="V2">
+        <Version>14.0</Version>
+    </VS>
+    <VS Include="V3">
+        <Version>12.0</Version>
+    </VS>
+    <VS Include="V4">
+        <Version>11.0</Version>
+    </VS>
+</ItemGroup>
+
+<Target Name="Install">
+    <Exec Command="VSIxinstaller /q /nr /l:install.log $(VSIXFile)" IgnoreExitCode="yes" />
+    <ListExtensions Version="%(VS.Version)" Status="EnabledExtensions" Identity="ef9502be-dbc2-4568-a846-02b8e42d04c2">
+        <Output TaskParameter="Paths" ItemName="EnabledExtension"/>
+    </ListExtensions>
+    <Message Text="Enabled extensions: %(EnabledExtension.Identity)" />
+</Target>
+
+
+<Target Name="Uninstall">
+    <Exec Command="VSIxinstaller /u:$(Identity) /q /l:install.log" IgnoreExitCode="yes" />
+    <ListExtensions Version="%(VS.Version)" Status="PendingDeletions" Identity="$(Identity)">
+        <Output TaskParameter="Paths" ItemName="PendingDeletions" />
+    </ListExtensions>
+    <RemoveDir Directories="%(PendingDeletions.Identity)" Condition="Exists('%(PendingDeletions.Identity)')"/>
+</Target>
+
+</Project>
