@@ -545,11 +545,6 @@ namespace IceBuilder
                     Directory.CreateDirectory(Path.GetDirectoryName(file));
                 }
 
-                if (!File.Exists(file))
-                {
-                    File.Create(file).Dispose();
-                }
-
                 int found;
                 uint id;
                 VSDOCUMENTPRIORITY[] priority = new VSDOCUMENTPRIORITY[1];
@@ -593,14 +588,13 @@ namespace IceBuilder
                             Directory.CreateDirectory(Path.GetDirectoryName(file));
                         }
 
-                        if (!File.Exists(file))
-                        {
-                            File.Create(file).Dispose();
-                        }
-
                         EnvDTE.ProjectItem item = FindProjectItem(file);
                         if (item == null)
                         {
+                            if (!File.Exists(file))
+                            {
+                                File.Create(file).Dispose();
+                            }
                             p.ProjectItems.AddFromFile(file);
                             try
                             {

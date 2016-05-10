@@ -77,22 +77,12 @@ namespace IceBuilder
 
             foreach (String path in paths)
             {
-                VCFile file = filter.AddFile(path);
-
-                //
-                // Exclude the file from all other configurations
-                //
-                if(generatedFilesPerConfiguration)
+                if (!File.Exists(path))
                 {
-                    foreach (VCFileConfiguration c in file.FileConfigurations)
-                    {
-                        if (!c.ProjectConfiguration.ConfigurationName.Equals(configurationName) || 
-                            !c.ProjectConfiguration.Platform.Name.Equals(platformName))
-                        {
-                            c.ExcludedFromBuild = true;
-                        }
-                    }
+                    File.Create(path).Dispose();
                 }
+
+                VCFile file = filter.AddFile(path);
 
                 try
                 {
@@ -103,6 +93,20 @@ namespace IceBuilder
                 }
                 catch (Exception)
                 {
+                }
+                //
+                // Exclude the file from all other configurations
+                //
+                if (generatedFilesPerConfiguration)
+                {
+                    foreach (VCFileConfiguration c in file.FileConfigurations)
+                    {
+                        if (!c.ProjectConfiguration.ConfigurationName.Equals(configurationName) || 
+                            !c.ProjectConfiguration.Platform.Name.Equals(platformName))
+                        {
+                            c.ExcludedFromBuild = true;
+                        }
+                    }
                 }
             }
         }
