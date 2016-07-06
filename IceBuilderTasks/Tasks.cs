@@ -414,6 +414,22 @@ namespace IceBuilder
             }
         }
 
+        [Output]
+        public ITaskItem[] ComputedSources
+        {
+            get;
+            private set;
+        }
+
+        protected ITaskItem[] GeneratedItems(ITaskItem source)
+        {
+            return new ITaskItem[]
+                {
+                    new TaskItem(GetGeneratedPath(source, OutputDir, SourceExt)),
+                    new TaskItem(GetGeneratedPath(source, String.IsNullOrEmpty(HeaderOutputDir) ? OutputDir : HeaderOutputDir, HeaderExt)),
+                };
+        }
+
         protected override String GenerateCommandLineCommands()
         {
             CommandLineBuilder builder = new CommandLineBuilder(false);
@@ -465,28 +481,60 @@ namespace IceBuilder
             try
             {
                 int status = base.ExecuteTool(pathToTool, responseFileCommands, commandLineCommands);
-                if (!String.IsNullOrEmpty(HeaderOutputDir) && !Depend && status == 0)
+                if(status == 0)
                 {
-                    if (!Directory.Exists(HeaderOutputDir))
+                    if(Depend)
                     {
-                        Directory.CreateDirectory(HeaderOutputDir);
-                    }
-                    foreach (ITaskItem source in Sources)
-                    {
-                        String sourceH = GetGeneratedPath(source, OutputDir, HeaderExt);
-                        String targetH = GetGeneratedPath(source, HeaderOutputDir, HeaderExt);
-                        if (!File.Exists(targetH) || new FileInfo(targetH).LastWriteTime < new FileInfo(sourceH).LastWriteTime)
-                        {
-                            if (File.Exists(targetH))
-                            {
-                                File.Delete(targetH);
-                            }
-                            File.Move(sourceH, targetH);
-                        }
+                        List<ITaskItem> computed = new List<ITaskItem>();
+                        XmlDocument dependsDoc = new XmlDocument();
+                        dependsDoc.Load(DependFile);
 
-                        if (File.Exists(sourceH))
+                        foreach(ITaskItem source in Sources)
                         {
-                            File.Delete(sourceH);
+                            List<string> dependPaths = new List<string>();
+                            XmlNodeList depends = dependsDoc.DocumentElement.SelectNodes(
+                                String.Format("/dependencies/source[@name='{0}']/dependsOn", source.GetMetadata("Identity")));
+                            if(depends != null)
+                            {
+                                foreach(XmlNode depend in depends)
+                                {
+                                    dependPaths.Add(Path.GetFullPath(depend.Attributes["name"].Value).ToUpper());
+                                }
+                            }
+                            dependPaths.Add(Path.GetFullPath(pathToTool).ToUpper());
+        
+                            ITaskItem computedSource = new TaskItem(source.ItemSpec);
+                            source.CopyMetadataTo(computedSource);
+                            computedSource.SetMetadata("Outputs", String.Join(";",
+                                Array.ConvertAll(GeneratedItems(source), (item) => item.GetMetadata("FullPath").ToUpper())));
+                            computedSource.SetMetadata("Inputs", String.Join(";", dependPaths.ToArray()));
+                            computed.Add(computedSource);
+                        }
+                        ComputedSources = computed.ToArray();
+                    }
+                    else if(!String.IsNullOrEmpty(HeaderOutputDir))
+                    {
+                        if(!Directory.Exists(HeaderOutputDir))
+                        {
+                            Directory.CreateDirectory(HeaderOutputDir);
+                        }
+                        foreach(ITaskItem source in Sources)
+                        {
+                            String sourceH = GetGeneratedPath(source, OutputDir, HeaderExt);
+                            String targetH = GetGeneratedPath(source, HeaderOutputDir, HeaderExt);
+                            if(!File.Exists(targetH) || new FileInfo(targetH).LastWriteTime < new FileInfo(sourceH).LastWriteTime)
+                            {
+                                if(File.Exists(targetH))
+                                {
+                                    File.Delete(targetH);
+                                }
+                                File.Move(sourceH, targetH);
+                            }
+
+                            if(File.Exists(sourceH))
+                            {
+                                File.Delete(sourceH);
+                            }
                         }
                     }
                 }
@@ -815,10 +863,10 @@ namespace IceBuilder
                     if (skip)
                     {
                         XmlNodeList depends = dependsDoc.DocumentElement.SelectNodes(
-                                    String.Format("/dependencies/source[@name='{0}']/dependsOn", source.GetMetadata("Identity")));
+                                String.Format("/dependencies/source[@name='{0}']/dependsOn", source.GetMetadata("Identity")));
+
                         if (depends != null)
                         {
-                            List<String> dependPaths = new List<String>();
                             foreach (XmlNode depend in depends)
                             {
                                 String path = depend.Attributes["name"].Value;

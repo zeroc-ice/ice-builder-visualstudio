@@ -1,5 +1,5 @@
 
-set ICEBUILDERINSTALLDIR=%LOCALAPPDATA%\Microsoft\VisualStudio\14.0Exp\Extensions\ZeroC\Ice Builder\4.3.2
+set ICEBUILDERINSTALLDIR=%LOCALAPPDATA%\Microsoft\VisualStudio\14.0Exp\Extensions\ZeroC\Ice Builder\4.3.3
 
 set IceBuilderCppProps=%ICEBUILDERINSTALLDIR%\Resources\IceBuilder.Cpp.props
 set IceBuilderCppTargets=%ICEBUILDERINSTALLDIR%\Resources\IceBuilder.Cpp.targets

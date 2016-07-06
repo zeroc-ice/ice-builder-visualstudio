@@ -18,8 +18,9 @@
     <Import Project="$(IceHome)\config\Ice.CSharp.props"
             Condition="Exists('$(IceHome)\config\Ice.CSharp.props')"/>
 
-    <Import Project="$(IceHome)\csharp\config\Ice.CSharp.props"
-            Condition="Exists('$(IceHome)\csharp\config\Ice.CSharp.props')"/>
+    <!-- With Ice source distribution the settings are in the cpp msbuild directory -->
+    <Import Project="$(IceHome)\csharp\msbuild\icebuilder.csharp.props"
+            Condition="Exists('$(IceHome)\csharp\msbuild\icebuilder.csharp.props')"/>
 
     <!-- With Ice binary distribution >= 3.7.0 settings are in the Nuget package build directory -->
     <Import Project="$(IceHome)\zeroc.ice.net\build\zeroc.ice.net.props"
@@ -39,7 +40,7 @@
     <IceBuilderOutputDir>$(MSBuildProjectDirectory)\generated</IceBuilderOutputDir>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(IceIntVersion)' &lt; '30700'">
+  <PropertyGroup Condition="'$(IceIntVersion)' != '' And '$(IceIntVersion)' &lt; '30700'">
     <IceToolsPath Condition="'$(IceToolsPath)' == '' And Exists('$(IceHome)\cpp\bin')">$(IceHome)\cpp\bin</IceToolsPath>
     <IceToolsPath Condition="'$(IceToolsPath)' == '' And Exists('$(IceHome)\bin')">$(IceHome)\bin</IceToolsPath>
     <IceToolsBin Condition="'$(IceToolsBin)' == ''">$(IceToolsPath)</IceToolsBin>

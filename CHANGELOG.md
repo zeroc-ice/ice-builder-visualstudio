@@ -1,3 +1,9 @@
+## Changes in Ice Builder for Visual Studio 4.3.3
+
+- Add support to generate TLog files with C++ builds, this ensure
+  that Visual Studio correctly rebuild projects when out of project
+  dependencies change.
+
 ## Changes in Ice Builder for Visual Studio 4.3.2
 
 - Fixed a bug that cause Slice files not being compiled after a project was

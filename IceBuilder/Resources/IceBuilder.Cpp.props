@@ -24,9 +24,9 @@
     <Import Project="$(IceHome)\config\Ice.Cpp.props"
             Condition="Exists('$(IceHome)\config\Ice.Cpp.props')"/>
 
-    <!-- With Ice source distribution the settings are in the cpp config directory -->
-    <Import Project="$(IceHome)\cpp\config\Ice.Cpp.props"
-            Condition="Exists('$(IceHome)\cpp\config\Ice.Cpp.props')"/>
+    <!-- With Ice source distribution the settings are in the cpp msbuild directory -->
+    <Import Project="$(IceHome)\cpp\msbuild\icebuilder.cpp.props"
+            Condition="Exists('$(IceHome)\cpp\msbuild\icebuilder.cpp.props')"/>
 
     <!-- With Ice 3.7.0 binary distribution settings are in the Nuget package build directory -->
     <Import Project="$(IceHome)\zeroc.ice.$(DefaultPlatformToolset)\build\zeroc.ice.$(DefaultPlatformToolset).props"
@@ -83,7 +83,7 @@
     <LocalDebuggerEnvironment>PATH=$(Path);$(LocalDebuggerEnvironment)</LocalDebuggerEnvironment>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(IceIntVersion)' &lt; '30700'">
+  <PropertyGroup Condition="'$(IceIntVersion)' != '' And '$(IceIntVersion)' &lt; '30700'">
     <IceToolsPath Condition="'$(IceToolsPath)' == '' And Exists('$(IceHome)\cpp\bin')">$(IceHome)\cpp\bin</IceToolsPath>
     <IceToolsPath Condition="'$(IceToolsPath)' == '' And Exists('$(IceHome)\bin')">$(IceHome)\bin</IceToolsPath>
     <IceToolsBin Condition="'$(IceToolsBin)' == ''">$(IceToolsPath)</IceToolsBin>

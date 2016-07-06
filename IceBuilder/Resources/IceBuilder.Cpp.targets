@@ -10,7 +10,7 @@
 
   <Target Name="IceBuilder_Validate">
     <Error Text="Ice Installation not detected. Please update Ice Home in 'Tools > Options > Projects and Solutions > Ice Builder'"
-           Condition="'$(IceHome)' == ''" />
+           Condition="'$(IceHome)' == '' Or '$(IceVersion)' == '' Or '$(IceIntVersion)' == ''" />
 
     <Error Text="The selected Ice home directory does not exist or is not an Ice installation. Please update Ice Home in 'Tools > Options > Projects and Solutions > Ice Builder'"
            Condition="!Exists('$(IceHome)')" />
@@ -97,7 +97,8 @@
         SourceExt                         = "$(IceBuilderSourceExt)"
         DependFile                        = "$(IceBuilderDependFile)"
         Sources                           = "@(_IceBuilder)"
-        Condition                         = "'%(_IceBuilder.BuildRequired)' == 'True'"/>
+        Condition                         = "'%(_IceBuilder.BuildRequired)' == 'True'">
+    </Slice2CppTask>
 
     <!-- Update the dependencies -->
     <Slice2CppTask
@@ -119,7 +120,23 @@
         DependFile                        = "$(IceBuilderDependFile)"
         Depend                            = "true"
         Sources                           = "@(_IceBuilder)"
-        Condition                         = "'$(_IceBuilderUdateDepends)' == 'True'"/>
+        Condition                         = "'$(_IceBuilderUdateDepends)' == 'True'">
+      <Output
+        ItemName                          = "__IceBuilder"
+        TaskParameter                     = "ComputedSources"/>
+    </Slice2CppTask>
+
+    <!-- Write TLog files -->
+    <WriteLinesToFile File                = "$(TLogLocation)\slice2cpp.write.1u.tlog"
+                      Encoding            = "Unicode"
+                      Lines               = "^%(__IceBuilder.FullPath);%(__IceBuilder.Outputs)"
+                      Condition           = "'$(_IceBuilderUdateDepends)' == 'True'"/>
+
+    <!-- Read TLog files -->
+    <WriteLinesToFile File                = "$(TLogLocation)\slice2cpp.read.1u.tlog"
+                      Encoding            = "Unicode"
+                      Lines               = "^%(__IceBuilder.FullPath);%(__IceBuilder.Inputs)"
+                      Condition           = "'$(_IceBuilderUdateDepends)' == 'True'"/>
   </Target>
 
   <Target Name="IceBuilder_Clean" BeforeTargets="Clean">

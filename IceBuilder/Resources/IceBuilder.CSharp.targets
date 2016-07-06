@@ -4,7 +4,7 @@
 
   <Target Name="IceBuilder_Validate">
     <Error Text="Ice Installation not detected. Please update Ice Home in 'Tools > Options > Projects and Solutions > Ice Builder'"
-           Condition="'$(IceHome)' == ''" />
+           Condition="'$(IceHome)' == '' Or '$(IceVersion)' == '' Or '$(IceIntVersion)' == ''" />
 
     <Error Text="The selected Ice home directory does not exist or is not an Ice installation. Please update Ice Home in 'Tools > Options > Projects and Solutions > Ice Builder'"
            Condition="!Exists('$(IceHome)')" />
