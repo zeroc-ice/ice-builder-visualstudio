@@ -12,6 +12,16 @@
   <UsingTask TaskName="IceBuilder.Slice2CppDependTask"
              AssemblyFile="$(MSBuildThisFileDirectory)IceBuilder.Tasks.dll" />
 
+  <!-- Ice Nuget Package -->
+  <Import Project="$(IceV140Package)"
+          Condition="'$(PlatformToolset)' == 'v140' and Exists('$(IceV140Package)')"/>
+
+  <Import Project="$(IceV120Package)"
+          Condition="'$(PlatformToolset)' == 'v120' and Exists('$(IceV120Package)')"/>
+
+  <Import Project="$(IceUWPPackage)"
+          Condition="'$(PlatformToolset)' == 'v140' and Exists('$(IceUWPPackage)')"/>
+
   <!-- Import settings from the Ice distribution, If the project is using a nuget package those
        are already imported and we avoid to import the settings twice -->
   <ImportGroup Condition="'$(IceNugetPackageVersion)' == ''">
