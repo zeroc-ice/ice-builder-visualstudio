@@ -45,11 +45,9 @@ namespace IceBuilder
             if (!String.IsNullOrEmpty(path))
             {
                 if (String.IsNullOrEmpty(path) ||
-                    File.Exists(Path.Combine(path, "bin", "slice2cpp.exe")) ||
-                    File.Exists(Path.Combine(path, "cpp", "bin", "slice2cpp.exe")) ||
-                    File.Exists(Path.Combine(path, "cpp", "config", "Ice.props")) ||
-                    File.Exists(Path.Combine(path, "config", "Ice.props")) ||
-                    File.Exists(Path.Combine(path, "build", "native", "Ice.props")))
+                    File.Exists(Path.Combine(path, "cpp", "config", "ice.props")) ||
+                    File.Exists(Path.Combine(path, "config", "ice.props")) ||
+                    File.Exists(Path.Combine(path, "config", "icebuilder.props")))
                 {
                     txtIceHome.Text = path;
                     return true;

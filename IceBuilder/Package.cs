@@ -248,9 +248,12 @@ namespace IceBuilder
             }
             else
             {
-                String props =
-                    new string[] { Path.Combine(value, "config", "Ice.props"),
-                                   Path.Combine(value,"cpp", "config", "Ice.props")}.FirstOrDefault(path => File.Exists(path) );
+                String props = new string[] 
+                    {
+                        Path.Combine(value, "config", "ice.props"),
+                        Path.Combine(value,"cpp", "config", "ice.props"),
+                        Path.Combine(value, "config", "icebuilder.props")
+                    }.FirstOrDefault(path => File.Exists(path) );
                     
 
                 if(String.IsNullOrEmpty(props) && Directory.Exists(value))
