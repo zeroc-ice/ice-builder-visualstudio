@@ -5,21 +5,13 @@
 // **********************************************************************
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 using Microsoft.Build.Utilities;
 using Microsoft.Build.Framework;
 
-using Microsoft.VisualStudio.Shell.Interop;
-
-using System.Windows.Threading;
 using System.Diagnostics;
 using System.IO;
-
-using Microsoft.VisualStudio;
 
 namespace IceBuilder
 {
@@ -37,7 +29,7 @@ namespace IceBuilder
             IndentLevel = 2;
         }
 
-        public override void Initialize(Microsoft.Build.Framework.IEventSource eventSource)
+        public override void Initialize(IEventSource eventSource)
         {
             eventSource.ProjectStarted += new ProjectStartedEventHandler(eventSource_ProjectStarted);
             eventSource.ProjectFinished += new ProjectFinishedEventHandler(eventSource_ProjectFinished);
@@ -53,14 +45,14 @@ namespace IceBuilder
         void eventSource_ProjectStarted(object sender, ProjectStartedEventArgs e)
         {
             Stopwatch = Stopwatch.StartNew();
-            WriteMessage(String.Format("Build started {0}.", System.DateTime.Now));
+            WriteMessage(string.Format("Build started {0}.", DateTime.Now));
         }
 
         void eventSource_ProjectFinished(object sender, ProjectFinishedEventArgs e)
         {
             Stopwatch.Stop();
-            WriteMessage(String.Format("\nBuild {0}.", (e.Succeeded ? "succeeded" : "FAILED")));
-            WriteMessage(String.Format("Time Elapsed {0:00}:{1:00}:{2:00}.{3:00}",
+            WriteMessage(string.Format("\nBuild {0}.", (e.Succeeded ? "succeeded" : "FAILED")));
+            WriteMessage(string.Format("Time Elapsed {0:00}:{1:00}:{2:00}.{3:00}",
                 Stopwatch.Elapsed.Hours,
                 Stopwatch.Elapsed.Minutes,
                 Stopwatch.Elapsed.Seconds,
@@ -70,32 +62,32 @@ namespace IceBuilder
 
         public void eventSource_TargetStarted(object sender, TargetStartedEventArgs e)
         {
-            if(e.TargetName.Equals("IceBuilder_Compile") ||IsVerbosityAtLeast(LoggerVerbosity.Detailed))
+            if(e.TargetName.Equals("IceBuilder_Compile") || IsVerbosityAtLeast(LoggerVerbosity.Detailed))
             {
-                WriteMessage(String.Format("{0}:", e.TargetName));
+                WriteMessage(string.Format("{0}:", e.TargetName));
             }
             Indent += IndentLevel;
         }
 
         public void eventSource_TargetFinished(object sender, TargetFinishedEventArgs e)
         {
-            Indent -= IndentLevel; 
+            Indent -= IndentLevel;
         }
 
         public void eventSource_MessageRaised(object sender, BuildMessageEventArgs e)
         {
             if((e.Importance == MessageImportance.High && IsVerbosityAtLeast(LoggerVerbosity.Minimal)) ||
                (e.Importance == MessageImportance.Normal && IsVerbosityAtLeast(LoggerVerbosity.Normal)) ||
-			   (e.Importance == MessageImportance.Low && IsVerbosityAtLeast(LoggerVerbosity.Detailed)))
+               (e.Importance == MessageImportance.Low && IsVerbosityAtLeast(LoggerVerbosity.Detailed)))
             {
                 WriteMessage(e.Message);
             }
         }
 
-        public void WriteMessage(String message)
+        public void WriteMessage(string message)
         {
             StringBuilder s = new StringBuilder();
-            for (int i = 0; i < Indent; ++i)
+            for(int i = 0; i < Indent; ++i)
             {
                 s.Append(" ");
             }
@@ -105,25 +97,25 @@ namespace IceBuilder
             OutputPane.OutputString(s.ToString());
         }
 
-        private void OutputTaskItem(String message, EnvDTE.vsTaskPriority priority, String subcategory,
-                                    String file, int line, String description)
+        private void OutputTaskItem(string message, EnvDTE.vsTaskPriority priority, string subcategory,
+                                    string file, int line, string description)
         {
             OutputPane.Activate();
             OutputPane.OutputTaskItemString(
-                message, 
-                priority, 
-                EnvDTE.vsTaskCategories.vsTaskCategoryBuildCompile, 
-                EnvDTE.vsTaskIcon.vsTaskIconCompile, 
-                file, 
-                line, 
-                description, 
+                message,
+                priority,
+                EnvDTE.vsTaskCategories.vsTaskCategoryBuildCompile,
+                EnvDTE.vsTaskIcon.vsTaskIconCompile,
+                file,
+                line,
+                description,
                 true);
         }
 
         void eventSource_WarningRaised(object sender, BuildWarningEventArgs e)
         {
             OutputTaskItem(
-                    String.Format("{0}({1}): warning : {2}",
+                    string.Format("{0}({1}): warning : {2}",
                         Path.Combine(Path.GetDirectoryName(e.ProjectFile), e.File),
                         e.LineNumber,
                         e.Message),
@@ -136,7 +128,7 @@ namespace IceBuilder
         void eventSource_ErrorRaised(object sender, BuildErrorEventArgs e)
         {
             OutputTaskItem(
-                String.Format("{0}({1}): error : {2}",
+                string.Format("{0}({1}): error : {2}",
                     Path.Combine(Path.GetDirectoryName(e.ProjectFile), e.File),
                     e.LineNumber,
                     e.Message),

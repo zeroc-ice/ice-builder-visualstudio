@@ -1,3 +1,9 @@
+// **********************************************************************
+//
+// Copyright (c) 2009-2016 ZeroC, Inc. All rights reserved.
+//
+// **********************************************************************
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,8 +34,8 @@ namespace IceBuilder
             Close();
         }
 
-        Dictionary<String, IVsProject> _projects;
-        public Dictionary<String, IVsProject> Projects
+        Dictionary<string, IVsProject> _projects;
+        public Dictionary<string, IVsProject> Projects
         {
             get
             {
@@ -42,12 +48,12 @@ namespace IceBuilder
             }
         }
 
-        public List<String> Values
+        public List<string> Values
         {
             set
             {
                 projectList.Items.Clear();
-                foreach(String v in value)
+                foreach(string v in value)
                 {
                     projectList.Items.Add(v);
                     projectList.SetItemCheckState(projectList.Items.Count - 1, CheckState.Checked);
@@ -60,12 +66,12 @@ namespace IceBuilder
             get
             {
                 List<IVsProject> values = new List<IVsProject>();
-                foreach (object o in projectList.CheckedItems)
+                foreach(object o in projectList.CheckedItems)
                 {
                     values.Add(Projects[o.ToString()]);
                 }
                 return values;
-            
+
             }
         }
     }

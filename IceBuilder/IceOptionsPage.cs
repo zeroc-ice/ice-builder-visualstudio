@@ -5,14 +5,7 @@
 // **********************************************************************
 
 using System;
-using System.Diagnostics;
-using System.Globalization;
 using System.Runtime.InteropServices;
-using System.ComponentModel.Design;
-using Microsoft.Win32;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using System.Windows.Forms;
 using System.ComponentModel;
@@ -40,11 +33,11 @@ namespace IceBuilder
             get
             {
                 Editor.optionsPage = this;
-                return Editor; 
+                return Editor;
             }
         }
 
-        protected override void OnApply(DialogPage.PageApplyEventArgs e)
+        protected override void OnApply(PageApplyEventArgs e)
         {
             try
             {
@@ -59,7 +52,7 @@ namespace IceBuilder
 
                 Package.Instance.SetAutoBuilding(Editor.AutoBuilding);
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 Package.UnexpectedExceptionWarning(ex);
                 throw;
@@ -73,7 +66,7 @@ namespace IceBuilder
                 Editor.IceHome = Package.Instance.GetIceHome();
                 Editor.AutoBuilding = Package.Instance.AutoBuilding;
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 Package.UnexpectedExceptionWarning(ex);
                 throw;

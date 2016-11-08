@@ -6,19 +6,10 @@
 // **********************************************************************
 
 using System;
-using System.Runtime.InteropServices;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
-
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell.Interop;
 
 namespace IceBuilder
 {
@@ -35,21 +26,21 @@ namespace IceBuilder
             InitializeComponent();
         }
 
-        public List<String> InitialValues
+        public List<string> InitialValues
         {
             get;
             set;
         }
 
-        public List<String> Values
+        public List<string> Values
         {
             set
             {
                 includeList.Items.Clear();
-                foreach(String v in value)
+                foreach(string v in value)
                 {
                     includeList.Items.Add(v);
-                    if (Path.IsPathRooted(v))
+                    if(Path.IsPathRooted(v))
                     {
                         includeList.SetItemCheckState(includeList.Items.Count - 1, CheckState.Checked);
                     }
@@ -58,8 +49,8 @@ namespace IceBuilder
             }
             get
             {
-                List<String> values = new List<String>();
-                foreach (object o in includeList.Items)
+                List<string> values = new List<string>();
+                foreach(object o in includeList.Items)
                 {
                     values.Add(o.ToString());
                 }
@@ -69,7 +60,7 @@ namespace IceBuilder
 
         private void btnAdd_Click(object sender, EventArgs e)
         {
-            if (_editing)
+            if(_editing)
             {
                 EndEditing(true);
             }
@@ -81,7 +72,7 @@ namespace IceBuilder
 
         private void btnEdit_Click(object sender, EventArgs e)
         {
-            if (includeList.SelectedIndex != -1)
+            if(includeList.SelectedIndex != -1)
             {
                 _editingIndex = includeList.SelectedIndex;
                 BeginEditing();
@@ -92,18 +83,18 @@ namespace IceBuilder
         {
             Cursor = Cursors.WaitCursor;
             int index = includeList.SelectedIndex;
-            if (_editing)
+            if(_editing)
             {
                 index = _editingIndex;
                 EndEditing(true);
             }
-            if (index > -1 && index < includeList.Items.Count)
+            if(index > -1 && index < includeList.Items.Count)
             {
                 int selected = index;
                 includeList.Items.RemoveAt(selected);
-                if (includeList.Items.Count > 0)
+                if(includeList.Items.Count > 0)
                 {
-                    if (selected > 0)
+                    if(selected > 0)
                     {
                         selected -= 1;
                     }
@@ -117,12 +108,12 @@ namespace IceBuilder
         private void btnUp_Click(object sender, EventArgs e)
         {
             Cursor = Cursors.WaitCursor;
-            if (_editing)
+            if(_editing)
             {
                 EndEditing(true);
             }
             int index = includeList.SelectedIndex;
-            if (index > 0)
+            if(index > 0)
             {
                 string current = includeList.SelectedItem.ToString();
                 includeList.Items.RemoveAt(index);
@@ -136,12 +127,12 @@ namespace IceBuilder
         private void btnDown_Click(object sender, EventArgs e)
         {
             Cursor = Cursors.WaitCursor;
-            if (_editing)
+            if(_editing)
             {
                 EndEditing(true);
             }
             int index = includeList.SelectedIndex;
-            if (index < includeList.Items.Count - 1 && index > -1)
+            if(index < includeList.Items.Count - 1 && index > -1)
             {
                 string current = includeList.SelectedItem.ToString();
                 includeList.Items.RemoveAt(index);
@@ -156,8 +147,8 @@ namespace IceBuilder
         {
             for(int i = 0; i < includeList.Items.Count; ++i)
             {
-                String path = includeList.Items[i].ToString();
-                if(!String.IsNullOrEmpty(path))
+                string path = includeList.Items[i].ToString();
+                if(!string.IsNullOrEmpty(path))
                 {
                     if(Path.IsPathRooted(path))
                     {
@@ -169,13 +160,13 @@ namespace IceBuilder
                     }
                 }
             }
-        }        
+        }
 
         private void BeginEditing()
         {
             EndEditing(true);
             _editing = true;
-            if (_editingIndex != -1)
+            if(_editingIndex != -1)
             {
                 _txtInclude = new TextBox();
                 _txtInclude.Leave += txtInclude_Leave;
@@ -215,11 +206,11 @@ namespace IceBuilder
 
         private void txtInclude_KeyUp(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode.Equals(Keys.Escape))
+            if(e.KeyCode.Equals(Keys.Escape))
             {
                 EndEditing(false);
             }
-            else if (e.KeyCode.Equals(Keys.Enter))
+            else if(e.KeyCode.Equals(Keys.Enter))
             {
                 EndEditing(true);
             }
@@ -227,11 +218,11 @@ namespace IceBuilder
 
         private void btnSelectInclude_Clicked(object sender, EventArgs e)
         {
-            String projectDir = Path.GetFullPath(Path.GetDirectoryName(ProjectUtil.GetProjectFullPath(PropertyPage.Project))); ;
-            String selectedPath = UIUtil.BrowserFolderDialog(Handle, "Slice Include Directory",
-                String.IsNullOrEmpty(_editingIncludeDir) ? projectDir : _editingIncludeDir);
+            string projectDir = Path.GetFullPath(Path.GetDirectoryName(ProjectUtil.GetProjectFullPath(PropertyPage.Project)));
+            string selectedPath = UIUtil.BrowserFolderDialog(Handle, "Slice Include Directory",
+                string.IsNullOrEmpty(_editingIncludeDir) ? projectDir : _editingIncludeDir);
 
-            if(String.IsNullOrEmpty(selectedPath) && !String.IsNullOrEmpty(_editingIncludeDir))
+            if(string.IsNullOrEmpty(selectedPath) && !string.IsNullOrEmpty(_editingIncludeDir))
             {
                 _txtInclude.Text = _editingIncludeDir;
             }
@@ -244,25 +235,25 @@ namespace IceBuilder
 
         private void EndEditing(bool save)
         {
-            if (_editing)
+            if(_editing)
             {
                 _editing = false;
-                
+
 
                 if(_txtInclude == null || _btnSelectInclude == null)
                 {
                     return;
                 }
 
-                String path = _txtInclude.Text;
+                string path = _txtInclude.Text;
                 _txtInclude = null;
                 _btnSelectInclude = null;
 
-                if (save)
+                if(save)
                 {
-                    if (_editingIndex != -1)
+                    if(_editingIndex != -1)
                     {
-                        if(!String.IsNullOrEmpty(path))
+                        if(!string.IsNullOrEmpty(path))
                         {
                             includeList.Items[_editingIndex] = path;
                         }
@@ -281,12 +272,12 @@ namespace IceBuilder
 
         private void includeList_ItemCheck(object sender, ItemCheckEventArgs e)
         {
-            if (!_editing)
+            if(!_editing)
             {
-                String path = includeList.Items[e.Index].ToString();
-                if (!String.IsNullOrEmpty(path) && path.IndexOf('$') == -1)
+                string path = includeList.Items[e.Index].ToString();
+                if(!string.IsNullOrEmpty(path) && path.IndexOf('$') == -1)
                 {
-                    String projectDir = Path.GetFullPath(Path.GetDirectoryName(ProjectUtil.GetProjectFullPath(PropertyPage.Project)));
+                    string projectDir = Path.GetFullPath(Path.GetDirectoryName(ProjectUtil.GetProjectFullPath(PropertyPage.Project)));
                     bool absolute = Path.IsPathRooted(path);
 
                     if(e.NewValue == CheckState.Unchecked)
@@ -314,7 +305,7 @@ namespace IceBuilder
             EndEditing(true);
         }
 
-        private String _editingIncludeDir;
+        private string _editingIncludeDir;
         private TextBox _txtInclude;
         private Button _btnSelectInclude;
 

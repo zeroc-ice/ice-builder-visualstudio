@@ -19,13 +19,13 @@ namespace IceBuilder
 {
     public class TaskUtil
     {
-        public static String MakeRelative(String from, String to)
+        public static string MakeRelative(string from, string to)
         {
-            if (!Path.IsPathRooted(from))
+            if(!Path.IsPathRooted(from))
             {
-                throw new ArgumentException(String.Format("from: `{0}' must be an absolute path", from));
+                throw new ArgumentException(string.Format("from: `{0}' must be an absolute path", from));
             }
-            else if (!Path.IsPathRooted(to))
+            else if(!Path.IsPathRooted(to))
             {
                 return to;
             }
@@ -34,27 +34,27 @@ namespace IceBuilder
             string[] secondPathParts = Path.GetFullPath(to).Trim(Path.DirectorySeparatorChar).Split(Path.DirectorySeparatorChar);
 
             int sameCounter = 0;
-            while (sameCounter < Math.Min(firstPathParts.Length, secondPathParts.Length) &&
-                String.Equals(firstPathParts[sameCounter], secondPathParts[sameCounter],
+            while(sameCounter < Math.Min(firstPathParts.Length, secondPathParts.Length) &&
+                string.Equals(firstPathParts[sameCounter], secondPathParts[sameCounter],
                 StringComparison.CurrentCultureIgnoreCase))
             {
                 ++sameCounter;
             }
 
             // Different volumes, relative path not possible.
-            if (sameCounter == 0)
+            if(sameCounter == 0)
             {
                 return to;
             }
 
             // Pop back up to the common point.
-            String newPath = "";
-            for (int i = sameCounter; i < firstPathParts.Length; ++i)
+            string newPath = "";
+            for(int i = sameCounter; i < firstPathParts.Length; ++i)
             {
                 newPath += ".." + Path.DirectorySeparatorChar;
             }
             // Descend to the target.
-            for (int i = sameCounter; i < secondPathParts.Length; ++i)
+            for(int i = sameCounter; i < secondPathParts.Length; ++i)
             {
                 newPath += secondPathParts[i] + Path.DirectorySeparatorChar;
             }
@@ -65,28 +65,28 @@ namespace IceBuilder
     public abstract class SliceCompilerTask : ToolTask
     {
         [Required]
-        public String WorkingDirectory
+        public string WorkingDirectory
         {
             get;
             set;
         }
 
         [Required]
-        public String IceHome
+        public string IceHome
         {
             get;
             set;
         }
 
         [Required]
-        public String IceToolsPath
+        public string IceToolsPath
         {
             get;
             set;
         }
 
         [Required]
-        public String OutputDir
+        public string OutputDir
         {
             get;
             set;
@@ -100,119 +100,119 @@ namespace IceBuilder
         }
 
         [Required]
-        public String DependFile
+        public string DependFile
         {
             get;
             set;
         }
 
-        public Boolean Depend
+        public bool Depend
         {
             get;
             set;
         }
 
-        public Boolean AllowIcePrefix
+        public bool AllowIcePrefix
         {
             get;
             set;
         }
 
-        public Boolean Underscore
+        public bool Underscore
         {
             get;
             set;
         }
 
-        public Boolean Stream
+        public bool Stream
         {
             get;
             set;
         }
 
-        public Boolean Checksum
+        public bool Checksum
         {
             get;
             set;
         }
 
-        public String[] IncludeDirectories
+        public string[] IncludeDirectories
         {
             get;
             set;
         }
 
-        public String AdditionalOptions
+        public string AdditionalOptions
         {
             get;
             set;
         }
 
-        protected override String GetWorkingDirectory()
+        protected override string GetWorkingDirectory()
         {
             return WorkingDirectory;
         }
 
-        protected virtual String GetGeneratedPath(ITaskItem item, String outputDir, String ext)
+        protected virtual string GetGeneratedPath(ITaskItem item, string outputDir, string ext)
         {
             return Path.Combine(
                 outputDir,
                 Path.GetFileName(Path.ChangeExtension(item.GetMetadata("Identity"), ext)));
         }
 
-        protected abstract String GeneratedExtensions
+        protected abstract string GeneratedExtensions
         {
             get;
         }
 
         protected abstract void TraceGenerated();
 
-        protected override String GenerateCommandLineCommands()
+        protected override string GenerateCommandLineCommands()
         {
             UsageError = false;
             CommandLineBuilder builder = new CommandLineBuilder(false);
-            if (Depend)
+            if(Depend)
             {
                 builder.AppendSwitch("--depend-xml");
                 builder.AppendSwitch("--depend-file");
                 builder.AppendFileNameIfNotNull(DependFile);
             }
 
-            if (!String.IsNullOrEmpty(OutputDir))
+            if(!string.IsNullOrEmpty(OutputDir))
             {
                 builder.AppendSwitch("--output-dir");
                 builder.AppendFileNameIfNotNull(OutputDir);
             }
 
-            if (AllowIcePrefix)
+            if(AllowIcePrefix)
             {
                 builder.AppendSwitch("--ice");
             }
 
-            if (Underscore)
+            if(Underscore)
             {
                 builder.AppendSwitch("--underscore");
             }
 
-            if (Stream)
+            if(Stream)
             {
                 builder.AppendSwitch("--stream");
             }
 
-            if (Checksum)
+            if(Checksum)
             {
                 builder.AppendSwitch("--checksum");
             }
 
-            if (IncludeDirectories != null)
+            if(IncludeDirectories != null)
             {
-                foreach (String path in IncludeDirectories)
+                foreach(string path in IncludeDirectories)
                 {
                     builder.AppendSwitchIfNotNull("-I", path);
                 }
             }
 
-            if (!String.IsNullOrEmpty(AdditionalOptions))
+            if(!string.IsNullOrEmpty(AdditionalOptions))
             {
                 builder.AppendTextUnquoted(" ");
                 builder.AppendTextUnquoted(AdditionalOptions);
@@ -227,7 +227,7 @@ namespace IceBuilder
         {
             try
             {
-                if (!Depend)
+                if(!Depend)
                 {
                     TraceGenerated();
                 }
@@ -242,13 +242,13 @@ namespace IceBuilder
 
         protected override string GenerateFullPathToTool()
         {
-            String home = IceHome;
-            String path = Path.Combine(IceToolsPath, ToolName);
-            if (!File.Exists(path))
+            string home = IceHome;
+            string path = Path.Combine(IceToolsPath, ToolName);
+            if(!File.Exists(path))
             {
-                const String message =
+                const string message =
                     "Slice compiler `{0}' not found. Review Ice Home setting in Visual Studio 'Tool > Options > Ice'";
-                Log.LogError(String.Format(message, path));
+                Log.LogError(string.Format(message, path));
             }
             return path;
         }
@@ -266,59 +266,59 @@ namespace IceBuilder
 
         protected override void LogEventsFromTextOutput(string singleLine, MessageImportance messageImportance)
         {
-            if (UsageError)
+            if(UsageError)
             {
                 return;
             }
 
-            int i = singleLine.IndexOf(String.Format("{0}:", ToolName));
-            if (i != -1)
+            int i = singleLine.IndexOf(string.Format("{0}:", ToolName));
+            if(i != -1)
             {
                 i += (ToolName.Length + 1);
                 Log.LogError("", "", "", "", 0, 0, 0, 0,
-                    String.Format("{0}: {1}", Path.GetFileName(ToolName), singleLine.Substring(i)));
+                    string.Format("{0}: {1}", Path.GetFileName(ToolName), singleLine.Substring(i)));
                 UsageError = true;
             }
             else
             {
-                String s = singleLine.Trim();
-                if (s.StartsWith(WorkingDirectory))
+                string s = singleLine.Trim();
+                if(s.StartsWith(WorkingDirectory))
                 {
                     s = s.Substring(WorkingDirectory.Length);
                 }
 
-                String file = "";
+                string file = "";
                 int line = 0;
-                String description = "";
+                string description = "";
 
                 //
                 // Skip the drive letter
                 //
                 i = s.IndexOf(":");
-                if (i <= 1 && s.Length > i + 1)
+                if(i <= 1 && s.Length > i + 1)
                 {
                     i = s.IndexOf(":", i + 1);
                 }
 
-                if (i != -1)
+                if(i != -1)
                 {
                     file = Path.GetFullPath(s.Substring(0, i).Trim().Trim('"'));
-                    if (file.IndexOf(WorkingDirectory) != -1)
+                    if(file.IndexOf(WorkingDirectory) != -1)
                     {
                         file = file.Substring(WorkingDirectory.Length)
                                    .Trim(Path.DirectorySeparatorChar);
                     }
 
-                    if (s.Length > i + 1)
+                    if(s.Length > i + 1)
                     {
                         s = s.Substring(i + 1);
 
                         i = s.IndexOf(":");
-                        if (i != -1)
+                        if(i != -1)
                         {
-                            if (Int32.TryParse(s.Substring(0, i), out line))
+                            if(int.TryParse(s.Substring(0, i), out line))
                             {
-                                if (s.Length > i + 1)
+                                if(s.Length > i + 1)
                                 {
                                     s = s.Substring(i + 1);
                                 }
@@ -335,22 +335,22 @@ namespace IceBuilder
                     }
                 }
 
-                if (description.IndexOf("warning:") == 0)
+                if(description.IndexOf("warning:") == 0)
                 {
                     //
                     // Don't emit warnings while parsing dependencies otherwise
                     // they will appear twices in the Error List and Output.
                     //
-                    if (!Depend)
+                    if(!Depend)
                     {
                         Log.LogWarning("", "", "", file, line - 1, 0, 0, 0, description.Substring("warning:".Length));
                     }
                 }
-                else if (description.IndexOf("error:") == 0)
+                else if(description.IndexOf("error:") == 0)
                 {
                     Log.LogError("", "", "", file, line - 1, 0, 0, 0, description.Substring("error:".Length));
                 }
-                else if (!String.IsNullOrEmpty(description))
+                else if(!string.IsNullOrEmpty(description))
                 {
                     Log.LogError("", "", "", file, line - 1, 0, 0, 0, description);
                 }
@@ -376,41 +376,41 @@ namespace IceBuilder
             }
         }
 
-        public String HeaderOutputDir
+        public string HeaderOutputDir
         {
             get;
             set;
         }
 
-        public String DLLExport
+        public string DLLExport
         {
             get;
             set;
         }
 
-        public String HeaderExt
+        public string HeaderExt
         {
             get;
             set;
         }
 
-        public String SourceExt
+        public string SourceExt
         {
             get;
             set;
         }
 
-        public String BaseDirectoryForGeneratedInclude
+        public string BaseDirectoryForGeneratedInclude
         {
             get;
             set;
         }
 
-        protected override String GeneratedExtensions
+        protected override string GeneratedExtensions
         {
             get
             {
-                return String.Format("{0},{1}", HeaderExt, SourceExt);
+                return string.Format("{0},{1}", HeaderExt, SourceExt);
             }
         }
 
@@ -426,33 +426,33 @@ namespace IceBuilder
             return new ITaskItem[]
                 {
                     new TaskItem(GetGeneratedPath(source, OutputDir, SourceExt)),
-                    new TaskItem(GetGeneratedPath(source, String.IsNullOrEmpty(HeaderOutputDir) ? OutputDir : HeaderOutputDir, HeaderExt)),
+                    new TaskItem(GetGeneratedPath(source, string.IsNullOrEmpty(HeaderOutputDir) ? OutputDir : HeaderOutputDir, HeaderExt)),
                 };
         }
 
-        protected override String GenerateCommandLineCommands()
+        protected override string GenerateCommandLineCommands()
         {
             CommandLineBuilder builder = new CommandLineBuilder(false);
 
-            if (!String.IsNullOrEmpty(DLLExport))
+            if(!string.IsNullOrEmpty(DLLExport))
             {
                 builder.AppendSwitch("--dll-export");
                 builder.AppendFileNameIfNotNull(DLLExport);
             }
 
-            if (!HeaderExt.Equals("h"))
+            if(!HeaderExt.Equals("h"))
             {
                 builder.AppendSwitch("--header-ext");
                 builder.AppendFileNameIfNotNull(HeaderExt);
             }
 
-            if (!SourceExt.Equals("cpp"))
+            if(!SourceExt.Equals("cpp"))
             {
                 builder.AppendSwitch("--source-ext");
                 builder.AppendFileNameIfNotNull(SourceExt);
             }
 
-            if (!String.IsNullOrEmpty(BaseDirectoryForGeneratedInclude))
+            if(!string.IsNullOrEmpty(BaseDirectoryForGeneratedInclude))
             {
                 builder.AppendSwitch("--include-dir");
                 builder.AppendFileNameIfNotNull(BaseDirectoryForGeneratedInclude);
@@ -465,13 +465,13 @@ namespace IceBuilder
 
         protected override void TraceGenerated()
         {
-            foreach (ITaskItem source in Sources)
+            foreach(ITaskItem source in Sources)
             {
-                String message = String.Format("Compiling {0} Generating -> ", source.GetMetadata("Identity"));
+                string message = string.Format("Compiling {0} Generating -> ", source.GetMetadata("Identity"));
                 message += TaskUtil.MakeRelative(WorkingDirectory, GetGeneratedPath(source, OutputDir, SourceExt));
                 message += " and ";
                 message += TaskUtil.MakeRelative(WorkingDirectory,
-                    GetGeneratedPath(source, String.IsNullOrEmpty(HeaderOutputDir) ? OutputDir : HeaderOutputDir, HeaderExt));
+                    GetGeneratedPath(source, string.IsNullOrEmpty(HeaderOutputDir) ? OutputDir : HeaderOutputDir, HeaderExt));
                 Log.LogMessage(MessageImportance.High, message);
             }
         }
@@ -493,7 +493,7 @@ namespace IceBuilder
                         {
                             List<string> dependPaths = new List<string>();
                             XmlNodeList depends = dependsDoc.DocumentElement.SelectNodes(
-                                String.Format("/dependencies/source[@name='{0}']/dependsOn", source.GetMetadata("Identity")));
+                                string.Format("/dependencies/source[@name='{0}']/dependsOn", source.GetMetadata("Identity")));
                             if(depends != null)
                             {
                                 foreach(XmlNode depend in depends)
@@ -502,17 +502,17 @@ namespace IceBuilder
                                 }
                             }
                             dependPaths.Add(Path.GetFullPath(pathToTool).ToUpper());
-        
+
                             ITaskItem computedSource = new TaskItem(source.ItemSpec);
                             source.CopyMetadataTo(computedSource);
-                            computedSource.SetMetadata("Outputs", String.Join(";",
+                            computedSource.SetMetadata("Outputs", string.Join(";",
                                 Array.ConvertAll(GeneratedItems(source), (item) => item.GetMetadata("FullPath").ToUpper())));
-                            computedSource.SetMetadata("Inputs", String.Join(";", dependPaths.ToArray()));
+                            computedSource.SetMetadata("Inputs", string.Join(";", dependPaths.ToArray()));
                             computed.Add(computedSource);
                         }
                         ComputedSources = computed.ToArray();
                     }
-                    else if(!String.IsNullOrEmpty(HeaderOutputDir))
+                    else if(!string.IsNullOrEmpty(HeaderOutputDir))
                     {
                         if(!Directory.Exists(HeaderOutputDir))
                         {
@@ -520,8 +520,8 @@ namespace IceBuilder
                         }
                         foreach(ITaskItem source in Sources)
                         {
-                            String sourceH = GetGeneratedPath(source, OutputDir, HeaderExt);
-                            String targetH = GetGeneratedPath(source, HeaderOutputDir, HeaderExt);
+                            string sourceH = GetGeneratedPath(source, OutputDir, HeaderExt);
+                            string targetH = GetGeneratedPath(source, HeaderOutputDir, HeaderExt);
                             if(!File.Exists(targetH) || new FileInfo(targetH).LastWriteTime < new FileInfo(sourceH).LastWriteTime)
                             {
                                 if(File.Exists(targetH))
@@ -552,7 +552,7 @@ namespace IceBuilder
     #region Slice2CSharpTask
     public class Slice2CSharpTask : SliceCompilerTask
     {
-        protected override String ToolName
+        protected override string ToolName
         {
             get
             {
@@ -560,13 +560,13 @@ namespace IceBuilder
             }
         }
 
-        public Boolean Tie
+        public bool Tie
         {
             get;
             set;
         }
 
-        protected override String GeneratedExtensions
+        protected override string GeneratedExtensions
         {
             get
             {
@@ -576,22 +576,22 @@ namespace IceBuilder
 
         protected override void TraceGenerated()
         {
-            foreach (ITaskItem source in Sources)
+            foreach(ITaskItem source in Sources)
             {
-                String message = String.Format("Compiling {0} Generating -> ", source.GetMetadata("Identity"));
+                string message = string.Format("Compiling {0} Generating -> ", source.GetMetadata("Identity"));
                 message += TaskUtil.MakeRelative(WorkingDirectory, GetGeneratedPath(source, OutputDir, ".cs"));
                 Log.LogMessage(MessageImportance.High, message);
             }
         }
 
-        protected override String GenerateCommandLineCommands()
+        protected override string GenerateCommandLineCommands()
         {
             CommandLineBuilder builder = new CommandLineBuilder();
-            if (Tie)
+            if(Tie)
             {
                 builder.AppendSwitch("--tie ");
             }
-            builder.AppendTextUnquoted(String.Format(" {0}", base.GenerateCommandLineCommands()));
+            builder.AppendTextUnquoted(string.Format(" {0}", base.GenerateCommandLineCommands()));
             return builder.ToString();
         }
     }
@@ -600,7 +600,7 @@ namespace IceBuilder
     #region Slice2PhpTask
     public class Slice2PhpTask : SliceCompilerTask
     {
-        protected override String ToolName
+        protected override string ToolName
         {
             get
             {
@@ -614,13 +614,13 @@ namespace IceBuilder
             set;
         }
 
-        public Boolean Namespace
+        public bool Namespace
         {
             get;
             set;
         }
 
-        protected override String GeneratedExtensions
+        protected override string GeneratedExtensions
         {
             get
             {
@@ -630,26 +630,26 @@ namespace IceBuilder
 
         protected override void TraceGenerated()
         {
-            foreach (ITaskItem source in Sources)
+            foreach(ITaskItem source in Sources)
             {
-                String message = String.Format("Compiling {0} Generating -> ", source.GetMetadata("Identity"));
+                string message = string.Format("Compiling {0} Generating -> ", source.GetMetadata("Identity"));
                 message += TaskUtil.MakeRelative(WorkingDirectory, GetGeneratedPath(source, OutputDir, ".php"));
                 Log.LogMessage(MessageImportance.High, message);
             }
         }
 
-        protected override String GenerateCommandLineCommands()
+        protected override string GenerateCommandLineCommands()
         {
             CommandLineBuilder builder = new CommandLineBuilder();
-            if (All)
+            if(All)
             {
                 builder.AppendSwitch("--all ");
             }
-            if (Namespace)
+            if(Namespace)
             {
                 builder.AppendSwitch("--namespace ");
             }
-            builder.AppendTextUnquoted(String.Format(" {0}", base.GenerateCommandLineCommands()));
+            builder.AppendTextUnquoted(string.Format(" {0}", base.GenerateCommandLineCommands()));
             return builder.ToString();
         }
     }
@@ -666,35 +666,35 @@ namespace IceBuilder
         }
 
         [Required]
-        public String OutputDir
+        public string OutputDir
         {
             get;
             set;
         }
 
         [Required]
-        public String SliceCompiler
+        public string SliceCompiler
         {
             get;
             set;
         }
 
         [Required]
-        public String WorkingDirectory
+        public string WorkingDirectory
         {
             get;
             set;
         }
 
         [Required]
-        public String DependFile
+        public string DependFile
         {
             get;
             set;
         }
 
         [Required]
-        public String CommandLog
+        public string CommandLog
         {
             get;
             set;
@@ -716,7 +716,7 @@ namespace IceBuilder
 
         abstract protected ITaskItem[] GeneratedItems(ITaskItem source);
 
-        protected virtual String GetGeneratedPath(ITaskItem item, String outputDir, String ext)
+        protected virtual string GetGeneratedPath(ITaskItem item, string outputDir, string ext)
         {
             return Path.Combine(
                 outputDir,
@@ -733,14 +733,14 @@ namespace IceBuilder
                 //
                 // Compare the command log files to detect changes in build options.
                 //
-                String log0 = String.Format(CommandLog);
-                String log1 = String.Format(Path.ChangeExtension(CommandLog, ".0.log"));
+                string log0 = string.Format(CommandLog);
+                string log1 = string.Format(Path.ChangeExtension(CommandLog, ".0.log"));
                 bool logChanged = false;
                 if(!File.Exists(log1))
                 {
                     logChanged = true;
                     Log.LogMessage(MessageImportance.Low,
-                        String.Format("Build required because command log file: {0} doesn't exists",
+                        string.Format("Build required because command log file: {0} doesn't exists",
                                       TaskUtil.MakeRelative(WorkingDirectory, log1)));
                 }
                 else if(!FileCompare(log0, log1))
@@ -767,47 +767,47 @@ namespace IceBuilder
                 //
                 if(!logChanged)
                 {
-                    if (dependExists)
+                    if(dependExists)
                     {
                         try
                         {
                             dependsDoc.Load(DependFile);
                         }
-                        catch (XmlException)
+                        catch(XmlException)
                         {
                             try
                             {
                                 File.Delete(DependFile);
                             }
-                            catch (IOException)
+                            catch(IOException)
                             {
                             }
                             Log.LogMessage(MessageImportance.Low,
-                                String.Format("Build required because depend file: {0} has some invalid data",
+                                string.Format("Build required because depend file: {0} has some invalid data",
                                     TaskUtil.MakeRelative(WorkingDirectory, DependFile)));
                         }
                     }
                     else
                     {
                         Log.LogMessage(MessageImportance.Low,
-                            String.Format("Build required because depend file: {0} doesn't exists",
+                            string.Format("Build required because depend file: {0} doesn't exists",
                                           TaskUtil.MakeRelative(WorkingDirectory, DependFile)));
                     }
                 }
 
-                foreach (ITaskItem source in Sources)
+                foreach(ITaskItem source in Sources)
                 {
                     bool skip = !logChanged && dependExists;
                     Log.LogMessage(MessageImportance.Low,
-                        String.Format("Computing dependencies for {0}", source.GetMetadata("Identity")));
+                        string.Format("Computing dependencies for {0}", source.GetMetadata("Identity")));
 
                     ITaskItem[] generatedItems = GeneratedItems(source);
 
                     FileInfo sourceInfo = new FileInfo(source.GetMetadata("FullPath"));
-                    if (!sourceInfo.Exists)
+                    if(!sourceInfo.Exists)
                     {
                         Log.LogMessage(MessageImportance.Low,
-                            String.Format("Build required because source: {0} doesn't exists",
+                            string.Format("Build required because source: {0} doesn't exists",
                                 source.GetMetadata("Identity")));
                         skip = false;
                     }
@@ -818,15 +818,15 @@ namespace IceBuilder
                     //
                     if(skip)
                     {
-                        foreach (ITaskItem item in generatedItems)
+                        foreach(ITaskItem item in generatedItems)
                         {
                             generatedInfo = new FileInfo(item.GetMetadata("FullPath"));
 
-                            if (generatedInfo.Exists &&
+                            if(generatedInfo.Exists &&
                                 sliceCompiler.LastWriteTime.ToFileTime() > generatedInfo.LastWriteTime.ToFileTime())
                             {
                                 Log.LogMessage(MessageImportance.Low,
-                                        String.Format("Build required because target: {0} is older than Slice compiler: {1}",
+                                        string.Format("Build required because target: {0} is older than Slice compiler: {1}",
                                             TaskUtil.MakeRelative(WorkingDirectory, generatedInfo.FullName),
                                             Path.GetFileName(SliceCompiler)));
                                 skip = false;
@@ -835,23 +835,23 @@ namespace IceBuilder
                         }
                     }
 
-                    if (skip)
+                    if(skip)
                     {
-                        foreach (ITaskItem item in generatedItems)
+                        foreach(ITaskItem item in generatedItems)
                         {
                             generatedInfo = new FileInfo(item.GetMetadata("FullPath"));
-                            if (!generatedInfo.Exists)
+                            if(!generatedInfo.Exists)
                             {
                                 Log.LogMessage(MessageImportance.Low,
-                                    String.Format("Build required because generated: {0} doesn't exists",
+                                    string.Format("Build required because generated: {0} doesn't exists",
                                         TaskUtil.MakeRelative(WorkingDirectory, generatedInfo.FullName)));
                                 skip = false;
                                 break;
                             }
-                            else if (sourceInfo.LastWriteTime.ToFileTime() > generatedInfo.LastWriteTime.ToFileTime())
+                            else if(sourceInfo.LastWriteTime.ToFileTime() > generatedInfo.LastWriteTime.ToFileTime())
                             {
                                 Log.LogMessage(MessageImportance.Low,
-                                    String.Format("Build required because source: {0} is older than target {1}",
+                                    string.Format("Build required because source: {0} is older than target {1}",
                                         source.GetMetadata("Identity"),
                                         TaskUtil.MakeRelative(WorkingDirectory, generatedInfo.FullName)));
                                 skip = false;
@@ -860,30 +860,30 @@ namespace IceBuilder
                         }
                     }
 
-                    if (skip)
+                    if(skip)
                     {
                         XmlNodeList depends = dependsDoc.DocumentElement.SelectNodes(
-                                String.Format("/dependencies/source[@name='{0}']/dependsOn", source.GetMetadata("Identity")));
+                                string.Format("/dependencies/source[@name='{0}']/dependsOn", source.GetMetadata("Identity")));
 
-                        if (depends != null)
+                        if(depends != null)
                         {
-                            foreach (XmlNode depend in depends)
+                            foreach(XmlNode depend in depends)
                             {
-                                String path = depend.Attributes["name"].Value;
+                                string path = depend.Attributes["name"].Value;
                                 FileInfo dependencyInfo = new FileInfo(path);
-                                if (!dependencyInfo.Exists)
+                                if(!dependencyInfo.Exists)
                                 {
                                     skip = false;
                                     Log.LogMessage(MessageImportance.Low,
-                                    String.Format("Build required because dependency: {0} doesn't exists",
+                                    string.Format("Build required because dependency: {0} doesn't exists",
                                         TaskUtil.MakeRelative(WorkingDirectory, dependencyInfo.FullName)));
                                     break;
                                 }
-                                else if (dependencyInfo.LastWriteTime > generatedInfo.LastWriteTime)
+                                else if(dependencyInfo.LastWriteTime > generatedInfo.LastWriteTime)
                                 {
                                     skip = false;
                                     Log.LogMessage(MessageImportance.Low,
-                                    String.Format("Build required because source: {0} is older than target: {1}",
+                                    string.Format("Build required because source: {0} is older than target: {1}",
                                         source.GetMetadata("Identity"),
                                         TaskUtil.MakeRelative(WorkingDirectory, dependencyInfo.FullName)));
                                     break;
@@ -892,11 +892,11 @@ namespace IceBuilder
                         }
                     }
 
-                    if (skip)
+                    if(skip)
                     {
-                        String message = String.Format("Skipping {0} -> ", source.GetMetadata("Identity"));
+                        string message = string.Format("Skipping {0} -> ", source.GetMetadata("Identity"));
                         message += generatedItems[0].GetMetadata("Identity");
-                        if (generatedItems.Length > 1)
+                        if(generatedItems.Length > 1)
                         {
                             message += " and ";
                             message += generatedItems[1].GetMetadata("Identity");
@@ -928,7 +928,7 @@ namespace IceBuilder
             }
         }
 
-        private bool FileCompare(String file1, String file2)
+        private bool FileCompare(string file1, string file2)
         {
             FileStream fs1 = new FileStream(file1, FileMode.Open);
             FileStream fs2 = new FileStream(file2, FileMode.Open);
@@ -938,7 +938,7 @@ namespace IceBuilder
             {
                 // Check the file sizes. If they are not the same, the files
                 // are not the same.
-                if (fs1.Length != fs2.Length)
+                if(fs1.Length != fs2.Length)
                 {
                     // Close the file
                     fs1.Close();
@@ -957,7 +957,7 @@ namespace IceBuilder
                     file1byte = fs1.ReadByte();
                     file2byte = fs2.ReadByte();
                 }
-                while ((file1byte == file2byte) && (file1byte != -1));
+                while((file1byte == file2byte) && (file1byte != -1));
 
 
             }
@@ -979,20 +979,20 @@ namespace IceBuilder
     public class Slice2CppDependTask : SliceDependTask
     {
         [Required]
-        public String SourceExt
+        public string SourceExt
         {
             get;
             set;
         }
 
         [Required]
-        public String HeaderExt
+        public string HeaderExt
         {
             get;
             set;
         }
 
-        public String HeaderOutputDir
+        public string HeaderOutputDir
         {
             get;
             set;
@@ -1003,7 +1003,7 @@ namespace IceBuilder
             return new ITaskItem[]
                 {
                     new TaskItem(GetGeneratedPath(source, OutputDir, SourceExt)),
-                    new TaskItem(GetGeneratedPath(source, String.IsNullOrEmpty(HeaderOutputDir) ? OutputDir : HeaderOutputDir, HeaderExt)),
+                    new TaskItem(GetGeneratedPath(source, string.IsNullOrEmpty(HeaderOutputDir) ? OutputDir : HeaderOutputDir, HeaderExt)),
                 };
         }
     }
@@ -1040,7 +1040,7 @@ namespace IceBuilder
     #region Slice2PythonTask
     public class Slice2PythonTask : SliceCompilerTask
     {
-        protected override String ToolName
+        protected override string ToolName
         {
             get
             {
@@ -1049,25 +1049,25 @@ namespace IceBuilder
         }
 
         [Required]
-        public String PythonHome
+        public string PythonHome
         {
             get;
             set;
         }
 
-        public String Prefix
+        public string Prefix
         {
             get;
             set;
         }
 
-        public Boolean NoPackage
+        public bool NoPackage
         {
             get;
             set;
         }
 
-        protected override String GeneratedExtensions
+        protected override string GeneratedExtensions
         {
             get
             {
@@ -1075,10 +1075,10 @@ namespace IceBuilder
             }
         }
 
-        protected override String GetGeneratedPath(ITaskItem item, String outputDir, String ext)
+        protected override string GetGeneratedPath(ITaskItem item, string outputDir, string ext)
         {
-            String generatedFileName = String.Format("{0}_ice.py ", item.GetMetadata("Filename"));
-            if(!String.IsNullOrEmpty(Prefix))
+            string generatedFileName = string.Format("{0}_ice.py ", item.GetMetadata("Filename"));
+            if(!string.IsNullOrEmpty(Prefix))
             {
                 generatedFileName = Prefix + generatedFileName;
             }
@@ -1087,18 +1087,18 @@ namespace IceBuilder
 
         protected override void TraceGenerated()
         {
-            foreach (ITaskItem source in Sources)
+            foreach(ITaskItem source in Sources)
             {
-                String message = String.Format("Compiling {0} Generating -> ", source.GetMetadata("Identity"));
+                string message = string.Format("Compiling {0} Generating -> ", source.GetMetadata("Identity"));
                 message += TaskUtil.MakeRelative(WorkingDirectory, GetGeneratedPath(source, OutputDir, GeneratedExtensions));
                 Log.LogMessage(MessageImportance.High, message);
             }
         }
 
-        protected override String GenerateCommandLineCommands()
+        protected override string GenerateCommandLineCommands()
         {
             CommandLineBuilder builder = new CommandLineBuilder();
-            if (!String.IsNullOrEmpty(Prefix))
+            if(!string.IsNullOrEmpty(Prefix))
             {
                 builder.AppendSwitch("--prefix");
                 builder.AppendFileNameIfNotNull(Prefix);
@@ -1107,7 +1107,7 @@ namespace IceBuilder
             {
                 builder.AppendSwitch("--no-package");
             }
-            builder.AppendTextUnquoted(String.Format(" {0}", base.GenerateCommandLineCommands()));
+            builder.AppendTextUnquoted(string.Format(" {0}", base.GenerateCommandLineCommands()));
             return builder.ToString();
         }
     }
@@ -1117,22 +1117,22 @@ namespace IceBuilder
     public class Slice2PythonDependTask : SliceDependTask
     {
         [Required]
-        public String PythonHome
+        public string PythonHome
         {
             get;
             set;
         }
 
-        public String Prefix
+        public string Prefix
         {
             get;
             set;
         }
 
-        protected override String GetGeneratedPath(ITaskItem item, String outputDir, String ext)
+        protected override string GetGeneratedPath(ITaskItem item, string outputDir, string ext)
         {
-            String generatedFileName = String.Format("{0}_ice.py ", item.GetMetadata("Filename"));
-            if (!String.IsNullOrEmpty(Prefix))
+            string generatedFileName = string.Format("{0}_ice.py ", item.GetMetadata("Filename"));
+            if(!string.IsNullOrEmpty(Prefix))
             {
                 generatedFileName = Prefix + generatedFileName;
             }

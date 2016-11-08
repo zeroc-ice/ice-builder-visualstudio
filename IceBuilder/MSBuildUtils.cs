@@ -4,65 +4,61 @@
 //
 // **********************************************************************
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Construction;
-using Microsoft.Build.Execution;
-using Microsoft.Build.Framework;
 using Microsoft.VisualStudio.Shell.Interop;
 
 namespace IceBuilder
 {
     class MSBuildUtils
     {
-        public static readonly String IceBuilderProjectFlavorGUID = "{3C53C28F-DC44-46B0-8B85-0C96B85B2042}";
-        public static readonly String CSharpProjectGUI = "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}";
+        public static readonly string IceBuilderProjectFlavorGUID = "{3C53C28F-DC44-46B0-8B85-0C96B85B2042}";
+        public static readonly string CSharpProjectGUI = "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}";
 
-        public static readonly String IceBuilderCppPropsPath =
-            String.Format(@"$([System.IO.Directory]::GetFiles('{0}', '{1}', SearchOption.AllDirectories))",
+        public static readonly string IceBuilderCppPropsPath =
+            string.Format(@"$([System.IO.Directory]::GetFiles('{0}', '{1}', SearchOption.AllDirectories))",
                           @"$(LocalAppData)\Microsoft\VisualStudio\$(VisualStudioVersion)\Extensions",
                           "IceBuilder.Cpp.props");
 
-        public static readonly String IceBuilderCppTargetsPath =
-                    String.Format(@"$([System.IO.Directory]::GetFiles('{0}', '{1}', SearchOption.AllDirectories))",
+        public static readonly string IceBuilderCppTargetsPath =
+                    string.Format(@"$([System.IO.Directory]::GetFiles('{0}', '{1}', SearchOption.AllDirectories))",
                                   @"$(LocalAppData)\Microsoft\VisualStudio\$(VisualStudioVersion)\Extensions",
                                   "IceBuilder.Cpp.targets");
 
-        public static readonly String IceBuilderCsharpPropsPath =
-            String.Format(@"$([System.IO.Directory]::GetFiles('{0}', '{1}', SearchOption.AllDirectories))",
+        public static readonly string IceBuilderCsharpPropsPath =
+            string.Format(@"$([System.IO.Directory]::GetFiles('{0}', '{1}', SearchOption.AllDirectories))",
                           @"$(LocalAppData)\Microsoft\VisualStudio\$(VisualStudioVersion)\Extensions",
                           "IceBuilder.Csharp.props");
 
-        public static readonly String IceBuilderCsharpTargetsPath =
-                    String.Format(@"$([System.IO.Directory]::GetFiles('{0}', '{1}', SearchOption.AllDirectories))",
+        public static readonly string IceBuilderCsharpTargetsPath =
+                    string.Format(@"$([System.IO.Directory]::GetFiles('{0}', '{1}', SearchOption.AllDirectories))",
                                   @"$(LocalAppData)\Microsoft\VisualStudio\$(VisualStudioVersion)\Extensions",
                                   "IceBuilder.Csharp.targets");
 
-        public static readonly String IceBuilderCppProps = "$(IceBuilderCppProps)";
-        public static readonly String IceBuilderCppTargets = "$(IceBuilderCppTargets)";
-        public static readonly String IceBuilderCsharpProps = "$(IceBuilderCsharpProps)";
-        public static readonly String IceBuilderCsharpTargets = "$(IceBuilderCsharpTargets)";
+        public static readonly string IceBuilderCppProps = "$(IceBuilderCppProps)";
+        public static readonly string IceBuilderCppTargets = "$(IceBuilderCppTargets)";
+        public static readonly string IceBuilderCsharpProps = "$(IceBuilderCsharpProps)";
+        public static readonly string IceBuilderCsharpTargets = "$(IceBuilderCsharpTargets)";
 
-        public static readonly String IceBuilderCppPropsPathOld =
+        public static readonly string IceBuilderCppPropsPathOld =
             "$(LOCALAPPDATA)\\ZeroC\\IceBuilder\\IceBuilder.Cpp.props";
 
-        public static readonly String IceBuilderCppTargetsPathOld =
+        public static readonly string IceBuilderCppTargetsPathOld =
             "$(LOCALAPPDATA)\\ZeroC\\IceBuilder\\IceBuilder.Cpp.targets";
 
-        public static readonly String IceBuilderCSharpPropsPathOld =
+        public static readonly string IceBuilderCSharpPropsPathOld =
             "$(LOCALAPPDATA)\\ZeroC\\IceBuilder\\IceBuilder.CSharp.props";
 
-        public static readonly String IceBuilderCSharpTargetsPathOld =
+        public static readonly string IceBuilderCSharpTargetsPathOld =
             "$(LOCALAPPDATA)\\ZeroC\\IceBuilder\\IceBuilder.CSharp.targets";
 
 
         static readonly ProjectCollection cppProjectColletion = new ProjectCollection();
 
-        public static Microsoft.Build.Evaluation.Project LoadedProject(String path, bool cpp, bool cached)
+        public static Microsoft.Build.Evaluation.Project LoadedProject(string path, bool cpp, bool cached)
         {
             Microsoft.Build.Evaluation.Project project = null;
             ProjectCollection collection = cpp ? cppProjectColletion : ProjectCollection.GlobalProjectCollection;
@@ -89,12 +85,12 @@ namespace IceBuilder
             return project;
         }
 
-        public static bool HasImport(Microsoft.Build.Evaluation.Project project, String path)
+        public static bool HasImport(Microsoft.Build.Evaluation.Project project, string path)
         {
             return project.Xml.Imports.FirstOrDefault(p => p.Project.Equals(path)) != null;
         }
 
-        public static bool AddProjectFlavorIfNotExists(Microsoft.Build.Evaluation.Project project, String flavor)
+        public static bool AddProjectFlavorIfNotExists(Microsoft.Build.Evaluation.Project project, string flavor)
         {
             ProjectPropertyElement property = project.Xml.Properties.FirstOrDefault(
                 p => p.Name.Equals("ProjectTypeGuids"));
@@ -103,13 +99,13 @@ namespace IceBuilder
             {
                 if(property.Value.IndexOf(flavor) == -1)
                 {
-                    if(String.IsNullOrEmpty(property.Value))
+                    if(string.IsNullOrEmpty(property.Value))
                     {
-                        property.Value = String.Format("{0};{1}", flavor, CSharpProjectGUI);
+                        property.Value = string.Format("{0};{1}", flavor, CSharpProjectGUI);
                     }
                     else
                     {
-                        property.Value = String.Format("{0};{1}", flavor, property.Value);
+                        property.Value = string.Format("{0};{1}", flavor, property.Value);
                     }
                     return true; //ProjectTypeGuids updated
                 }
@@ -120,19 +116,19 @@ namespace IceBuilder
             }
 
             // ProjectTypeGuids not present
-            project.Xml.AddProperty("ProjectTypeGuids", String.Format("{0};{1}", flavor, CSharpProjectGUI));
+            project.Xml.AddProperty("ProjectTypeGuids", string.Format("{0};{1}", flavor, CSharpProjectGUI));
             return true;
         }
 
-        public static bool RemoveProjectFlavorIfExists(Microsoft.Build.Evaluation.Project project, String flavor)
+        public static bool RemoveProjectFlavorIfExists(Microsoft.Build.Evaluation.Project project, string flavor)
         {
             ProjectPropertyElement property = project.Xml.Properties.FirstOrDefault(
                 p => p.Name.Equals("ProjectTypeGuids"));
 
-            if (property != null && property.Value.IndexOf(flavor) != -1)
+            if(property != null && property.Value.IndexOf(flavor) != -1)
             {
                 property.Value = property.Value.Replace(flavor, "").Trim(new char[] { ';' });
-                if (property.Value.Equals(CSharpProjectGUI))
+                if(property.Value.Equals(CSharpProjectGUI))
                 {
                     property.Parent.RemoveChild(property);
                 }
@@ -141,7 +137,7 @@ namespace IceBuilder
             return false;
         }
 
-        public static bool HasProjectFlavor(Microsoft.Build.Evaluation.Project project, String flavor)
+        public static bool HasProjectFlavor(Microsoft.Build.Evaluation.Project project, string flavor)
         {
             ProjectPropertyElement property = project.Xml.Properties.FirstOrDefault(
                 p => p.Name.Equals("ProjectTypeGuids"));
@@ -163,7 +159,7 @@ namespace IceBuilder
         public static bool IsIceBuilderEnabled(Microsoft.Build.Evaluation.Project project)
         {
             bool value = false;
-            if (IsCppProject(project))
+            if(IsCppProject(project))
             {
                 value = HasImport(project, IceBuilderCppProps) && HasImport(project, IceBuilderCppTargets);
                 value = value || (HasImport(project, IceBuilderCppPropsPathOld) && HasImport(project, IceBuilderCppTargetsPathOld));
@@ -177,10 +173,10 @@ namespace IceBuilder
             return value;
         }
 
-        private static bool AddGlobalProperty(Microsoft.Build.Evaluation.Project project, String name, String value)
+        private static bool AddGlobalProperty(Microsoft.Build.Evaluation.Project project, string name, string value)
         {
             ProjectPropertyGroupElement globals = project.Xml.PropertyGroups.FirstOrDefault(p => p.Label.Equals("Globals"));
-            if (globals == null)
+            if(globals == null)
             {
                 globals = project.Xml.AddPropertyGroup();
                 globals.Label = "Globals";
@@ -192,17 +188,17 @@ namespace IceBuilder
             if(property == null)
             {
                 property = globals.AddProperty(name, value);
-                property.Condition = String.Format("!Exists('$({0})')", name);
+                property.Condition = string.Format("!Exists('$({0})')", name);
                 return true;
             }
             return false;
         }
 
-        private static bool RemoveGlobalProperty(Microsoft.Build.Evaluation.Project project, String name)
+        private static bool RemoveGlobalProperty(Microsoft.Build.Evaluation.Project project, string name)
         {
             ProjectPropertyGroupElement globals = project.Xml.PropertyGroups.FirstOrDefault(p => p.Label.Equals("Globals"));
             ProjectPropertyElement property = globals.Properties.FirstOrDefault(p => p.Name.Equals(name));
-            if (property != null)
+            if(property != null)
             {
                 globals.RemoveChild(property);
                 return true;
@@ -211,32 +207,32 @@ namespace IceBuilder
         }
 
         private static bool AddImportAfter(Microsoft.Build.Evaluation.Project project,
-                                           String import,
+                                           string import,
                                            ProjectElement after)
         {
-            if (!HasImport(project, import))
+            if(!HasImport(project, import))
             {
                 ProjectImportElement props = project.Xml.CreateImportElement(import);
-                props.Condition = String.Format("Exists('{0}')", import);
+                props.Condition = string.Format("Exists('{0}')", import);
                 project.Xml.InsertAfterChild(props, after);
                 return true;
             }
             return false;
         }
 
-        private static bool UpdateImport(Microsoft.Build.Evaluation.Project project, String oldValue, String newValue)
+        private static bool UpdateImport(Microsoft.Build.Evaluation.Project project, string oldValue, string newValue)
         {
             ProjectImportElement import = project.Xml.Imports.FirstOrDefault(p => p.Project.Equals(oldValue));
             if(import != null)
             {
                 import.Project = newValue;
-                import.Condition = String.Format("Exists('{0}')", newValue);
+                import.Condition = string.Format("Exists('{0}')", newValue);
                 return true;
             }
             return false;
         }
 
-        private static bool RemoveImport(Microsoft.Build.Evaluation.Project project, String import)
+        private static bool RemoveImport(Microsoft.Build.Evaluation.Project project, string import)
         {
             ProjectElement element = project.Xml.Imports.FirstOrDefault(p => p.Project.Equals(import));
             if(element != null)
@@ -304,13 +300,13 @@ namespace IceBuilder
         public static bool UpgradeProjectImports(Microsoft.Build.Evaluation.Project project)
         {
             bool modified = false;
-            if (IsCppProject(project))
+            if(IsCppProject(project))
             {
                 modified = AddCppGlobalProperties(project);
                 modified = UpdateImport(project, IceBuilderCppPropsPathOld, IceBuilderCppProps) || modified;
                 modified = UpdateImport(project, IceBuilderCppTargetsPathOld, IceBuilderCppTargets) || modified;
             }
-            else if (IsCSharpProject(project))
+            else if(IsCSharpProject(project))
             {
                 modified = AddCsharpGlobalProperties(project);
                 modified = UpdateImport(project, IceBuilderCSharpPropsPathOld, IceBuilderCsharpProps) || modified;
@@ -322,13 +318,13 @@ namespace IceBuilder
         public static bool AddIceBuilderToProject(Microsoft.Build.Evaluation.Project project)
         {
             bool modified = false;
-            if (project != null)
+            if(project != null)
             {
-                if (IsCppProject(project))
+                if(IsCppProject(project))
                 {
                     modified = SetupCppProject(project);
                 }
-                else if (IsCSharpProject(project))
+                else if(IsCSharpProject(project))
                 {
                     modified = SetupCsharpProject(project);
                 }
@@ -339,15 +335,15 @@ namespace IceBuilder
         public static bool RemoveIceBuilderFromProject(Microsoft.Build.Evaluation.Project project)
         {
             bool modified = false;
-            if (project != null)
+            if(project != null)
             {
-                if (IsCppProject(project))
+                if(IsCppProject(project))
                 {
                     modified = RemoveCppGlobalProperties(project);
                     modified = RemoveImport(project, IceBuilderCppProps) || modified;
                     modified = RemoveImport(project, IceBuilderCppTargets) || modified;
                 }
-                else if (IsCSharpProject(project))
+                else if(IsCSharpProject(project))
                 {
                     modified = RemoveCsharpGlobalProperties(project);
                     modified = RemoveImport(project, IceBuilderCsharpProps) || modified;
@@ -357,7 +353,7 @@ namespace IceBuilder
                 }
 
                 ProjectPropertyGroupElement group = project.Xml.PropertyGroups.FirstOrDefault(g => g.Label.Equals("IceBuilder"));
-                if (group != null)
+                if(group != null)
                 {
                     group.Parent.RemoveChild(group);
                 }
@@ -365,7 +361,7 @@ namespace IceBuilder
             return modified;
         }
 
-        public static void SetProperty(Microsoft.Build.Evaluation.Project project, String label, String name, String value)
+        public static void SetProperty(Microsoft.Build.Evaluation.Project project, string label, string name, string value)
         {
             ProjectPropertyGroupElement group = project.Xml.PropertyGroups.FirstOrDefault(g => g.Label.Equals(label));
             if(group == null)
@@ -376,7 +372,7 @@ namespace IceBuilder
                 //
                 ProjectImportElement import = project.Xml.Imports.FirstOrDefault(
                     p => (p.Project.IndexOf("Microsoft.Cpp.targets") != -1 || p.Project.Equals(IceBuilderCsharpProps)));
-                if (import != null)
+                if(import != null)
                 {
                     group = project.Xml.CreatePropertyGroupElement();
                     project.Xml.InsertAfterChild(group, import);
@@ -389,7 +385,7 @@ namespace IceBuilder
             }
 
             ProjectPropertyElement property = group.Properties.FirstOrDefault(p => p.Name.Equals(name));
-            if (property != null)
+            if(property != null)
             {
                 property.Value = value;
             }
@@ -399,13 +395,13 @@ namespace IceBuilder
             }
         }
 
-        public static String GetProperty(Microsoft.Build.Evaluation.Project project, String name)
+        public static string GetProperty(Microsoft.Build.Evaluation.Project project, string name)
         {
             ProjectProperty property = project.GetProperty(name);
-            return property != null ? property.UnevaluatedValue : String.Empty;
+            return property != null ? property.UnevaluatedValue : string.Empty;
         }
 
-        public static String GetEvaluatedProperty(Microsoft.Build.Evaluation.Project project, String name)
+        public static string GetEvaluatedProperty(Microsoft.Build.Evaluation.Project project, string name)
         {
             return project.GetPropertyValue(name);
         }
@@ -413,19 +409,19 @@ namespace IceBuilder
         //
         // Set Ice Home and force projects to re evaluate changes in the imported project
         //
-        public static void SetIceHome(List<IVsProject> projects, String iceHome, String iceVersion, String iceIntVersion, String iceVersionMM)
+        public static void SetIceHome(List<IVsProject> projects, string iceHome, string iceVersion, string iceIntVersion, string iceVersionMM)
         {
-            foreach (IVsProject p in projects)
+            foreach(IVsProject p in projects)
             {
                 if(DTEUtil.IsIceBuilderEnabled(p) != IceBuilderProjectType.None)
                 {
-                    Microsoft.Build.Evaluation.Project project = MSBuildUtils.LoadedProject(ProjectUtil.GetProjectFullPath(p), DTEUtil.IsCppProject(p), true);
+                    Microsoft.Build.Evaluation.Project project = LoadedProject(ProjectUtil.GetProjectFullPath(p), DTEUtil.IsCppProject(p), true);
                     ResolvedImport import = project.Imports.FirstOrDefault(i => i.ImportedProject.FullPath.EndsWith("IceBuilder.Common.props"));
 
-                    if (import.ImportedProject != null)
+                    if(import.ImportedProject != null)
                     {
                         ProjectPropertyGroupElement group = import.ImportedProject.PropertyGroups.FirstOrDefault(g => g.Label.Equals("IceHome"));
-                        if (group != null)
+                        if(group != null)
                         {
                             group.SetProperty(Package.IceHomeValue, iceHome);
                             group.SetProperty(Package.IceVersionValue, iceVersion);

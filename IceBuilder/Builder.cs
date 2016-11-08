@@ -5,14 +5,11 @@
 // **********************************************************************
 
 using System;
-using System.Threading.Tasks;
 
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 
-using Microsoft.Build.Evaluation;
 using Microsoft.Build.Execution;
-using Microsoft.Build.Framework;
 using MSBuildProject = Microsoft.Build.Evaluation.Project;
 using System.Windows.Threading;
 using System.Threading;
@@ -45,28 +42,28 @@ namespace IceBuilder
             int err = BuildManagerAccessor.AcquireBuildResources(VSBUILDMANAGERRESOURCE.VSBUILDMANAGERRESOURCE_DESIGNTIME |
                                                                  VSBUILDMANAGERRESOURCE.VSBUILDMANAGERRESOURCE_UITHREAD, out cookie);
 
-            if (err != VSConstants.E_PENDING && err != VSConstants.S_OK)
+            if(err != VSConstants.E_PENDING && err != VSConstants.S_OK)
             {
                 ErrorHandler.ThrowOnFailure(err);
             }
 
-            if (err == VSConstants.E_PENDING)
+            if(err == VSConstants.E_PENDING)
             {
                 project.ProjectCollection.Loggers.Remove(buildLogger);
                 project.ProjectCollection.OnlyLogCriticalEvents = onlyLogCriticalEvents;
 
                 Dispatcher = Dispatcher.CurrentDispatcher;
-                BuildAvailableEvent = new System.Threading.ManualResetEvent(false);
+                BuildAvailableEvent = new ManualResetEvent(false);
                 BuildAvailableEvent.SafeWaitHandle = new SafeWaitHandle(BuildManagerAccessor.DesignTimeBuildAvailable, false);
 
                 Thread t = new Thread(() =>
+                {
+                    BuildAvailableEvent.WaitOne();
+                    Dispatcher.BeginInvoke(new Action(() =>
                     {
-                        BuildAvailableEvent.WaitOne();
-                        Dispatcher.BeginInvoke(new Action(() =>
-                        {
-                            Package.Instance.BuildNextProject();
-                        }));
-                    });
+                        Package.Instance.BuildNextProject();
+                    }));
+                });
                 t.Start();
                 return false;
             }
@@ -75,7 +72,7 @@ namespace IceBuilder
                 try
                 {
                     Dictionary<string, string> properties = new Dictionary<string, string>();
-                    String platform = buildCallback.ProjectConfiguration.PlatformName;
+                    string platform = buildCallback.ProjectConfiguration.PlatformName;
                     properties["Platform"] = platform.Equals("Any CPU") ? "AnyCPU" : platform;
                     properties["Configuration"] = buildCallback.ProjectConfiguration.ConfigurationName;
 
@@ -83,7 +80,7 @@ namespace IceBuilder
                             ProjectUtil.GetProjectFullPath(p),
                             properties,
                             null,
-                            new String[] { "IceBuilder_Compile" },
+                            new string[] { "IceBuilder_Compile" },
                             project.ProjectCollection.HostServices,
                             BuildRequestDataFlags.IgnoreExistingProjectState |
                             BuildRequestDataFlags.ReplaceExistingProjectInstance);
@@ -92,20 +89,20 @@ namespace IceBuilder
                     ErrorHandler.ThrowOnFailure(BuildManagerAccessor.RegisterLogger(submission.SubmissionId, buildLogger));
                     buildCallback.BeginBuild();
                     submission.ExecuteAsync((s) =>
+                    {
+                        Dispatcher.BeginInvoke(DispatcherPriority.Send, new Action(() =>
                         {
-                            Dispatcher.BeginInvoke(DispatcherPriority.Send, new Action(() =>
-                            {
-                                project.ProjectCollection.Loggers.Remove(buildLogger);
-                                project.ProjectCollection.OnlyLogCriticalEvents = onlyLogCriticalEvents;
-                                BuildManagerAccessor.ReleaseBuildResources(cookie);
-                                BuildManagerAccessor.UnregisterLoggers(submission.SubmissionId);
-                                buildCallback.EndBuild(submission.BuildResult.OverallResult == BuildResultCode.Success);
-                            }));
-                        }, null);
+                            project.ProjectCollection.Loggers.Remove(buildLogger);
+                            project.ProjectCollection.OnlyLogCriticalEvents = onlyLogCriticalEvents;
+                            BuildManagerAccessor.ReleaseBuildResources(cookie);
+                            BuildManagerAccessor.UnregisterLoggers(submission.SubmissionId);
+                            buildCallback.EndBuild(submission.BuildResult.OverallResult == BuildResultCode.Success);
+                        }));
+                    }, null);
 
                     return true;
                 }
-                catch (Exception)
+                catch(Exception)
                 {
                     project.ProjectCollection.Loggers.Remove(buildLogger);
                     project.ProjectCollection.OnlyLogCriticalEvents = onlyLogCriticalEvents;
@@ -143,22 +140,22 @@ namespace IceBuilder
             Project = project;
             OutputPane = outputPane;
             ProjectConfiguration = projectConfiguration;
-            
+
         }
 
         public void BeginBuild()
         {
             OutputPane.OutputString(
-            String.Format("------ Ice Builder Build started: Project: {0}, Configuration: {1} {2} ------\n",
-                ProjectUtil.GetProjectName(Project),
-                ProjectConfiguration.ConfigurationName,
-                ProjectConfiguration.PlatformName));
+                string.Format("------ Ice Builder Build started: Project: {0}, Configuration: {1} {2} ------\n",
+                    ProjectUtil.GetProjectName(Project),
+                    ProjectConfiguration.ConfigurationName,
+                    ProjectConfiguration.PlatformName));
         }
 
         public void EndBuild(bool succeed)
         {
             OutputPane.OutputString(
-                String.Format("------ Build {0} ------\n\n", (succeed ? "succeeded" : "failed")));
+                string.Format("------ Build {0} ------\n\n", (succeed ? "succeeded" : "failed")));
             Package.Instance.BuildDone();
         }
 

@@ -16,7 +16,7 @@ namespace IceBuilder
 {
     class UIUtil
     {
-        public static void ShowErrorDialog(String title, String message)
+        public static void ShowErrorDialog(string title, string message)
         {
             MessageBox.Show(
                 message,
@@ -30,7 +30,7 @@ namespace IceBuilder
         //
         // Open the Visual Studio native dialog for selecting a directory
         //
-        public static String BrowserFolderDialog(IntPtr owner, String title, String initialDirectory)
+        public static string BrowserFolderDialog(IntPtr owner, string title, string initialDirectory)
         {
             IVsUIShell shell = Package.Instance.UIShell;
 
@@ -46,16 +46,16 @@ namespace IceBuilder
             try
             {
                 int hr = shell.GetDirectoryViaBrowseDlg(browseInfo);
-                if (hr == VSConstants.OLE_E_PROMPTSAVECANCELLED)
+                if(hr == VSConstants.OLE_E_PROMPTSAVECANCELLED)
                 {
-                    return String.Empty;
+                    return string.Empty;
                 }
                 ErrorHandler.ThrowOnFailure(hr);
                 return Marshal.PtrToStringAuto(browseInfo[0].pwzDirName);
             }
             finally
             {
-                if (pDirName != IntPtr.Zero)
+                if(pDirName != IntPtr.Zero)
                 {
                     Marshal.FreeCoTaskMem(pDirName);
                 }

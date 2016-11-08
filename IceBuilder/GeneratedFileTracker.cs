@@ -4,12 +4,7 @@
 //
 // **********************************************************************
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
 using Microsoft.VisualStudio.Shell.Interop;
 
 namespace IceBuilder
@@ -18,7 +13,7 @@ namespace IceBuilder
     {
         public void Add(IVsProject project, IceBuilderProjectType type)
         {
-            String projectFullPath = ProjectUtil.GetProjectFullPath(project);
+            string projectFullPath = ProjectUtil.GetProjectFullPath(project);
             Remove(projectFullPath);
             _generated.Add(projectFullPath,
                 type == IceBuilderProjectType.CsharpProjectType ?
@@ -26,21 +21,21 @@ namespace IceBuilder
                     ProjectUtil.GetCppGeneratedFiles(ProjectUtil.GetCppGeneratedFiles(project)));
         }
 
-        public void Remove(String project)
+        public void Remove(string project)
         {
-            if (_generated.ContainsKey(project))
+            if(_generated.ContainsKey(project))
             {
                 _generated.Remove(project);
             }
         }
 
-        public void Reap(String project, Dictionary<String, List<String>> newGenerated)
+        public void Reap(string project, Dictionary<string, List<string>> newGenerated)
         {
-            
-            if (_generated.ContainsKey(project))
+
+            if(_generated.ContainsKey(project))
             {
-                Dictionary<String, List<String>> oldGenerated = _generated[project];
-                foreach (KeyValuePair<String, List<String>> i in oldGenerated)
+                Dictionary<string, List<string>> oldGenerated = _generated[project];
+                foreach(KeyValuePair<string, List<string>> i in oldGenerated)
                 {
                     if(!newGenerated.ContainsKey(i.Key))
                     {
@@ -48,9 +43,9 @@ namespace IceBuilder
                     }
                     else
                     {
-                        List<String> newFiles = newGenerated[i.Key];
-                        List<String> outdated = i.Value.FindAll(f => !newFiles.Contains(f));
-                        if (outdated.Count > 0)
+                        List<string> newFiles = newGenerated[i.Key];
+                        List<string> outdated = i.Value.FindAll(f => !newFiles.Contains(f));
+                        if(outdated.Count > 0)
                         {
                             ProjectUtil.DeleteItems(outdated);
                         }
@@ -60,19 +55,19 @@ namespace IceBuilder
             _generated[project] = newGenerated;
         }
 
-        public bool Contains(EnvDTE.Project project, String path)
+        public bool Contains(EnvDTE.Project project, string path)
         {
             return Contains(project.FullName, path);
         }
 
-        public bool Contains(String project, String path)
+        public bool Contains(string project, string path)
         {
-            Dictionary<String, List<String>> names;
-            if (_generated.TryGetValue(project, out names))
+            Dictionary<string, List<string>> names;
+            if(_generated.TryGetValue(project, out names))
             {
-                foreach (KeyValuePair<String, List<String>> k in names)
+                foreach(KeyValuePair<string, List<string>> k in names)
                 {
-                    if (k.Value.Contains(path))
+                    if(k.Value.Contains(path))
                     {
                         return true;
                     }
@@ -87,7 +82,8 @@ namespace IceBuilder
         }
 
 
-        private Dictionary<String, Dictionary<String, List<String>>> _generated =
-            new Dictionary<String, Dictionary<String, List<String>>>();
+        private Dictionary<string, Dictionary<string, List<string>>> _generated =
+            new Dictionary<string, Dictionary<string, List<string>>>();
     }
+
 }

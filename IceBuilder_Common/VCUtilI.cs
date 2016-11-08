@@ -1,3 +1,9 @@
+// **********************************************************************
+//
+// Copyright (c) 2009-2016 ZeroC, Inc. All rights reserved.
+//
+// **********************************************************************
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,11 +17,11 @@ namespace IceBuilder
         public bool SetupSliceFilter(EnvDTE.Project dteProject)
         {
             VCProject project = dteProject.Object as VCProject;
-            foreach (VCFilter f in project.Filters)
+            foreach(VCFilter f in project.Filters)
             {
-                if (f.Name.Equals("Slice Files"))
+                if(f.Name.Equals("Slice Files"))
                 {
-                    if (String.IsNullOrEmpty(f.Filter) || !f.Filter.Equals("ice"))
+                    if(string.IsNullOrEmpty(f.Filter) || !f.Filter.Equals("ice"))
                     {
                         f.Filter = "ice";
                         return true;
@@ -29,9 +35,9 @@ namespace IceBuilder
             return true;
         }
 
-        public VCFilter FindOrCreateFilter(VCFilter parent, String name)
+        public VCFilter FindOrCreateFilter(VCFilter parent, string name)
         {
-            foreach (VCFilter f in parent.Filters)
+            foreach(VCFilter f in parent.Filters)
             {
                 if(f.Name.Equals(name))
                 {
@@ -41,11 +47,11 @@ namespace IceBuilder
             return parent.AddFilter(name);
         }
 
-        public VCFilter FindOrCreateFilter(VCProject parent, String name)
+        public VCFilter FindOrCreateFilter(VCProject parent, string name)
         {
             foreach(VCFilter f in parent.Filters)
             {
-                if (f.Name.Equals(name))
+                if(f.Name.Equals(name))
                 {
                     return f;
                 }
@@ -53,7 +59,7 @@ namespace IceBuilder
             return parent.AddFilter(name);
         }
 
-        public String Evaluate(EnvDTE.Configuration dteConfig, String value)
+        public string Evaluate(EnvDTE.Configuration dteConfig, string value)
         {
             EnvDTE.Project dteProject = dteConfig.Owner as EnvDTE.Project;
             VCProject project = dteProject.Object as VCProject;
@@ -61,7 +67,8 @@ namespace IceBuilder
             return config.Evaluate(value);
         }
 
-        public void AddGeneratedFiles(EnvDTE.Project dteProject, EnvDTE.Configuration config, String filterName, List<String> paths, bool generatedFilesPerConfiguration)
+        public void AddGeneratedFiles(EnvDTE.Project dteProject, EnvDTE.Configuration config, string filterName,
+                                      List<string> paths, bool generatedFilesPerConfiguration)
         {
             VCProject project = dteProject.Object as VCProject;
 
@@ -72,12 +79,12 @@ namespace IceBuilder
                 filter = FindOrCreateFilter(filter, config.ConfigurationName);
             }
 
-            String configurationName = config.ConfigurationName;
-            String platformName = config.PlatformName;
+            string configurationName = config.ConfigurationName;
+            string platformName = config.PlatformName;
 
-            foreach (String path in paths)
+            foreach(string path in paths)
             {
-                if (!File.Exists(path))
+                if(!File.Exists(path))
                 {
                     File.Create(path).Dispose();
                 }
@@ -91,17 +98,17 @@ namespace IceBuilder
                     //
                     File.Delete(path);
                 }
-                catch (Exception)
+                catch(Exception)
                 {
                 }
                 //
                 // Exclude the file from all other configurations
                 //
-                if (generatedFilesPerConfiguration)
+                if(generatedFilesPerConfiguration)
                 {
-                    foreach (VCFileConfiguration c in file.FileConfigurations)
+                    foreach(VCFileConfiguration c in file.FileConfigurations)
                     {
-                        if (!c.ProjectConfiguration.ConfigurationName.Equals(configurationName) || 
+                        if(!c.ProjectConfiguration.ConfigurationName.Equals(configurationName) ||
                             !c.ProjectConfiguration.Platform.Name.Equals(platformName))
                         {
                             c.ExcludedFromBuild = true;

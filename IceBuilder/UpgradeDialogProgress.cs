@@ -1,21 +1,22 @@
+// **********************************************************************
+//
+// Copyright (c) 2009-2016 ZeroC, Inc. All rights reserved.
+//
+// **********************************************************************
+
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace IceBuilder
 {
-
     public interface UpgradeProgressCallback
     {
-        bool Canceled { get; set; }
+        bool Canceled
+        {
+            get; set;
+        }
         void Finished();
-        void ReportProgress(String project, int index);
+        void ReportProgress(string project, int index);
     }
 
     public partial class UpgradeDialogProgress : Form, UpgradeProgressCallback
@@ -29,7 +30,7 @@ namespace IceBuilder
 
         private void CancelButton_Clicked(object sender, EventArgs e)
         {
-            Canceled = true; 
+            Canceled = true;
         }
 
         private bool _canceled;
@@ -37,23 +38,23 @@ namespace IceBuilder
         {
             get
             {
-                lock (_lock)
+                lock(_lock)
                 {
                     return _canceled;
                 }
             }
             set
             {
-                lock (_lock)
+                lock(_lock)
                 {
                     _canceled = value;
                 }
             }
         }
 
-        public void ReportProgress(String project, int index)
+        public void ReportProgress(string project, int index)
         {
-            InfoLabel.Text = String.Format("Upgrading project: {0}", project);
+            InfoLabel.Text = string.Format("Upgrading project: {0}", project);
             ProgressBar.Value = index;
         }
 
@@ -62,6 +63,6 @@ namespace IceBuilder
             Close();
         }
 
-        private Object _lock = new Object();
+        private object _lock = new object();
     }
 }

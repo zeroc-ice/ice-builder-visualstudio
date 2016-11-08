@@ -4,11 +4,6 @@
 //
 // **********************************************************************
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Diagnostics;
 
 namespace IceBuilder
@@ -21,7 +16,7 @@ namespace IceBuilder
     {
         public void appendData(object sendingProcess, DataReceivedEventArgs outLine)
         {
-            if (outLine.Data != null)
+            if(outLine.Data != null)
             {
                 _data += outLine.Data + "\n";
             }

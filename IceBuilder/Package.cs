@@ -10,14 +10,12 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Diagnostics;
-using System.Globalization;
 using System.Runtime.InteropServices;
 using System.ComponentModel.Design;
 using System.Windows.Forms;
 using Microsoft.Win32;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.Build.Evaluation;
 
@@ -39,7 +37,7 @@ namespace IceBuilder
         null,
         null,
         @"..\Templates\Projects")]
- 
+
     public sealed class Package : Microsoft.VisualStudio.Shell.Package
     {
 
@@ -142,25 +140,25 @@ namespace IceBuilder
         {
             try
             {
-                if(!Package.Instance.CommandLineMode)
+                if(!Instance.CommandLineMode)
                 {
                     MessageBox.Show("The Ice Builder has raised an unexpected exception:\n" +
                                     ex.ToString(),
                                     "Ice Builder", MessageBoxButtons.OK,
                                     MessageBoxIcon.Error,
                                     MessageBoxDefaultButton.Button1,
-                                    (MessageBoxOptions)0);
+                                    0);
                 }
             }
-            catch (Exception)
+            catch(Exception)
             {
             }
 
             try
             {
-                Package.Instance.OutputPane.OutputString(ex.ToString());
+                Instance.OutputPane.OutputString(ex.ToString());
             }
-            catch (Exception)
+            catch(Exception)
             {
             }
         }
@@ -180,8 +178,7 @@ namespace IceBuilder
 
         public void SetAutoBuilding(bool value)
         {
-            Microsoft.Win32.Registry.SetValue(IceHomeKey, IceAutoBuilding, value ? 1 : 0,
-                                              Microsoft.Win32.RegistryValueKind.DWord);
+            Registry.SetValue(IceHomeKey, IceAutoBuilding, value ? 1 : 0, RegistryValueKind.DWord);
             AutoBuilding = value;
         }
 
@@ -189,7 +186,7 @@ namespace IceBuilder
         {
             try
             {
-                return 1 == (int)Microsoft.Win32.Registry.GetValue(IceHomeKey, IceAutoBuilding, 0);
+                return 1 == (int)Registry.GetValue(IceHomeKey, IceAutoBuilding, 0);
             }
             catch(System.NullReferenceException)
             {
@@ -201,14 +198,14 @@ namespace IceBuilder
 
 
         private static void TryRemoveAssemblyFoldersExKey()
-        { 
-            Microsoft.Win32.RegistryKey key = null;
+        {
+            RegistryKey key = null;
             try
             {
-                key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(
+                key = Registry.CurrentUser.OpenSubKey(
                    @"Software\Microsoft\.NETFramework\v2.0.50727\AssemblyFoldersEx", true);
 
-                if (key.GetSubKeyNames().Contains("Ice"))
+                if(key.GetSubKeyNames().Contains("Ice"))
                 {
                     key.DeleteSubKey("Ice");
                 }
@@ -225,21 +222,17 @@ namespace IceBuilder
             }
         }
 
-        public void SetIceHome(String value)
+        public void SetIceHome(string value)
         {
-            if (String.IsNullOrEmpty(value))
+            if(string.IsNullOrEmpty(value))
             {
                 //
                 // Remove all registry settings.
                 //
-                Microsoft.Win32.Registry.SetValue(IceHomeKey, IceHomeValue, "",
-                                                  Microsoft.Win32.RegistryValueKind.String);
-                Microsoft.Win32.Registry.SetValue(IceHomeKey, IceVersionValue, "",
-                                                  Microsoft.Win32.RegistryValueKind.String);
-                Microsoft.Win32.Registry.SetValue(IceHomeKey, IceIntVersionValue, "",
-                                                  Microsoft.Win32.RegistryValueKind.String);
-                Microsoft.Win32.Registry.SetValue(IceHomeKey, IceVersionMMValue, "",
-                                                  Microsoft.Win32.RegistryValueKind.String);
+                Registry.SetValue(IceHomeKey, IceHomeValue, "", RegistryValueKind.String);
+                Registry.SetValue(IceHomeKey, IceVersionValue, "", RegistryValueKind.String);
+                Registry.SetValue(IceHomeKey, IceIntVersionValue, "", RegistryValueKind.String);
+                Registry.SetValue(IceHomeKey, IceVersionMMValue, "", RegistryValueKind.String);
 
                 TryRemoveAssemblyFoldersExKey();
 
@@ -248,61 +241,54 @@ namespace IceBuilder
             }
             else
             {
-                String props = new string[] 
+                string props = new string[]
                     {
                         Path.Combine(value, "config", "ice.props"),
                         Path.Combine(value,"cpp", "config", "ice.props"),
                         Path.Combine(value, "config", "icebuilder.props")
-                    }.FirstOrDefault(path => File.Exists(path) );
-                    
+                    }.FirstOrDefault(path => File.Exists(path));
 
-                if(String.IsNullOrEmpty(props) && Directory.Exists(value))
+
+                if(string.IsNullOrEmpty(props) && Directory.Exists(value))
                 {
-                    foreach(String d in Directory.EnumerateDirectories(value))
+                    foreach(string d in Directory.EnumerateDirectories(value))
                     {
-                        if (File.Exists(Path.Combine(d, "build", String.Format("{0}.props", Path.GetFileName(d)))))
+                        if(File.Exists(Path.Combine(d, "build", string.Format("{0}.props", Path.GetFileName(d)))))
                         {
-                            props = Path.Combine(d, "build", String.Format("{0}.props", Path.GetFileName(d)));
+                            props = Path.Combine(d, "build", string.Format("{0}.props", Path.GetFileName(d)));
                             break;
                         }
                     }
                 }
 
-                if (!String.IsNullOrEmpty(props))
+                if(!string.IsNullOrEmpty(props))
                 {
                     Microsoft.Build.Evaluation.Project p = new Microsoft.Build.Evaluation.Project(
                         props,
-                        new Dictionary<String, String>()
+                        new Dictionary<string, string>()
                             {
                                 { "ICE_HOME", value }
                             },
                         null);
-                    Microsoft.Win32.Registry.SetValue(IceHomeKey, IceHomeValue, value,
-                                              Microsoft.Win32.RegistryValueKind.String);
+                    Registry.SetValue(IceHomeKey, IceHomeValue, value, RegistryValueKind.String);
 
-                    String version = p.GetPropertyValue(IceVersionValue);
-                    Microsoft.Win32.Registry.SetValue(IceHomeKey, IceVersionValue, version,
-                                                      Microsoft.Win32.RegistryValueKind.String);
+                    string version = p.GetPropertyValue(IceVersionValue);
+                    Registry.SetValue(IceHomeKey, IceVersionValue, version, RegistryValueKind.String);
 
-                    String intVersion = p.GetPropertyValue(IceIntVersionValue);
-                    Microsoft.Win32.Registry.SetValue(IceHomeKey, IceIntVersionValue,
-                                                      intVersion,
-                                                      Microsoft.Win32.RegistryValueKind.String);
+                    string intVersion = p.GetPropertyValue(IceIntVersionValue);
+                    Registry.SetValue(IceHomeKey, IceIntVersionValue, intVersion, RegistryValueKind.String);
 
-                    String mmVersion = p.GetPropertyValue(IceVersionMMValue);
-                    Microsoft.Win32.Registry.SetValue(IceHomeKey, IceVersionMMValue, mmVersion,
-                                                      Microsoft.Win32.RegistryValueKind.String);
+                    string mmVersion = p.GetPropertyValue(IceVersionMMValue);
+                    Registry.SetValue(IceHomeKey, IceVersionMMValue, mmVersion, RegistryValueKind.String);
 
                     MSBuildUtils.SetIceHome(DTEUtil.GetProjects(), value, version, intVersion, mmVersion);
 
-                    Microsoft.Win32.Registry.SetValue(IceCSharpAssembleyKey, "", GetAssembliesDir(),
-                                                      Microsoft.Win32.RegistryValueKind.String);
-
+                    Registry.SetValue(IceCSharpAssembleyKey, "", GetAssembliesDir(), RegistryValueKind.String);
                     ICollection<Microsoft.Build.Evaluation.Project> projects =
-                        Microsoft.Build.Evaluation.ProjectCollection.GlobalProjectCollection.GetLoadedProjects(props);
+                        ProjectCollection.GlobalProjectCollection.GetLoadedProjects(props);
                     if(projects.Count > 0)
                     {
-                        Microsoft.Build.Evaluation.ProjectCollection.GlobalProjectCollection.UnloadProject(p);
+                        ProjectCollection.GlobalProjectCollection.UnloadProject(p);
                     }
                 }
                 else
@@ -310,8 +296,8 @@ namespace IceBuilder
                     Version v = null;
                     try
                     {
-                        String compiler = GetSliceCompilerVersion(value);
-                        if (String.IsNullOrEmpty(compiler))
+                        string compiler = GetSliceCompilerVersion(value);
+                        if(string.IsNullOrEmpty(compiler))
                         {
                             string err = "Unable to find a valid Ice installation in `" + value + "'";
 
@@ -320,7 +306,7 @@ namespace IceBuilder
                                             MessageBoxButtons.OK,
                                             MessageBoxIcon.Error,
                                             MessageBoxDefaultButton.Button1,
-                                            (MessageBoxOptions)0);
+                                            0);
                             return;
                         }
                         else
@@ -328,47 +314,40 @@ namespace IceBuilder
                             v = Version.Parse(compiler);
                         }
                     }
-                    catch (System.Exception ex)
+                    catch(Exception ex)
                     {
                         string err = "Failed to run Slice compiler using Ice installation from `" + value + "'"
                             + "\n" + ex.ToString();
 
                         MessageBox.Show(err, "Ice Builder",
-                                        MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1,
-                                        (MessageBoxOptions)0);
+                                        MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, 0);
                         return;
                     }
-                    Microsoft.Win32.Registry.SetValue(IceHomeKey, IceHomeValue, value,
-                                                  Microsoft.Win32.RegistryValueKind.String);
+                    Registry.SetValue(IceHomeKey, IceHomeValue, value, RegistryValueKind.String);
 
-                    Microsoft.Win32.Registry.SetValue(IceHomeKey, IceVersionValue, v.ToString(),
-                                                      Microsoft.Win32.RegistryValueKind.String);
+                    Registry.SetValue(IceHomeKey, IceVersionValue, v.ToString(), RegistryValueKind.String);
 
-                    String iceIntVersion = String.Format("{0}{1:00}{2:00}", v.Major, v.Minor, v.Build);
-                    Microsoft.Win32.Registry.SetValue(IceHomeKey, IceIntVersionValue,
-                                                      iceIntVersion,
-                                                      Microsoft.Win32.RegistryValueKind.String);
+                    string iceIntVersion = String.Format("{0}{1:00}{2:00}", v.Major, v.Minor, v.Build);
+                    Registry.SetValue(IceHomeKey, IceIntVersionValue, iceIntVersion, RegistryValueKind.String);
 
-                    String iceVersionMM = String.Format("{0}.{1}", v.Major, v.Minor);
-                    Microsoft.Win32.Registry.SetValue(IceHomeKey, IceVersionMMValue, iceVersionMM,
-                                                      Microsoft.Win32.RegistryValueKind.String);
+                    string iceVersionMM = string.Format("{0}.{1}", v.Major, v.Minor);
+                    Registry.SetValue(IceHomeKey, IceVersionMMValue, iceVersionMM, RegistryValueKind.String);
 
                     MSBuildUtils.SetIceHome(DTEUtil.GetProjects(), value, v.ToString(), iceIntVersion, iceVersionMM);
 
-                    Microsoft.Win32.Registry.SetValue(IceCSharpAssembleyKey, "", GetAssembliesDir(),
-                                                      Microsoft.Win32.RegistryValueKind.String);
+                    Registry.SetValue(IceCSharpAssembleyKey, "", GetAssembliesDir(), RegistryValueKind.String);
                 }
             }
         }
 
-        public String GetAssembliesDir(IVsProject project = null)
+        public string GetAssembliesDir(IVsProject project = null)
         {
-            String iceHome = GetIceHome(project);
-            if (Directory.Exists(Path.Combine(iceHome, "Assemblies")))
+            string iceHome = GetIceHome(project);
+            if(Directory.Exists(Path.Combine(iceHome, "Assemblies")))
             {
                 return Path.Combine(iceHome, "Assemblies");
             }
-            else if (Directory.Exists(Path.Combine(iceHome, "csharp", "Assemblies")))
+            else if(Directory.Exists(Path.Combine(iceHome, "csharp", "Assemblies")))
             {
                 return Path.Combine(iceHome, "csharp", "Assemblies");
             }
@@ -376,21 +355,21 @@ namespace IceBuilder
             {
                 return Path.Combine(iceHome, "lib");
             }
-            return String.Empty;
+            return string.Empty;
         }
 
-        public String GetIceHome(IVsProject project = null)
+        public string GetIceHome(IVsProject project = null)
         {
-            String iceHome = String.Empty;
+            string iceHome = string.Empty;
             if(project != null)
             {
                 iceHome = ProjectUtil.GetEvaluatedProperty(project, IceHomeValue);
             }
 
-            if(String.IsNullOrEmpty(iceHome))
+            if(string.IsNullOrEmpty(iceHome))
             {
-                Object value = Microsoft.Win32.Registry.GetValue(IceHomeKey, IceHomeValue, "");
-                iceHome = value == null ? String.Empty : value.ToString();
+                object value = Registry.GetValue(IceHomeKey, IceHomeValue, "");
+                iceHome = value == null ? string.Empty : value.ToString();
             }
 
             return iceHome;
@@ -401,7 +380,7 @@ namespace IceBuilder
             BuildContext(true);
             OutputPane.Clear();
             OutputPane.Activate();
-            foreach (IVsProject p in projects)
+            foreach(IVsProject p in projects)
             {
                 _buildProjects.Add(p);
             }
@@ -416,16 +395,16 @@ namespace IceBuilder
 
         public void BuildNextProject()
         {
-            if (_buildProjects.Count == 0)
+            if(_buildProjects.Count == 0)
             {
                 BuildContext(false);
             }
-            else if (!Building && BuildingProject == null)
+            else if(!Building && BuildingProject == null)
             {
                 IVsProject p = _buildProjects.ElementAt(0);
                 ProjectUtil.SaveProject(p);
                 ProjectUtil.SetupGenerated(p, DTEUtil.IsIceBuilderEnabled(p));
-                if (BuildProject(p))
+                if(BuildProject(p))
                 {
                     _buildProjects.Remove(p);
                 }
@@ -451,14 +430,14 @@ namespace IceBuilder
 
             List<IVsProject> projects = DTEUtil.GetProjects();
 
-            foreach (IVsProject project in projects)
+            foreach(IVsProject project in projects)
             {
                 IceBuilderProjectType projectType = DTEUtil.IsIceBuilderEnabled(project);
-                if (projectType != IceBuilderProjectType.None)
+                if(projectType != IceBuilderProjectType.None)
                 {
                     Microsoft.Build.Evaluation.Project p = MSBuildUtils.LoadedProject(
                                 ProjectUtil.GetProjectFullPath(project), projectType == IceBuilderProjectType.CppProjectType, true);
-                    if (MSBuildUtils.UpgradeProjectImports(p))
+                    if(MSBuildUtils.UpgradeProjectImports(p))
                     {
                         IVsHierarchy hier = project as IVsHierarchy;
                         Guid projectGUID = Guid.Empty;
@@ -469,7 +448,7 @@ namespace IceBuilder
                         {
                             ProjectCollection.GlobalProjectCollection.UnloadProject(p);
                         }
-                        catch (System.Exception)
+                        catch(Exception)
                         {
                             //expected if the project is not in the global project collection
                         }
@@ -479,13 +458,13 @@ namespace IceBuilder
             }
             projects = DTEUtil.GetProjects();
             List<IVsProject> sliceProjects = new List<IVsProject>();
-            foreach (IVsProject project in projects)
+            foreach(IVsProject project in projects)
             {
                 IceBuilderProjectType projectType = DTEUtil.IsIceBuilderEnabled(project);
 
-                if (projectType != IceBuilderProjectType.None)
+                if(projectType != IceBuilderProjectType.None)
                 {
-                    if (projectType == IceBuilderProjectType.CppProjectType)
+                    if(projectType == IceBuilderProjectType.CppProjectType)
                     {
                         VCUtil.SetupSliceFilter(DTEUtil.GetProject(project as IVsHierarchy));
                     }
@@ -493,8 +472,8 @@ namespace IceBuilder
                     {
                         ProjectUtil.UpgradReferencesHintPath(DTEUtil.GetProject(project as IVsHierarchy));
                     }
-                    
-                    if (AutoBuilding)
+
+                    if(AutoBuilding)
                     {
                         sliceProjects.Add(project);
                     }
@@ -517,25 +496,25 @@ namespace IceBuilder
             private set;
         }
 
-        public String AddinPath
+        public string AddinPath
         {
             get
-            { 
+            {
                 if(DTE.Version.StartsWith("11.0"))
                 {
                     return Path.Combine(
-                        System.Environment.GetEnvironmentVariable("ALLUSERSPROFILE"),
+                        Environment.GetEnvironmentVariable("ALLUSERSPROFILE"),
                         "Microsoft\\VisualStudio\\11.0\\Addins\\Ice-VS2012.AddIn");
                 }
                 else if(DTE.Version.StartsWith("12.0"))
                 {
                     return Path.Combine(
-                        System.Environment.GetEnvironmentVariable("ALLUSERSPROFILE"),
-                        "Microsoft\\VisualStudio\\12.0\\Addins\\Ice-VS2013.AddIn");   
+                        Environment.GetEnvironmentVariable("ALLUSERSPROFILE"),
+                        "Microsoft\\VisualStudio\\12.0\\Addins\\Ice-VS2013.AddIn");
                 }
                 else
                 {
-                    return String.Empty;
+                    return string.Empty;
                 }
             }
         }
@@ -554,9 +533,9 @@ namespace IceBuilder
                 CommandLineMode = (bool)value;
             }
 
-            this.RegisterProjectFactory(new ProjectFactory());
-            
-            if (!CommandLineMode)
+            RegisterProjectFactory(new ProjectFactory());
+
+            if(!CommandLineMode)
             {
                 ResourcesDirectory = Path.Combine(
                     Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Resources");
@@ -564,14 +543,14 @@ namespace IceBuilder
                 //
                 // Copy required target, property and task files
                 //
-                String dataDir = Path.Combine(Environment.GetEnvironmentVariable("LOCALAPPDATA"), "ZeroC", "IceBuilder");
-                if (!Directory.Exists(dataDir))
+                string dataDir = Path.Combine(Environment.GetEnvironmentVariable("LOCALAPPDATA"), "ZeroC", "IceBuilder");
+                if(!Directory.Exists(dataDir))
                 {
                     Directory.CreateDirectory(dataDir);
                 }
 
-                foreach (String f in new String[] 
-                                        { 
+                foreach(string f in new string[]
+                                        {
                                             "IceBuilder.Common.props",
                                             "IceBuilder.Cpp.props",
                                             "Ice.3.6.0.Cpp.props",
@@ -583,10 +562,10 @@ namespace IceBuilder
                                             "IceBuilder.Php.targets",
                                             "IceBuilder.Python.props",
                                             "IceBuilder.Python.targets",
-                                            "IceBuilder.Tasks.dll" 
+                                            "IceBuilder.Tasks.dll"
                                         })
                 {
-                    if (!File.Exists(Path.Combine(dataDir, f)))
+                    if(!File.Exists(Path.Combine(dataDir, f)))
                     {
                         File.Copy(Path.Combine(ResourcesDirectory, f), Path.Combine(dataDir, f));
                     }
@@ -594,7 +573,7 @@ namespace IceBuilder
                     {
                         byte[] data1 = File.ReadAllBytes(Path.Combine(ResourcesDirectory, f));
                         byte[] data2 = File.ReadAllBytes(Path.Combine(dataDir, f));
-                        if (!data1.SequenceEqual(data2))
+                        if(!data1.SequenceEqual(data2))
                         {
                             File.Copy(Path.Combine(ResourcesDirectory, f), Path.Combine(dataDir, f), true);
                         }
@@ -605,13 +584,13 @@ namespace IceBuilder
                 DTEEvents = DTE.Events.DTEEvents;
                 IVsSolution = GetService(typeof(SVsSolution)) as IVsSolution;
                 IVsSolution4 = GetService(typeof(SVsSolution)) as IVsSolution4;
-                UIShell = Package.Instance.GetService(typeof(SVsUIShell)) as IVsUIShell;
+                UIShell = Instance.GetService(typeof(SVsUIShell)) as IVsUIShell;
                 MonitorSelection = GetGlobalService(typeof(SVsShellMonitorSelection)) as IVsMonitorSelection;
 
                 // Add our command handlers for menu (commands must exist in the .vsct file)
                 OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
 
-                if (null != mcs)
+                if(null != mcs)
                 {
                     // Create the command for the menu item.
                     CommandID menuCommandAddID = new CommandID(GuidList.IceBuilderCommandsGUI, (int)PkgCmdIDList.AddIceBuilder);
@@ -633,17 +612,17 @@ namespace IceBuilder
                 //
                 Version version = null;
                 Version latest = null;
-                String iceHome = null;
+                string iceHome = null;
 
-                if(String.IsNullOrEmpty(GetIceHome()))
+                if(string.IsNullOrEmpty(GetIceHome()))
                 {
-                    using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"Software\ZeroC"))
+                    using(RegistryKey key = Registry.LocalMachine.OpenSubKey(@"Software\ZeroC"))
                     {
-                        if (key != null)
+                        if(key != null)
                         {
-                            foreach (String name in key.GetSubKeyNames())
+                            foreach(string name in key.GetSubKeyNames())
                             {
-                                using (RegistryKey subKey = key.OpenSubKey(name))
+                                using(RegistryKey subKey = key.OpenSubKey(name))
                                 {
                                     if(subKey == null)
                                     {
@@ -651,21 +630,21 @@ namespace IceBuilder
                                     }
 
                                     object value = subKey.GetValue("InstallDir");
-                                    if (value == null)
+                                    if(value == null)
                                     {
                                         continue;
                                     }
 
-                                    String installDir = value.ToString();
+                                    string installDir = value.ToString();
 
                                     try
                                     {
-                                        if (!File.Exists(Path.Combine(installDir, "bin", "slice2cpp.exe")))
+                                        if(!File.Exists(Path.Combine(installDir, "bin", "slice2cpp.exe")))
                                         {
                                             continue;
                                         }
                                     }
-                                    catch (ArgumentException)
+                                    catch(ArgumentException)
                                     {
                                         // Could happen if install dir is null or has invalid characters
                                         continue;
@@ -675,32 +654,32 @@ namespace IceBuilder
                                     {
                                         version = Version.Parse(GetSliceCompilerVersion(installDir));
                                     }
-                                    catch (System.Exception)
+                                    catch(Exception)
                                     {
                                         continue;
                                     }
 
-                                    if (version.Build == 51)
+                                    if(version.Build == 51)
                                     {
                                         // Ignore beta version
                                         continue;
                                     }
 
-                                    if (version < new Version(3, 6, 0))
-                                    { 
+                                    if(version < new Version(3, 6, 0))
+                                    {
                                         //We require 3.6.0 or greatest
                                         continue;
                                     }
 
-                                    if (!name.Equals(
-                                        String.Format("Ice {0}.{1}.{2}",
+                                    if(!name.Equals(
+                                        string.Format("Ice {0}.{1}.{2}",
                                             version.Major, version.Minor, version.Build)))
                                     {
                                         continue;
                                     }
 
                                     latest = (latest == null) ? version : (latest > version) ? latest : version;
-                                    if (latest.Equals(version))
+                                    if(latest.Equals(version))
                                     {
                                         iceHome = installDir;
                                     }
@@ -716,11 +695,11 @@ namespace IceBuilder
                 }
 
                 Assembly assembly = null;
-                if (DTE.Version.StartsWith("11.0"))
+                if(DTE.Version.StartsWith("11.0"))
                 {
                     assembly = Assembly.LoadFrom(Path.Combine(ResourcesDirectory, "IceBuilder.VS2012.dll"));
                 }
-                else if (DTE.Version.StartsWith("12.0"))
+                else if(DTE.Version.StartsWith("12.0"))
                 {
                     assembly = Assembly.LoadFrom(Path.Combine(ResourcesDirectory, "IceBuilder.VS2013.dll"));
                 }
@@ -769,7 +748,7 @@ namespace IceBuilder
                     //
                     // Ensure this runs once for parallel builds.
                     //
-                    if (Building)
+                    if(Building)
                     {
                         return;
                     }
@@ -777,7 +756,7 @@ namespace IceBuilder
                 }
 
                 List<IVsProject> projects = new List<IVsProject>();
-                if (scope.Equals(EnvDTE.vsBuildScope.vsBuildScopeSolution))
+                if(scope.Equals(EnvDTE.vsBuildScope.vsBuildScopeSolution))
                 {
                     projects = DTEUtil.GetProjects();
                 }
@@ -791,18 +770,18 @@ namespace IceBuilder
                     }
                 }
 
-                foreach (IVsProject project in projects)
+                foreach(IVsProject project in projects)
                 {
                     IceBuilderProjectType type = DTEUtil.IsIceBuilderEnabled(project);
-                    if (type != IceBuilderProjectType.None)
+                    if(type != IceBuilderProjectType.None)
                     {
                         ProjectUtil.SetupGenerated(project, type);
                     }
                 }
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
-                Package.UnexpectedExceptionWarning(ex);
+                UnexpectedExceptionWarning(ex);
                 throw;
             }
         }
@@ -812,15 +791,15 @@ namespace IceBuilder
             try
             {
                 Building = false;
-                if (_buildProjects.Count > 0)
+                if(_buildProjects.Count > 0)
                 {
                     BuildContext(true);
                     BuildNextProject();
                 }
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
-                Package.UnexpectedExceptionWarning(ex);
+                UnexpectedExceptionWarning(ex);
                 throw;
             }
         }
@@ -844,7 +823,7 @@ namespace IceBuilder
             {
                 ErrorHandler.ThrowOnFailure(MonitorSelection.IsCmdUIContextActive(cookie, out active));
             }
-            return active != 0; ;
+            return active != 0;
         }
 
         private void BuildContext(bool enabled)
@@ -884,7 +863,7 @@ namespace IceBuilder
                 BuildLogger logger = new BuildLogger(OutputPane);
                 logger.Verbosity = LoggerVerbosity;
                 BuildingProject = project;
-                if (!Builder.Build(project, new BuildCallback(project, OutputPane, 
+                if(!Builder.Build(project, new BuildCallback(project, OutputPane,
                     DTEUtil.GetProject(project as IVsHierarchy).ConfigurationManager.ActiveConfiguration),
                                    logger))
                 {
@@ -921,9 +900,9 @@ namespace IceBuilder
                     }
                 }
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
-                Package.UnexpectedExceptionWarning(ex);
+                UnexpectedExceptionWarning(ex);
                 throw;
             }
         }
@@ -933,12 +912,12 @@ namespace IceBuilder
             try
             {
                 OleMenuCommand command = sender as OleMenuCommand;
-                if (command != null)
+                if(command != null)
                 {
                     IVsProject p = DTEUtil.GetSelectedProject();
-                    if (p != null)
+                    if(p != null)
                     {
-                        if (DTEUtil.IsCppProject(p) || DTEUtil.IsCSharpProject(p))
+                        if(DTEUtil.IsCppProject(p) || DTEUtil.IsCSharpProject(p))
                         {
                             command.Enabled = MSBuildUtils.IsIceBuilderEnabled(MSBuildUtils.LoadedProject(ProjectUtil.GetProjectFullPath(p), DTEUtil.IsCppProject(p), true));
                         }
@@ -949,9 +928,9 @@ namespace IceBuilder
                     }
                 }
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
-                Package.UnexpectedExceptionWarning(ex);
+                UnexpectedExceptionWarning(ex);
                 throw;
             }
         }
@@ -961,18 +940,18 @@ namespace IceBuilder
             try
             {
                 OleMenuCommand command = sender as OleMenuCommand;
-                if (command != null)
+                if(command != null)
                 {
                     IVsProject p = DTEUtil.GetSelectedProject();
-                    if (p != null)
+                    if(p != null)
                     {
                         AddIceBuilderToProject(p);
                     }
                 }
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
-                Package.UnexpectedExceptionWarning(ex);
+                UnexpectedExceptionWarning(ex);
                 throw;
             }
         }
@@ -983,7 +962,7 @@ namespace IceBuilder
             bool cppProject = DTEUtil.IsCppProject(p);
             ProjectUtil.SaveProject(p);
             Microsoft.Build.Evaluation.Project project = MSBuildUtils.LoadedProject(projectPath, cppProject, false);
-            if (MSBuildUtils.AddIceBuilderToProject(project))
+            if(MSBuildUtils.AddIceBuilderToProject(project))
             {
                 if(cppProject)
                 {
@@ -991,15 +970,15 @@ namespace IceBuilder
                 }
                 else
                 {
-                    String includeDirectories = ProjectUtil.GetProperty(p, PropertyNames.IncludeDirectories);
-                    if (String.IsNullOrEmpty(includeDirectories))
+                    string includeDirectories = ProjectUtil.GetProperty(p, PropertyNames.IncludeDirectories);
+                    if(string.IsNullOrEmpty(includeDirectories))
                     {
                         ProjectUtil.SetProperty(p, PropertyNames.IncludeDirectories, @"$(IceHome)\slice");
                     }
                     else if(includeDirectories.IndexOf(@"$(IceHome)\slice") == -1)
                     {
-                        ProjectUtil.SetProperty(p, PropertyNames.IncludeDirectories, 
-                            String.Format(@"$(IceHome)\slice;{0}", includeDirectories));
+                        ProjectUtil.SetProperty(p, PropertyNames.IncludeDirectories,
+                            string.Format(@"$(IceHome)\slice;{0}", includeDirectories));
                     }
                 }
 
@@ -1013,16 +992,16 @@ namespace IceBuilder
                 {
                     ProjectCollection.GlobalProjectCollection.UnloadProject(project);
                 }
-                catch(System.Exception)
+                catch(Exception)
                 {
                     //expected if the project is not in the global project collection
                 }
                 IVsSolution4.ReloadProject(ref projectGUID);
 
-                if (!cppProject)
+                if(!cppProject)
                 {
                     IVsProject p1 = DTEUtil.GetProject(projectPath);
-                    ProjectUtil.AddAssemblyReference(DTEUtil.GetProject(p1 as IVsHierarchy), 
+                    ProjectUtil.AddAssemblyReference(DTEUtil.GetProject(p1 as IVsHierarchy),
                                                      ProjectUtil.GetEvaluatedProperty(p1, "IceAssembliesDir"), "Ice");
                 }
             }
@@ -1033,28 +1012,27 @@ namespace IceBuilder
             try
             {
                 OleMenuCommand command = sender as OleMenuCommand;
-                if (command != null)
+                if(command != null)
                 {
                     IVsProject p = DTEUtil.GetSelectedProject();
-                    if (p != null)
+                    if(p != null)
                     {
                         RemoveIceBuilderFromProject(p);
                     }
                 }
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
-                Package.UnexpectedExceptionWarning(ex);
+                UnexpectedExceptionWarning(ex);
                 throw;
             }
         }
 
         private void RemoveIceBuilderFromProject(IVsProject p)
         {
-            String path = ProjectUtil.GetProjectFullPath(p);
-
-            foreach (IVsProject p1 in _buildProjects)
-            { 
+            string path = ProjectUtil.GetProjectFullPath(p);
+            foreach(IVsProject p1 in _buildProjects)
+            {
                 if(path.Equals(ProjectUtil.GetProjectFullPath(p1)))
                 {
                     _buildProjects.Remove(p1);
@@ -1064,19 +1042,19 @@ namespace IceBuilder
 
             ProjectUtil.DeleteItems(
                 ProjectUtil.GetGeneratedFiles(p).Aggregate(
-                    new List<String>(),
-                    (items, kv) => 
-                        {
-                            items.AddRange(kv.Value);
-                            return items;
-                        }));
+                    new List<string>(),
+                    (items, kv) =>
+                    {
+                        items.AddRange(kv.Value);
+                        return items;
+                    }));
 
             if(DTEUtil.IsCSharpProject(p))
             {
                 VSLangProj.References references = ProjectUtil.GetProjectRererences(DTEUtil.GetProject(p as IVsHierarchy));
                 foreach(VSLangProj.Reference r in references)
                 {
-                    if (Package.AssemblyNames.Contains(r.Name))
+                    if(AssemblyNames.Contains(r.Name))
                     {
                         r.Remove();
                     }
@@ -1096,7 +1074,7 @@ namespace IceBuilder
             {
                 ProjectCollection.GlobalProjectCollection.UnloadProject(project);
             }
-            catch(System.Exception)
+            catch(Exception)
             {
                 //expected if the project is not in the global project collection
             }
@@ -1106,24 +1084,24 @@ namespace IceBuilder
         //
         // With Ice >= 3.7.0 we get the compiler version from Ice.props
         //
-        private String GetSliceCompilerVersion(String iceHome)
+        private string GetSliceCompilerVersion(string iceHome)
         {
-            String sliceCompiler = GetSliceCompilerPath(null, iceHome);
+            string sliceCompiler = GetSliceCompilerPath(null, iceHome);
             if(!File.Exists(sliceCompiler))
             {
-                String message = String.Format("'{0}' not found, review your Ice installation", sliceCompiler);
+                string message = string.Format("'{0}' not found, review your Ice installation", sliceCompiler);
                 OutputPane.OutputTaskItemString(
-                    message, 
+                    message,
                     EnvDTE.vsTaskPriority.vsTaskPriorityHigh,
-                    EnvDTE.vsTaskCategories.vsTaskCategoryBuildCompile, 
-                    EnvDTE.vsTaskIcon.vsTaskIconCompile, 
-                    sliceCompiler, 
-                    0, 
+                    EnvDTE.vsTaskCategories.vsTaskCategoryBuildCompile,
+                    EnvDTE.vsTaskIcon.vsTaskIconCompile,
+                    sliceCompiler,
+                    0,
                     message);
                 return null;
             }
 
-            System.Diagnostics.Process process = new System.Diagnostics.Process();
+            Process process = new Process();
             process.StartInfo.FileName = sliceCompiler;
             process.StartInfo.Arguments = "-v";
             process.StartInfo.CreateNoWindow = true;
@@ -1156,17 +1134,17 @@ namespace IceBuilder
                 string version = process.StandardError.ReadToEnd().Trim();
                 process.WaitForExit();
 
-                if (process.ExitCode != 0)
+                if(process.ExitCode != 0)
                 {
-                    String message = String.Format("Slice compiler `{0}' failed to start(error code {1})", 
+                    string message = string.Format("Slice compiler `{0}' failed to start(error code {1})",
                         sliceCompiler, process.ExitCode);
                     OutputPane.OutputTaskItemString(
-                        message, 
+                        message,
                         EnvDTE.vsTaskPriority.vsTaskPriorityHigh,
-                        EnvDTE.vsTaskCategories.vsTaskCategoryBuildCompile, 
-                        EnvDTE.vsTaskIcon.vsTaskIconCompile, 
-                        sliceCompiler, 
-                        0, 
+                        EnvDTE.vsTaskCategories.vsTaskCategoryBuildCompile,
+                        EnvDTE.vsTaskIcon.vsTaskIconCompile,
+                        sliceCompiler,
+                        0,
                         message);
                     return null;
                 }
@@ -1174,19 +1152,18 @@ namespace IceBuilder
                 //
                 // Convert beta version to is numeric value
                 //
-                if (version.EndsWith("b"))
+                if(version.EndsWith("b"))
                 {
-                    version = String.Format("{0}.{1}",
-                        version.Substring(0, version.Length - 1), 51);
+                    version = string.Format("{0}.{1}", version.Substring(0, version.Length - 1), 51);
                 }
                 return version;
             }
             catch(Exception ex)
             {
-                String message = String.Format("An exception was thrown when trying to start the Slice compiler\n{0}",
+                string message = string.Format("An exception was thrown when trying to start the Slice compiler\n{0}",
                         ex.ToString());
                 OutputPane.OutputTaskItemString(
-                    message, 
+                    message,
                     EnvDTE.vsTaskPriority.vsTaskPriorityHigh,
                     EnvDTE.vsTaskCategories.vsTaskCategoryBuildCompile,
                     EnvDTE.vsTaskIcon.vsTaskIconCompile,
@@ -1201,24 +1178,24 @@ namespace IceBuilder
             }
         }
 
-        private string GetSliceCompilerPath(Microsoft.Build.Evaluation.Project project, String iceHome)
+        private string GetSliceCompilerPath(Microsoft.Build.Evaluation.Project project, string iceHome)
         {
             string compiler = MSBuildUtils.IsCSharpProject(project) ? "slice2cs.exe" : "slice2cpp.exe";
-            if (!String.IsNullOrEmpty(iceHome))
+            if(!string.IsNullOrEmpty(iceHome))
             {
-                if (File.Exists(Path.Combine(iceHome, "cpp", "bin", compiler)))
+                if(File.Exists(Path.Combine(iceHome, "cpp", "bin", compiler)))
                 {
                     return Path.Combine(iceHome, "cpp", "bin", compiler);
                 }
 
-                if (File.Exists(Path.Combine(iceHome, "bin", compiler)))
+                if(File.Exists(Path.Combine(iceHome, "bin", compiler)))
                 {
                     return Path.Combine(iceHome, "bin", compiler);
                 }
             }
 
-            String message = "'" + compiler + "' not found";
-            if (!String.IsNullOrEmpty(iceHome))
+            string message = "'" + compiler + "' not found";
+            if(!string.IsNullOrEmpty(iceHome))
             {
                 message += " in '" + iceHome + "'. You may need to update Ice Home in 'Tools > Options > Ice'";
             }
@@ -1227,27 +1204,27 @@ namespace IceBuilder
                 message += ". You may need to set Ice Home in 'Tools > Options > Ice'";
             }
             OutputPane.OutputTaskItemString(
-                message, 
+                message,
                 EnvDTE.vsTaskPriority.vsTaskPriorityHigh,
-                EnvDTE.vsTaskCategories.vsTaskCategoryBuildCompile, 
-                EnvDTE.vsTaskIcon.vsTaskIconCompile, 
-                compiler, 
+                EnvDTE.vsTaskCategories.vsTaskCategoryBuildCompile,
+                EnvDTE.vsTaskIcon.vsTaskIconCompile,
+                compiler,
                 0,
                 message);
             return null;
         }
 
-        private readonly String BuildOutputPaneGUID = "{1BD8A850-02D1-11d1-BEE7-00A0C913D1F8}";
+        private readonly string BuildOutputPaneGUID = "{1BD8A850-02D1-11d1-BEE7-00A0C913D1F8}";
         private EnvDTE.OutputWindowPane _outputPane = null;
         public EnvDTE.OutputWindowPane OutputPane
         {
             get
             {
-                if (_outputPane == null)
+                if(_outputPane == null)
                 {
                     EnvDTE.Window window = DTE2.Windows.Item(EnvDTE.Constants.vsWindowKindOutput);
                     EnvDTE.OutputWindow outputWindow = window.Object as EnvDTE.OutputWindow;
-                    foreach (EnvDTE.OutputWindowPane pane in outputWindow.OutputWindowPanes)
+                    foreach(EnvDTE.OutputWindowPane pane in outputWindow.OutputWindowPanes)
                     {
                         if(pane.Guid.Equals(BuildOutputPaneGUID, StringComparison.CurrentCultureIgnoreCase))
                         {
@@ -1282,17 +1259,17 @@ namespace IceBuilder
         {
             get
             {
-                object value = Microsoft.Win32.Registry.GetValue(
+                object value = Registry.GetValue(
                     Path.Combine("HKEY_CURRENT_USER", DTE.RegistryRoot, "General"),
                     "MSBuildLoggerVerbosity", 2);
 
                 uint verbosity;
-                if (!UInt32.TryParse(value == null ? "2" : value.ToString(), out verbosity))
+                if(!UInt32.TryParse(value == null ? "2" : value.ToString(), out verbosity))
                 {
                     verbosity = 2;
                 }
 
-                switch (verbosity)
+                switch(verbosity)
                 {
                     case 0:
                         return Microsoft.Build.Framework.LoggerVerbosity.Quiet;
@@ -1310,20 +1287,20 @@ namespace IceBuilder
 
         private void AddinRemoval()
         {
-            String path = Path.Combine(
-                System.Environment.GetEnvironmentVariable("ALLUSERSPROFILE"),
+            string path = Path.Combine(
+                Environment.GetEnvironmentVariable("ALLUSERSPROFILE"),
                     (DTE.Version.StartsWith("11.0") ?
                         "Microsoft\\VisualStudio\\11.0\\Addins\\Ice-VS2012.AddIn" :
                         "Microsoft\\VisualStudio\\12.0\\Addins\\Ice-VS2013.AddIn"));
-            if (File.Exists(path))
+            if(File.Exists(path))
             {
                 if(MessageBox.Show("Detected Ice Add-in for Visual Studio; this Add-in is not compatible with " +
                                    "the Ice Builder for Visual Studio. Do you want to remove this Add-in?",
                                    "Ice Builder", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
-                    System.Diagnostics.Process process = new System.Diagnostics.Process();
+                    Process process = new Process();
                     process.StartInfo.FileName = Path.Combine(ResourcesDirectory, "AddinRemoval.exe");
-                    process.StartInfo.Arguments = String.Format("\"{0}\" \"{1}\"", DTE.FullName, path);
+                    process.StartInfo.Arguments = string.Format("\"{0}\" \"{1}\"", DTE.FullName, path);
                     process.StartInfo.CreateNoWindow = true;
                     process.StartInfo.UseShellExecute = true;
                     process.Start();
@@ -1334,7 +1311,7 @@ namespace IceBuilder
             }
         }
 
-        private String ResourcesDirectory
+        private string ResourcesDirectory
         {
             get;
             set;
@@ -1345,17 +1322,17 @@ namespace IceBuilder
             get;
             set;
         }
-       
+
         private HashSet<IVsProject> _buildProjects = new HashSet<IVsProject>();
 
-        public static readonly String IceHomeKey = @"HKEY_CURRENT_USER\Software\ZeroC\IceBuilder";
-        public static readonly String IceHomeValue = "IceHome";
-        public static readonly String IceVersionValue = "IceVersion";
-        public static readonly String IceVersionMMValue = "IceVersionMM";
-        public static readonly String IceIntVersionValue = "IceIntVersion";
-        public static readonly String IceCSharpAssembleyKey =
+        public static readonly string IceHomeKey = @"HKEY_CURRENT_USER\Software\ZeroC\IceBuilder";
+        public static readonly string IceHomeValue = "IceHome";
+        public static readonly string IceVersionValue = "IceVersion";
+        public static readonly string IceVersionMMValue = "IceVersionMM";
+        public static readonly string IceIntVersionValue = "IceIntVersion";
+        public static readonly string IceCSharpAssembleyKey =
             @"HKEY_CURRENT_USER\Software\Microsoft\.NETFramework\v2.0.50727\AssemblyFoldersEx\Ice";
-        public static readonly String IceAutoBuilding = "IceAutoBuilding";
+        public static readonly string IceAutoBuilding = "IceAutoBuilding";
     }
 
     static class PkgCmdIDList

@@ -6,11 +6,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 
 namespace IceBuilder
@@ -35,7 +31,7 @@ namespace IceBuilder
                 Package.Instance.RunningDocumentTableEventHandler.BeginTrack();
                 Package.Instance.InitializeProjects();
             }
-            catch(System.Exception ex)
+            catch(Exception ex)
             {
                 Package.UnexpectedExceptionWarning(ex);
                 throw;
@@ -71,7 +67,7 @@ namespace IceBuilder
         #endregion
 
         #region IVsSolutionEvents3
-        public int OnAfterCloseSolution(Object pUnkReserved)
+        public int OnAfterCloseSolution(object pUnkReserved)
         {
             try
             {
@@ -96,12 +92,12 @@ namespace IceBuilder
             try
             {
                 IVsProject project = hierarchyNew as IVsProject;
-                if (project != null)
+                if(project != null)
                 {
                     Package.Instance.InitializeProjects(new List<IVsProject>(new IVsProject[] { project }));
                 }
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 Package.UnexpectedExceptionWarning(ex);
                 throw;
@@ -109,7 +105,7 @@ namespace IceBuilder
             return 0;
         }
 
-        public int OnAfterMergeSolution(Object pUnkReserved)
+        public int OnAfterMergeSolution(object pUnkReserved)
         {
             return 0;
         }
@@ -124,7 +120,7 @@ namespace IceBuilder
             return 0;
         }
 
-        public int OnAfterOpenSolution(Object pUnkReserved, int fNewSolution)
+        public int OnAfterOpenSolution(object pUnkReserved, int fNewSolution)
         {
             return 0;
         }
@@ -134,7 +130,7 @@ namespace IceBuilder
             try
             {
                 IVsProject project = pHierarchy as IVsProject;
-                if (project != null)
+                if(project != null)
                 {
                     if(DTEUtil.IsIceBuilderEnabled(project) != IceBuilderProjectType.None)
                     {
@@ -142,7 +138,7 @@ namespace IceBuilder
                     }
                 }
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 Package.UnexpectedExceptionWarning(ex);
                 throw;
@@ -150,7 +146,7 @@ namespace IceBuilder
             return 0;
         }
 
-        public int OnBeforeCloseSolution(Object pUnkReserved)
+        public int OnBeforeCloseSolution(object pUnkReserved)
         {
             return 0;
         }
@@ -170,12 +166,12 @@ namespace IceBuilder
             try
             {
                 IVsProject project = pRealHierarchy as IVsProject;
-                if (project != null)
+                if(project != null)
                 {
                     Package.Instance.FileTracker.Remove(ProjectUtil.GetProjectFullPath(project));
                 }
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 Package.UnexpectedExceptionWarning(ex);
                 throw;
@@ -189,7 +185,7 @@ namespace IceBuilder
             return 0;
         }
 
-        public int OnQueryCloseSolution(Object pUnkReserved, ref int pfCancel)
+        public int OnQueryCloseSolution(object pUnkReserved, ref int pfCancel)
         {
             pfCancel = 0;
             return 0;

@@ -40,49 +40,49 @@ namespace IceBuilder
             SetPropertyIfChanged(PropertyNames.AdditionalOptions, AdditionalOptions);
         }
 
-        public String OutputDir
+        public string OutputDir
         {
             get;
             set;
         }
 
-        public Boolean AllowIcePrefix
+        public bool AllowIcePrefix
         {
             get;
             set;
         }
 
-        public Boolean Checksum
+        public bool Checksum
         {
             get;
             set;
         }
 
-        public Boolean Stream
+        public bool Stream
         {
             get;
             set;
         }
 
-        public Boolean Tie
+        public bool Tie
         {
             get;
             set;
         }
 
-        public Boolean Underscore
+        public bool Underscore
         {
             get;
             set;
         }
 
-        public String IncludeDirectories
+        public string IncludeDirectories
         {
             get;
             set;
         }
 
-        public String AdditionalOptions
+        public string AdditionalOptions
         {
             get;
             set;
@@ -94,37 +94,37 @@ namespace IceBuilder
             set;
         }
 
-        private String GetProperty(String name)
+        private string GetProperty(string name)
         {
             return ProjectUtil.GetProperty(Project, name);
         }
 
-        private bool GetPropertyAsBool(String name)
+        private bool GetPropertyAsBool(string name)
         {
             return GetProperty(name).Equals("yes", StringComparison.CurrentCultureIgnoreCase);
         }
 
-        private void SetPropertyAsBool(String name, bool value)
+        private void SetPropertyAsBool(string name, bool value)
         {
             SetProperty(name, value ? "yes" : "");
         }
 
-        private void SetProperty(String name, String value)
+        private void SetProperty(string name, string value)
         {
             ProjectUtil.SetProperty(Project, name, value);
         }
 
-        private void SetPropertyIfChanged(String name, String value)
+        private void SetPropertyIfChanged(string name, string value)
         {
-            if (!GetProperty(name).Equals(value))
+            if(!GetProperty(name).Equals(value))
             {
                 SetProperty(name, value);
             }
         }
 
-        private void SetPropertyAsBoolIfChanged(String name, bool value)
+        private void SetPropertyAsBoolIfChanged(string name, bool value)
         {
-            if (GetPropertyAsBool(name) != value)
+            if(GetPropertyAsBool(name) != value)
             {
                 SetPropertyAsBool(name, value);
             }

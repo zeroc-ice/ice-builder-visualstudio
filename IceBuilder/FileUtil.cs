@@ -5,10 +5,6 @@
 // **********************************************************************
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 
 namespace IceBuilder
@@ -17,17 +13,17 @@ namespace IceBuilder
     {
         public static string RelativePath(string mainDirPath, string absoluteFilePath)
         {
-            if (String.IsNullOrEmpty(absoluteFilePath))
+            if(string.IsNullOrEmpty(absoluteFilePath))
             {
                 return "";
             }
 
-            if (String.IsNullOrEmpty(mainDirPath))
+            if(string.IsNullOrEmpty(mainDirPath))
             {
                 return absoluteFilePath;
             }
 
-            if (!Path.IsPathRooted(absoluteFilePath))
+            if(!Path.IsPathRooted(absoluteFilePath))
             {
                 return absoluteFilePath;
             }
@@ -39,28 +35,28 @@ namespace IceBuilder
             string[] secondPathParts = absoluteFilePath.Split(Path.DirectorySeparatorChar);
 
             int sameCounter = 0;
-            while (sameCounter < Math.Min(firstPathParts.Length, secondPathParts.Length) &&
-                String.Equals(firstPathParts[sameCounter], secondPathParts[sameCounter],
+            while(sameCounter < Math.Min(firstPathParts.Length, secondPathParts.Length) &&
+                string.Equals(firstPathParts[sameCounter], secondPathParts[sameCounter],
                 StringComparison.CurrentCultureIgnoreCase))
             {
                 ++sameCounter;
             }
 
             // Different volumes, relative path not possible.
-            if (sameCounter == 0)
+            if(sameCounter == 0)
             {
                 return absoluteFilePath;
             }
 
             // Pop back up to the common point.
             string newPath = "";
-            for (int i = sameCounter; i < firstPathParts.Length; ++i)
+            for(int i = sameCounter; i < firstPathParts.Length; ++i)
             {
                 newPath += ".." + Path.DirectorySeparatorChar;
             }
 
             // Descend to the target.
-            for (int i = sameCounter; i < secondPathParts.Length; ++i)
+            for(int i = sameCounter; i < secondPathParts.Length; ++i)
             {
                 newPath += secondPathParts[i] + Path.DirectorySeparatorChar;
             }

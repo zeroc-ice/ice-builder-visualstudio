@@ -16,10 +16,10 @@ using Microsoft.VisualStudio.Shell.Interop;
 namespace IceBuilder
 {
 
-    [Guid(PropertyPage.PropertyPageGUID)]
+    [Guid(PropertyPageGUID)]
     public class PropertyPage : IPropertyPage2, IPropertyPage, IDisposable
     {
-        public const String PropertyPageGUID = "1E2800FE-37C5-4FD3-BC2E-969342EE08AF";
+        public const string PropertyPageGUID = "1E2800FE-37C5-4FD3-BC2E-969342EE08AF";
 
         private CSharpConfigurationView _view;
         public CSharpConfigurationView ConfigurationView
@@ -55,10 +55,10 @@ namespace IceBuilder
             try
             {
                 RECT rect = pRect[0];
-                this.ConfigurationView.Initialize(Control.FromHandle(parentHandle),
-                                                  Rectangle.FromLTRB(rect.left, rect.top, rect.right, rect.bottom));
+                ConfigurationView.Initialize(Control.FromHandle(parentHandle),
+                                             Rectangle.FromLTRB(rect.left, rect.top, rect.right, rect.bottom));
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 Package.UnexpectedExceptionWarning(ex);
                 throw;
@@ -75,24 +75,24 @@ namespace IceBuilder
                 Settings.Stream = ConfigurationView.Streaming == CheckState.Checked ? true : false;
                 Settings.Tie = ConfigurationView.Tie == CheckState.Checked ? true : false;
                 Settings.Underscore = ConfigurationView.Underscores == CheckState.Checked ? true : false;
-                Settings.IncludeDirectories = String.Join(";", ConfigurationView.IncludeDirectories.Values);
+                Settings.IncludeDirectories = string.Join(";", ConfigurationView.IncludeDirectories.Values);
                 Settings.AdditionalOptions = ConfigurationView.AdditionalOptions;
 
-                List<String> referencedAssemblies = ConfigurationView.ReferencedAssemblies;
-                String assembliesDir = ProjectUtil.GetEvaluatedProperty(Project, "IceAssembliesDir");
-                foreach (String assembly in ConfigurationView.Assemblies)
+                List<string> referencedAssemblies = ConfigurationView.ReferencedAssemblies;
+                string assembliesDir = ProjectUtil.GetEvaluatedProperty(Project, "IceAssembliesDir");
+                foreach(string assembly in ConfigurationView.Assemblies)
                 {
                     EnvDTE.Project p = DTEUtil.GetProject(Project as IVsHierarchy);
-                    if (ProjectUtil.HasAssemblyReference(p, assembly))
+                    if(ProjectUtil.HasAssemblyReference(p, assembly))
                     {
-                        if (!referencedAssemblies.Contains(assembly))
+                        if(!referencedAssemblies.Contains(assembly))
                         {
                             ProjectUtil.RemoveAssemblyReference(p, assembly);
                         }
                     }
                     else
                     {
-                        if (referencedAssemblies.Contains(assembly))
+                        if(referencedAssemblies.Contains(assembly))
                         {
                             ProjectUtil.AddAssemblyReference(p, assembliesDir, assembly);
                         }
@@ -101,7 +101,7 @@ namespace IceBuilder
                 Settings.Save();
                 ConfigurationView.Dirty = false;
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 Package.UnexpectedExceptionWarning(ex);
                 throw;
@@ -118,7 +118,7 @@ namespace IceBuilder
                     _view = null;
                 }
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 Package.UnexpectedExceptionWarning(ex);
                 throw;
@@ -139,19 +139,19 @@ namespace IceBuilder
                 proppageinfo.pszDocString = null;
                 proppageinfo.pszHelpFile = null;
                 proppageinfo.pszTitle = "Ice Builder";
-                proppageinfo.SIZE.cx = this.ConfigurationView.Size.Width;
-                proppageinfo.SIZE.cy = this.ConfigurationView.Size.Height;
+                proppageinfo.SIZE.cx = ConfigurationView.Size.Width;
+                proppageinfo.SIZE.cy = ConfigurationView.Size.Height;
                 pageInfo[0] = proppageinfo;
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 Package.UnexpectedExceptionWarning(ex);
                 throw;
             }
         }
 
-        public void Help(String pszHelpDir)
-        { 
+        public void Help(string pszHelpDir)
+        {
         }
 
         public int IsPageDirty()
@@ -160,7 +160,7 @@ namespace IceBuilder
             {
                 return ConfigurationView.Dirty ? VSConstants.S_OK : VSConstants.S_FALSE;
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 Package.UnexpectedExceptionWarning(ex);
                 throw;
@@ -175,7 +175,7 @@ namespace IceBuilder
                 ConfigurationView.Location = new Point(rect.X, rect.Y);
                 ConfigurationView.Size = new Size(rect.Width, rect.Height);
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 Package.UnexpectedExceptionWarning(ex);
                 throw;
@@ -194,20 +194,20 @@ namespace IceBuilder
             private set;
         }
 
-        public void SetObjects(uint cObjects, Object[] objects)
+        public void SetObjects(uint cObjects, object[] objects)
         {
             try
             {
-                if (objects != null && cObjects > 0)
+                if(objects != null && cObjects > 0)
                 {
                     IVsBrowseObject browse = objects[0] as IVsBrowseObject;
-                    if (browse != null)
+                    if(browse != null)
                     {
                         IVsHierarchy hier;
                         uint id;
                         browse.GetProjectItem(out hier, out id);
                         Project = hier as IVsProject;
-                        if (Project != null)
+                        if(Project != null)
                         {
                             Settings = new ProjectSettigns(Project);
                             Settings.Load();
@@ -217,7 +217,7 @@ namespace IceBuilder
                             ConfigurationView.Streaming = Settings.Stream ? CheckState.Checked : CheckState.Unchecked;
                             ConfigurationView.Tie = Settings.Tie ? CheckState.Checked : CheckState.Unchecked;
                             ConfigurationView.Underscores = Settings.Underscore ? CheckState.Checked : CheckState.Unchecked;
-                            ConfigurationView.IncludeDirectories.Values = new List<String>(
+                            ConfigurationView.IncludeDirectories.Values = new List<string>(
                                 Settings.IncludeDirectories.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries));
                             ConfigurationView.AdditionalOptions = Settings.AdditionalOptions;
                             ConfigurationView.LoadReferencedAssemblies();
@@ -226,7 +226,7 @@ namespace IceBuilder
                     }
                 }
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 Package.UnexpectedExceptionWarning(ex);
                 throw;
@@ -253,20 +253,20 @@ namespace IceBuilder
             switch(show)
             {
                 case SW_HIDE:
-                {
-                    ConfigurationView.Hide();
-                    break;
-                }
+                    {
+                        ConfigurationView.Hide();
+                        break;
+                    }
                 case SW_SHOW:
                 case SW_SHOWNORMAL:
-                {
-                    ConfigurationView.Show();
-                    break;
-                }
+                    {
+                        ConfigurationView.Show();
+                        break;
+                    }
                 default:
-                {
-                    break;
-                }
+                    {
+                        break;
+                    }
             }
         }
 
@@ -280,7 +280,7 @@ namespace IceBuilder
                 pMsg[0].wParam = message.WParam;
                 return hr;
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 Package.UnexpectedExceptionWarning(ex);
                 throw;
@@ -292,7 +292,7 @@ namespace IceBuilder
         #region IPropertyPage methods
         int IPropertyPage.Apply()
         {
-            this.Apply();
+            Apply();
             return VSConstants.S_OK;
         }
         #endregion

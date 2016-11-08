@@ -6,9 +6,7 @@
 
 using System;
 using System.Linq;
-using System.Text;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 
 using Microsoft.VisualStudio;
@@ -19,15 +17,15 @@ namespace IceBuilder
 {
     public class Project : FlavoredProjectBase
     {
-        public static readonly String BuildEventsPropertyPageGUID = "{1e78f8db-6c07-4d61-a18f-7514010abd56}";
+        public static readonly string BuildEventsPropertyPageGUID = "{1e78f8db-6c07-4d61-a18f-7514010abd56}";
 
         protected override void SetInnerProject(IntPtr innerIUnknown)
         {
             object objectForIUnknown = null;
             objectForIUnknown = Marshal.GetObjectForIUnknown(innerIUnknown);
-            if (base.serviceProvider == null)
+            if(serviceProvider == null)
             {
-                base.serviceProvider = this.Package;
+                serviceProvider = Package;
             }
             base.SetInnerProject(innerIUnknown);
             _cfgProvider = objectForIUnknown as IVsProjectFlavorCfgProvider;
@@ -36,9 +34,9 @@ namespace IceBuilder
         protected override void Close()
         {
             base.Close();
-            if (_cfgProvider != null)
+            if(_cfgProvider != null)
             {
-                if (Marshal.IsComObject(_cfgProvider))
+                if(Marshal.IsComObject(_cfgProvider))
                 {
                     Marshal.ReleaseComObject(_cfgProvider);
                 }
@@ -50,40 +48,41 @@ namespace IceBuilder
         {
             if(propId == (int)__VSHPROPID2.VSHPROPID_PropertyPagesCLSIDList)
             {
-                String propertyPageGUID = typeof(PropertyPage).GUID.ToString("B");
+                string propertyPageGUID = typeof(PropertyPage).GUID.ToString("B");
                 ErrorHandler.ThrowOnFailure(base.GetProperty(itemId, propId, out property));
-                property = String.Format("{0};{1}", propertyPageGUID, property);
+                property = string.Format("{0};{1}", propertyPageGUID, property);
                 return VSConstants.S_OK;
             }
-            else if (propId == (int)__VSHPROPID2.VSHPROPID_PriorityPropertyPagesCLSIDList)
+            else if(propId == (int)__VSHPROPID2.VSHPROPID_PriorityPropertyPagesCLSIDList)
             {
-                String propertyPageGUID = typeof(PropertyPage).GUID.ToString("B");
+                string propertyPageGUID = typeof(PropertyPage).GUID.ToString("B");
                 ErrorHandler.ThrowOnFailure(base.GetProperty(itemId, propId, out property));
-                List<String> sorted = new List<String>();
+                List<string> sorted = new List<string>();
                 property.ToString()
                         .Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
                         .ToList()
                         .ForEach(token =>
+                        {
+                            if(!token.Equals(propertyPageGUID, StringComparison.CurrentCultureIgnoreCase))
                             {
-                                if (!token.Equals(propertyPageGUID,
-                                   StringComparison.CurrentCultureIgnoreCase))
-                                {
-                                    sorted.Add(token);
-                                }
+                                sorted.Add(token);
+                            }
 
-                                if(token.Equals(BuildEventsPropertyPageGUID, 
-                                   StringComparison.CurrentCultureIgnoreCase))
-                                {
-                                    sorted.Add(propertyPageGUID);
-                                }
-                            });
-                property = String.Join(";", sorted);
+                            if(token.Equals(BuildEventsPropertyPageGUID, StringComparison.CurrentCultureIgnoreCase))
+                            {
+                                sorted.Add(propertyPageGUID);
+                            }
+                        });
+                property = string.Join(";", sorted);
                 return VSConstants.S_OK;
             }
             return base.GetProperty(itemId, propId, out property);
         }
 
         protected IVsProjectFlavorCfgProvider _cfgProvider = null;
-        internal Microsoft.VisualStudio.Shell.Package Package { get; set; }
+        internal Microsoft.VisualStudio.Shell.Package Package
+        {
+            get; set;
+        }
     }
 }

@@ -64,16 +64,16 @@ namespace IceBuilder
             public OldConfiguration()
             {
                 Enabled = false;
-                OutputDir = String.Empty;
-                HeaderExt = String.Empty;
-                SourceExt = String.Empty;
-                AdditionalOptions = String.Empty;
-                IncludeDirectories = String.Empty;
+                OutputDir = string.Empty;
+                HeaderExt = string.Empty;
+                SourceExt = string.Empty;
+                AdditionalOptions = string.Empty;
+                IncludeDirectories = string.Empty;
                 Ice = false;
                 Stream = false;
                 Checksum = false;
                 Tie = false;
-                DLLExport = String.Empty;
+                DLLExport = string.Empty;
             }
 
             public bool Enabled
@@ -82,31 +82,31 @@ namespace IceBuilder
                 set;
             }
 
-            public String OutputDir
+            public string OutputDir
             {
                 get;
                 set;
             }
 
-            public String HeaderExt
+            public string HeaderExt
             {
                 get;
                 set;
             }
 
-            public String SourceExt
+            public string SourceExt
             {
                 get;
                 set;
             }
 
-            public String AdditionalOptions
+            public string AdditionalOptions
             {
                 get;
                 set;
             }
 
-            public String IncludeDirectories
+            public string IncludeDirectories
             {
                 get;
                 set;
@@ -136,7 +136,7 @@ namespace IceBuilder
                 set;
             }
 
-            public String DLLExport
+            public string DLLExport
             {
                 get;
                 set;
@@ -145,10 +145,10 @@ namespace IceBuilder
             public bool Load(Microsoft.Build.Evaluation.Project project, bool remove)
             {
                 bool loaded = false;
-                foreach (ProjectElement element in project.Xml.Children)
+                foreach(ProjectElement element in project.Xml.Children)
                 {
                     ProjectExtensionsElement extension = element as ProjectExtensionsElement;
-                    if (extension != null && !String.IsNullOrEmpty(extension.Content))
+                    if(extension != null && !string.IsNullOrEmpty(extension.Content))
                     {
                         try
                         {
@@ -157,32 +157,32 @@ namespace IceBuilder
                             XmlNamespaceManager ns = new XmlNamespaceManager(doc.NameTable);
                             ns.AddNamespace("msb", "http://schemas.microsoft.com/developer/msbuild/2003");
                             XmlNode userProperties = doc.DocumentElement.SelectSingleNode("/msb:VisualStudio/msb:UserProperties", ns);
-                            if (userProperties != null)
+                            if(userProperties != null)
                             {
                                 if(userProperties.Attributes[PropertyIce] != null)
                                 {
                                     loaded = true;
                                     Enabled = userProperties.Attributes[PropertyIce].Value.Equals("True");
                                 }
-                                
+
                                 if(userProperties.Attributes[PropertyIceOutputDir] != null)
                                 {
                                     loaded = true;
                                     OutputDir = userProperties.Attributes[PropertyIceOutputDir].Value;
                                 }
-                                
+
                                 if(userProperties.Attributes[PropertyIceHeaderExt] != null)
                                 {
                                     loaded = true;
-                                    HeaderExt =  userProperties.Attributes[PropertyIceHeaderExt].Value;
+                                    HeaderExt = userProperties.Attributes[PropertyIceHeaderExt].Value;
                                 }
-                                
+
                                 if(userProperties.Attributes[PropertyIceSourceExt] != null)
                                 {
                                     loaded = true;
                                     SourceExt = userProperties.Attributes[PropertyIceSourceExt].Value;
                                 }
-                                
+
                                 if(userProperties.Attributes[PropertyIceExtraOptions] != null)
                                 {
                                     loaded = true;
@@ -200,23 +200,23 @@ namespace IceBuilder
                                     loaded = true;
                                     Stream = userProperties.Attributes[PropertyIceStreaming].Value.Equals("True");
                                 }
-                                
+
                                 if(userProperties.Attributes[PropertyIceChecksum] != null)
                                 {
                                     loaded = true;
                                     Checksum = userProperties.Attributes[PropertyIceChecksum].Value.Equals("True");
                                 }
-                                
+
                                 if(userProperties.Attributes[PropertyIceTie] != null)
                                 {
                                     loaded = true;
                                     Tie = userProperties.Attributes[PropertyIceTie].Value.Equals("True");
                                 }
-                                
+
                                 if(userProperties.Attributes[PropertyIcePrefix] != null)
                                 {
                                     loaded = true;
-                                    Ice =  userProperties.Attributes[PropertyIcePrefix].Value.Equals("True");
+                                    Ice = userProperties.Attributes[PropertyIcePrefix].Value.Equals("True");
                                 }
 
                                 if(userProperties.Attributes[PropertyIceDllExport] != null)
@@ -225,17 +225,17 @@ namespace IceBuilder
                                     DLLExport = userProperties.Attributes[PropertyIceDllExport].Value;
                                 }
 
-                                if (remove)
+                                if(remove)
                                 {
-                                    foreach (String name in OldPropertyNames)
+                                    foreach(string name in OldPropertyNames)
                                     {
-                                        if (userProperties.Attributes[name] != null)
+                                        if(userProperties.Attributes[name] != null)
                                         {
                                             userProperties.Attributes.Remove(userProperties.Attributes[name]);
                                         }
                                     }
 
-                                    if (userProperties.Attributes.Count == 0)
+                                    if(userProperties.Attributes.Count == 0)
                                     {
                                         project.Xml.RemoveChild(extension);
                                     }
@@ -243,8 +243,8 @@ namespace IceBuilder
                                 break;
                             }
                         }
-                        catch (XmlException)
-                        { 
+                        catch(XmlException)
+                        {
                         }
                     }
                 }
@@ -254,17 +254,17 @@ namespace IceBuilder
 
         public static void TryUpgrade(List<IVsProject> projects)
         {
-            String baseDir = String.Empty;
-            if(!String.IsNullOrEmpty(Package.Instance.DTE2.Solution.FullName))
+            string baseDir = string.Empty;
+            if(!string.IsNullOrEmpty(Package.Instance.DTE2.Solution.FullName))
             {
                 baseDir = Path.GetDirectoryName(Package.Instance.DTE2.Solution.FullName);
             }
-            Dictionary<String, IVsProject> upgradeProjects = new Dictionary<String, IVsProject>();
-            foreach (IVsProject project in projects)
+            Dictionary<string, IVsProject> upgradeProjects = new Dictionary<string, IVsProject>();
+            foreach(IVsProject project in projects)
             {
                 if(DTEUtil.IsCppProject(project) || DTEUtil.IsCSharpProject(project))
                 {
-                    String fullName = ProjectUtil.GetProjectFullPath(project);
+                    string fullName = ProjectUtil.GetProjectFullPath(project);
                     if(new OldConfiguration().Load(MSBuildUtils.LoadedProject(fullName, DTEUtil.IsCppProject(project), true), false))
                     {
                         upgradeProjects.Add(FileUtil.RelativePath(baseDir, fullName), project);
@@ -272,7 +272,7 @@ namespace IceBuilder
                 }
             }
 
-            if (upgradeProjects.Count > 0)
+            if(upgradeProjects.Count > 0)
             {
                 UpgradeDialog dialog = new UpgradeDialog();
                 dialog.StartPosition = FormStartPosition.CenterParent;
@@ -283,29 +283,29 @@ namespace IceBuilder
 
         public static void Upgrade(List<IVsProject> projects, UpgradeProgressCallback progressCallback)
         {
-            String solutionDir = Path.GetDirectoryName(Package.Instance.DTE2.Solution.FullName);
+            string solutionDir = Path.GetDirectoryName(Package.Instance.DTE2.Solution.FullName);
             Dispatcher dispatcher = Dispatcher.CurrentDispatcher;
             Thread t = new Thread(() =>
             {
-                for (int i = 0; i < projects.Count; ++i)
+                for(int i = 0; i < projects.Count; ++i)
                 {
-                    if (progressCallback.Canceled)
+                    if(progressCallback.Canceled)
                     {
                         break;
                     }
 
                     IVsProject project = projects[i];
-                    String projectName = FileUtil.RelativePath(solutionDir, ProjectUtil.GetProjectFullPath(project));
-                    if (Upgrade(project))
+                    string projectName = FileUtil.RelativePath(solutionDir, ProjectUtil.GetProjectFullPath(project));
+                    if(Upgrade(project))
                     {
                         EnvDTE.Project p = DTEUtil.GetProject(project as IVsHierarchy);
-                        if (p.Globals != null)
+                        if(p.Globals != null)
                         {
-                            foreach (String name in ProjectConverter.OldPropertyNames)
+                            foreach(string name in OldPropertyNames)
                             {
-                                if (p.Globals.get_VariableExists(name))
+                                if(p.Globals.get_VariableExists(name))
                                 {
-                                    p.Globals[name] = String.Empty;
+                                    p.Globals[name] = string.Empty;
                                     p.Globals.set_VariablePersists(name, false);
                                 }
                             }
@@ -314,9 +314,9 @@ namespace IceBuilder
                     }
                     dispatcher.Invoke(
                         new Action(() =>
-                            {
-                                progressCallback.ReportProgress(projectName, i);
-                            }));
+                        {
+                            progressCallback.ReportProgress(projectName, i);
+                        }));
                 }
                 dispatcher.BeginInvoke(new Action(() => progressCallback.Finished()));
             });
@@ -328,13 +328,13 @@ namespace IceBuilder
             OldConfiguration oldConfiguration = new OldConfiguration();
             Microsoft.Build.Evaluation.Project msbuildProject = MSBuildUtils.LoadedProject(ProjectUtil.GetProjectFullPath(project), DTEUtil.IsCppProject(project), true);
 
-            if (oldConfiguration.Load(msbuildProject, true))
+            if(oldConfiguration.Load(msbuildProject, true))
             {
                 if(DTEUtil.IsCppProject(project))
                 {
                     return UpgadeCppConfiguration(msbuildProject, oldConfiguration);
                 }
-                else if (DTEUtil.IsCSharpProject(project))
+                else if(DTEUtil.IsCSharpProject(project))
                 {
                     return UpgradeCSharpConfiguration(DTEUtil.GetProject(project as IVsHierarchy), msbuildProject, oldConfiguration);
                 }
@@ -346,53 +346,53 @@ namespace IceBuilder
             Microsoft.Build.Evaluation.Project project, OldConfiguration cfg)
         {
             ProjectPropertyGroupElement propertyGroup = project.Xml.PropertyGroups.FirstOrDefault(g => g.Label.Equals("IceBuilder"));
-            if (propertyGroup == null)
+            if(propertyGroup == null)
             {
                 propertyGroup = project.Xml.AddPropertyGroup();
                 propertyGroup.Label = "IceBuilder";
             }
 
-            if (!String.IsNullOrEmpty(cfg.OutputDir))
+            if(!string.IsNullOrEmpty(cfg.OutputDir))
             {
                 propertyGroup.AddProperty(PropertyNames.OutputDir, cfg.OutputDir);
             }
 
-            if (!String.IsNullOrEmpty(cfg.AdditionalOptions))
+            if(!string.IsNullOrEmpty(cfg.AdditionalOptions))
             {
                 propertyGroup.AddProperty(PropertyNames.AdditionalOptions, cfg.AdditionalOptions);
             }
 
-            if (!String.IsNullOrEmpty(cfg.IncludeDirectories))
+            if(!string.IsNullOrEmpty(cfg.IncludeDirectories))
             {
                 propertyGroup.AddProperty(PropertyNames.IncludeDirectories,
-                    String.Format(@"{0};$(IceHome)\slice", cfg.IncludeDirectories));
+                    string.Format(@"{0};$(IceHome)\slice", cfg.IncludeDirectories));
             }
             else
             {
                 propertyGroup.AddProperty(PropertyNames.IncludeDirectories, @"$(IceHome)\slice");
             }
 
-            if (cfg.Stream)
+            if(cfg.Stream)
             {
                 propertyGroup.AddProperty(PropertyNames.Stream, "True");
             }
 
-            if (cfg.Checksum)
+            if(cfg.Checksum)
             {
                 propertyGroup.AddProperty(PropertyNames.Checksum, "True");
             }
 
-            if (cfg.Ice)
+            if(cfg.Ice)
             {
                 propertyGroup.AddProperty(PropertyNames.AllowIcePrefix, "True");
             }
 
-            if (cfg.Tie)
+            if(cfg.Tie)
             {
                 propertyGroup.AddProperty(PropertyNames.Tie, "True");
             }
 
-            foreach (String assembly in Package.AssemblyNames)
+            foreach(string assembly in Package.AssemblyNames)
             {
                 VSLangProj80.Reference3 reference = ProjectUtil.FindAssemblyReference(dteProject, assembly) as VSLangProj80.Reference3;
                 if(reference != null)
@@ -407,7 +407,7 @@ namespace IceBuilder
             //
             // Default output directory has changed
             //
-            if (String.IsNullOrEmpty(cfg.OutputDir))
+            if(string.IsNullOrEmpty(cfg.OutputDir))
             {
                 project.GetItems("Compile").Where(
                     item =>
@@ -428,59 +428,59 @@ namespace IceBuilder
         private static bool UpgadeCppConfiguration(Microsoft.Build.Evaluation.Project project, OldConfiguration cfg)
         {
             ProjectPropertyGroupElement propertyGroup = project.Xml.PropertyGroups.FirstOrDefault(g => g.Label.Equals("IceBuilder"));
-            if (propertyGroup == null)
+            if(propertyGroup == null)
             {
                 propertyGroup = project.Xml.AddPropertyGroup();
                 propertyGroup.Label = "IceBuilder";
             }
 
-            if (!String.IsNullOrEmpty(cfg.OutputDir))
+            if(!string.IsNullOrEmpty(cfg.OutputDir))
             {
                 propertyGroup.AddProperty(PropertyNames.OutputDir, cfg.OutputDir);
             }
 
-            if (!String.IsNullOrEmpty(cfg.HeaderExt))
+            if(!string.IsNullOrEmpty(cfg.HeaderExt))
             {
                 propertyGroup.AddProperty(PropertyNames.HeaderExt, cfg.HeaderExt);
             }
 
-            if (!String.IsNullOrEmpty(cfg.SourceExt))
+            if(!string.IsNullOrEmpty(cfg.SourceExt))
             {
                 propertyGroup.AddProperty(PropertyNames.SourceExt, cfg.SourceExt);
             }
 
-            if (!String.IsNullOrEmpty(cfg.AdditionalOptions))
+            if(!string.IsNullOrEmpty(cfg.AdditionalOptions))
             {
                 propertyGroup.AddProperty(PropertyNames.AdditionalOptions, cfg.AdditionalOptions);
             }
 
-            if (!String.IsNullOrEmpty(cfg.IncludeDirectories))
+            if(!string.IsNullOrEmpty(cfg.IncludeDirectories))
             {
-                propertyGroup.AddProperty(PropertyNames.IncludeDirectories, 
-                    String.Format("{0};$({1})", cfg.IncludeDirectories, PropertyNames.IncludeDirectories));
+                propertyGroup.AddProperty(PropertyNames.IncludeDirectories,
+                    string.Format("{0};$({1})", cfg.IncludeDirectories, PropertyNames.IncludeDirectories));
             }
 
-            if (cfg.Stream)
+            if(cfg.Stream)
             {
                 propertyGroup.AddProperty(PropertyNames.Stream, "True");
             }
 
-            if (cfg.Checksum)
+            if(cfg.Checksum)
             {
                 propertyGroup.AddProperty(PropertyNames.Checksum, "True");
             }
 
-            if (cfg.Ice)
+            if(cfg.Ice)
             {
                 propertyGroup.AddProperty(PropertyNames.AllowIcePrefix, "True");
             }
 
-            if (!String.IsNullOrEmpty(cfg.DLLExport))
+            if(!string.IsNullOrEmpty(cfg.DLLExport))
             {
                 propertyGroup.AddProperty(PropertyNames.DLLExport, cfg.DLLExport);
             }
 
-            foreach (ProjectItemDefinitionGroupElement group in project.Xml.ItemDefinitionGroups)
+            foreach(ProjectItemDefinitionGroupElement group in project.Xml.ItemDefinitionGroups)
             {
                 //
                 // Remove old property sheet from all configurations
@@ -489,7 +489,7 @@ namespace IceBuilder
                     p => p.Project.Equals("$(ALLUSERSPROFILE)\\ZeroC\\Ice.props"));
                 if(imports != null)
                 {
-                    foreach (ProjectImportElement import in imports)
+                    foreach(ProjectImportElement import in imports)
                     {
                         import.Parent.RemoveChild(import);
                     }
@@ -501,71 +501,71 @@ namespace IceBuilder
                     p => p.Project.IndexOf("CommonConfiguration\\Neutral\\Ice.props") != -1);
                 if(imports != null)
                 {
-                    foreach (ProjectImportElement import in imports)
+                    foreach(ProjectImportElement import in imports)
                     {
                         import.Parent.RemoveChild(import);
                     }
                 }
-                
-                foreach (ProjectItemDefinitionElement i in group.ItemDefinitions)
+
+                foreach(ProjectItemDefinitionElement i in group.ItemDefinitions)
                 {
-                    if (i.ItemType.Equals("ClCompile"))
+                    if(i.ItemType.Equals("ClCompile"))
                     {
-                        if (!String.IsNullOrEmpty(cfg.OutputDir))
+                        if(!string.IsNullOrEmpty(cfg.OutputDir))
                         {
                             ProjectMetadataElement metaData = i.Metadata.FirstOrDefault(
                                 e => e.Name.Equals("AdditionalIncludeDirectories"));
 
-                            if (metaData != null)
+                            if(metaData != null)
                             {
-                                List<String> values = new List<String>(metaData.Value.Split(new char[] { ';' }));
+                                List<string> values = new List<string>(metaData.Value.Split(new char[] { ';' }));
                                 values.Remove(cfg.OutputDir);
-                                metaData.Value = String.Join(";", values);
+                                metaData.Value = string.Join(";", values);
 
-                                if (values.Count == 0 ||
+                                if(values.Count == 0 ||
                                     (values.Count == 1 && values[0].Equals("%(AdditionalIncludeDirectories)")))
                                 {
                                     i.RemoveChild(metaData);
                                 }
                                 else
                                 {
-                                    if (!values.Contains("%(AdditionalIncludeDirectories)"))
+                                    if(!values.Contains("%(AdditionalIncludeDirectories)"))
                                     {
                                         values.Add("%(AdditionalIncludeDirectories)");
                                     }
-                                    metaData.Value = String.Join(";", values);
+                                    metaData.Value = string.Join(";", values);
                                 }
                             }
                         }
                     }
-                    else if (i.ItemType.Equals("Link"))
+                    else if(i.ItemType.Equals("Link"))
                     {
                         ProjectMetadataElement metaData = i.Metadata.FirstOrDefault(
                                 e => e.Name.Equals("AdditionalDependencies"));
 
-                        if (metaData != null)
+                        if(metaData != null)
                         {
-                            List<String> values = new List<String>(metaData.Value.Split(new char[] { ';' }));
-                            foreach (String name in Package.CppLibNames)
+                            List<string> values = new List<string>(metaData.Value.Split(new char[] { ';' }));
+                            foreach(string name in Package.CppLibNames)
                             {
-                                values.Remove(String.Format("{0}.lib", name));
-                                values.Remove(String.Format("{0}d.lib", name));
+                                values.Remove(string.Format("{0}.lib", name));
+                                values.Remove(string.Format("{0}d.lib", name));
                             }
 
-                            if (values.Count == 0 || (values.Count == 1 && values[0].Equals("%(AdditionalDependencies)")))
+                            if(values.Count == 0 || (values.Count == 1 && values[0].Equals("%(AdditionalDependencies)")))
                             {
                                 i.RemoveChild(metaData);
                             }
                             else
                             {
-                                metaData.Value = String.Join(";", values);
+                                metaData.Value = string.Join(";", values);
                             }
                         }
 
                         metaData = i.Metadata.FirstOrDefault(e => e.Name.Equals("AdditionalLibraryDirectories"));
-                        if (metaData != null)
+                        if(metaData != null)
                         {
-                            if (metaData.Value.Equals("%(AdditionalLibraryDirectories)"))
+                            if(metaData.Value.Equals("%(AdditionalLibraryDirectories)"))
                             {
                                 i.RemoveChild(metaData);
                             }
@@ -580,9 +580,9 @@ namespace IceBuilder
             //
             // Default output directory has changed
             //
-            if(String.IsNullOrEmpty(cfg.OutputDir))
+            if(string.IsNullOrEmpty(cfg.OutputDir))
             {
-                foreach (String itemType in new String[] { "ClInclude", "ClCompile" })
+                foreach(string itemType in new string[] { "ClInclude", "ClCompile" })
                 {
                     project.GetItems(itemType).Where(
                         item =>
@@ -599,10 +599,10 @@ namespace IceBuilder
             }
 
             sliceItems.ForEach(item =>
-                {
-                    project.RemoveItem(item);
-                    project.AddItem("IceBuilder", item.UnevaluatedInclude);
-                });
+            {
+                project.RemoveItem(item);
+                project.AddItem("IceBuilder", item.UnevaluatedInclude);
+            });
             return true;
         }
     }
