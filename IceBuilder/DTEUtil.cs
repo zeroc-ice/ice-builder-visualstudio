@@ -24,6 +24,31 @@ namespace IceBuilder
 
     public class DTEUtil
     {
+        private static uint GetItemId(object value)
+        {
+            if(value == null)
+            {
+                return VSConstants.VSITEMID_NIL;
+            }
+            if(value is int)
+            {
+                return (uint)(int)value;
+            }
+            if(value is uint)
+            {
+                return (uint)value;
+            }
+            if(value is short)
+            {
+                return (uint)(short)value;
+            }
+            if(value is long)
+            {
+                return (uint)(long)value;
+            }
+            return VSConstants.VSITEMID_NIL;
+        }
+
         public static IVsProject GetProject(String path)
         {
             List<IVsProject> projects = GetProjects();
@@ -46,7 +71,11 @@ namespace IceBuilder
                 ErrorHandler.ThrowOnFailure(enumHierarchies.Next(1, hierarchies, out sz));
                 if(sz > 0)
                 {
-                    projects.Add(hierarchies[0] as IVsProject);
+                    var project = hierarchies[0] as IVsProject;
+                    if(project != null)
+                    {
+                        projects.Add(project);
+                    }
                 }
             }
             while(sz == 1);
@@ -61,14 +90,14 @@ namespace IceBuilder
             int result = h.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_FirstVisibleChild, out value);
             while(ErrorHandler.Succeeded(result))
             {
-                if(value is int && (uint)(int)value == VSConstants.VSITEMID_NIL)
+                uint child = GetItemId(value);
+                if(child == VSConstants.VSITEMID_NIL)
                 {
                     // No more nodes
                     break;
                 }
                 else
                 {
-                    uint child = Convert.ToUInt32(value);
                     GetSubProjects(h, child, ref projects);
 
                     // Get the next visible sibling node
