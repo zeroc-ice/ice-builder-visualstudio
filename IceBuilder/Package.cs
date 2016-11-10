@@ -178,7 +178,7 @@ namespace IceBuilder
 
         public void SetAutoBuilding(bool value)
         {
-            Registry.SetValue(IceHomeKey, IceAutoBuilding, value ? 1 : 0, RegistryValueKind.DWord);
+            Registry.SetValue(IceBuilderKey, IceAutoBuilding, value ? 1 : 0, RegistryValueKind.DWord);
             AutoBuilding = value;
         }
 
@@ -186,7 +186,7 @@ namespace IceBuilder
         {
             try
             {
-                return 1 == (int)Registry.GetValue(IceHomeKey, IceAutoBuilding, 0);
+                return 1 == (int)Registry.GetValue(IceBuilderKey, IceAutoBuilding, 0);
             }
             catch(System.NullReferenceException)
             {
@@ -229,10 +229,10 @@ namespace IceBuilder
                 //
                 // Remove all registry settings.
                 //
-                Registry.SetValue(IceHomeKey, IceHomeValue, "", RegistryValueKind.String);
-                Registry.SetValue(IceHomeKey, IceVersionValue, "", RegistryValueKind.String);
-                Registry.SetValue(IceHomeKey, IceIntVersionValue, "", RegistryValueKind.String);
-                Registry.SetValue(IceHomeKey, IceVersionMMValue, "", RegistryValueKind.String);
+                Registry.SetValue(IceBuilderKey, IceHomeValue, "", RegistryValueKind.String);
+                Registry.SetValue(IceBuilderKey, IceVersionValue, "", RegistryValueKind.String);
+                Registry.SetValue(IceBuilderKey, IceIntVersionValue, "", RegistryValueKind.String);
+                Registry.SetValue(IceBuilderKey, IceVersionMMValue, "", RegistryValueKind.String);
 
                 TryRemoveAssemblyFoldersExKey();
 
@@ -270,16 +270,16 @@ namespace IceBuilder
                                 { "ICE_HOME", value }
                             },
                         null);
-                    Registry.SetValue(IceHomeKey, IceHomeValue, value, RegistryValueKind.String);
+                    Registry.SetValue(IceBuilderKey, IceHomeValue, value, RegistryValueKind.String);
 
                     string version = p.GetPropertyValue(IceVersionValue);
-                    Registry.SetValue(IceHomeKey, IceVersionValue, version, RegistryValueKind.String);
+                    Registry.SetValue(IceBuilderKey, IceVersionValue, version, RegistryValueKind.String);
 
                     string intVersion = p.GetPropertyValue(IceIntVersionValue);
-                    Registry.SetValue(IceHomeKey, IceIntVersionValue, intVersion, RegistryValueKind.String);
+                    Registry.SetValue(IceBuilderKey, IceIntVersionValue, intVersion, RegistryValueKind.String);
 
                     string mmVersion = p.GetPropertyValue(IceVersionMMValue);
-                    Registry.SetValue(IceHomeKey, IceVersionMMValue, mmVersion, RegistryValueKind.String);
+                    Registry.SetValue(IceBuilderKey, IceVersionMMValue, mmVersion, RegistryValueKind.String);
 
                     MSBuildUtils.SetIceHome(DTEUtil.GetProjects(), value, version, intVersion, mmVersion);
 
@@ -323,15 +323,15 @@ namespace IceBuilder
                                         MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, 0);
                         return;
                     }
-                    Registry.SetValue(IceHomeKey, IceHomeValue, value, RegistryValueKind.String);
+                    Registry.SetValue(IceBuilderKey, IceHomeValue, value, RegistryValueKind.String);
 
-                    Registry.SetValue(IceHomeKey, IceVersionValue, v.ToString(), RegistryValueKind.String);
+                    Registry.SetValue(IceBuilderKey, IceVersionValue, v.ToString(), RegistryValueKind.String);
 
                     string iceIntVersion = String.Format("{0}{1:00}{2:00}", v.Major, v.Minor, v.Build);
-                    Registry.SetValue(IceHomeKey, IceIntVersionValue, iceIntVersion, RegistryValueKind.String);
+                    Registry.SetValue(IceBuilderKey, IceIntVersionValue, iceIntVersion, RegistryValueKind.String);
 
                     string iceVersionMM = string.Format("{0}.{1}", v.Major, v.Minor);
-                    Registry.SetValue(IceHomeKey, IceVersionMMValue, iceVersionMM, RegistryValueKind.String);
+                    Registry.SetValue(IceBuilderKey, IceVersionMMValue, iceVersionMM, RegistryValueKind.String);
 
                     MSBuildUtils.SetIceHome(DTEUtil.GetProjects(), value, v.ToString(), iceIntVersion, iceVersionMM);
 
@@ -368,7 +368,7 @@ namespace IceBuilder
 
             if(string.IsNullOrEmpty(iceHome))
             {
-                object value = Registry.GetValue(IceHomeKey, IceHomeValue, "");
+                object value = Registry.GetValue(IceBuilderKey, IceHomeValue, "");
                 iceHome = value == null ? string.Empty : value.ToString();
             }
 
@@ -437,7 +437,9 @@ namespace IceBuilder
                 {
                     Microsoft.Build.Evaluation.Project p = MSBuildUtils.LoadedProject(
                                 ProjectUtil.GetProjectFullPath(project), projectType == IceBuilderProjectType.CppProjectType, true);
-                    if(MSBuildUtils.UpgradeProjectImports(p))
+                    bool modified = MSBuildUtils.UpgradeProjectImports(p);
+                    modified = MSBuildUtils.EnsureIceBuilderImports(p) || modified;
+                    if(modified)
                     {
                         IVsHierarchy hier = project as IVsHierarchy;
                         Guid projectGUID = Guid.Empty;
@@ -537,8 +539,8 @@ namespace IceBuilder
 
             if(!CommandLineMode)
             {
-                ResourcesDirectory = Path.Combine(
-                    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Resources");
+                InstallDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                ResourcesDirectory = Path.Combine(InstallDirectory, "Resources");
 
                 //
                 // Copy required target, property and task files
@@ -589,6 +591,12 @@ namespace IceBuilder
 
                 // Add our command handlers for menu (commands must exist in the .vsct file)
                 OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
+
+                //
+                // Update the InstallDir it will be used in project imports
+                //
+                Registry.SetValue(IceBuilderKey, string.Format("InstallDir.{0}", DTE.Version), InstallDirectory,
+                                  RegistryValueKind.String);
 
                 if(null != mcs)
                 {
@@ -1311,6 +1319,11 @@ namespace IceBuilder
             }
         }
 
+        private string InstallDirectory
+        {
+            get;
+            set;
+        }
         private string ResourcesDirectory
         {
             get;
@@ -1325,7 +1338,7 @@ namespace IceBuilder
 
         private HashSet<IVsProject> _buildProjects = new HashSet<IVsProject>();
 
-        public static readonly string IceHomeKey = @"HKEY_CURRENT_USER\Software\ZeroC\IceBuilder";
+        public static readonly string IceBuilderKey = @"HKEY_CURRENT_USER\Software\ZeroC\IceBuilder";
         public static readonly string IceHomeValue = "IceHome";
         public static readonly string IceVersionValue = "IceVersion";
         public static readonly string IceVersionMMValue = "IceVersionMM";

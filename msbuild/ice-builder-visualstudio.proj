@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Install" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-<!-- Custom task to query the installed VS extensions -->
 <UsingTask TaskName="ListExtensions"
            TaskFactory="CodeTaskFactory"
            AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
@@ -9,7 +8,44 @@
         <Version ParameterType="System.String" Required="true"/>
         <Status ParameterType="System.String" Required="true"/>
         <Identity ParameterType="System.String" Required="true"/>
-        <Paths ParameterType="System.String[]" Output="true" />
+        <Items ParameterType="Microsoft.Build.Framework.ITaskItem[]" Output="true" />
+    </ParameterGroup>
+    <Task>
+        <Reference Include="System" />
+        <Reference Include="mscorlib"/>
+        <Using Namespace="Microsoft.Win32"/>
+        <Using Namespace="Microsoft.Build.Framework"/>
+        <Code Type="Fragment" Language="cs">
+            <![CDATA[
+            using(RegistryKey k = Registry.CurrentUser.OpenSubKey(
+                String.Format("Software\\Microsoft\\VisualStudio\\{0}\\ExtensionManager\\{1}", Version, Status)))
+            {
+                var items = new List<ITaskItem>();
+                if(k != null)
+                {
+                    foreach(string v in k.GetValueNames())
+                    {
+                        if(v.StartsWith(Identity))
+                        {
+                            var item = new TaskItem(k.GetValue(v).ToString());
+                            item.SetMetadata("Version", Version);
+                            items.Add(item);
+                        }
+                    }
+                }
+                Items = items.ToArray();
+            }
+            ]]>
+        </Code>
+    </Task>
+</UsingTask>
+
+<UsingTask TaskName="UpdateExtensionInstallDir"
+           TaskFactory="CodeTaskFactory"
+           AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
+    <ParameterGroup>
+        <Version ParameterType="System.String" Required="true"/>
+        <InstallDir ParameterType="System.String" Required="true"/>
     </ParameterGroup>
     <Task>
         <Reference Include="System" />
@@ -17,21 +53,9 @@
         <Using Namespace="Microsoft.Win32"/>
         <Code Type="Fragment" Language="cs">
             <![CDATA[
-            using(RegistryKey k = Registry.CurrentUser.OpenSubKey(
-                String.Format("Software\\Microsoft\\VisualStudio\\{0}\\ExtensionManager\\{1}", Version, Status)))
+            using(RegistryKey k = Registry.CurrentUser.CreateSubKey("Software\\ZeroC\\IceBuilder"))
             {
-                List<String> paths = new List<String>();
-                if(k != null)
-                {
-                    foreach(string v in k.GetValueNames())
-                    {
-                        if(v.StartsWith(Identity))
-                        {
-                            paths.Add(k.GetValue(v).ToString());
-                        }
-                    }
-                }
-                Paths = paths.ToArray();
+                k.SetValue(string.Format("InstallDir.{0}", Version), InstallDir);
             }
             ]]>
         </Code>
@@ -59,16 +83,16 @@
 <Target Name="Install">
     <Exec Command="VSIxinstaller /q /nr /l:install.log $(VSIXFile)" IgnoreExitCode="yes" />
     <ListExtensions Version="%(VS.Version)" Status="EnabledExtensions" Identity="ef9502be-dbc2-4568-a846-02b8e42d04c2">
-        <Output TaskParameter="Paths" ItemName="EnabledExtension"/>
+        <Output TaskParameter="Items" ItemName="EnabledExtension"/>
     </ListExtensions>
+    <UpdateExtensionInstallDir Version="%(EnabledExtension.Version)" InstallDir="%(EnabledExtension.Identity)" />
     <Message Text="Enabled extensions: %(EnabledExtension.Identity)" />
 </Target>
-
 
 <Target Name="Uninstall">
     <Exec Command="VSIxinstaller /u:$(Identity) /q /l:install.log" IgnoreExitCode="yes" />
     <ListExtensions Version="%(VS.Version)" Status="PendingDeletions" Identity="$(Identity)">
-        <Output TaskParameter="Paths" ItemName="PendingDeletions" />
+        <Output TaskParameter="Items" ItemName="PendingDeletions" />
     </ListExtensions>
     <RemoveDir Directories="%(PendingDeletions.Identity)" Condition="Exists('%(PendingDeletions.Identity)')"/>
 </Target>
