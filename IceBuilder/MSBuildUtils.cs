@@ -346,7 +346,9 @@ namespace IceBuilder
             bool modified = AddCsharpGlobalProperties(project);
             modified = AddImportAfter(project, IceBuilderCSharpProps,
                 project.Xml.Imports.FirstOrDefault(
-                    p => p.Project.Equals(@"$(MSBuildToolsPath)\Microsoft.CSharp.targets", 
+                    p => p.Project.EndsWith(@"$(MSBuildToolsPath)\Microsoft.CSharp.targets", 
+                                          StringComparison.CurrentCultureIgnoreCase) ||
+                         p.Project.Equals(@"$(MSBuildBinPath)\Microsoft.CSharp.targets",
                                           StringComparison.CurrentCultureIgnoreCase))) || modified;
 
             modified = AddImportAfter(project, IceBuilderCSharpTargets,
