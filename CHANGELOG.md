@@ -1,3 +1,10 @@
+## Changes in Ice Builder for Visual Studio 4.3.5
+
+- Fixed a bug that can cause  OverflowException when 
+  traversing IVsHierarchy.
+
+- Improve msbuild project integration.
+
 ## Changes in Ice Builder for Visual Studio 4.3.4
 
 - Update the builder to support using Ice 3.7 Nuget
