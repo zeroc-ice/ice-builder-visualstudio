@@ -5,6 +5,9 @@
 
 - Improve msbuild project integration.
 
+- Fix compatibility issue with older csharp projects using 
+  $(MSBuildBinPath)
+
 ## Changes in Ice Builder for Visual Studio 4.3.4
 
 - Update the builder to support using Ice 3.7 Nuget
