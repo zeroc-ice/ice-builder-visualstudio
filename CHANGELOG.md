@@ -1,11 +1,17 @@
+## Changes in Ice Builder for Visual Studio 4.3.6
+
+- Fixed a bug that can cause an OverflowException when
+  trasversing IVsHierachy, is a similar issue to the one
+  fixed in 4.3.5 but affects a different code path.
+
 ## Changes in Ice Builder for Visual Studio 4.3.5
 
-- Fixed a bug that can cause  OverflowException when 
+- Fixed a bug that can cause OverflowException when
   traversing IVsHierarchy.
 
 - Improve msbuild project integration.
 
-- Fix compatibility issue with older csharp projects using 
+- Fix compatibility issue with older csharp projects using
   $(MSBuildBinPath)
 
 ## Changes in Ice Builder for Visual Studio 4.3.4

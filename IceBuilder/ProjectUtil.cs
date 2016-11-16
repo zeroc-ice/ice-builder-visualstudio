@@ -130,27 +130,23 @@ namespace IceBuilder
                 result = h.GetProperty(itemId, (int)__VSHPROPID.VSHPROPID_FirstVisibleChild, out value);
                 while(result == VSConstants.S_OK && value != null)
                 {
-                    if(value is int && (uint)(int)value == VSConstants.VSITEMID_NIL)
+                    uint child = DTEUtil.GetItemId(value);
+                    if(child == VSConstants.VSITEMID_NIL)
                     {
                         // No more nodes
                         break;
                     }
                     else
                     {
-                        uint child = Convert.ToUInt32(value);
-
-                        value = null;
                         result = h.GetProperty(child, (int)__VSHPROPID.VSHPROPID_Name, out value);
                         string path = value as string;
                         if(IsSliceFileName(path))
                         {
                             items.Add(path);
                         }
-
                         GetIceBuilderItems(h, child, ref items);
 
                         // Get the next visible sibling node
-                        value = null;
                         result = h.GetProperty(child, (int)__VSHPROPID.VSHPROPID_NextVisibleSibling, out value);
                     }
                 }

@@ -24,7 +24,7 @@ namespace IceBuilder
 
     public class DTEUtil
     {
-        private static uint GetItemId(object value)
+        public static uint GetItemId(object value)
         {
             if(value == null)
             {
