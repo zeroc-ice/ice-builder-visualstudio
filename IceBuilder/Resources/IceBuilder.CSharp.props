@@ -2,9 +2,6 @@
 <!-- Copyright (c) 2009-2016 ZeroC, Inc. All rights reserved. -->
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <!-- Import IceBuilder common settings -->
-  <Import Project="$(MSBuildThisFileDirectory)\IceBuilder.Common.props"/>
-
   <!-- Import our custom MSbuild tasks used to build Ice for CSharp projects -->
   <UsingTask TaskName="IceBuilder.Slice2CSharpTask"
              AssemblyFile="$(MSBuildThisFileDirectory)IceBuilder.Tasks.dll" />
@@ -12,17 +9,18 @@
   <UsingTask TaskName="IceBuilder.Slice2CSharpDependTask"
              AssemblyFile="$(MSBuildThisFileDirectory)IceBuilder.Tasks.dll" />
 
-  <!-- Import settings from the Ice distribution, If the project is usig a nuget package those
-       are already imported and we avoid to import the settings twice -->
-  <ImportGroup Condition="'$(IceNugetPackageVersion)' == ''">
-    <Import Project="$(IceHome)\config\Ice.CSharp.props"
-            Condition="Exists('$(IceHome)\config\Ice.CSharp.props')"/>
+  <!-- Import IceBuilder common settings -->
+  <Import Project="$(MSBuildThisFileDirectory)\IceBuilder.Common.props"/>
 
-    <!-- With Ice source distribution the settings are in the cpp msbuild directory -->
+  <!-- Import settings from the Ice distribution, If the project is usig Ice nuget packages 
+       those are already imported and we avoid to import the settings twice -->
+  <ImportGroup Condition="'$(IceNugetPackageVersion)' == ''">
+
+    <!-- With Ice source distribution > 3.6 the settings are in the cpp msbuild directory -->
     <Import Project="$(IceHome)\csharp\msbuild\icebuilder.csharp.props"
             Condition="Exists('$(IceHome)\csharp\msbuild\icebuilder.csharp.props')"/>
 
-    <!-- With Ice binary distribution >= 3.7.0 settings are in the Nuget package build directory -->
+    <!-- With Ice binary distribution > 3.6 settings are in the Nuget package build directory -->
     <Import Project="$(IceHome)\zeroc.ice.net\build\zeroc.ice.net.props"
             Condition="Exists('$(IceHome)\zeroc.ice.net\build\zeroc.ice.net.props')"/>
   </ImportGroup>

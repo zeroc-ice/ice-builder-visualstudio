@@ -2,9 +2,6 @@
 <!-- Copyright (c) 2009-2016 ZeroC, Inc. All rights reserved. -->
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <!-- Import IceBuilder common settings -->
-  <Import Project="$(MSBuildThisFileDirectory)\IceBuilder.Common.props"/>
-
   <!-- Import our custom MSbuild tasks used to build Ice for C++ projects -->
   <UsingTask TaskName="IceBuilder.Slice2CppTask"
              AssemblyFile="$(MSBuildThisFileDirectory)IceBuilder.Tasks.dll" />
@@ -22,8 +19,10 @@
   <Import Project="$(IceUWPPackage)"
           Condition="'$(PlatformToolset)' == 'v140' and Exists('$(IceUWPPackage)')"/>
 
-  <!-- Import settings from the Ice distribution, If the project is using a nuget package those
-       are already imported and we avoid to import the settings twice -->
+  <!-- Import IceBuilder common settings -->
+  <Import Project="$(MSBuildThisFileDirectory)\IceBuilder.Common.props"/>
+
+  <!-- Import settings from the Ice distribution -->
   <ImportGroup Condition="'$(IceNugetPackageVersion)' == ''">
 
     <!-- With Ice 3.6.0 settings are in the builder directory -->
@@ -34,13 +33,23 @@
     <Import Project="$(IceHome)\config\Ice.Cpp.props"
             Condition="Exists('$(IceHome)\config\Ice.Cpp.props')"/>
 
-    <!-- With Ice source distribution the settings are in the cpp msbuild directory -->
+    <!-- With Ice > 3.6 source distribution the settings are in the cpp msbuild directory -->
     <Import Project="$(IceHome)\cpp\msbuild\icebuilder.cpp.props"
             Condition="Exists('$(IceHome)\cpp\msbuild\icebuilder.cpp.props')"/>
 
-    <!-- With Ice 3.7.0 binary distribution settings are in the Nuget package build directory -->
-    <Import Project="$(IceHome)\zeroc.ice.$(DefaultPlatformToolset)\build\zeroc.ice.$(DefaultPlatformToolset).props"
-            Condition="Exists('$(IceHome)\zeroc.ice.$(DefaultPlatformToolset)\build\zeroc.ice.$(DefaultPlatformToolset).props')"/>
+    <!-- With Ice > 3.6 binary distribution settings are in the Nuget package build directory -->
+
+    <Import Project="$(IceHome)\zeroc.ice.$(DefaultPlatformToolset)\build\native\zeroc.ice.props"
+            Condition="Exists('$(IceHome)\zeroc.ice.$(DefaultPlatformToolset)\build\native\zeroc.ice.props')"/>
+
+    <!-- For Windows Store applications we also need to import the targets from the ARCH dependent packages -->
+    <Import Project="$(IceHome)\zeroc.ice.uwp.arm\build\native\zeroc.ice.uwp.arm.targets"
+            Condition="'$(ApplicationType)' == 'Windows Store' and Exists('$(IceHome)\zeroc.ice.uwp.arm\build\native\zeroc.ice.uwp.arm.targets')"/>
+    <Import Project="$(IceHome)\zeroc.ice.uwp.arm\build\native\zeroc.ice.uwp.x64.targets"
+            Condition="'$(ApplicationType)' == 'Windows Store' and Exists('$(IceHome)\zeroc.ice.uwp.arm\build\native\zeroc.ice.uwp.x64.targets')"/>
+    <Import Project="$(IceHome)\zeroc.ice.uwp.arm\build\native\zeroc.ice.uwp.x86.targets"
+            Condition="'$(ApplicationType)' == 'Windows Store' and Exists('$(IceHome)\zeroc.ice.uwp.arm\build\native\zeroc.ice.uwp.x86.targets')"/>
+
   </ImportGroup>
 
   <!-- Default settings for IceBuilder -->
