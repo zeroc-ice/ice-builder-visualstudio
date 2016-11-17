@@ -253,9 +253,9 @@ namespace IceBuilder
                 {
                     foreach(string d in Directory.EnumerateDirectories(value))
                     {
-                        if(File.Exists(Path.Combine(d, "build", "native", string.Format("zeroc.ice.props", Path.GetFileName(d)))))
+                        if(File.Exists(Path.Combine(d, "build", "native", "zeroc.ice.props")))
                         {
-                            props = Path.Combine(d, "build", "native", string.Format("zeroc.ice.props", Path.GetFileName(d)));
+                            props = Path.Combine(d, "build", "native", "zeroc.ice.props");
                             break;
                         }
                     }
