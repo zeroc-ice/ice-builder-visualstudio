@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="ef9502be-dbc2-4568-a846-02b8e42d04c2" Version="4.3.5" Language="en-US" Publisher="ZeroC" />
+    <Identity Id="ef9502be-dbc2-4568-a846-02b8e42d04c2" Version="4.3.6" Language="en-US" Publisher="ZeroC" />
     <DisplayName>Ice Builder</DisplayName>
     <Description xml:space="preserve">Ice Builder manages the compilation of Slice (.ice) files to C++ and C#. It compiles your Slice files with slice2cpp and slice2cs, and allows you to specify the parameters provided to these compilers.</Description>
     <MoreInfo>https://github.com/zeroc-ice/ice-builder-visualstudio</MoreInfo>
