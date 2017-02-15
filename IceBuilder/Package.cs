@@ -707,13 +707,17 @@ namespace IceBuilder
                 {
                     assembly = Assembly.LoadFrom(Path.Combine(ResourcesDirectory, "IceBuilder.VS2012.dll"));
                 }
-                else if(DTE.Version.StartsWith("12.0"))
+                else if (DTE.Version.StartsWith("12.0"))
                 {
                     assembly = Assembly.LoadFrom(Path.Combine(ResourcesDirectory, "IceBuilder.VS2013.dll"));
                 }
-                else
+                else if (DTE.Version.StartsWith("14.0"))
                 {
                     assembly = Assembly.LoadFrom(Path.Combine(ResourcesDirectory, "IceBuilder.VS2015.dll"));
+                }
+                else
+                {
+                    assembly = Assembly.LoadFrom(Path.Combine(ResourcesDirectory, "IceBuilder.VS2017.dll"));
                 }
                 VCUtil = assembly.GetType("IceBuilder.VCUtilI").GetConstructor(new Type[] { }).Invoke(
                     new object[] { }) as VCUtil;
