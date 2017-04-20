@@ -1,26 +1,24 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
-  <Metadata>
-    <Identity Id="ef9502be-dbc2-4568-a846-02b8e42d04c2" Version="4.3.6" Language="en-US" Publisher="ZeroC" />
-    <DisplayName>Ice Builder</DisplayName>
-    <Description xml:space="preserve">Ice Builder manages the compilation of Slice (.ice) files to C++ and C#. It compiles your Slice files with slice2cpp and slice2cs, and allows you to specify the parameters provided to these compilers.</Description>
-    <MoreInfo>https://github.com/zeroc-ice/ice-builder-visualstudio</MoreInfo>
-    <License>Resources\LICENSE.rtf</License>
-    <Icon>Resources\Package.png</Icon>
-    <PreviewImage>Resources\Preview.png</PreviewImage>
-    <Tags>ZeroC, Ice, Slice</Tags>
-  </Metadata>
-  <Installation>
-    <InstallationTarget Version="[11.0,14.0]" Id="Microsoft.VisualStudio.Pro" />
-  </Installation>
-  <Dependencies>
-    <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5, 5.0]" />
-    <Dependency Id="Microsoft.VisualStudio.MPF.11.0" DisplayName="Visual Studio MPF 11.0" d:Source="Installed" Version="11.0" />
-  </Dependencies>
-  <Assets>
-    <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
-    <Asset Type="Microsoft.VisualStudio.ItemTemplate" d:Source="Project" d:ProjectName="CSharpSliceItemTemplate" d:TargetPath="|CSharpSliceItemTemplate;TemplateProjectOutputGroup|" Path="ItemTemplates" d:VsixSubPath="ItemTemplates" />
-    <Asset Type="Microsoft.VisualStudio.ItemTemplate" d:Source="Project" d:ProjectName="VCSliceItemTemplate" d:TargetPath="|VCSliceItemTemplate;TemplateProjectOutputGroup|" Path="ItemTemplates" d:VsixSubPath="ItemTemplates" />
-    <Asset Type="Microsoft.VisualStudio.Assembly" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%|" AssemblyName="|%CurrentProject%;AssemblyName|" />
-  </Assets>
-</PackageManifest>
+<Vsix xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="1.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2010">
+  <Identifier Id="D381D516-A7DA-4BFD-BD04-A649F2DB947F">
+    <Name>Ice Builder for Visual Studio 2010</Name>
+    <Author>ZeroC</Author>
+    <Version>4.3.6</Version>
+    <Description xml:space="preserve">Ice Builder for Visual Studio 2010</Description>
+    <Locale>1033</Locale>
+    <MoreInfoUrl>https://github.com/zeroc-ice/ice-builder-visualstudio/</MoreInfoUrl>
+    <License>LICENSE.rtf</License>
+    <Icon>Package.ico</Icon>
+    <PreviewImage>Preview.png</PreviewImage>
+    <SupportedProducts>
+      <VisualStudio Version="10.0">
+        <Edition>Pro</Edition>
+      </VisualStudio>
+    </SupportedProducts>
+    <SupportedFrameworkRuntimeEdition MinVersion="4.0" MaxVersion="4.0" />
+  </Identifier>
+  <References />
+  <Content>
+    <VsPackage>|%CurrentProject%;PkgdefProjectOutputGroup|</VsPackage>
+  </Content>
+</Vsix>
