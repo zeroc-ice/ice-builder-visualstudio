@@ -74,6 +74,9 @@
     <Content Include="LICENSE.rtf">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="Resources\IceBuilder.Common.props">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <None Include="source.extension.vsixmanifest" />
   </ItemGroup>
   <ItemGroup>
