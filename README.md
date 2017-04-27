@@ -22,9 +22,7 @@ The Ice Builder is a Visual Studio extension compatible with Visual Studio 2010,
 ## Installation
 
 The Ice Builder is available as two Visual Studio extensions in the 
-[Visual Studio Marketplace](https://marketplace.visualstudio.com/): [Ice Builder](https://marketplace.visualstudio.com/vsgallery/1a64e701-63f2-4740-8004-290e6c682ce0) for Visual Studio 2012,
-2013 and 2015 and 
-[Ice Builder for Visual Studio 2010](https://marketplace.visualstudio.com/vsgallery/d5df280b-2972-4d03-babb-e40b1437fde1).
+Visual Studio Marketplace: [Ice Builder](https://marketplace.visualstudio.com/vsgallery/1a64e701-63f2-4740-8004-290e6c682ce0) for Visual Studio 2012, 2013 and 2015 and [Ice Builder for Visual Studio 2010](https://marketplace.visualstudio.com/vsgallery/d5df280b-2972-4d03-babb-e40b1437fde1).
 
 If you build Ice Builder from sources, simply double-click on `IceBuilder.vsix` or `IceBuilder_VS2010.vsix` to install the extension into Visual Studio.
 
