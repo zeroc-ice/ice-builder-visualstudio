@@ -33,6 +33,10 @@
     <Import Project="$(IceHome)\config\Ice.Cpp.props"
             Condition="Exists('$(IceHome)\config\Ice.Cpp.props')"/>
 
+    <!-- With Ice 3.6 source distribution settings are in the Ice Home config directory -->
+    <Import Project="$(IceHome)\cpp\config\Ice.Cpp.props"
+            Condition="Exists('$(IceHome)\cpp\config\Ice.Cpp.props')"/>
+
     <!-- With Ice > 3.6 source distribution the settings are in the cpp msbuild directory -->
     <Import Project="$(IceHome)\cpp\msbuild\icebuilder.cpp.props"
             Condition="Exists('$(IceHome)\cpp\msbuild\icebuilder.cpp.props')"/>
