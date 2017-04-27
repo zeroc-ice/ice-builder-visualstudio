@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Vsix xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="1.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2010">
+  <Identifier Id="D381D516-A7DA-4BFD-BD04-A649F2DB947F">
+    <Name>Ice Builder for Visual Studio 2010</Name>
+    <Author>ZeroC</Author>
+    <Version>4.3.7</Version>
+    <Description xml:space="preserve">Ice Builder for Visual Studio 2010</Description>
+    <Locale>1033</Locale>
+    <MoreInfoUrl>https://github.com/zeroc-ice/ice-builder-visualstudio/tree/vs2010</MoreInfoUrl>
+    <License>LICENSE.rtf</License>
+    <Icon>Package.ico</Icon>
+    <PreviewImage>Preview.png</PreviewImage>
+    <SupportedProducts>
+      <VisualStudio Version="10.0">
+        <Edition>Pro</Edition>
+      </VisualStudio>
+    </SupportedProducts>
+    <SupportedFrameworkRuntimeEdition MinVersion="4.0" MaxVersion="4.0" />
+  </Identifier>
+  <References />
+  <Content>
+    <VsPackage>|%CurrentProject%;PkgdefProjectOutputGroup|</VsPackage>
+  </Content>
+</Vsix>

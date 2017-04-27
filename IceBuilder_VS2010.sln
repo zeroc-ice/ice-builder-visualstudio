@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IceBuilder_VS2010", "IceBuilder_VS2010\IceBuilder_VS2010.csproj", "{29741D28-33F2-4634-B9F4-25211C1EEA3F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{92CBD919-8F0D-477E-813E-880BAD8236FD} = {92CBD919-8F0D-477E-813E-880BAD8236FD}
+		{D92A8387-5F12-475B-AB4D-7E23F6A2AEB8} = {D92A8387-5F12-475B-AB4D-7E23F6A2AEB8}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IceBuilderTasks", "IceBuilderTasks\IceBuilderTasks.csproj", "{92CBD919-8F0D-477E-813E-880BAD8236FD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignExtensionTask", "SignExtensionTask\SignExtensionTask.csproj", "{D92A8387-5F12-475B-AB4D-7E23F6A2AEB8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{29741D28-33F2-4634-B9F4-25211C1EEA3F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29741D28-33F2-4634-B9F4-25211C1EEA3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29741D28-33F2-4634-B9F4-25211C1EEA3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{29741D28-33F2-4634-B9F4-25211C1EEA3F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92CBD919-8F0D-477E-813E-880BAD8236FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92CBD919-8F0D-477E-813E-880BAD8236FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92CBD919-8F0D-477E-813E-880BAD8236FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92CBD919-8F0D-477E-813E-880BAD8236FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D92A8387-5F12-475B-AB4D-7E23F6A2AEB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D92A8387-5F12-475B-AB4D-7E23F6A2AEB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D92A8387-5F12-475B-AB4D-7E23F6A2AEB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D92A8387-5F12-475B-AB4D-7E23F6A2AEB8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,3 +1,7 @@
+## Changes in Ice Builder for Visual Studio 4.3.7
+
+- Added support for Visual Studio 2010 C++ builds
+
 ## Changes in Ice Builder for Visual Studio 4.3.6
 
 - Fixed a bug that can cause an OverflowException when
