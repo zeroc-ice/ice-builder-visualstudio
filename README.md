@@ -2,7 +2,7 @@
 
 The Ice Builder for Visual Studio manages the compilation of Slice (`.ice`) files to C++ and C#. It compiles your Slice files with `slice2cpp` and `slice2cs`, and allows you to specify the parameters provided to these compilers.
 
-The Ice Builder is a Visual Studio extension compatible with Visual Studio 2012, 2013, and 2015. An Ice installation with `slice2cpp` and `slice2cs` version 3.6.0 or higher is also required.
+The Ice Builder is a Visual Studio extension compatible with Visual Studio 2010, 2012, 2013, and 2015. An Ice installation with `slice2cpp` and `slice2cs` version 3.6.0 or higher is also required.
 
 ## Contents
 - [Installation](#installation)
@@ -21,9 +21,12 @@ The Ice Builder is a Visual Studio extension compatible with Visual Studio 2012,
 
 ## Installation
 
-The Ice Builder is available as a Visual Studio extension in the [Visual Studio Marketplace](https://marketplace.visualstudio.com/vsgallery/1a64e701-63f2-4740-8004-290e6c682ce0). The Ice Builder for Visual Studio 2010 is available as Visual Studio extension in the [Visual Studio Marketplace](https://marketplace.visualstudio.com/vsgallery/d5df280b-2972-4d03-babb-e40b1437fde1)
+The Ice Builder is available as two Visual Studio extensions in the 
+[Visual Studio Marketplace](https://marketplace.visualstudio.com/): [Ice Builder](https://marketplace.visualstudio.com/vsgallery/1a64e701-63f2-4740-8004-290e6c682ce0) for Visual Studio 2012,
+2013 and 2015 and 
+[Ice Builder for Visual Studio 2010](https://marketplace.visualstudio.com/vsgallery/d5df280b-2972-4d03-babb-e40b1437fde1).
 
-If you build it from sources, simply double-click on `IceBuilder.vsix` or `IceBuilder_VS2010.vsix` to install the extension into Visual Studio.
+If you build Ice Builder from sources, simply double-click on `IceBuilder.vsix` or `IceBuilder_VS2010.vsix` to install the extension into Visual Studio.
 
 ## Overview
 
@@ -35,7 +38,7 @@ The Ice Builder compiles and recompiles a Slice file as needed:
 
 The Ice Builder checks whether Slice files need to be compiled or recompiled each time Visual Studio loads a project, and each time you build a project. Saving a Slice file also triggers the (re)compilation of this Slice file. And when you remove or rename a Slice file, the Ice Builder automatically removes the corresponding generated files.
 
-The Ice Builder for VS2010 is more limited in scope, you cannot configure Ice build settings from within the VS2010 IDE. You need to edit the .vcxproj file in a text editor or with the VS2013 or VS2015 IDE.
+The Ice Builder for Visual Studio 2010 does not include support for the Visual Studio IDE. To add `.ice` files to projects or to configure Slice compiler options, you need to edit the .vcxproj file in a text editor or with the Ice Builder in the IDE of a newer version of Visual Studio.
 
 ## Migration from the Ice Add-in for Visual Studio
 
@@ -155,25 +158,24 @@ Ice Builder adds two targets, `IceBuilder_Compile` and `IceBuilder_Clean`, that 
 
 ### Build Requirements
 
-To build Ice Builder for Visual Studio you will need Visual Studio 2015:
+You need Visual Studio 2015
 
 **AND**
 
-Install ALL the following Visual Studio SDKs:
+to install ALL the following Visual Studio SDKs:
 - [Visual Studio 2012 SDK](https://www.microsoft.com/en-us/download/details.aspx?id=30668)
 - [Visual Studio 2013 SDK](https://www.microsoft.com/en-us/download/details.aspx?id=40758)
 - [Visual Studio 2015 SDK](https://msdn.microsoft.com/en-us/library/bb166441.aspx)
 
-
 ### Build Instructions
 
-To build the Ice Builder for Visual Studio, open the `IceBuilder.sln` solution file in Visual Studio.
+Open the `IceBuilder.sln` solution file in Visual Studio 2015.
 
 After building the Ice Builder extension, the VSIX package will be placed in the build output directory
 `IceBuilder\bin\Debug\IceBuilder.vsix` for debug builds, and `IceBuilder\bin\Release\IceBuilder.vsix`
 for release builds.
 
-If you want to sign your extension with Authenticode, set the environment variable `SIGN_CERTIFICATE` to
+You can sign your extension with Authenticode by setting the environment variable `SIGN_CERTIFICATE` to
 the path of your PFX certificate store, and the `SIGN_PASSWORD` environment variable to the password
 used by your certificate store.
 
@@ -181,18 +183,17 @@ used by your certificate store.
 
 ### Build Requirements
 
-To build Ice Builder for Visual Studio you will need Visual Studio 2010 SP1 and Visual Studio 2010 SP1 SDKs:
+To build Ice Builder for Visual Studio 2010, you need Visual Studio 2010 SP1 and Visual Studio 2010 SP1 SDKs:
 - [Visual Studio 2010 SP1 SDK](https://www.microsoft.com/en-us/download/details.aspx?id=21835)
-
 
 ### Build Instructions
 
-To build the Ice Builder for Visual Studio, open the `IceBuilder_2010.sln` solution file in Visual Studio.
+Open the `IceBuilder_2010.sln` solution file in Visual Studio 2010.
 
 After building the Ice Builder extension, the VSIX package will be placed in the build output directory
 `IceBuilder\bin\Debug\IceBuilder_2010.vsix` for debug builds, and `IceBuilder_2010\bin\Release\IceBuilder_2010.vsix`
 for release builds.
 
-If you want to sign your extension with Authenticode, set the environment variable `SIGN_CERTIFICATE` to
+You can sign your extension with Authenticode by setting the environment variable `SIGN_CERTIFICATE` to
 the path of your PFX certificate store, and the `SIGN_PASSWORD` environment variable to the password
 used by your certificate store.
