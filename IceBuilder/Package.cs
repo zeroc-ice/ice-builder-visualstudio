@@ -615,7 +615,7 @@ namespace IceBuilder
                 }
 
                 //
-                // If IceHome isn't set or is set to an invlid location, try to 
+                // If IceHome isn't set or is set to an invlid location, try to
                 // locate the latest version installed and use that.
                 //
                 Version version = null;

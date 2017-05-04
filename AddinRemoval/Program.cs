@@ -37,7 +37,7 @@ namespace AddinRemoval
                         @"VC\vcprojectitems\Slice\slice.vsdir"
                     };
 
-                String[] templateDirs = new String[] 
+                String[] templateDirs = new String[]
                     {
                         @"CSharpProjectItems\Slice",
                         @"VC\vcprojectitems\Slice"

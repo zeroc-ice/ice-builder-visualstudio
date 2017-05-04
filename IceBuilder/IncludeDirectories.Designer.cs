@@ -8,12 +8,12 @@ namespace IceBuilder
 {
     partial class IncludeDirectories
     {
-        /// <summary> 
+        /// <summary>
         /// Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary> 
+        /// <summary>
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
@@ -28,8 +28,8 @@ namespace IceBuilder
 
         #region Component Designer generated code
 
-        /// <summary> 
-        /// Required method for Designer support - do not modify 
+        /// <summary>
+        /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent()
@@ -44,9 +44,9 @@ namespace IceBuilder
             this.btnDown = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.SuspendLayout();
-            // 
+            //
             // btnAdd
-            // 
+            //
             this.btnAdd.ForeColor = System.Drawing.SystemColors.ControlText;
             this.btnAdd.Location = new System.Drawing.Point(436, 3);
             this.btnAdd.Name = "btnAdd";
@@ -55,9 +55,9 @@ namespace IceBuilder
             this.btnAdd.Text = "Add";
             this.btnAdd.UseVisualStyleBackColor = true;
             this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
-            // 
+            //
             // btnEdit
-            // 
+            //
             this.btnEdit.ForeColor = System.Drawing.SystemColors.ControlText;
             this.btnEdit.Location = new System.Drawing.Point(436, 26);
             this.btnEdit.Name = "btnEdit";
@@ -66,9 +66,9 @@ namespace IceBuilder
             this.btnEdit.Text = "Edit";
             this.btnEdit.UseVisualStyleBackColor = true;
             this.btnEdit.Click += new System.EventHandler(this.btnEdit_Click);
-            // 
+            //
             // includeList
-            // 
+            //
             this.includeList.FormattingEnabled = true;
             this.includeList.HorizontalScrollbar = true;
             this.includeList.Location = new System.Drawing.Point(107, 3);
@@ -78,9 +78,9 @@ namespace IceBuilder
             this.toolTip1.SetToolTip(this.includeList, "Specifies one or more directories to add to the Slice include path.");
             this.includeList.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.includeList_ItemCheck);
             this.includeList.Leave += new System.EventHandler(this.IncludeDirectories_Leave);
-            // 
+            //
             // btnRemove
-            // 
+            //
             this.btnRemove.ForeColor = System.Drawing.SystemColors.ControlText;
             this.btnRemove.Location = new System.Drawing.Point(436, 49);
             this.btnRemove.Name = "btnRemove";
@@ -89,18 +89,18 @@ namespace IceBuilder
             this.btnRemove.Text = "Remove";
             this.btnRemove.UseVisualStyleBackColor = true;
             this.btnRemove.Click += new System.EventHandler(this.btnRemove_Click);
-            // 
+            //
             // lblDescription
-            // 
+            //
             this.lblDescription.AutoSize = true;
             this.lblDescription.Location = new System.Drawing.Point(3, 3);
             this.lblDescription.Name = "lblDescription";
             this.lblDescription.Size = new System.Drawing.Size(98, 13);
             this.lblDescription.TabIndex = 57;
             this.lblDescription.Text = "Include Directories:";
-            // 
+            //
             // btnUp
-            // 
+            //
             this.btnUp.ForeColor = System.Drawing.SystemColors.ControlText;
             this.btnUp.Location = new System.Drawing.Point(436, 72);
             this.btnUp.Name = "btnUp";
@@ -109,9 +109,9 @@ namespace IceBuilder
             this.btnUp.Text = "Up";
             this.btnUp.UseVisualStyleBackColor = true;
             this.btnUp.Click += new System.EventHandler(this.btnUp_Click);
-            // 
+            //
             // btnDown
-            // 
+            //
             this.btnDown.ForeColor = System.Drawing.SystemColors.ControlText;
             this.btnDown.Location = new System.Drawing.Point(436, 95);
             this.btnDown.Name = "btnDown";
@@ -120,9 +120,9 @@ namespace IceBuilder
             this.btnDown.Text = "Down";
             this.btnDown.UseVisualStyleBackColor = true;
             this.btnDown.Click += new System.EventHandler(this.btnDown_Click);
-            // 
+            //
             // IncludeDirectories
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;

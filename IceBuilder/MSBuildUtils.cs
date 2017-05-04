@@ -331,7 +331,7 @@ namespace IceBuilder
             bool modified = AddCppGlobalProperties(project);
             modified = AddImportAfter(project, IceBuilderCppProps,
                 project.Xml.Imports.FirstOrDefault(
-                    p => p.Project.Equals(@"$(VCTargetsPath)\Microsoft.Cpp.props", 
+                    p => p.Project.Equals(@"$(VCTargetsPath)\Microsoft.Cpp.props",
                                           StringComparison.CurrentCultureIgnoreCase))) || modified;
 
             modified = AddImportAfter(project, IceBuilderCppTargets,
@@ -346,14 +346,14 @@ namespace IceBuilder
             bool modified = AddCsharpGlobalProperties(project);
             modified = AddImportAfter(project, IceBuilderCSharpProps,
                 project.Xml.Imports.FirstOrDefault(
-                    p => p.Project.EndsWith(@"$(MSBuildToolsPath)\Microsoft.CSharp.targets", 
+                    p => p.Project.EndsWith(@"$(MSBuildToolsPath)\Microsoft.CSharp.targets",
                                           StringComparison.CurrentCultureIgnoreCase) ||
                          p.Project.Equals(@"$(MSBuildBinPath)\Microsoft.CSharp.targets",
                                           StringComparison.CurrentCultureIgnoreCase))) || modified;
 
             modified = AddImportAfter(project, IceBuilderCSharpTargets,
                 project.Xml.Imports.FirstOrDefault(
-                    p => p.Project.Equals(@"$(IceBuilderCSharpProps)", 
+                    p => p.Project.Equals(@"$(IceBuilderCSharpProps)",
                                           StringComparison.CurrentCultureIgnoreCase))) || modified;
 
             modified = AddProjectFlavorIfNotExists(project, IceBuilderProjectFlavorGUID) || modified;

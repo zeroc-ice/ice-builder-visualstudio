@@ -32,16 +32,16 @@ namespace IceBuilder
             this.Cancel = new System.Windows.Forms.Button();
             this.InfoLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
-            // 
+            //
             // ProgressBar
-            // 
+            //
             this.ProgressBar.Location = new System.Drawing.Point(12, 40);
             this.ProgressBar.Name = "ProgressBar";
             this.ProgressBar.Size = new System.Drawing.Size(433, 23);
             this.ProgressBar.TabIndex = 0;
-            // 
+            //
             // Cancel
-            // 
+            //
             this.Cancel.Location = new System.Drawing.Point(191, 71);
             this.Cancel.Name = "Cancel";
             this.Cancel.Size = new System.Drawing.Size(75, 23);
@@ -49,16 +49,16 @@ namespace IceBuilder
             this.Cancel.Text = "Cancel";
             this.Cancel.UseVisualStyleBackColor = true;
             this.Cancel.Click += new System.EventHandler(this.CancelButton_Clicked);
-            // 
+            //
             // InfoLabel
-            // 
+            //
             this.InfoLabel.Location = new System.Drawing.Point(12, 9);
             this.InfoLabel.Name = "InfoLabel";
             this.InfoLabel.Size = new System.Drawing.Size(433, 23);
             this.InfoLabel.TabIndex = 2;
-            // 
+            //
             // UpgradeDialogProgress
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(457, 100);

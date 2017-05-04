@@ -56,7 +56,7 @@
                  Include Directories: $(IceBuilderIncludeDirectories);
                  Additional Options: $(IceBuilderAdditionalOptions)"
           Overwrite="true"/>
-    
+
     <!-- First we check dependencies and decide what must be rebuild -->
     <Slice2PhpDependTask
       OutputDir           = "$(IceBuilderOutputDir)"

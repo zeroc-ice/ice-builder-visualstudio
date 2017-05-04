@@ -12,7 +12,7 @@
   <!-- Import IceBuilder common settings -->
   <Import Project="$(MSBuildThisFileDirectory)\IceBuilder.Common.props"/>
 
-  <!-- Import settings from the Ice distribution, If the project is usig Ice nuget packages 
+  <!-- Import settings from the Ice distribution, If the project is usig Ice nuget packages
        those are already imported and we avoid to import the settings twice -->
   <ImportGroup Condition="'$(IceNugetPackageVersion)' == ''">
 

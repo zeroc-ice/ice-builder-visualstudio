@@ -2,12 +2,12 @@ namespace IceBuilder
 {
     partial class IceHomeEditor
     {
-        /// <summary> 
+        /// <summary>
         /// Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary> 
+        /// <summary>
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
@@ -22,8 +22,8 @@ namespace IceBuilder
 
         #region Component Designer generated code
 
-        /// <summary> 
-        /// Required method for Designer support - do not modify 
+        /// <summary>
+        /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent()
@@ -34,18 +34,18 @@ namespace IceBuilder
             this.lblIceHome = new System.Windows.Forms.Label();
             this.autoBuild = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
-            // 
+            //
             // txtIceHome
-            // 
-            this.txtIceHome.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            //
+            this.txtIceHome.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtIceHome.Location = new System.Drawing.Point(0, 16);
             this.txtIceHome.Name = "txtIceHome";
             this.txtIceHome.Size = new System.Drawing.Size(283, 20);
             this.txtIceHome.TabIndex = 49;
-            // 
+            //
             // btnIceHome
-            // 
+            //
             this.btnIceHome.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnIceHome.Location = new System.Drawing.Point(286, 15);
             this.btnIceHome.Margin = new System.Windows.Forms.Padding(0);
@@ -55,27 +55,27 @@ namespace IceBuilder
             this.btnIceHome.Text = "...";
             this.btnIceHome.UseVisualStyleBackColor = true;
             this.btnIceHome.Click += new System.EventHandler(this.btnIceHome_Click);
-            // 
+            //
             // lblInfo
-            // 
-            this.lblInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            //
+            this.lblInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lblInfo.Location = new System.Drawing.Point(0, 73);
             this.lblInfo.Name = "lblInfo";
             this.lblInfo.Size = new System.Drawing.Size(315, 29);
             this.lblInfo.TabIndex = 51;
-            // 
+            //
             // lblIceHome
-            // 
+            //
             this.lblIceHome.AutoSize = true;
             this.lblIceHome.Location = new System.Drawing.Point(0, 0);
             this.lblIceHome.Name = "lblIceHome";
             this.lblIceHome.Size = new System.Drawing.Size(97, 13);
             this.lblIceHome.TabIndex = 48;
             this.lblIceHome.Text = "Ice home directory:";
-            // 
+            //
             // autoBuild
-            // 
+            //
             this.autoBuild.AutoSize = true;
             this.autoBuild.Location = new System.Drawing.Point(3, 53);
             this.autoBuild.Name = "autoBuild";
@@ -83,9 +83,9 @@ namespace IceBuilder
             this.autoBuild.TabIndex = 53;
             this.autoBuild.Text = "Build automatically";
             this.autoBuild.UseVisualStyleBackColor = true;
-            // 
+            //
             // IceHomeEditor
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.autoBuild);

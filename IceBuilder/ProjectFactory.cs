@@ -22,12 +22,12 @@ namespace IceBuilder
         #region IVsAggregatableProjectFactory
 
         /// <summary>
-        /// Create an instance of CustomPropertyPageProjectFlavor. 
+        /// Create an instance of CustomPropertyPageProjectFlavor.
         /// The initialization will be done later when Visual Studio calls
         /// InitalizeForOuter on it.
         /// </summary>
         /// <param name="outerProjectIUnknown">
-        /// This value points to the outer project. It is useful if there is a 
+        /// This value points to the outer project. It is useful if there is a
         /// Project SubType of this Project SubType.
         /// </param>
         /// <returns>
