@@ -16,7 +16,6 @@ using Microsoft.Build.Evaluation;
 using Microsoft.Build.Construction;
 using Microsoft.VisualStudio.Shell.Interop;
 
-
 using System.Xml;
 
 namespace IceBuilder

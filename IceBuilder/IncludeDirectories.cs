@@ -189,7 +189,6 @@ namespace IceBuilder
                 _btnSelectInclude.Height = _txtInclude.Height;
                 _btnSelectInclude.Click += new EventHandler(btnSelectInclude_Clicked);
 
-
                 _txtInclude.Show();
                 _txtInclude.BringToFront();
                 _txtInclude.Focus();
@@ -238,7 +237,6 @@ namespace IceBuilder
             if(_editing)
             {
                 _editing = false;
-
 
                 if(_txtInclude == null || _btnSelectInclude == null)
                 {

@@ -196,7 +196,6 @@ namespace IceBuilder
         }
         public Guid OutputPaneGUID = new Guid("CE9BFDCD-5AFD-4A77-BD40-75E0E1E5162C");
 
-
         private static void TryRemoveAssemblyFoldersExKey()
         {
             RegistryKey key = null;
@@ -247,7 +246,6 @@ namespace IceBuilder
                         Path.Combine(value,"cpp", "config", "ice.props"),
                         Path.Combine(value, "config", "icebuilder.props")
                     }.FirstOrDefault(path => File.Exists(path));
-
 
                 if(string.IsNullOrEmpty(props) && Directory.Exists(value))
                 {
@@ -1124,7 +1122,6 @@ namespace IceBuilder
             process.StartInfo.WorkingDirectory = Path.GetDirectoryName(sliceCompiler);
             StreamReader reader = new StreamReader();
             process.OutputDataReceived += new DataReceivedEventHandler(reader.appendData);
-
 
             try
             {

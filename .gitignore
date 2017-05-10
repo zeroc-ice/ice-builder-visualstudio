@@ -34,7 +34,6 @@ local.properties
 # PDT-specific
 .buildpath
 
-
 #################
 ## Visual Studio
 #################
@@ -189,7 +188,6 @@ $RECYCLE.BIN/
 # Mac crap
 .DS_Store
 
-
 #############
 ## Python
 #############
@@ -220,7 +218,6 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
-
 
 #
 # Executables

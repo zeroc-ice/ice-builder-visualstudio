@@ -81,7 +81,6 @@ namespace IceBuilder
             _generated.Clear();
         }
 
-
         private Dictionary<string, Dictionary<string, List<string>>> _generated =
             new Dictionary<string, Dictionary<string, List<string>>>();
     }

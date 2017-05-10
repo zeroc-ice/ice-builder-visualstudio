@@ -329,7 +329,6 @@ namespace IceBuilder
                             }
                         }
 
-
                         description = s.Trim();
                         description += Environment.NewLine;
                     }
@@ -958,7 +957,6 @@ namespace IceBuilder
                     file2byte = fs2.ReadByte();
                 }
                 while((file1byte == file2byte) && (file1byte != -1));
-
 
             }
             finally
