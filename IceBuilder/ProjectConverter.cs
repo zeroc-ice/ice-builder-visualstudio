@@ -309,7 +309,7 @@ namespace IceBuilder
                                 }
                             }
                         }
-                        Package.Instance.AddIceBuilderToProject(project);
+                        Package.Instance.SaveProject(project, MSBuildUtils.LoadedProject(ProjectUtil.GetProjectFullPath(project), DTEUtil.IsCppProject(project), true));
                     }
                     dispatcher.Invoke(
                         new Action(() =>
@@ -485,7 +485,8 @@ namespace IceBuilder
                 // Remove old property sheet from all configurations
                 //
                 IEnumerable<ProjectImportElement> imports = project.Xml.Imports.Where(
-                    p => p.Project.Equals("$(ALLUSERSPROFILE)\\ZeroC\\Ice.props"));
+                    p => p.Project.Equals("$(ALLUSERSPROFILE)\\ZeroC\\Ice.props", StringComparison.CurrentCultureIgnoreCase));
+
                 if(imports != null)
                 {
                     foreach(ProjectImportElement import in imports)
@@ -497,7 +498,7 @@ namespace IceBuilder
                 // WinRT SDK old property sheet
                 //
                 imports = project.Xml.Imports.Where(
-                    p => p.Project.IndexOf("CommonConfiguration\\Neutral\\Ice.props") != -1);
+                    p => p.Project.IndexOf("CommonConfiguration\\Neutral\\Ice.props", StringComparison.CurrentCultureIgnoreCase) != -1);
                 if(imports != null)
                 {
                     foreach(ProjectImportElement import in imports)

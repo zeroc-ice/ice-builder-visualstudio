@@ -422,6 +422,24 @@ namespace IceBuilder
             }
         }
 
+        public void SaveProject(IVsProject project, Microsoft.Build.Evaluation.Project p)
+        {
+            IVsHierarchy hier = project as IVsHierarchy;
+            Guid projectGUID = Guid.Empty;
+            IVsSolution.GetGuidOfProject(hier, out projectGUID);
+            IVsSolution.CloseSolutionElement((uint)__VSSLNCLOSEOPTIONS.SLNCLOSEOPT_UnloadProject, hier, 0);
+            p.Save();
+            try
+            {
+                ProjectCollection.GlobalProjectCollection.UnloadProject(p);
+            }
+            catch (Exception)
+            {
+                //expected if the project is not in the global project collection
+            }
+            IVsSolution4.ReloadProject(ref projectGUID);
+        }
+
         public void InitializeProjects(List<IVsProject> upgradeProjects)
         {
             ProjectConverter.TryUpgrade(upgradeProjects);
@@ -440,20 +458,7 @@ namespace IceBuilder
                     modified = MSBuildUtils.UpgradeProjectProperties(p) || modified;
                     if (modified)
                     {
-                        IVsHierarchy hier = project as IVsHierarchy;
-                        Guid projectGUID = Guid.Empty;
-                        IVsSolution.GetGuidOfProject(hier, out projectGUID);
-                        IVsSolution.CloseSolutionElement((uint)__VSSLNCLOSEOPTIONS.SLNCLOSEOPT_UnloadProject, hier, 0);
-                        p.Save();
-                        try
-                        {
-                            ProjectCollection.GlobalProjectCollection.UnloadProject(p);
-                        }
-                        catch(Exception)
-                        {
-                            //expected if the project is not in the global project collection
-                        }
-                        IVsSolution4.ReloadProject(ref projectGUID);
+                        SaveProject(project, p);
                     }
                 }
             }
