@@ -69,20 +69,8 @@
       <IceBuilderSourceExt>cpp</IceBuilderSourceExt>
   </PropertyGroup>
 
-  <PropertyGroup Label="IceBuilder" Condition="'$(IceBuilderAllowIcePrefix)' == ''">
-      <IceBuilderAllowIcePrefix>false</IceBuilderAllowIcePrefix>
-  </PropertyGroup>
-
-  <PropertyGroup Label="IceBuilder" Condition="'$(IceBuilderUnderscore)' == ''">
-      <IceBuilderUnderscore>false</IceBuilderUnderscore>
-  </PropertyGroup>
-
   <PropertyGroup Label="IceBuilder" Condition="'$(IceBuilderChecksum)' == ''">
       <IceBuilderChecksum>false</IceBuilderChecksum>
-  </PropertyGroup>
-
-  <PropertyGroup Label="IceBuilder" Condition="'$(IceBuilderStream)' == ''">
-    <IceBuilderStream>false</IceBuilderStream>
   </PropertyGroup>
 
   <PropertyGroup Label="IceBuilder">

@@ -46,9 +46,6 @@ namespace IceBuilder
             this.txtAdditionalOptions = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
-            this.chkUnderscores = new System.Windows.Forms.CheckBox();
-            this.chkIce = new System.Windows.Forms.CheckBox();
-            this.chkStreaming = new System.Windows.Forms.CheckBox();
             this.chkChecksum = new System.Windows.Forms.CheckBox();
             this.chkTie = new System.Windows.Forms.CheckBox();
             this.tooltip = new System.Windows.Forms.ToolTip(this.components);
@@ -107,7 +104,7 @@ namespace IceBuilder
             // referencedAssemblies
             //
             this.referencedAssemblies.FormattingEnabled = true;
-            this.referencedAssemblies.Location = new System.Drawing.Point(112, 488);
+            this.referencedAssemblies.Location = new System.Drawing.Point(112, 422);
             this.referencedAssemblies.Name = "referencedAssemblies";
             this.referencedAssemblies.Size = new System.Drawing.Size(322, 139);
             this.referencedAssemblies.TabIndex = 53;
@@ -116,14 +113,14 @@ namespace IceBuilder
             // label4
             //
             this.label4.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.label4.Location = new System.Drawing.Point(128, 480);
+            this.label4.Location = new System.Drawing.Point(128, 414);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(402, 1);
             this.label4.TabIndex = 52;
             //
             // txtAdditionalOptions
             //
-            this.txtAdditionalOptions.Location = new System.Drawing.Point(112, 368);
+            this.txtAdditionalOptions.Location = new System.Drawing.Point(112, 302);
             this.txtAdditionalOptions.Multiline = true;
             this.txtAdditionalOptions.Name = "txtAdditionalOptions";
             this.txtAdditionalOptions.Size = new System.Drawing.Size(322, 90);
@@ -134,7 +131,7 @@ namespace IceBuilder
             // label5
             //
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(8, 472);
+            this.label5.Location = new System.Drawing.Point(8, 406);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(121, 13);
             this.label5.TabIndex = 51;
@@ -143,52 +140,16 @@ namespace IceBuilder
             // label8
             //
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(11, 371);
+            this.label8.Location = new System.Drawing.Point(11, 305);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(95, 13);
             this.label8.TabIndex = 49;
             this.label8.Text = "Additional Options:";
             //
-            // chkUnderscores
-            //
-            this.chkUnderscores.AutoSize = true;
-            this.chkUnderscores.Location = new System.Drawing.Point(14, 102);
-            this.chkUnderscores.Name = "chkUnderscores";
-            this.chkUnderscores.Size = new System.Drawing.Size(170, 17);
-            this.chkUnderscores.TabIndex = 46;
-            this.chkUnderscores.Text = "Allow underscores in identifiers";
-            this.tooltip.SetToolTip(this.chkUnderscores, "Allow underscores in Slice identifiers.");
-            this.chkUnderscores.UseVisualStyleBackColor = true;
-            this.chkUnderscores.CheckStateChanged += new System.EventHandler(this.Underscore_Changed);
-            //
-            // chkIce
-            //
-            this.chkIce.AutoSize = true;
-            this.chkIce.Location = new System.Drawing.Point(14, 80);
-            this.chkIce.Name = "chkIce";
-            this.chkIce.Size = new System.Drawing.Size(160, 17);
-            this.chkIce.TabIndex = 42;
-            this.chkIce.Text = "Allow reserved Ice identifiers";
-            this.tooltip.SetToolTip(this.chkIce, "Allow reserved Ice prefix in Slice identifiers.");
-            this.chkIce.UseVisualStyleBackColor = true;
-            this.chkIce.CheckedChanged += new System.EventHandler(this.AllowIcePrefix_CheckedChanged);
-            //
-            // chkStreaming
-            //
-            this.chkStreaming.AutoSize = true;
-            this.chkStreaming.Location = new System.Drawing.Point(14, 124);
-            this.chkStreaming.Name = "chkStreaming";
-            this.chkStreaming.Size = new System.Drawing.Size(217, 17);
-            this.chkStreaming.TabIndex = 43;
-            this.chkStreaming.Text = "Generated helper functions for streaming";
-            this.tooltip.SetToolTip(this.chkStreaming, "Generate marshaling support for public stream API.");
-            this.chkStreaming.UseVisualStyleBackColor = true;
-            this.chkStreaming.CheckStateChanged += new System.EventHandler(this.Stream_CheckedChanged);
-            //
             // chkChecksum
             //
             this.chkChecksum.AutoSize = true;
-            this.chkChecksum.Location = new System.Drawing.Point(14, 146);
+            this.chkChecksum.Location = new System.Drawing.Point(14, 80);
             this.chkChecksum.Name = "chkChecksum";
             this.chkChecksum.Size = new System.Drawing.Size(153, 17);
             this.chkChecksum.TabIndex = 44;
@@ -200,7 +161,7 @@ namespace IceBuilder
             // chkTie
             //
             this.chkTie.AutoSize = true;
-            this.chkTie.Location = new System.Drawing.Point(14, 168);
+            this.chkTie.Location = new System.Drawing.Point(14, 102);
             this.chkTie.Name = "chkTie";
             this.chkTie.Size = new System.Drawing.Size(122, 17);
             this.chkTie.TabIndex = 45;
@@ -229,7 +190,7 @@ namespace IceBuilder
             //
             this.includeDirectories.AutoSize = true;
             this.includeDirectories.InitialValues = ((System.Collections.Generic.List<string>)(resources.GetObject("includeDirectories.InitialValues")));
-            this.includeDirectories.Location = new System.Drawing.Point(6, 197);
+            this.includeDirectories.Location = new System.Drawing.Point(6, 131);
             this.includeDirectories.Margin = new System.Windows.Forms.Padding(0);
             this.includeDirectories.Name = "includeDirectories";
             this.includeDirectories.PropertyPage = null;
@@ -254,14 +215,11 @@ namespace IceBuilder
             this.Controls.Add(this.lblOutputDirectory);
             this.Controls.Add(this.lblSliceCompilerOptions);
             this.Controls.Add(this.includeDirectories);
-            this.Controls.Add(this.chkUnderscores);
             this.Controls.Add(this.btnOutputDirectoryBrowse);
-            this.Controls.Add(this.chkIce);
-            this.Controls.Add(this.chkStreaming);
             this.Controls.Add(this.chkTie);
             this.Controls.Add(this.chkChecksum);
             this.Name = "CSharpConfigurationView";
-            this.Size = new System.Drawing.Size(535, 630);
+            this.Size = new System.Drawing.Size(535, 570);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -276,9 +234,6 @@ namespace IceBuilder
         private System.Windows.Forms.Button btnOutputDirectoryBrowse;
         private System.Windows.Forms.TextBox txtAdditionalOptions;
         private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.CheckBox chkUnderscores;
-        private System.Windows.Forms.CheckBox chkIce;
-        private System.Windows.Forms.CheckBox chkStreaming;
         private System.Windows.Forms.CheckBox chkChecksum;
         private System.Windows.Forms.CheckBox chkTie;
         private IncludeDirectories includeDirectories;

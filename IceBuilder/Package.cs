@@ -437,7 +437,8 @@ namespace IceBuilder
                                 ProjectUtil.GetProjectFullPath(project), projectType == IceBuilderProjectType.CppProjectType, true);
                     bool modified = MSBuildUtils.UpgradeProjectImports(p);
                     modified = MSBuildUtils.EnsureIceBuilderImports(p) || modified;
-                    if(modified)
+                    modified = MSBuildUtils.UpgradeProjectProperties(p) || modified;
+                    if (modified)
                     {
                         IVsHierarchy hier = project as IVsHierarchy;
                         Guid projectGUID = Guid.Empty;

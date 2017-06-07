@@ -112,24 +112,6 @@ namespace IceBuilder
             set;
         }
 
-        public bool AllowIcePrefix
-        {
-            get;
-            set;
-        }
-
-        public bool Underscore
-        {
-            get;
-            set;
-        }
-
-        public bool Stream
-        {
-            get;
-            set;
-        }
-
         public bool Checksum
         {
             get;
@@ -182,21 +164,6 @@ namespace IceBuilder
             {
                 builder.AppendSwitch("--output-dir");
                 builder.AppendFileNameIfNotNull(OutputDir);
-            }
-
-            if(AllowIcePrefix)
-            {
-                builder.AppendSwitch("--ice");
-            }
-
-            if(Underscore)
-            {
-                builder.AppendSwitch("--underscore");
-            }
-
-            if(Stream)
-            {
-                builder.AppendSwitch("--stream");
             }
 
             if(Checksum)
@@ -381,12 +348,6 @@ namespace IceBuilder
             set;
         }
 
-        public string DLLExport
-        {
-            get;
-            set;
-        }
-
         public string HeaderExt
         {
             get;
@@ -432,13 +393,6 @@ namespace IceBuilder
         protected override string GenerateCommandLineCommands()
         {
             CommandLineBuilder builder = new CommandLineBuilder(false);
-
-            if(!string.IsNullOrEmpty(DLLExport))
-            {
-                builder.AppendSwitch("--dll-export");
-                builder.AppendFileNameIfNotNull(DLLExport);
-            }
-
             if(!HeaderExt.Equals("h"))
             {
                 builder.AppendSwitch("--header-ext");

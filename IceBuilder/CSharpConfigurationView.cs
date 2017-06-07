@@ -75,18 +75,6 @@ namespace IceBuilder
             }
         }
 
-        public CheckState Ice
-        {
-            get
-            {
-                return chkIce.CheckState;
-            }
-            set
-            {
-                chkIce.CheckState = value;
-            }
-        }
-
         public CheckState Checksum
         {
             get
@@ -99,18 +87,6 @@ namespace IceBuilder
             }
         }
 
-        public CheckState Streaming
-        {
-            get
-            {
-                return chkStreaming.CheckState;
-            }
-            set
-            {
-                chkStreaming.CheckState = value;
-            }
-        }
-
         public CheckState Tie
         {
             get
@@ -120,18 +96,6 @@ namespace IceBuilder
             set
             {
                 chkTie.CheckState = value;
-            }
-        }
-
-        public CheckState Underscores
-        {
-            get
-            {
-                return chkUnderscores.CheckState;
-            }
-            set
-            {
-                chkUnderscores.CheckState = value;
             }
         }
 
@@ -223,30 +187,6 @@ namespace IceBuilder
         private void OutputDirectory_Leave(object sender, EventArgs e)
         {
             if(!txtOutputDir.Text.Equals(Page.Settings.OutputDir))
-            {
-                Dirty = true;
-            }
-        }
-
-        private void AllowIcePrefix_CheckedChanged(object sender, EventArgs e)
-        {
-            if(chkIce.Checked != Page.Settings.AllowIcePrefix)
-            {
-                Dirty = true;
-            }
-        }
-
-        private void Underscore_Changed(object sender, EventArgs e)
-        {
-            if(chkUnderscores.Checked != Page.Settings.Underscore)
-            {
-                Dirty = true;
-            }
-        }
-
-        private void Stream_CheckedChanged(object sender, EventArgs e)
-        {
-            if(chkStreaming.Checked != Page.Settings.Stream)
             {
                 Dirty = true;
             }

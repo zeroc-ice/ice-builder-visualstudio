@@ -233,6 +233,18 @@ namespace IceBuilder
             return false;
         }
 
+        private static bool RemoveProperty(Microsoft.Build.Evaluation.Project project, string name)
+        {
+            ProjectPropertyElement property = project.Xml.Properties.FirstOrDefault(
+                p => p.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase));
+            if(property != null)
+            {
+                property.Parent.RemoveChild(property);
+                return true;
+            }
+            return false;
+        }
+
         private static bool AddImportAfter(Microsoft.Build.Evaluation.Project project,
                                            string import,
                                            ProjectElement after)
@@ -378,6 +390,62 @@ namespace IceBuilder
             return modified;
         }
 
+        public static bool UpgradeProjectProperties(Microsoft.Build.Evaluation.Project project)
+        {
+            bool modified = false;
+            string value = GetProperty(project, PropertyNames.AllowIcePrefix, false);
+            string additionalOptions = GetProperty(project, PropertyNames.AdditionalOptions);
+            if(!string.IsNullOrEmpty(value))
+            {
+                if(value.Equals("yes", StringComparison.CurrentCultureIgnoreCase) ||
+                   value.Equals("true", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    additionalOptions = String.Format("{0} --ice", additionalOptions).Trim();
+                }
+                RemoveProperty(project, PropertyNames.AllowIcePrefix);
+                modified = true;
+            }
+
+            value = GetProperty(project, PropertyNames.Underscore, false);
+            if (!string.IsNullOrEmpty(value))
+            {
+                if(value.Equals("yes", StringComparison.CurrentCultureIgnoreCase) ||
+                   value.Equals("true", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    additionalOptions = String.Format("{0} --underscore", additionalOptions).Trim();
+                }
+                RemoveProperty(project, PropertyNames.Underscore);
+                modified = true;
+            }
+
+            value = GetProperty(project, PropertyNames.Stream, false);
+            if(!string.IsNullOrEmpty(value))
+            {
+                if(value.Equals("yes", StringComparison.CurrentCultureIgnoreCase) ||
+                   value.Equals("true", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    additionalOptions = String.Format("{0} --stream ", additionalOptions).Trim();
+                }
+                RemoveProperty(project, PropertyNames.Stream);
+                modified = true;
+            }
+
+            value = GetProperty(project, PropertyNames.DLLExport, false);
+            if(!string.IsNullOrEmpty(value))
+            {
+                additionalOptions = String.Format("{0} --dll-export {1}", additionalOptions, value).Trim();
+                RemoveProperty(project, PropertyNames.DLLExport);
+                modified = true;
+            }
+
+            if(modified)
+            {
+                SetProperty(project, "IceBuilder", PropertyNames.AdditionalOptions, additionalOptions);
+            }
+
+            return modified;
+        }
+
         public static bool AddIceBuilderToProject(Microsoft.Build.Evaluation.Project project)
         {
             bool modified = false;
@@ -480,10 +548,10 @@ namespace IceBuilder
             }
         }
 
-        public static string GetProperty(Microsoft.Build.Evaluation.Project project, string name)
+        public static string GetProperty(Microsoft.Build.Evaluation.Project project, string name, bool imported = true)
         {
             ProjectProperty property = project.GetProperty(name);
-            return property != null ? property.UnevaluatedValue : string.Empty;
+            return property == null || (!imported && property.IsImported) ? String.Empty : property.UnevaluatedValue;
         }
 
         public static string GetEvaluatedProperty(Microsoft.Build.Evaluation.Project project, string name)

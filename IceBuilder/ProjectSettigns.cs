@@ -19,11 +19,8 @@ namespace IceBuilder
         public void Load()
         {
             OutputDir = GetProperty(PropertyNames.OutputDir);
-            AllowIcePrefix = GetPropertyAsBool(PropertyNames.AllowIcePrefix);
             Checksum = GetPropertyAsBool(PropertyNames.Checksum);
-            Stream = GetPropertyAsBool(PropertyNames.Stream);
             Tie = GetPropertyAsBool(PropertyNames.Tie);
-            Underscore = GetPropertyAsBool(PropertyNames.Underscore);
             IncludeDirectories = GetProperty(PropertyNames.IncludeDirectories);
             AdditionalOptions = GetProperty(PropertyNames.AdditionalOptions);
         }
@@ -31,22 +28,13 @@ namespace IceBuilder
         public void Save()
         {
             SetPropertyIfChanged(PropertyNames.OutputDir, OutputDir);
-            SetPropertyAsBoolIfChanged(PropertyNames.AllowIcePrefix, AllowIcePrefix);
             SetPropertyAsBoolIfChanged(PropertyNames.Checksum, Checksum);
-            SetPropertyAsBoolIfChanged(PropertyNames.Stream, Stream);
             SetPropertyAsBoolIfChanged(PropertyNames.Tie, Tie);
-            SetPropertyAsBoolIfChanged(PropertyNames.Underscore, Underscore);
             SetPropertyIfChanged(PropertyNames.IncludeDirectories, IncludeDirectories);
             SetPropertyIfChanged(PropertyNames.AdditionalOptions, AdditionalOptions);
         }
 
         public string OutputDir
-        {
-            get;
-            set;
-        }
-
-        public bool AllowIcePrefix
         {
             get;
             set;
@@ -58,19 +46,7 @@ namespace IceBuilder
             set;
         }
 
-        public bool Stream
-        {
-            get;
-            set;
-        }
-
         public bool Tie
-        {
-            get;
-            set;
-        }
-
-        public bool Underscore
         {
             get;
             set;

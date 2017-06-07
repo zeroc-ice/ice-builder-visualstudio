@@ -45,12 +45,9 @@
                  Ice Tools Path: $(IceToolsPath);
                  Output Dir: $(IceBuilderOutputDir);
                  Header Output Dir: $(IceBuilderHeaderOutputDir);
-                 Allow Ice Prefix: $(IceBuilderAllowIcePrefix);
-                 Underscore: $(IceBuilderUnderscore);
                  Checksum: $(IceBuilderChecksum);
                  Include Directories: $(IceBuilderIncludeDirectories);
                  Additional Options: $(IceBuilderAdditionalOptions);
-                 DLL Export: $(IceBuilderDLLExport);
                  Base Directory For Generated Include: $(IceBuilderBaseDirectoryForGeneratedInclude);
                  Header Ext: $(IceBuilderHeaderExt);
                  Source Ext: $(IceBuilderSourceExt)"
@@ -85,13 +82,9 @@
         OutputDir                         = "$(IceBuilderOutputDir)"
         HeaderOutputDir                   = "$(IceBuilderHeaderOutputDir)"
         WorkingDirectory                  = "$(MSBuildProjectDirectory)"
-        AllowIcePrefix                    = "$(IceBuilderAllowIcePrefix)"
-        Underscore                        = "$(IceBuilderUnderscore)"
-        Stream                            = "$(IceBuilderStream)"
         Checksum                          = "$(IceBuilderChecksum)"
         IncludeDirectories                = "$(IceBuilderIncludeDirectories)"
         AdditionalOptions                 = "$(IceBuilderAdditionalOptions)"
-        DLLExport                         = "$(IceBuilderDLLExport)"
         BaseDirectoryForGeneratedInclude  = "$(IceBuilderBaseDirectoryForGeneratedInclude)"
         HeaderExt                         = "$(IceBuilderHeaderExt)"
         SourceExt                         = "$(IceBuilderSourceExt)"
@@ -107,13 +100,9 @@
         OutputDir                         = "$(IceBuilderOutputDir)"
         HeaderOutputDir                   = "$(IceBuilderHeaderOutputDir)"
         WorkingDirectory                  = "$(MSBuildProjectDirectory)"
-        AllowIcePrefix                    = "$(IceBuilderAllowIcePrefix)"
-        Underscore                        = "$(IceBuilderUnderscore)"
-        Stream                            = "$(IceBuilderStream)"
         Checksum                          = "$(IceBuilderChecksum)"
         IncludeDirectories                = "$(IceBuilderIncludeDirectories)"
         AdditionalOptions                 = "$(IceBuilderAdditionalOptions)"
-        DLLExport                         = "$(IceBuilderDLLExport)"
         BaseDirectoryForGeneratedInclude  = "$(IceBuilderBaseDirectoryForGeneratedInclude)"
         HeaderExt                         = "$(IceBuilderHeaderExt)"
         SourceExt                         = "$(IceBuilderSourceExt)"

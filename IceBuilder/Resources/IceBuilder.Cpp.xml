@@ -33,26 +33,6 @@
     </StringProperty>
 
     <!-- Parsing Options -->
-    <BoolProperty Name="IceBuilderAllowIcePrefix"
-                  DisplayName="Allow Reserved Ice Identifiers"
-                  Description="Allow reserved Ice prefix in Slice identifiers."
-                  Switch="--ice"
-                  Category="General">
-      <BoolProperty.DataSource>
-        <DataSource Persistence="ProjectFile" ItemType="" Label="IceBuilder" HasConfigurationCondition="false" />
-      </BoolProperty.DataSource>
-    </BoolProperty>
-
-    <BoolProperty Name="IceBuilderUnderscore"
-                  DisplayName="Allow Underscore In Identifiers"
-                  Description="Allow underscores in Slice identifiers."
-                  Switch="--underscore"
-                  Category="General">
-      <BoolProperty.DataSource>
-        <DataSource Persistence="ProjectFile" ItemType="" Label="IceBuilder" HasConfigurationCondition="false" />
-      </BoolProperty.DataSource>
-    </BoolProperty>
-
     <StringListProperty Name="IceBuilderIncludeDirectories"
                     DisplayName="Include Directories"
                     Description="Specifies one or more directories to add to the Slice include path; use semi-colons (;) as directory separators."
@@ -74,26 +54,6 @@
         <DataSource Persistence="ProjectFile" ItemType="" Label="IceBuilder" HasConfigurationCondition="false" />
       </StringProperty.DataSource>
     </StringProperty>
-
-    <StringProperty Name="IceBuilderDLLExport"
-                    DisplayName="DLL Export Macro"
-                    Switch="--dll-export"
-                    Category="General"
-                    Description="Macro for exporting symbols from DLL.">
-      <StringProperty.DataSource>
-        <DataSource Persistence="ProjectFile" ItemType="" Label="IceBuilder" HasConfigurationCondition="false" />
-      </StringProperty.DataSource>
-    </StringProperty>
-
-    <BoolProperty Name="IceBuilderStream"
-                  DisplayName="Generate Helper Functions For Streaming"
-                  Description="Generate marshaling support for public stream API."
-                  Switch="--stream"
-                  Category="General">
-      <BoolProperty.DataSource>
-        <DataSource Persistence="ProjectFile" ItemType="" Label="IceBuilder" HasConfigurationCondition="false" />
-      </BoolProperty.DataSource>
-    </BoolProperty>
 
     <BoolProperty Name="IceBuilderChecksum"
                   DisplayName="Generate Slice Checksums"

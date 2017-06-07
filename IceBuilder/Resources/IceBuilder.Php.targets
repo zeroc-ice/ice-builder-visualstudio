@@ -48,9 +48,6 @@
           Lines="Ice Home: $(IceHome);
                  Ice Tools Path: $(IceToolsPath);
                  Output Dir: $(IceBuilderOutputDir);
-                 Allow Ice Prefix: $(IceBuilderAllowIcePrefix);
-                 Underscore: $(IceBuilderUnderscore);
-                 Checksum: $(IceBuilderChecksum);
                  All: $(IceBuilderAll);
                  Namespace: $(IceBuilderNamespace);
                  Include Directories: $(IceBuilderIncludeDirectories);
@@ -82,9 +79,6 @@
         IceToolsPath        = "$(IceToolsPath)"
         OutputDir           = "$(IceBuilderOutputDir)"
         WorkingDirectory    = "$(MSBuildProjectDirectory)"
-        AllowIcePrefix      = "$(IceBuilderAllowIcePrefix)"
-        Underscore          = "$(IceBuilderUnderscore)"
-        Stream              = "$(IceBuilderStream)"
         Checksum            = "$(IceBuilderChecksum)"
         All                 = "$(IceBuilderAll)"
         Namespace           = "$(IceBuilderNamespace)"
@@ -100,9 +94,6 @@
         IceToolsPath        = "$(IceToolsPath)"
         OutputDir           = "$(IceBuilderOutputDir)"
         WorkingDirectory    = "$(MSBuildProjectDirectory)"
-        AllowIcePrefix      = "$(IceBuilderAllowIcePrefix)"
-        Underscore          = "$(IceBuilderUnderscore)"
-        Stream              = "$(IceBuilderStream)"
         Checksum            = "$(IceBuilderChecksum)"
         All                 = "$(IceBuilderAll)"
         Namespace           = "$(IceBuilderNamespace)"
