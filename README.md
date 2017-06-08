@@ -139,7 +139,7 @@ The Ice builder install directory can be read from Windows registry and assigned
 
     <PropertyGroup>
         <IceBuilderInstallDir>$([MSBuild]::GetRegistryValue('HKEY_CURRENT_USER\SOFTWARE\ZeroC\IceBuilder',
-                                                            'InstallDir.$(VisualStudioVersion)'))</IceBuilderInstallDir>
+                                                    'InstallDir.$(VisualStudioVersion)'))</IceBuilderInstallDir>
     </PropertyGroup>
 
 Then for a C++ project, you need:
