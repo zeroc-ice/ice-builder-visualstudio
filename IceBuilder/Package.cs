@@ -427,7 +427,7 @@ namespace IceBuilder
             IVsHierarchy hier = project as IVsHierarchy;
             Guid projectGUID = Guid.Empty;
             IVsSolution.GetGuidOfProject(hier, out projectGUID);
-            IVsSolution.CloseSolutionElement((uint)__VSSLNCLOSEOPTIONS.SLNCLOSEOPT_UnloadProject, hier, 0);
+            IVsSolution4.UnloadProject(projectGUID, (uint)_VSProjectUnloadStatus.UNLOADSTATUS_UnloadedByUser);
             p.Save();
             try
             {
@@ -456,7 +456,7 @@ namespace IceBuilder
                     bool modified = MSBuildUtils.UpgradeProjectImports(p);
                     modified = MSBuildUtils.EnsureIceBuilderImports(p) || modified;
                     modified = MSBuildUtils.UpgradeProjectProperties(p) || modified;
-                    if (modified)
+                    if(modified)
                     {
                         SaveProject(project, p);
                     }
@@ -997,23 +997,7 @@ namespace IceBuilder
                             string.Format(@"$(IceHome)\slice;{0}", includeDirectories));
                     }
                 }
-
-                ProjectUtil.SaveProject(p);
-                IVsHierarchy hier = p as IVsHierarchy;
-                Guid projectGUID = Guid.Empty;
-                IVsSolution.GetGuidOfProject(hier, out projectGUID);
-                IVsSolution.CloseSolutionElement((uint)__VSSLNCLOSEOPTIONS.SLNCLOSEOPT_UnloadProject, hier, 0);
-                project.Save();
-                try
-                {
-                    ProjectCollection.GlobalProjectCollection.UnloadProject(project);
-                }
-                catch(Exception)
-                {
-                    //expected if the project is not in the global project collection
-                }
-                IVsSolution4.ReloadProject(ref projectGUID);
-
+                SaveProject(p, project);
                 if(!cppProject)
                 {
                     IVsProject p1 = DTEUtil.GetProject(projectPath);
@@ -1079,22 +1063,7 @@ namespace IceBuilder
 
             Microsoft.Build.Evaluation.Project project = MSBuildUtils.LoadedProject(path, DTEUtil.IsCppProject(p), true);
             MSBuildUtils.RemoveIceBuilderFromProject(project);
-            ProjectUtil.SaveProject(p);
-
-            Guid projectGUID = Guid.Empty;
-            IVsHierarchy hier = p as IVsHierarchy;
-            IVsSolution.GetGuidOfProject(hier, out projectGUID);
-            IVsSolution.CloseSolutionElement((uint)__VSSLNCLOSEOPTIONS.SLNCLOSEOPT_UnloadProject, hier, 0);
-            project.Save();
-            try
-            {
-                ProjectCollection.GlobalProjectCollection.UnloadProject(project);
-            }
-            catch(Exception)
-            {
-                //expected if the project is not in the global project collection
-            }
-            IVsSolution4.ReloadProject(ref projectGUID);
+            SaveProject(p, project);
         }
 
         //
