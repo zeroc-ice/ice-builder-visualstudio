@@ -22,7 +22,7 @@ The Ice Builder is a Visual Studio extension compatible with Visual Studio 2010,
 ## Installation
 
 The Ice Builder is available as two Visual Studio extensions in the
-Visual Studio Marketplace: [Ice Builder](https://marketplace.visualstudio.com/vsgallery/1a64e701-63f2-4740-8004-290e6c682ce0) for Visual Studio 2012, 2013 and 2015 and [Ice Builder for Visual Studio 2010](https://marketplace.visualstudio.com/vsgallery/d5df280b-2972-4d03-babb-e40b1437fde1).
+Visual Studio Marketplace: [Ice Builder](https://marketplace.visualstudio.com/vsgallery/1a64e701-63f2-4740-8004-290e6c682ce0) for Visual Studio 2012, 2013, 2015 and 2018 and [Ice Builder for Visual Studio 2010](https://marketplace.visualstudio.com/vsgallery/d5df280b-2972-4d03-babb-e40b1437fde1).
 
 If you build Ice Builder from sources, simply double-click on `IceBuilder.vsix` or `IceBuilder_VS2010.vsix` to install the extension into Visual Studio.
 
@@ -34,7 +34,7 @@ The Ice Builder compiles and recompiles a Slice file as needed:
 - when the generated C++ or C# source files are missing or older than this Slice file
 - when the generated C++ or C# source files are older than a Slice file included directly or indirectly by this Slice file
 
-The Ice Builder checks whether Slice files need to be compiled or recompiled each time Visual Studio loads a project, and each time you build a project. Saving a Slice file also triggers the (re)compilation of this Slice file. And when you remove or rename a Slice file, the Ice Builder automatically removes the corresponding generated files.
+The Ice Builder checks whether Slice files need to be compiled or recompiled each time Visual Studio loads a project, and each time you build a project. And when you remove or rename a Slice file, the Ice Builder automatically removes the corresponding generated files.
 
 The Ice Builder for Visual Studio 2010 does not include support for the Visual Studio IDE. To add `.ice` files to projects or to configure Slice compiler options, you need to edit the .vcxproj file in a text editor or with the Ice Builder in the IDE of a newer version of Visual Studio.
 
@@ -46,7 +46,7 @@ Project files created with the Ice add-in are not compatible with the Ice Builde
 
 ## Ice Home Configuration
 
-The Ice Builder relies on a specific Ice installation on your system. In Visual Studio, you can view or edit the home directory of this Ice installation through the `TOOLS` > `Options` > `Project and Solutions` > `Ice Builder` options page.
+The Ice Builder relies on a specific Ice installation on your system. In Visual Studio, you can view or edit the home directory of this Ice installation through the `Tools` > `Options` > `Project and Solutions` > `Ice Builder` options page.
 
 This installation can correspond to a binary distribution, such as `C:\Program Files (x86)\ZeroC\Ice-3.6.3`, or to a source tree, such as `C:\users\mike\github\zeroc-ice\ice`.
 
@@ -54,10 +54,15 @@ This installation can correspond to a binary distribution, such as `C:\Program F
 
 :warning: The Ice Home setting is ignored when a project uses an Ice NuGet package. Installing an Ice NuGet package into a project automatically configures the project to use the Ice SDK provided by that NuGet package.
 
+If automatic build option is selected Slice files will be compiled each time they are saved, otherwise they will be only compiled during project builds.
+
 ### Setting Ice Home with Visual Studio 2010
-Since the Ice Builder for Visual Studio 2010 does not support the Visual Studio IDE, you have two ways to set Ice Home:
+
+Since the Ice Builder for Visual Studio 2010 does not support the Visual Studio IDE, you have severals ways to set Ice Home:
  - set Ice Home with Ice Builder and a more recent version of Visual Studio. Ice Builder and Ice Builder for Visual Studio 2010 share the same Ice Home configuration.
  - set Ice Home in the Windows registry, by editing `IceHome` in `HKEY_CURRENT_USER\SOFTWARE\ZeroC\IceBuilder`.
+ - set ICE_HOME enviroment variable
+ - set IceHome MSbuild property `/p:IceHome=<Ice Install Dir>`
 
 ## C++ Usage
 
@@ -65,7 +70,7 @@ Since the Ice Builder for Visual Studio 2010 does not support the Visual Studio 
 
 Follow these steps:
 
-1. Add the Ice Builder to your C++ project by right-clicking on the project and selecting `Add Ice Builder to Project`. Alternatively, you can select the project and use the menu item `TOOLS` > `Add Ice Builder to Project`.
+1. Add the Ice Builder to your C++ project by right-clicking on the project and selecting `Add Ice Builder to Project`. Alternatively, you can select the project and use the menu item `Tools` > `Add Ice Builder to Project`.
 
    Adding the Ice Builder creates a `Slice Files` filter in your project.
 
@@ -85,13 +90,9 @@ These properties are the same for all configurations and platforms, and allow yo
 | --------------------------------------- | ------------------------------------------- | -------------------------- | ----------------------------------- |
 | Output Directory                        | IceBuilderOutputDir                         | $(ProjectDir)\generated    | `--output-dir`                      |
 | Header Output Directory                 | IceBuilderHeaderOutputDir                   | $(IceBuilderOutputDir)     | (none)                              |
-| Allow Reserved Ice Identifiers          | IceBuilderAllowIcePrefix                    | No                         | `--ice`                             |
-| Allow Underscores In Identifiers        | IceBuilderUnderscore                        | No                         | `--underscore`                      |
 | Include Directories                     | IceBuilderIncludeDirectories                | $(IceHome)\slice           | `-I`                                |
 | Base Directory For Generated #include   | IceBuilderBaseDirectory ForGeneratedInclude |                            | `--include-dir`                     |
-| DLL Export Macro                        | IceBuilderDLLExport                         |                            | `--dll-export`                      |
 | Generated Header Extension              | IceBuilderHeaderExt                         | .h                         | `--header-ext`                      |
-| Generate Helper Functions For Streaming | IceBuilderStream                            | No                         | `--stream`                          |
 | Generate Slice Checksums                | IceBuilderChecksum                          | No                         | `--checksum`                        |
 | Generated Source Extension              | IceBuilderSourceExt                         | .cpp                       | `--source-ext`                      |
 | Additional Options                      | IceBuilderAdditionalOptions                 |                            | (any)                               |
@@ -102,7 +103,7 @@ These properties are the same for all configurations and platforms, and allow yo
 
 Follow these steps:
 
-1. Add the Ice Builder to your C# project by right-clicking on the project and selecting `Add Ice Builder to Project`. Alternatively, you can select the project and use the menu item `TOOLS` > `Add Ice Builder to Project`.
+1. Add the Ice Builder to your C# project by right-clicking on the project and selecting `Add Ice Builder to Project`. Alternatively, you can select the project and use the menu item `Tools` > `Add Ice Builder to Project`.
 
    Adding the Ice Builder creates a `Slice Files` filter in your project.
 
@@ -121,9 +122,6 @@ These properties are the same for all configurations and platforms, and allow yo
 | Property                                | MSBuild Property             | Default Value              | Corresponding `slice2cs` parameter |
 | --------------------------------------- | -----------------------------| -------------------------- | ---------------------------------- |
 | Output directory                        | IceBuilderOutputDir          | $(ProjectDir)\generated    | `--output-dir`                     |
-| Allow reserved Ice identifiers          | IceBuilderAllowIcePrefix     | (unchecked)                | `--ice`                            |
-| Allow underscores in identifiers        | IceBuilderUnderscore         | (unchecked)                | `--underscore`                     |
-| Generate helper methods for streaming   | IceBuilderStream             | (unchecked)                | `--stream`                         |
 | Generate Slice checksums                | IceBuilderChecksum           | (unchecked)                | `--checksum`                       |
 | Generate tie classes                    | IceBuilderTie                | (unchecked)                | `--tie`                            |
 | Include directories                     | IceBuilderIncludeDirectories | $(IceHome)\slice           | `-I`                               |
@@ -135,19 +133,25 @@ The Ice Builder automatically adds a reference to the Ice assembly, and allows y
 
 The Ice Builder uses [MSBuild](https://msdn.microsoft.com/en-us/library/dd393574.aspx) tasks to build Slice files using `slice2cpp` and `slice2cs`. As a result, you can build Visual Studio projects that enable Ice Builder directly with MSBuild.
 
-The simplest and most common way to configure Ice Builder is in Visual Studio. You can nevertheless also configure Ice Builder directly in your MSBuild project, by importing two Ice Builder projects into your project.
+The simplest and most common way to configure Ice Builder is in Visual Studio. You can nevertheless also configure Ice Builder directly in your MSBuild project, by importing two Ice Builder projects from the Ice Builder install into your project.
 
-For a C++ project, you need:
+The Ice builder install directory can be read from Windows registry and assigned it to `IceBuilderInstallDir` MSBuild property using the following code:
 
-1. `<Ice Builder Install Path>\Resources\IceBuilder.Cpp.props` - This project defines the default settings for Ice Builder in C++
-2. `<Ice Builder Install Path>\Resources\IceBuilder.Cpp.targets` - This projet defines the targets required to build C++ projects with Ice Builder
+    <PropertyGroup>
+        <IceBuilderInstallDir>$([MSBuild]::GetRegistryValue('HKEY_CURRENT_USER\SOFTWARE\ZeroC\IceBuilder', 'InstallDir.$(VisualStudioVersion)'))</IceBuilderInstallDir>
+    </PropertyGroup>
+
+Then for a C++ project, you need:
+
+1. `$(IceBuilderInstallDir)\Resources\IceBuilder.Cpp.props` - This project defines the default settings for Ice Builder in C++
+2. `$(IceBuilderInstallDir)\Resources\IceBuilder.Cpp.targets` - This projet defines the targets required to build C++ projects with Ice Builder
 
 The import order matters for MSBuild. `IceBuilder.Cpp.props` depends on common properties defined in `Microsoft.Cpp.props` and must be imported after this project. Likewise, `IceBuilder.Cpp.targets` depends on targets defined in `Microsoft.Cpp.targets` and must be imported after this project.
 
-For a C# project, you need:
+And for a C# project, you need:
 
-1. `<Ice Builder Install Path>\Resources\IceBuilder.CSharp.props` - This project defines the default settings for Ice Builder in C# projects
-2. `<Ice Builder Install Path>\Resources\IceBuilder.CSharp.targets` - This project defines the targets required to build C# projects with Ice Builder
+1. `$(IceBuilderInstallDir)\Resources\IceBuilder.CSharp.props` - This project defines the default settings for Ice Builder in C# projects
+2. `$(IceBuilderInstallDir)\Resources\IceBuilder.CSharp.targets` - This project defines the targets required to build C# projects with Ice Builder
 
 Like for C++, the import order is important. Both `IceBuilder.CSharp.props` and `IceBuilder.CSharp.targets` must be imported after `Microsoft.CSharp.targets`.
 
@@ -161,7 +165,7 @@ Ice Builder adds two targets, `IceBuilder_Compile` and `IceBuilder_Clean`, that 
 
 ### Build Requirements
 
-You need Visual Studio 2015
+You need Visual Studio 2017
 
 **AND**
 
@@ -169,10 +173,11 @@ to install ALL the following Visual Studio SDKs:
 - [Visual Studio 2012 SDK](https://www.microsoft.com/en-us/download/details.aspx?id=30668)
 - [Visual Studio 2013 SDK](https://www.microsoft.com/en-us/download/details.aspx?id=40758)
 - [Visual Studio 2015 SDK](https://msdn.microsoft.com/en-us/library/bb166441.aspx)
+- [Visual Studio 2017 SDK](https://docs.microsoft.com/en-us/visualstudio/extensibility/installing-the-visual-studio-sdk)
 
 ### Build Instructions
 
-Open the `IceBuilder.sln` solution file in Visual Studio 2015.
+Open the `IceBuilder.sln` solution file in Visual Studio 2017.
 
 After building the Ice Builder extension, the VSIX package will be placed in the build output directory
 `IceBuilder\bin\Debug\IceBuilder.vsix` for debug builds, and `IceBuilder\bin\Release\IceBuilder.vsix`

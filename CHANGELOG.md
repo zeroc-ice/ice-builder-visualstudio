@@ -1,6 +1,10 @@
 ## Changes in Ice Builder for Visual Studio 4.3.7
 
+- Added support for Visual Studio 2017
 - Added support for Visual Studio 2010 C++ builds
+- Moved Slice compilers options that were deprecated in 3.7 to additional
+  options and doesn't longer exists as explicit options in the respective
+  configuration pages, projects will be automatically updated.
 
 ## Changes in Ice Builder for Visual Studio 4.3.6
 
