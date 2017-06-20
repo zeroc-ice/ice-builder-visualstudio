@@ -96,7 +96,7 @@
                     Name="IceBuilderAdditionalOptions"
                     Category="General"
                     Subtype="AdditionalOptions"
-                    Description="Additional command line options to pass to Slice compiler.">
+                    Description="Additional command line options to pass to slice2cpp.">
       <StringProperty.DataSource>
         <DataSource Persistence="ProjectFile" ItemType="" Label="IceBuilder" HasConfigurationCondition="false" />
       </StringProperty.DataSource>
