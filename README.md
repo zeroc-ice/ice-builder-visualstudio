@@ -11,7 +11,7 @@ The Ice Builder is a Visual Studio extension compatible with Visual Studio 2010,
 - [C++ Usage](#c-usage)
   - [Adding Slice Files to a C++ Project](#adding-slice-files-to-a-c-project)
   - [Ice Builder Configuration for a C++ Project](#ice-builder-configuration-for-a-c-project)
-  - [Visual Studio 2017 Known Issues](#visual-studio-2017-known-issues)
+   - [Known Issue with Visual Studio 2017](#known-issue-with-visual-studio-2017)
 - [C# Usage](#c-usage-1)
   - [Adding Slice Files to a C# Project](#adding-slice-files-to-a-c-project-1)
   - [Ice Builder Configuration for a C# Project](#ice-builder-configuration-for-a-c-project-1)
@@ -91,7 +91,7 @@ These properties are the same for all configurations and platforms, and allow yo
 | Generated Source Extension              | IceBuilderSourceExt                         | .cpp                       | `--source-ext`                      |
 | Additional Options                      | IceBuilderAdditionalOptions                 |                            | (any)                               |
 
-:warning: Known Issue with Visual Studio 2017
+#### Known Issue with Visual Studio 2017
 
 With Visual Studio 2017, the `Ice Builder` property page is currently not available in solutions with more than one C++ project. Universal Windows (UWP) and C# projects are not affected by this bug.
 
