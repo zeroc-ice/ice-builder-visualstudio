@@ -23,7 +23,7 @@ The Ice Builder is a Visual Studio extension compatible with Visual Studio 2010,
 ## Installation
 
 The Ice Builder is available as two Visual Studio extensions in the
-Visual Studio Marketplace: [Ice Builder](https://marketplace.visualstudio.com/vsgallery/1a64e701-63f2-4740-8004-290e6c682ce0) for Visual Studio 2012, 2013, 2015 and 2017 and [Ice Builder for Visual Studio 2010](https://marketplace.visualstudio.com/vsgallery/d5df280b-2972-4d03-babb-e40b1437fde1).
+Visual Studio Marketplace: [Ice Builder](https://marketplace.visualstudio.com/items?itemName=ZeroCInc.IceBuilder) for Visual Studio 2012, 2013, 2015 and 2017 and [Ice Builder for Visual Studio 2010](https://marketplace.visualstudio.com/items?itemName=ZeroCInc.IceBuilderforVisualStudio2010).
 
 If you build Ice Builder from sources, simply double-click on `IceBuilder.vsix` or `IceBuilder_VS2010.vsix` to install the extension into Visual Studio.
 
@@ -37,7 +37,7 @@ The Ice Builder compiles and recompiles a Slice file as needed:
 
 The Ice Builder checks whether Slice files need to be compiled or recompiled each time Visual Studio loads a project, and each time you build a project. And when you remove or rename a Slice file, the Ice Builder automatically removes the corresponding generated files.
 
-The Ice Builder for Visual Studio 2010 does not allow you to add .ice files to your projects or configure Slice compilation options in the Visual Studio IDE. You need to edit the .vcxproj file in a text editor or with the Ice Builder in the IDE of a newer version of Visual Studio.
+The Ice Builder for Visual Studio 2010 does not allow you to add `.ice` files to your projects or configure Slice compilation options in the Visual Studio IDE. You need to edit the `.vcxproj` file in a text editor or with the Ice Builder in the IDE of a newer version of Visual Studio.
 
 ## Ice Home Configuration
 
@@ -53,7 +53,7 @@ If automatic build option is selected Slice files will be compiled each time the
 
 ### Setting Ice Home with Visual Studio 2010
 
-Since the Ice Builder for Visual Studio 2010 does not support the Visual Studio IDE, you have severals ways to set Ice Home:
+Since the Ice Builder for Visual Studio 2010 does not support setting Ice Builder properties in the Visual Studio IDE, you have severals ways to set Ice Home:
  - set Ice Home with Ice Builder and a more recent version of Visual Studio. Ice Builder and Ice Builder for Visual Studio 2010 share the same Ice Home configuration.
  - set Ice Home in the Windows registry, by editing `IceHome` in `HKEY_CURRENT_USER\SOFTWARE\ZeroC\IceBuilder`.
  - set ICE_HOME enviroment variable
@@ -91,9 +91,9 @@ These properties are the same for all configurations and platforms, and allow yo
 | Generated Source Extension              | IceBuilderSourceExt                         | .cpp                       | `--source-ext`                      |
 | Additional Options                      | IceBuilderAdditionalOptions                 |                            | (any)                               |
 
-### Visual Studio 2017 Known Issues
+:warning: Known Issue with Visual Studio 2017
 
-When using Visual Studio 2017 `Ice Builder` property page does not show up for C++ project in Visual Studio solution files with more than one C++ project.
+With Visual Studio 2017, the `Ice Builder` property page is currently not available in solutions with more than one C++ project. Universal Windows (UWP) and C# projects are not affected by this bug.
 
 ## C# Usage
 
