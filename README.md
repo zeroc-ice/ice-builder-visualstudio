@@ -7,17 +7,18 @@ The Ice Builder is a Visual Studio extension compatible with Visual Studio 2010,
 ## Contents
 - [Installation](#installation)
 - [Overview](#overview)
-- [Migration from the Ice Add-in for Visual Studio](#migration-from-the-ice-add-in-for-visual-studio)
 - [Ice Home Configuration](#ice-home-configuration)
 - [C++ Usage](#c-usage)
   - [Adding Slice Files to a C++ Project](#adding-slice-files-to-a-c-project)
   - [Ice Builder Configuration for a C++ Project](#ice-builder-configuration-for-a-c-project)
+  - [Visual Studio 2017 Known Issues](#visual-studio-2017-known-issues)
 - [C# Usage](#c-usage-1)
   - [Adding Slice Files to a C# Project](#adding-slice-files-to-a-c-project-1)
   - [Ice Builder Configuration for a C# Project](#ice-builder-configuration-for-a-c-project-1)
 - [MSBuild Usage](#msbuild-usage)
 - [Building Ice Builder from Source](#building-ice-builder-from-source)
 - [Building Ice Builder for Visual Studio 2010 from Source](#building-ice-builder-for-visual-studio-2010-from-source)
+- [Migration from the Ice Add-in for Visual Studio](#migration-from-the-ice-add-in-for-visual-studio)
 
 ## Installation
 
@@ -36,13 +37,7 @@ The Ice Builder compiles and recompiles a Slice file as needed:
 
 The Ice Builder checks whether Slice files need to be compiled or recompiled each time Visual Studio loads a project, and each time you build a project. And when you remove or rename a Slice file, the Ice Builder automatically removes the corresponding generated files.
 
-The Ice Builder for Visual Studio 2010 does not include support for the Visual Studio IDE. To add `.ice` files to projects or to configure Slice compiler options, you need to edit the .vcxproj file in a text editor or with the Ice Builder in the IDE of a newer version of Visual Studio.
-
-## Migration from the Ice Add-in for Visual Studio
-
-The Ice Builder for Visual Studio replaces the old Ice add-in for Visual Studio. Each time you start Visual Studio with both the Ice Builder extension and the Ice add-in installed, the Ice Builder will offer to remove the Ice add-in.
-
-Project files created with the Ice add-in are not compatible with the Ice Builder. When you open such a project file, the Ice Builder will offer to convert your project's configuration to the Ice Builder format. You should backup your project files first, as this conversion is irreversible.
+The Ice Builder for Visual Studio 2010 does not allow you to add .ice files to your projects or configure Slice compilation options in the Visual Studio IDE. You need to edit the .vcxproj file in a text editor or with the Ice Builder in the IDE of a newer version of Visual Studio.
 
 ## Ice Home Configuration
 
@@ -95,6 +90,10 @@ These properties are the same for all configurations and platforms, and allow yo
 | Generated Header Extension              | IceBuilderHeaderExt                         | .h                         | `--header-ext`                      |
 | Generated Source Extension              | IceBuilderSourceExt                         | .cpp                       | `--source-ext`                      |
 | Additional Options                      | IceBuilderAdditionalOptions                 |                            | (any)                               |
+
+### Visual Studio 2017 Known Issues
+
+When using Visual Studio 2017 `Ice Builder` property page does not show up for C++ project in Visual Studio solution files with more than one C++ project.
 
 ## C# Usage
 
@@ -203,3 +202,9 @@ for release builds.
 You can sign your extension with Authenticode by setting the environment variable `SIGN_CERTIFICATE` to
 the path of your PFX certificate store, and the `SIGN_PASSWORD` environment variable to the password
 used by your certificate store.
+
+## Migration from the Ice Add-in for Visual Studio
+
+The Ice Builder for Visual Studio replaces the old Ice add-in for Visual Studio. Each time you start Visual Studio with both the Ice Builder extension and the Ice add-in installed, the Ice Builder will offer to remove the Ice add-in.
+
+Project files created with the Ice add-in are not compatible with the Ice Builder. When you open such a project file, the Ice Builder will offer to convert your project's configuration to the Ice Builder format. You should backup your project files first, as this conversion is irreversible.
