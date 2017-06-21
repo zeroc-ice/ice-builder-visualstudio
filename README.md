@@ -2,7 +2,7 @@
 
 The Ice Builder for Visual Studio manages the compilation of Slice (`.ice`) files to C++ and C#. It compiles your Slice files with `slice2cpp` and `slice2cs`, and allows you to specify the parameters provided to these compilers.
 
-The Ice Builder is a Visual Studio extension compatible with Visual Studio 2010, 2012, 2013, and 2015. An Ice installation with `slice2cpp` and `slice2cs` version 3.6.0 or higher is also required.
+The Ice Builder is a Visual Studio extension compatible with Visual Studio 2010, 2012, 2013, 2015 and 2017. An Ice installation with `slice2cpp` and `slice2cs` version 3.6.0 or higher is also required.
 
 ## Contents
 - [Installation](#installation)
@@ -22,7 +22,7 @@ The Ice Builder is a Visual Studio extension compatible with Visual Studio 2010,
 ## Installation
 
 The Ice Builder is available as two Visual Studio extensions in the
-Visual Studio Marketplace: [Ice Builder](https://marketplace.visualstudio.com/vsgallery/1a64e701-63f2-4740-8004-290e6c682ce0) for Visual Studio 2012, 2013, 2015 and 2018 and [Ice Builder for Visual Studio 2010](https://marketplace.visualstudio.com/vsgallery/d5df280b-2972-4d03-babb-e40b1437fde1).
+Visual Studio Marketplace: [Ice Builder](https://marketplace.visualstudio.com/vsgallery/1a64e701-63f2-4740-8004-290e6c682ce0) for Visual Studio 2012, 2013, 2015 and 2017 and [Ice Builder for Visual Studio 2010](https://marketplace.visualstudio.com/vsgallery/d5df280b-2972-4d03-babb-e40b1437fde1).
 
 If you build Ice Builder from sources, simply double-click on `IceBuilder.vsix` or `IceBuilder_VS2010.vsix` to install the extension into Visual Studio.
 
@@ -48,7 +48,7 @@ Project files created with the Ice add-in are not compatible with the Ice Builde
 
 The Ice Builder relies on a specific Ice installation on your system. In Visual Studio, you can view or edit the home directory of this Ice installation through the `Tools` > `Options` > `Project and Solutions` > `Ice Builder` options page.
 
-This installation can correspond to a binary distribution, such as `C:\Program Files (x86)\ZeroC\Ice-3.6.3`, or to a source tree, such as `C:\users\mike\github\zeroc-ice\ice`.
+This installation can correspond to a binary distribution, such as `C:\Program Files\ZeroC\Ice-3.7.0`, or to a source tree, such as `C:\users\mike\github\zeroc-ice\ice`.
 
 ![Ice home screenshot](https://github.com/zeroc-ice/ice-builder-visualstudio/raw/master/Screenshots/vs2015-options.png)
 
@@ -93,7 +93,6 @@ These properties are the same for all configurations and platforms, and allow yo
 | Include Directories                     | IceBuilderIncludeDirectories                | $(IceHome)\slice           | `-I`                                |
 | Base Directory For Generated #include   | IceBuilderBaseDirectory ForGeneratedInclude |                            | `--include-dir`                     |
 | Generated Header Extension              | IceBuilderHeaderExt                         | .h                         | `--header-ext`                      |
-| Generate Slice Checksums                | IceBuilderChecksum                          | No                         | `--checksum`                        |
 | Generated Source Extension              | IceBuilderSourceExt                         | .cpp                       | `--source-ext`                      |
 | Additional Options                      | IceBuilderAdditionalOptions                 |                            | (any)                               |
 
@@ -122,8 +121,6 @@ These properties are the same for all configurations and platforms, and allow yo
 | Property                                | MSBuild Property             | Default Value              | Corresponding `slice2cs` parameter |
 | --------------------------------------- | -----------------------------| -------------------------- | ---------------------------------- |
 | Output directory                        | IceBuilderOutputDir          | $(ProjectDir)\generated    | `--output-dir`                     |
-| Generate Slice checksums                | IceBuilderChecksum           | (unchecked)                | `--checksum`                       |
-| Generate tie classes                    | IceBuilderTie                | (unchecked)                | `--tie`                            |
 | Include directories                     | IceBuilderIncludeDirectories | $(IceHome)\slice           | `-I`                               |
 | Additional options                      | IceBuilderAdditionalOptions  |                            | (any)                              |
 
