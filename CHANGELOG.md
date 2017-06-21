@@ -1,3 +1,11 @@
+## Changes in Ice Builder for Visual Studio 4.3.8
+
+- Move --tie and --checksum Slice compiler options to additional
+  options, projects will be automatically update if required.
+
+- Do not show up popup window for unexpected exceptions, the exception are log
+  to Visual Studio output window.
+
 ## Changes in Ice Builder for Visual Studio 4.3.7
 
 - Added support for Visual Studio 2017
