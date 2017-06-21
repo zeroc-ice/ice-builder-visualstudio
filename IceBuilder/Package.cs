@@ -140,23 +140,8 @@ namespace IceBuilder
         {
             try
             {
-                if(!Instance.CommandLineMode)
-                {
-                    MessageBox.Show("The Ice Builder has raised an unexpected exception:\n" +
-                                    ex.ToString(),
-                                    "Ice Builder", MessageBoxButtons.OK,
-                                    MessageBoxIcon.Error,
-                                    MessageBoxDefaultButton.Button1,
-                                    0);
-                }
-            }
-            catch(Exception)
-            {
-            }
-
-            try
-            {
-                Instance.OutputPane.OutputString(ex.ToString());
+                Instance.OutputPane.OutputString(
+                    String.Format("The Ice Builder has raised an unexpected exception:\n{0}", ex.ToString()));
             }
             catch(Exception)
             {
