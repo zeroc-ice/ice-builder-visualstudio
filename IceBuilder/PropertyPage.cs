@@ -70,8 +70,6 @@ namespace IceBuilder
             try
             {
                 Settings.OutputDir = ConfigurationView.OutputDir;
-                Settings.Checksum = ConfigurationView.Checksum == CheckState.Checked ? true : false;
-                Settings.Tie = ConfigurationView.Tie == CheckState.Checked ? true : false;
                 Settings.IncludeDirectories = string.Join(";", ConfigurationView.IncludeDirectories.Values);
                 Settings.AdditionalOptions = ConfigurationView.AdditionalOptions;
 
@@ -209,8 +207,6 @@ namespace IceBuilder
                             Settings = new ProjectSettigns(Project);
                             Settings.Load();
                             ConfigurationView.OutputDir = Settings.OutputDir;
-                            ConfigurationView.Checksum = Settings.Checksum ? CheckState.Checked : CheckState.Unchecked;
-                            ConfigurationView.Tie = Settings.Tie ? CheckState.Checked : CheckState.Unchecked;
                             ConfigurationView.IncludeDirectories.Values = new List<string>(
                                 Settings.IncludeDirectories.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries));
                             ConfigurationView.AdditionalOptions = Settings.AdditionalOptions;

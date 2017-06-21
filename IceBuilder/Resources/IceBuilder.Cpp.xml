@@ -55,16 +55,6 @@
       </StringProperty.DataSource>
     </StringProperty>
 
-    <BoolProperty Name="IceBuilderChecksum"
-                  DisplayName="Generate Slice Checksums"
-                  Description="Generate checksums for Slice definitions."
-                  Switch="--checksum"
-                  Category="General">
-      <BoolProperty.DataSource>
-        <DataSource Persistence="ProjectFile" ItemType="" Label="IceBuilder" HasConfigurationCondition="false" />
-      </BoolProperty.DataSource>
-    </BoolProperty>
-
     <EnumProperty Name="IceBuilderHeaderExt"
                   DisplayName="Generated Header Extension"
                   Description="Use extension instead of default `h' header extension."

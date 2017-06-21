@@ -75,30 +75,6 @@ namespace IceBuilder
             }
         }
 
-        public CheckState Checksum
-        {
-            get
-            {
-                return chkChecksum.CheckState;
-            }
-            set
-            {
-                chkChecksum.CheckState = value;
-            }
-        }
-
-        public CheckState Tie
-        {
-            get
-            {
-                return chkTie.CheckState;
-            }
-            set
-            {
-                chkTie.CheckState = value;
-            }
-        }
-
         public string AdditionalOptions
         {
             get
@@ -187,22 +163,6 @@ namespace IceBuilder
         private void OutputDirectory_Leave(object sender, EventArgs e)
         {
             if(!txtOutputDir.Text.Equals(Page.Settings.OutputDir))
-            {
-                Dirty = true;
-            }
-        }
-
-        private void Checksum_CheckedChanged(object sender, EventArgs e)
-        {
-            if(chkChecksum.Checked != Page.Settings.Checksum)
-            {
-                Dirty = true;
-            }
-        }
-
-        private void Tie_CheckedChanged(object sender, EventArgs e)
-        {
-            if(chkTie.Checked != Page.Settings.Tie)
             {
                 Dirty = true;
             }

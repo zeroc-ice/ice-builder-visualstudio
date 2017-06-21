@@ -19,8 +19,6 @@ namespace IceBuilder
         public void Load()
         {
             OutputDir = GetProperty(PropertyNames.OutputDir);
-            Checksum = GetPropertyAsBool(PropertyNames.Checksum);
-            Tie = GetPropertyAsBool(PropertyNames.Tie);
             IncludeDirectories = GetProperty(PropertyNames.IncludeDirectories);
             AdditionalOptions = GetProperty(PropertyNames.AdditionalOptions);
         }
@@ -28,25 +26,11 @@ namespace IceBuilder
         public void Save()
         {
             SetPropertyIfChanged(PropertyNames.OutputDir, OutputDir);
-            SetPropertyAsBoolIfChanged(PropertyNames.Checksum, Checksum);
-            SetPropertyAsBoolIfChanged(PropertyNames.Tie, Tie);
             SetPropertyIfChanged(PropertyNames.IncludeDirectories, IncludeDirectories);
             SetPropertyIfChanged(PropertyNames.AdditionalOptions, AdditionalOptions);
         }
 
         public string OutputDir
-        {
-            get;
-            set;
-        }
-
-        public bool Checksum
-        {
-            get;
-            set;
-        }
-
-        public bool Tie
         {
             get;
             set;

@@ -438,6 +438,22 @@ namespace IceBuilder
                 modified = true;
             }
 
+            value = GetProperty(project, PropertyNames.Checksum, false);
+            if(!string.IsNullOrEmpty(value))
+            {
+                additionalOptions = String.Format("{0} --checksum", additionalOptions).Trim();
+                RemoveProperty(project, PropertyNames.Checksum);
+                modified = true;
+            }
+
+            value = GetProperty(project, PropertyNames.Tie, false);
+            if(!string.IsNullOrEmpty(value))
+            {
+                additionalOptions = String.Format("{0} --tie", additionalOptions).Trim();
+                RemoveProperty(project, PropertyNames.Tie);
+                modified = true;
+            }
+
             if(modified)
             {
                 SetProperty(project, "IceBuilder", PropertyNames.AdditionalOptions, additionalOptions);
