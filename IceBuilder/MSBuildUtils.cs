@@ -454,6 +454,22 @@ namespace IceBuilder
                 modified = true;
             }
 
+            value = GetProperty(project, PropertyNames.DLLExport, false);
+            if(!string.IsNullOrEmpty(value))
+            {
+                additionalOptions = String.Format("{0} --dll-export {1}", additionalOptions, value).Trim();
+                RemoveProperty(project, PropertyNames.DLLExport);
+                modified = true;
+            }
+
+            value = GetProperty(project, PropertyNames.BaseDirectoryForGeneratedInclude, false);
+            if(!string.IsNullOrEmpty(value))
+            {
+                additionalOptions = String.Format("{0} --include-dir {1}", additionalOptions, value).Trim();
+                RemoveProperty(project, PropertyNames.BaseDirectoryForGeneratedInclude);
+                modified = true;
+            }
+
             if(modified)
             {
                 SetProperty(project, "IceBuilder", PropertyNames.AdditionalOptions, additionalOptions);
