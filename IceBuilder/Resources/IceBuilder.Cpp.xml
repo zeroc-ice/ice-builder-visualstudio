@@ -45,6 +45,16 @@
     </StringListProperty>
 
     <!-- Output Options -->
+    <StringProperty Name="IceBuilderBaseDirectoryForGeneratedInclude"
+                    DisplayName="Base Directory For Generated #include"
+                    Category="General"
+                    Switch="--include-dir"
+                    Description="Base directory for #include in generated C++ files.">
+      <StringProperty.DataSource>
+        <DataSource Persistence="ProjectFile" ItemType="" Label="IceBuilder" HasConfigurationCondition="false" />
+      </StringProperty.DataSource>
+    </StringProperty>
+
     <EnumProperty Name="IceBuilderHeaderExt"
                   DisplayName="Generated Header Extension"
                   Description="Use extension instead of default `h' header extension."

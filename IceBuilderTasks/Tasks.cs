@@ -112,12 +112,6 @@ namespace IceBuilder
             set;
         }
 
-        public bool Checksum
-        {
-            get;
-            set;
-        }
-
         public string[] IncludeDirectories
         {
             get;
@@ -164,11 +158,6 @@ namespace IceBuilder
             {
                 builder.AppendSwitch("--output-dir");
                 builder.AppendFileNameIfNotNull(OutputDir);
-            }
-
-            if(Checksum)
-            {
-                builder.AppendSwitch("--checksum");
             }
 
             if(IncludeDirectories != null)
@@ -513,12 +502,6 @@ namespace IceBuilder
             }
         }
 
-        public bool Tie
-        {
-            get;
-            set;
-        }
-
         protected override string GeneratedExtensions
         {
             get
@@ -535,17 +518,6 @@ namespace IceBuilder
                 message += TaskUtil.MakeRelative(WorkingDirectory, GetGeneratedPath(source, OutputDir, ".cs"));
                 Log.LogMessage(MessageImportance.High, message);
             }
-        }
-
-        protected override string GenerateCommandLineCommands()
-        {
-            CommandLineBuilder builder = new CommandLineBuilder();
-            if(Tie)
-            {
-                builder.AppendSwitch("--tie ");
-            }
-            builder.AppendTextUnquoted(string.Format(" {0}", base.GenerateCommandLineCommands()));
-            return builder.ToString();
         }
     }
     #endregion

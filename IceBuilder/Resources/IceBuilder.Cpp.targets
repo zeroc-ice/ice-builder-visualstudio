@@ -45,7 +45,6 @@
                  Ice Tools Path: $(IceToolsPath);
                  Output Dir: $(IceBuilderOutputDir);
                  Header Output Dir: $(IceBuilderHeaderOutputDir);
-                 Checksum: $(IceBuilderChecksum);
                  Include Directories: $(IceBuilderIncludeDirectories);
                  Additional Options: $(IceBuilderAdditionalOptions);
                  Base Directory For Generated Include: $(IceBuilderBaseDirectoryForGeneratedInclude);
@@ -82,7 +81,6 @@
         OutputDir                         = "$(IceBuilderOutputDir)"
         HeaderOutputDir                   = "$(IceBuilderHeaderOutputDir)"
         WorkingDirectory                  = "$(MSBuildProjectDirectory)"
-        Checksum                          = "$(IceBuilderChecksum)"
         IncludeDirectories                = "$(IceBuilderIncludeDirectories)"
         AdditionalOptions                 = "$(IceBuilderAdditionalOptions)"
         BaseDirectoryForGeneratedInclude  = "$(IceBuilderBaseDirectoryForGeneratedInclude)"
@@ -100,7 +98,6 @@
         OutputDir                         = "$(IceBuilderOutputDir)"
         HeaderOutputDir                   = "$(IceBuilderHeaderOutputDir)"
         WorkingDirectory                  = "$(MSBuildProjectDirectory)"
-        Checksum                          = "$(IceBuilderChecksum)"
         IncludeDirectories                = "$(IceBuilderIncludeDirectories)"
         AdditionalOptions                 = "$(IceBuilderAdditionalOptions)"
         BaseDirectoryForGeneratedInclude  = "$(IceBuilderBaseDirectoryForGeneratedInclude)"
