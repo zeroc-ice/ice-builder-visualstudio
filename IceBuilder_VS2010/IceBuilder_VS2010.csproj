@@ -63,6 +63,10 @@
       <IncludeInVSIX>true</IncludeInVSIX>
       <Link>Resources\IceBuilder.Cpp.xml</Link>
     </Content>
+    <Content Include="..\IceBuilder\Resources\IceBuilder.Tasks.dll">
+      <Link>Resources\IceBuilder.Tasks.dll</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="..\IceBuilder\Resources\Package.ico">
       <Link>Package.ico</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -88,11 +92,6 @@
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <None Include="source.extension.vsixmanifest" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Resources\IceBuilder.Tasks.dll">
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
   </ItemGroup>
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>

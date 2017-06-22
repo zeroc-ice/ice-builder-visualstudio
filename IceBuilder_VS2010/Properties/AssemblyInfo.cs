@@ -15,5 +15,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCompany("ZeroC, Inc.")]
 [assembly: AssemblyProduct("Ice Builder")]
 [assembly: AssemblyCopyright("Copyright (c) 2009-2017 ZeroC, Inc.")]
-[assembly: AssemblyVersion("4.3.7.0")]
+[assembly: AssemblyVersion("4.3.8.0")]
 [assembly: ComVisibleAttribute(false)]
