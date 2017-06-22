@@ -86,10 +86,12 @@ These properties are the same for all configurations and platforms, and allow yo
 | Output Directory                        | IceBuilderOutputDir                         | $(ProjectDir)\generated    | `--output-dir`                      |
 | Header Output Directory                 | IceBuilderHeaderOutputDir                   | $(IceBuilderOutputDir)     | (none)                              |
 | Include Directories                     | IceBuilderIncludeDirectories                | $(IceHome)\slice           | `-I`                                |
-| Base Directory For Generated #include   | IceBuilderBaseDirectory ForGeneratedInclude |                            | `--include-dir`                     |
+| Base Directory For Generated #include   | IceBuilderBaseDirectoryForGeneratedInclude |                            | `--include-dir`                     |
 | Generated Header Extension              | IceBuilderHeaderExt                         | .h                         | `--header-ext`                      |
 | Generated Source Extension              | IceBuilderSourceExt                         | .cpp                       | `--source-ext`                      |
 | Additional Options                      | IceBuilderAdditionalOptions                 |                            | (any)                               |
+
+If you leave `Base Directory For Generated #include` unset, Ice Builder automatically adds `Header Output Directory` (when set) or `Output Directory` to the include directories used during the C++ compilation of your project. With MSBuild, this corresponds to the property `AdditionalIncludeDirectories`.
 
 ### Known Issue with Visual Studio 2017
 
