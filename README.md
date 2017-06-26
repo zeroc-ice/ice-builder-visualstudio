@@ -95,7 +95,7 @@ If you leave `Base Directory For Generated #include` unset, Ice Builder automati
 
 ### Known Issue with Visual Studio 2017
 
-The `Ice Builder` property page does not always appear in C++ projects with Visual Studio 2017; it however appears with some installations of Visual Studio 2017 version 15.2 (26430.14). We are currently researching this issue. Universal Windows (UWP) and C# projects are not affected by this problem.
+The `Ice Builder` property page does not always appear in C++ projects with Visual Studio 2017: it appears with some installations of Visual Studio 2017, but not all of them. We are currently researching this issue. Universal Windows (UWP) and C# projects are not affected by this problem.
 
 ## C# Usage
 
