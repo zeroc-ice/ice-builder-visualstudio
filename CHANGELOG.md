@@ -1,10 +1,10 @@
 ## Changes in Ice Builder for Visual Studio 4.3.8
 
 - Move --tie and --checksum Slice compiler options to additional
-  options, projects will be automatically update if required.
+  options, projects will be automatically updated if required.
 
-- Do not show up popup window for unexpected exceptions, the exception are log
-  to Visual Studio output window.
+- Do not show popup window for unexpected exceptions. Exceptions are now logged
+  to Visual Studio's output window.
 
 ## Changes in Ice Builder for Visual Studio 4.3.7
 
@@ -32,7 +32,7 @@
 
 ## Changes in Ice Builder for Visual Studio 4.3.4
 
-- Update the builder to support using Ice 3.7 Nuget
+- Update the builder to support using Ice 3.7 NuGet
   packages.
 
 - Fix to allow setting Ice Home to point to Ice 3.6 source
@@ -69,7 +69,7 @@
 
 ## Changes in Ice Builder for Visual Studio 4.3.0
 
-- Add support to use Ice Builder with the upcoming Ice 3.7.0 Nuget packages.
+- Add support to use Ice Builder with the upcoming Ice 3.7.0 NuGet packages.
 
 - Improve the layout of the CSharp configuration dialog.
 
@@ -144,7 +144,7 @@
 
 ## Changes in Ice Builder for Visual Studio 4.1.0
 
-- Source builds of Ice C++ 3.6 now use Nuget to download and install C/C++ third-party
+- Source builds of Ice C++ 3.6 now use NuGet to download and install C/C++ third-party
   dependencies such as bzip2, expat and mcpp. When you set your Ice home directory (in
   Ice Builder) to point to such a source distribution, the Ice Builder automatically adds
   the directory of these third-party libraries to the Debugging/Environment PATH used
