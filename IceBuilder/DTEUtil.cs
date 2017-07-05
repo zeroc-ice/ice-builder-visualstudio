@@ -208,6 +208,19 @@ namespace IceBuilder
             return IceBuilderProjectType.None;
         }
 
+        public static bool EnsureFileIsCheckout(string path)
+        {
+            var sc = Package.Instance.DTE.SourceControl;
+            if(sc != null)
+            {
+                if(sc.IsItemUnderSCC(path) && !sc.IsItemCheckedOut(path))
+                {
+                    return sc.CheckOutItem(path);
+                }
+            }
+            return true;
+        }
+
         public static readonly Guid cppProjectGUID =
             new Guid("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}");
         public static readonly Guid cppStoreAppProjectGUID =

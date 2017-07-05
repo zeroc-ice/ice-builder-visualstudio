@@ -961,6 +961,7 @@ namespace IceBuilder
         {
             String projectPath = ProjectUtil.GetProjectFullPath(p);
             bool cppProject = DTEUtil.IsCppProject(p);
+            DTEUtil.EnsureFileIsCheckout(projectPath);
             ProjectUtil.SaveProject(p);
             Microsoft.Build.Evaluation.Project project = MSBuildUtils.LoadedProject(projectPath, cppProject, false);
             if(MSBuildUtils.AddIceBuilderToProject(project))
@@ -1016,6 +1017,7 @@ namespace IceBuilder
         private void RemoveIceBuilderFromProject(IVsProject p)
         {
             string path = ProjectUtil.GetProjectFullPath(p);
+            DTEUtil.EnsureFileIsCheckout(path);
             foreach(IVsProject p1 in _buildProjects)
             {
                 if(path.Equals(ProjectUtil.GetProjectFullPath(p1)))

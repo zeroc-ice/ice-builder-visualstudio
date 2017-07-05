@@ -325,8 +325,9 @@ namespace IceBuilder
         public static bool Upgrade(IVsProject project)
         {
             OldConfiguration oldConfiguration = new OldConfiguration();
-            Microsoft.Build.Evaluation.Project msbuildProject = MSBuildUtils.LoadedProject(ProjectUtil.GetProjectFullPath(project), DTEUtil.IsCppProject(project), true);
-
+            var fullPath = ProjectUtil.GetProjectFullPath(project);
+            Microsoft.Build.Evaluation.Project msbuildProject = MSBuildUtils.LoadedProject(fullPath, DTEUtil.IsCppProject(project), true);
+            DTEUtil.EnsureFileIsCheckout(fullPath);
             if(oldConfiguration.Load(msbuildProject, true))
             {
                 if(DTEUtil.IsCppProject(project))

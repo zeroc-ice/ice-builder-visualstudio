@@ -255,7 +255,9 @@ namespace IceBuilder
 
         public static void SetProperty(IVsProject project, string name, string value)
         {
-            MSBuildUtils.SetProperty(MSBuildUtils.LoadedProject(GetProjectFullPath(project), DTEUtil.IsCppProject(project), true), "IceBuilder", name, value);
+            var fullPath = GetProjectFullPath(project);
+            DTEUtil.EnsureFileIsCheckout(fullPath);
+            MSBuildUtils.SetProperty(MSBuildUtils.LoadedProject(fullPath, DTEUtil.IsCppProject(project), true), "IceBuilder", name, value);
         }
 
         public static string GetEvaluatedProperty(IVsProject project, string name)

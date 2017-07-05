@@ -96,6 +96,7 @@ namespace IceBuilder
             {
                 if(property.Value.IndexOf(flavor) == -1)
                 {
+                    DTEUtil.EnsureFileIsCheckout(project.FullPath);
                     if(string.IsNullOrEmpty(property.Value))
                     {
                         property.Value = string.Format("{0};{1}", flavor, CSharpProjectGUI);
@@ -113,6 +114,7 @@ namespace IceBuilder
             }
 
             // ProjectTypeGuids not present
+            DTEUtil.EnsureFileIsCheckout(project.FullPath);
             project.Xml.AddProperty("ProjectTypeGuids", string.Format("{0};{1}", flavor, CSharpProjectGUI));
             return true;
         }
@@ -124,6 +126,7 @@ namespace IceBuilder
 
             if(property != null && property.Value.IndexOf(flavor) != -1)
             {
+                DTEUtil.EnsureFileIsCheckout(project.FullPath);
                 property.Value = property.Value.Replace(flavor, "").Trim(new char[] { ';' });
                 if(property.Value.Equals(CSharpProjectGUI, StringComparison.CurrentCultureIgnoreCase))
                 {
@@ -176,6 +179,7 @@ namespace IceBuilder
                 p => p.Label.Equals("Globals", StringComparison.CurrentCultureIgnoreCase));
             if(globals == null)
             {
+                DTEUtil.EnsureFileIsCheckout(project.FullPath);
                 globals = project.Xml.AddPropertyGroup();
                 globals.Label = "Globals";
                 globals.Parent.RemoveChild(globals);
@@ -186,6 +190,7 @@ namespace IceBuilder
                 p => p.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase));
             if(property == null)
             {
+                DTEUtil.EnsureFileIsCheckout(project.FullPath);
                 property = globals.AddProperty(name, value);
                 return true;
             }
@@ -198,6 +203,7 @@ namespace IceBuilder
                 t => t.Name.Equals("EnsureIceBuilderImports", StringComparison.CurrentCultureIgnoreCase));
             if(target == null)
             {
+                DTEUtil.EnsureFileIsCheckout(project.FullPath);
                 target = project.Xml.AddTarget("EnsureIceBuilderImports");
                 target.BeforeTargets = "PrepareForBuild";
 
@@ -227,6 +233,7 @@ namespace IceBuilder
                 p => p.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase));
             if(property != null)
             {
+                DTEUtil.EnsureFileIsCheckout(project.FullPath);
                 globals.RemoveChild(property);
                 return true;
             }
@@ -239,6 +246,7 @@ namespace IceBuilder
                 p => p.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase));
             if(property != null)
             {
+                DTEUtil.EnsureFileIsCheckout(project.FullPath);
                 property.Parent.RemoveChild(property);
                 return true;
             }
@@ -251,6 +259,7 @@ namespace IceBuilder
         {
             if(!HasImport(project, import))
             {
+                DTEUtil.EnsureFileIsCheckout(project.FullPath);
                 ProjectImportElement props = project.Xml.CreateImportElement(import);
                 props.Condition = string.Format("Exists('{0}')", import);
                 project.Xml.InsertAfterChild(props, after);
@@ -265,6 +274,7 @@ namespace IceBuilder
                 p => p.Project.Equals(oldValue, StringComparison.CurrentCultureIgnoreCase));
             if(import != null)
             {
+                DTEUtil.EnsureFileIsCheckout(project.FullPath);
                 import.Project = newValue;
                 import.Condition = string.Format("Exists('{0}')", newValue);
                 return true;
@@ -278,6 +288,7 @@ namespace IceBuilder
                 p => p.Project.Equals(import, StringComparison.CurrentCultureIgnoreCase));
             if(element != null)
             {
+                DTEUtil.EnsureFileIsCheckout(project.FullPath);
                 if(element.Parent != null)
                 {
                     element.Parent.RemoveChild(element);
@@ -496,14 +507,14 @@ namespace IceBuilder
                     modified = RemoveCsharpGlobalProperties(project);
                     modified = RemoveImport(project, IceBuilderCSharpProps) || modified;
                     modified = RemoveImport(project, IceBuilderCSharpTargets) || modified;
-
-                    RemoveProjectFlavorIfExists(project, IceBuilderProjectFlavorGUID);
+                    modified = RemoveProjectFlavorIfExists(project, IceBuilderProjectFlavorGUID) || modified;
                 }
 
                 ProjectPropertyGroupElement group = project.Xml.PropertyGroups.FirstOrDefault(
                     g => g.Label.Equals("IceBuilder", StringComparison.CurrentCultureIgnoreCase));
                 if(group != null)
                 {
+                    DTEUtil.EnsureFileIsCheckout(project.FullPath);
                     group.Parent.RemoveChild(group);
                 }
 
@@ -514,6 +525,7 @@ namespace IceBuilder
                     t => t.Name.Equals("EnsureIceBuilderImports", StringComparison.CurrentCultureIgnoreCase));
                 if(target != null)
                 {
+                    DTEUtil.EnsureFileIsCheckout(project.FullPath);
                     if(target.Parent != null)
                     {
                         target.Parent.RemoveChild(target);
@@ -529,6 +541,7 @@ namespace IceBuilder
 
         public static void SetProperty(Microsoft.Build.Evaluation.Project project, string label, string name, string value)
         {
+            DTEUtil.EnsureFileIsCheckout(project.FullPath);
             ProjectPropertyGroupElement group = project.Xml.PropertyGroups.FirstOrDefault(
                 g => g.Label.Equals(label, StringComparison.CurrentCultureIgnoreCase));
             if(group == null)
@@ -593,6 +606,7 @@ namespace IceBuilder
                             g => g.Label.Equals("IceHome", StringComparison.CurrentCultureIgnoreCase));
                         if(group != null)
                         {
+                            DTEUtil.EnsureFileIsCheckout(project.FullPath);
                             group.SetProperty(Package.IceHomeValue, iceHome);
                             group.SetProperty(Package.IceVersionValue, iceVersion);
                             group.SetProperty(Package.IceIntVersionValue, iceIntVersion);
