@@ -13,5 +13,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCompany("ZeroC, Inc.")]
 [assembly: AssemblyProduct("Ice Visual Studio Extension")]
 [assembly: AssemblyCopyright("Copyright (c) 2009-2017 ZeroC, Inc.")]
-[assembly: AssemblyVersion("4.3.8")]
+[assembly: AssemblyVersion("4.3.9")]
 [assembly: AssemblyDelaySign(false)]
