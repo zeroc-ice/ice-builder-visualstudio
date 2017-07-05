@@ -69,10 +69,6 @@
       <IceBuilderSourceExt>cpp</IceBuilderSourceExt>
   </PropertyGroup>
 
-  <PropertyGroup Label="IceBuilder" Condition="'$(IceBuilderChecksum)' == ''">
-      <IceBuilderChecksum>false</IceBuilderChecksum>
-  </PropertyGroup>
-
   <PropertyGroup Label="IceBuilder">
       <IceBuilderIncludeDirectories>$(IceHome)\slice;%(IceBuilderIncludeDirectories)</IceBuilderIncludeDirectories>
   </PropertyGroup>
