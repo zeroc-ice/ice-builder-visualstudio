@@ -211,6 +211,12 @@ The Ice Builder for Visual Studio replaces the old Ice add-in for Visual Studio.
 
 Project files created with the Ice add-in are not compatible with the Ice Builder. When you open such a project file, the Ice Builder will offer to convert your project's configuration to the Ice Builder format. You should backup your project files first, as this conversion is irreversible.
 
-The C++ projects created with the old Add-in include a uncoditional import of `$(ALLUSERSPROFILE)\\ZeroC\\Ice.props`
-this file is no longer installed with Ice 3.7.0 and you must manually remove the imports to be able to load the projects
-and convert them with the Ice Builder.
+All C++ projects configured to use the Ice add-in import the file `%ALLUSERSPROFILE%\ZeroC\Ice.props`. This file must exist to allow
+the project to load and get converted to the new Ice Builder format. You can supply this file by installing a binary distribution
+for Ice 3.6 and older, or you can create an `Ice.props` file in `%ALLUSERSPROFILE%\ZeroC` with the following contents:
+```
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <!-- Temporary file for projects configured to use the old Ice add-in for Visual Studio -->
+</Project>
+```
