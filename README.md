@@ -49,15 +49,15 @@ This installation can correspond to a binary distribution, such as `C:\Program F
 
 :warning: The Ice Home setting is ignored when a project uses an Ice NuGet package. Installing an Ice NuGet package into a project automatically configures the project to use the Ice SDK provided by that NuGet package.
 
-If automatic build option is selected Slice files will be compiled each time they are saved, otherwise they will be only compiled during project builds.
+If the automatic build option is selected, Slice files will be compiled each time they are saved, otherwise they will be compiled only during project builds.
 
 ### Setting Ice Home with Visual Studio 2010
 
-Since the Ice Builder for Visual Studio 2010 does not support setting Ice Builder properties in the Visual Studio IDE, you have severals ways to set Ice Home:
+Since the Ice Builder for Visual Studio 2010 does not support setting Ice Builder properties in the Visual Studio IDE, you have several ways to set Ice Home:
  - set Ice Home with Ice Builder and a more recent version of Visual Studio. Ice Builder and Ice Builder for Visual Studio 2010 share the same Ice Home configuration.
  - set Ice Home in the Windows registry, by editing `IceHome` in `HKEY_CURRENT_USER\SOFTWARE\ZeroC\IceBuilder`.
- - set ICE_HOME enviroment variable
- - set IceHome MSbuild property `/p:IceHome=<Ice Install Dir>`
+ - set the ICE_HOME environment variable
+ - set the IceHome MSbuild property `/p:IceHome=<Ice Install Dir>`
 
 ## C++ Usage
 
@@ -133,7 +133,7 @@ The Ice Builder uses [MSBuild](https://msdn.microsoft.com/en-us/library/dd393574
 
 The simplest and most common way to configure Ice Builder is in Visual Studio. You can nevertheless also configure Ice Builder directly in your MSBuild project, by importing two Ice Builder projects from the Ice Builder install into your project.
 
-The Ice builder install directory can be read from Windows registry and assigned it to `IceBuilderInstallDir` MSBuild property using the following code:
+The Ice builder install directory can be read from the Windows registry and assigned to the `IceBuilderInstallDir` MSBuild property using the following code:
 
     <PropertyGroup>
         <IceBuilderInstallDir>$([MSBuild]::GetRegistryValue('HKEY_CURRENT_USER\SOFTWARE\ZeroC\IceBuilder',
@@ -143,7 +143,7 @@ The Ice builder install directory can be read from Windows registry and assigned
 Then for a C++ project, you need:
 
 1. `$(IceBuilderInstallDir)\Resources\IceBuilder.Cpp.props` - This project defines the default settings for Ice Builder in C++
-2. `$(IceBuilderInstallDir)\Resources\IceBuilder.Cpp.targets` - This projet defines the targets required to build C++ projects with Ice Builder
+2. `$(IceBuilderInstallDir)\Resources\IceBuilder.Cpp.targets` - This project defines the targets required to build C++ projects with Ice Builder
 
 The import order matters for MSBuild. `IceBuilder.Cpp.props` depends on common properties defined in `Microsoft.Cpp.props` and must be imported after this project. Likewise, `IceBuilder.Cpp.targets` depends on targets defined in `Microsoft.Cpp.targets` and must be imported after this project.
 
@@ -168,7 +168,7 @@ You need Visual Studio 2017
 
 **AND**
 
-to install ALL the following Visual Studio SDKs:
+to install ALL of the following Visual Studio SDKs:
 - [Visual Studio 2012 SDK](https://www.microsoft.com/en-us/download/details.aspx?id=30668)
 - [Visual Studio 2013 SDK](https://www.microsoft.com/en-us/download/details.aspx?id=40758)
 - [Visual Studio 2015 SDK](https://msdn.microsoft.com/en-us/library/bb166441.aspx)
@@ -178,7 +178,7 @@ to install ALL the following Visual Studio SDKs:
 
 Open the `IceBuilder.sln` solution file in Visual Studio 2017.
 
-After building the Ice Builder extension, the VSIX package will be placed in the build output directory
+After building the Ice Builder extension, the VSIX package will be placed in the build output directory:
 `IceBuilder\bin\Debug\IceBuilder.vsix` for debug builds, and `IceBuilder\bin\Release\IceBuilder.vsix`
 for release builds.
 
@@ -197,7 +197,7 @@ To build Ice Builder for Visual Studio 2010, you need Visual Studio 2010 SP1 and
 
 Open the `IceBuilder_2010.sln` solution file in Visual Studio 2010.
 
-After building the Ice Builder extension, the VSIX package will be placed in the build output directory
+After building the Ice Builder extension, the VSIX package will be placed in the build output directory:
 `IceBuilder\bin\Debug\IceBuilder_2010.vsix` for debug builds, and `IceBuilder_2010\bin\Release\IceBuilder_2010.vsix`
 for release builds.
 
