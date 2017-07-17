@@ -213,7 +213,7 @@ Project files created with the Ice add-in are not compatible with the Ice Builde
 
 All C++ projects configured to use the Ice add-in import the file `%ALLUSERSPROFILE%\ZeroC\Ice.props`. This file must exist to allow
 the project to load and get converted to the new Ice Builder format. You can supply this file by installing a binary distribution
-for Ice 3.6 and older, or you can create an `Ice.props` file in `%ALLUSERSPROFILE%\ZeroC` with the following contents:
+for Ice 3.6 or older, or you can create an `Ice.props` file in `%ALLUSERSPROFILE%\ZeroC` with the following contents:
 ```
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
