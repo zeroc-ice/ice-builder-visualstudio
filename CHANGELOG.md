@@ -1,3 +1,12 @@
+## Changes in Ice Builder for Visual Studio 4.3.9
+
+- Update the builder to ensure that projects in VCS are checkout
+  before being modified.
+
+- Fixed a bug in PHP and Python target files that still reference
+  property that were removed in previous versions causing Ice PHP
+  and Python builds failure.
+
 ## Changes in Ice Builder for Visual Studio 4.3.8
 
 - Move --tie and --checksum Slice compiler options to additional
