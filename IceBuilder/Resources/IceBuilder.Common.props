@@ -16,10 +16,15 @@
   -->
   <ImportGroup Condition="'$(IceVersion)' == ''">
     <!--
-        With Ice 3.6.x this settings are in config\Ice.props.
+        With Ice 3.6.x binary distribution this settings are in config\Ice.props.
     -->
     <Import Project="$(IceHome)\config\Ice.props"
             Condition="Exists('$(IceHome)\config\Ice.props')"/>
+    <!--
+        With Ice 3.6.x source distribution this settings are in cpp\config\Ice.props.
+    -->
+    <Import Project="$(IceHome)\cpp\config\Ice.props"
+            Condition="Exists('$(IceHome)\cpp\config\Ice.props')"/>
 
     <!--
         With Ice 3.7 the settings were move to config\icebuilder.props.
