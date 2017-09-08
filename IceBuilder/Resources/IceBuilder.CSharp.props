@@ -16,7 +16,7 @@
        those are already imported and we avoid to import the settings twice -->
   <ImportGroup Condition="'$(IceNugetPackageVersion)' == ''">
 
-    <!-- With Ice source distribution > 3.6 the settings are in the cpp msbuild directory -->
+    <!-- With Ice source distribution > 3.6 the settings are in the csharp msbuild directory -->
     <Import Project="$(IceHome)\csharp\msbuild\icebuilder.csharp.props"
             Condition="Exists('$(IceHome)\csharp\msbuild\icebuilder.csharp.props')"/>
 
