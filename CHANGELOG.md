@@ -1,3 +1,8 @@
+## Changes in Ice Builder for Visual Studio 4.3.10
+
+- Fix to allow building projects with ICE_HOME environment
+  variable set to an Ice 3.6 source distribution.
+
 ## Changes in Ice Builder for Visual Studio 4.3.9
 
 - Update the builder to ensure that projects in VCS are checkout
