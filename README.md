@@ -131,9 +131,9 @@ The Ice Builder automatically adds a reference to the Ice assembly, and allows y
 
 The Ice Builder uses [MSBuild](https://msdn.microsoft.com/en-us/library/dd393574.aspx) tasks to build Slice files using `slice2cpp` and `slice2cs`. As a result, you can build Visual Studio projects that enable Ice Builder directly with MSBuild.
 
-The simplest and most common way to configure Ice Builder is in Visual Studio. You can nevertheless also configure Ice Builder directly in your MSBuild project, by importing two Ice Builder projects from the Ice Builder install into your project.
+The simplest and most common way to configure Ice Builder is with the Visual Studio IDE. You can also configure Ice Builder directly in your MSBuild project, by importing two Ice Builder project files from the Ice Builder installation into your project.
 
-The Ice builder install directory can be read from the Windows registry and assigned to the `IceBuilderInstallDir` MSBuild property using the following code:
+You can locate the Ice Builder installation directory by reading the Windows registry. For example, we assign it to the `IceBuilderInstallDir` MSBuild property with the following code:
 
     <PropertyGroup>
         <IceBuilderInstallDir>$([MSBuild]::GetRegistryValue('HKEY_CURRENT_USER\SOFTWARE\ZeroC\IceBuilder',
@@ -142,19 +142,19 @@ The Ice builder install directory can be read from the Windows registry and assi
 
 Then for a C++ project, you need:
 
-1. `$(IceBuilderInstallDir)\Resources\IceBuilder.Cpp.props` - This project defines the default settings for Ice Builder in C++
-2. `$(IceBuilderInstallDir)\Resources\IceBuilder.Cpp.targets` - This project defines the targets required to build C++ projects with Ice Builder
+1. `$(IceBuilderInstallDir)\Resources\IceBuilder.Cpp.props` - This project file defines the default settings for Ice Builder in C++
+2. `$(IceBuilderInstallDir)\Resources\IceBuilder.Cpp.targets` - This project file defines the targets required to build C++ projects with Ice Builder
 
-The import order matters for MSBuild. `IceBuilder.Cpp.props` depends on common properties defined in `Microsoft.Cpp.props` and must be imported after this project. Likewise, `IceBuilder.Cpp.targets` depends on targets defined in `Microsoft.Cpp.targets` and must be imported after this project.
+The import order matters for MSBuild. `IceBuilder.Cpp.props` depends on common properties defined in `Microsoft.Cpp.props` and must be imported after this project file. Likewise, `IceBuilder.Cpp.targets` depends on targets defined in `Microsoft.Cpp.targets` and must be imported after this project file.
 
 And for a C# project, you need:
 
-1. `$(IceBuilderInstallDir)\Resources\IceBuilder.CSharp.props` - This project defines the default settings for Ice Builder in C# projects
-2. `$(IceBuilderInstallDir)\Resources\IceBuilder.CSharp.targets` - This project defines the targets required to build C# projects with Ice Builder
+1. `$(IceBuilderInstallDir)\Resources\IceBuilder.CSharp.props` - This project file defines the default settings for Ice Builder in C# projects
+2. `$(IceBuilderInstallDir)\Resources\IceBuilder.CSharp.targets` - This project file defines the targets required to build C# projects with Ice Builder
 
 Like for C++, the import order is important. Both `IceBuilder.CSharp.props` and `IceBuilder.CSharp.targets` must be imported after `Microsoft.CSharp.targets`.
 
-The actual configuration of your C++ or C# project uses the MSBuild Properties listed in the sections above.
+The actual configuration of your C++ or C# project uses the MSBuild properties listed in the sections above.
 
 You add Slice files to your project with the `Include` attribute of the `IceBuilder` element, for example `<IceBuilder Include="Hello.ice"/>`. Note that you also need to add the generated files to your project. In C++, with the default settings, you need to add `<ClCompile Include="generated\Hello.cpp"/>` and `<ClInclude Include="generated\Hello.h"\>`. In C#, with the default settings, you need to add `<ClCompile Include="generated\Hello.cs"/>`.
 
