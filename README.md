@@ -43,7 +43,7 @@ The Ice Builder for Visual Studio 2010 does not allow you to add `.ice` files to
 
 The Ice Builder relies on a specific Ice installation on your system. In Visual Studio, you can view or edit the home directory of this Ice installation through the `Tools` > `Options` > `Project and Solutions` > `Ice Builder` options page.
 
-This installation can correspond to a binary distribution, such as `C:\Program Files\ZeroC\Ice-3.7.0`, or to a source tree, such as `C:\users\mike\github\zeroc-ice\ice`.
+For Ice versions < 3.7, this installation can correspond to a binary distribution, such as `C:\Program Files (x86)\ZeroC\Ice-3.6.4`. For Ice 3.7.0 and higher, Ice binaries are provided with NuGet packages so it can be left blank. It can also be set to a source tree, such as `C:\users\mike\github\zeroc-ice\ice`.
 
 ![Ice home screenshot](https://github.com/zeroc-ice/ice-builder-visualstudio/raw/master/Screenshots/vs2015-options.png)
 
@@ -86,7 +86,7 @@ These properties are the same for all configurations and platforms, and allow yo
 | Output Directory                        | IceBuilderOutputDir                         | $(ProjectDir)\generated    | `--output-dir`                      |
 | Header Output Directory                 | IceBuilderHeaderOutputDir                   | $(IceBuilderOutputDir)     | (none)                              |
 | Include Directories                     | IceBuilderIncludeDirectories                | $(IceHome)\slice           | `-I`                                |
-| Base Directory For Generated #include   | IceBuilderBaseDirectoryForGeneratedInclude |                            | `--include-dir`                     |
+| Base Directory For Generated #include   | IceBuilderBaseDirectoryForGeneratedInclude  |                            | `--include-dir`                     |
 | Generated Header Extension              | IceBuilderHeaderExt                         | .h                         | `--header-ext`                      |
 | Generated Source Extension              | IceBuilderSourceExt                         | .cpp                       | `--source-ext`                      |
 | Additional Options                      | IceBuilderAdditionalOptions                 |                            | (any)                               |
