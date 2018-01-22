@@ -11,7 +11,6 @@ The Ice Builder is a Visual Studio extension compatible with Visual Studio 2010,
 - [C++ Usage](#c-usage)
   - [Adding Slice Files to a C++ Project](#adding-slice-files-to-a-c-project)
   - [Ice Builder Configuration for a C++ Project](#ice-builder-configuration-for-a-c-project)
-  - [Known Issue with Visual Studio 2017](#known-issue-with-visual-studio-2017)
 - [C# Usage](#c-usage-1)
   - [Adding Slice Files to a C# Project](#adding-slice-files-to-a-c-project-1)
   - [Ice Builder Configuration for a C# Project](#ice-builder-configuration-for-a-c-project-1)
@@ -92,10 +91,6 @@ These properties are the same for all configurations and platforms, and allow yo
 | Additional Options                      | IceBuilderAdditionalOptions                 |                            | (any)                               |
 
 If you leave `Base Directory For Generated #include` unset, Ice Builder automatically adds `Header Output Directory` (when set) or `Output Directory` to the include directories used during the C++ compilation of your project. With MSBuild, this corresponds to the property `AdditionalIncludeDirectories`.
-
-### Known Issue with Visual Studio 2017
-
-The `Ice Builder` property page does not always appear in C++ projects with Visual Studio 2017: it appears with some installations of Visual Studio 2017, but not all of them. We are currently researching this issue. Universal Windows (UWP) and C# projects are not affected by this problem.
 
 ## C# Usage
 
