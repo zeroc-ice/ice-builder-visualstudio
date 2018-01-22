@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) 2009-2017 ZeroC, Inc. All rights reserved. -->
 <ProjectSchemaDefinitions xmlns="clr-namespace:Microsoft.Build.Framework.XamlTypes;assembly=Microsoft.Build.Framework">
-  <Rule Name="IceBuilder" PageTemplate="tool" DisplayName="Ice Builder" Order="9" SwitchPrefix="">
+  <Rule Name="IceBuilder" PageTemplate="generic" DisplayName="Ice Builder" Order="9" SwitchPrefix="">
 
     <Rule.DataSource>
-      <DataSource Persistence="ProjectFile" ItemType="" Label="IceBuilder" HasConfigurationCondition="true" />
+      <DataSource Persistence="ProjectFile" ItemType="" Label="IceBuilder"/>
     </Rule.DataSource>
 
     <Rule.Categories>
@@ -91,6 +91,10 @@
         <DataSource Persistence="ProjectFile" ItemType="" Label="IceBuilder" HasConfigurationCondition="false" />
       </StringProperty.DataSource>
     </StringProperty>
+
+    <!-- We need to define at least one config specific property for the configuration page to show up
+         see:  https://developercommunity.visualstudio.com/content/problem/174540/propertypageschema-do-not-show-in-solution-that-co.html -->
+    <StringProperty Name="Dummy" Visible="false" />
   </Rule>
 
   <ItemType Name="IceBuilder" DisplayName="Build Slice Files" />
