@@ -88,14 +88,15 @@ namespace IceBuilder
                     BuildSubmission submission = BuildManager.DefaultBuildManager.PendBuildRequest(buildRequest);
                     ErrorHandler.ThrowOnFailure(BuildManagerAccessor.RegisterLogger(submission.SubmissionId, buildLogger));
                     buildCallback.BeginBuild();
-                    submission.ExecuteAsync((s) =>
+                    submission.ExecuteAsync(s =>
                     {
                         Dispatcher.BeginInvoke(DispatcherPriority.Send, new Action(() =>
                         {
                             project.ProjectCollection.Loggers.Remove(buildLogger);
                             project.ProjectCollection.OnlyLogCriticalEvents = onlyLogCriticalEvents;
                             BuildManagerAccessor.ReleaseBuildResources(cookie);
-                            BuildManagerAccessor.UnregisterLoggers(submission.SubmissionId);
+                            s.BuildManager.ResetCaches();
+                            BuildManagerAccessor.UnregisterLoggers(s.SubmissionId);
                             buildCallback.EndBuild(submission.BuildResult.OverallResult == BuildResultCode.Success);
                         }));
                     }, null);
