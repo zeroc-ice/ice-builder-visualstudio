@@ -1,5 +1,11 @@
 ## Changes in Ice Builder for Visual Studio 4.3.10
 
+- Fix issue that cause the `Ice Builder` property page to not always
+  appear in C++ projects with Visual Studio 2017.
+
+- Fix issue that cause Slice files to not be recompile on save when
+  automatic build of Slice files was enabled.
+
 - Fix to allow building projects with ICE_HOME environment
   variable set to an Ice 3.6 source distribution.
 
