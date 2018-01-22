@@ -21,7 +21,7 @@
 
   <Target Name="IceBuilder_Compile"
          DependsOnTargets="IceBuilder_Validate;IceBuilder_Prepare"
-         BeforeTargets="CoreCompile">
+         BeforeTargets="CoreCompile;XamlPreCompile">
 
     <CreateProperty Value="$(IceBuilderOutputDir)\IceBuilder.d" Condition="'$(IceBuilderDependFile)' == ''">
       <Output TaskParameter="Value" PropertyName="IceBuilderDependFile" />
