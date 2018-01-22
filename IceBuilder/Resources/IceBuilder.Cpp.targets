@@ -113,6 +113,7 @@
     </Slice2CppTask>
 
     <!-- Write TLog files -->
+    <MakeDir Directories="$(TLogLocation)" Condition="!Exists($(TLogLocation))"/>
     <WriteLinesToFile File                = "$(TLogLocation)\slice2cpp.write.1u.tlog"
                       Encoding            = "Unicode"
                       Lines               = "^%(__IceBuilder.FullPath);%(__IceBuilder.Outputs)"
