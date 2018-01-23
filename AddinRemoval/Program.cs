@@ -1,13 +1,11 @@
 // **********************************************************************
 //
-// Copyright (c) 2009-2017 ZeroC, Inc. All rights reserved.
+// Copyright (c) 2009-2018 ZeroC, Inc. All rights reserved.
 //
 // **********************************************************************
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Xml;
 
 namespace AddinRemoval
 {

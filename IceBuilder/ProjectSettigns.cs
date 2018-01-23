@@ -1,6 +1,6 @@
 // **********************************************************************
 //
-// Copyright (c) 2009-2017 ZeroC, Inc. All rights reserved.
+// Copyright (c) 2009-2018 ZeroC, Inc. All rights reserved.
 //
 // **********************************************************************
 
@@ -11,23 +11,23 @@ namespace IceBuilder
 {
     public class ProjectSettigns
     {
-        public ProjectSettigns(IVsProject project)
+        public ProjectSettigns(IVsProjectManager projectManager)
         {
-            Project = project;
+            ProjectManager = projectManager;
         }
 
         public void Load()
         {
-            OutputDir = GetProperty(PropertyNames.OutputDir);
-            IncludeDirectories = GetProperty(PropertyNames.IncludeDirectories);
-            AdditionalOptions = GetProperty(PropertyNames.AdditionalOptions);
+            OutputDir = GetProperty(PropertyNames.New.OutputDir);
+            IncludeDirectories = GetProperty(PropertyNames.New.IncludeDirectories);
+            AdditionalOptions = GetProperty(PropertyNames.New.AdditionalOptions);
         }
 
         public void Save()
         {
-            SetPropertyIfChanged(PropertyNames.OutputDir, OutputDir);
-            SetPropertyIfChanged(PropertyNames.IncludeDirectories, IncludeDirectories);
-            SetPropertyIfChanged(PropertyNames.AdditionalOptions, AdditionalOptions);
+            SetPropertyIfChanged(PropertyNames.New.OutputDir, OutputDir);
+            SetPropertyIfChanged(PropertyNames.New.IncludeDirectories, IncludeDirectories);
+            SetPropertyIfChanged(PropertyNames.New.AdditionalOptions, AdditionalOptions);
         }
 
         public string OutputDir
@@ -48,30 +48,20 @@ namespace IceBuilder
             set;
         }
 
-        private IVsProject Project
+        public IVsProjectManager ProjectManager
         {
             get;
-            set;
+            private set;
         }
 
         private string GetProperty(string name)
         {
-            return ProjectUtil.GetProperty(Project, name);
-        }
-
-        private bool GetPropertyAsBool(string name)
-        {
-            return GetProperty(name).Equals("yes", StringComparison.CurrentCultureIgnoreCase);
-        }
-
-        private void SetPropertyAsBool(string name, bool value)
-        {
-            SetProperty(name, value ? "yes" : "");
+            return ProjectManager.GetProjectProperty(name);
         }
 
         private void SetProperty(string name, string value)
         {
-            ProjectUtil.SetProperty(Project, name, value);
+            ProjectManager.SetProjectProperty(name, value);
         }
 
         private void SetPropertyIfChanged(string name, string value)
@@ -79,14 +69,6 @@ namespace IceBuilder
             if(!GetProperty(name).Equals(value))
             {
                 SetProperty(name, value);
-            }
-        }
-
-        private void SetPropertyAsBoolIfChanged(string name, bool value)
-        {
-            if(GetPropertyAsBool(name) != value)
-            {
-                SetPropertyAsBool(name, value);
             }
         }
     }

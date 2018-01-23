@@ -1,6 +1,6 @@
 // **********************************************************************
 //
-// Copyright (c) 2009-2017 ZeroC, Inc. All rights reserved.
+// Copyright (c) 2009-2018 ZeroC, Inc. All rights reserved.
 //
 // **********************************************************************
 
@@ -62,7 +62,7 @@ namespace IceBuilder
 
         public void eventSource_TargetStarted(object sender, TargetStartedEventArgs e)
         {
-            if(e.TargetName.Equals("IceBuilder_Compile") || IsVerbosityAtLeast(LoggerVerbosity.Detailed))
+            if(e.TargetName.Equals("SliceCompile") || IsVerbosityAtLeast(LoggerVerbosity.Detailed))
             {
                 WriteMessage(string.Format("{0}:", e.TargetName));
             }

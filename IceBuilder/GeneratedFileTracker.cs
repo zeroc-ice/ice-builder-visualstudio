@@ -1,6 +1,6 @@
 // **********************************************************************
 //
-// Copyright (c) 2009-2017 ZeroC, Inc. All rights reserved.
+// Copyright (c) 2009-2018 ZeroC, Inc. All rights reserved.
 //
 // **********************************************************************
 
@@ -55,11 +55,6 @@ namespace IceBuilder
             _generated[project] = newGenerated;
         }
 
-        public bool Contains(EnvDTE.Project project, string path)
-        {
-            return Contains(project.FullName, path);
-        }
-
         public bool Contains(string project, string path)
         {
             Dictionary<string, List<string>> names;
@@ -74,6 +69,11 @@ namespace IceBuilder
                 }
             }
             return false;
+        }
+
+        public bool Contains(string project)
+        {
+            return _generated.ContainsKey(project);
         }
 
         public void Clear()

@@ -1,6 +1,6 @@
 // **********************************************************************
 //
-// Copyright (c) 2009-2017 ZeroC, Inc. All rights reserved.
+// Copyright (c) 2009-2018 ZeroC, Inc. All rights reserved.
 //
 // **********************************************************************
 
@@ -64,7 +64,7 @@ namespace IceBuilder
                     uint item = 0;
                     string path = null;
                     GetDocumentInfo(docCookie, ref project, ref item, ref path);
-                    if(DTEUtil.IsIceBuilderEnabled(project) != IceBuilderProjectType.None &&
+                    if(DTEUtil.IsIceBuilderNuGetInstalled(project) != IceBuilderProjectType.None &&
                         ProjectUtil.IsSliceFileName(path))
                     {
                         Package.Instance.QueueProjectsForBuilding(new List<IVsProject>(new IVsProject[] { project }));
@@ -74,7 +74,6 @@ namespace IceBuilder
             catch(Exception ex)
             {
                 Package.UnexpectedExceptionWarning(ex);
-                throw;
             }
             return 0;
         }
@@ -183,7 +182,7 @@ namespace IceBuilder
                 for(int i = 0; i < projectsLength; ++i)
                 {
                     IVsProject project = projects[i];
-                    IceBuilderProjectType projectType = DTEUtil.IsIceBuilderEnabled(project);
+                    IceBuilderProjectType projectType = DTEUtil.IsIceBuilderNuGetInstalled(project);
                     if(projectType != IceBuilderProjectType.None)
                     {
                         int j = indices[i];
@@ -203,7 +202,6 @@ namespace IceBuilder
             catch(Exception ex)
             {
                 Package.UnexpectedExceptionWarning(ex);
-                throw;
             }
             return 0;
         }
@@ -223,7 +221,7 @@ namespace IceBuilder
                 for(int i = 0; i < projectsLength; ++i)
                 {
                     IVsProject project = projects[i];
-                    IceBuilderProjectType projectType = DTEUtil.IsIceBuilderEnabled(project);
+                    IceBuilderProjectType projectType = DTEUtil.IsIceBuilderNuGetInstalled(project);
                     if(projectType != IceBuilderProjectType.None)
                     {
                         int j = indices[i];
@@ -243,7 +241,6 @@ namespace IceBuilder
             catch(Exception ex)
             {
                 Package.UnexpectedExceptionWarning(ex);
-                throw;
             }
             return 0;
         }
@@ -263,7 +260,7 @@ namespace IceBuilder
                 for(int i = 0; i < projectsLength; ++i)
                 {
                     IVsProject project = projects[i];
-                    IceBuilderProjectType projectType = DTEUtil.IsIceBuilderEnabled(project);
+                    IceBuilderProjectType projectType = DTEUtil.IsIceBuilderNuGetInstalled(project);
                     if(projectType != IceBuilderProjectType.None)
                     {
                         int j = indices[i];
@@ -284,7 +281,6 @@ namespace IceBuilder
             catch(Exception ex)
             {
                 Package.UnexpectedExceptionWarning(ex);
-                throw;
             }
             return 0;
         }
@@ -311,7 +307,7 @@ namespace IceBuilder
             {
                 if(files.Any(f => ProjectUtil.IsSliceFileName(f)))
                 {
-                    IceBuilderProjectType projectType = DTEUtil.IsIceBuilderEnabled(project);
+                    IceBuilderProjectType projectType = DTEUtil.IsIceBuilderNuGetInstalled(project);
                     if(projectType != IceBuilderProjectType.None)
                     {
                         for(int i = 0; i < length; ++i)
@@ -330,7 +326,6 @@ namespace IceBuilder
             catch(Exception ex)
             {
                 Package.UnexpectedExceptionWarning(ex);
-                throw;
             }
             return 0;
         }
@@ -365,7 +360,7 @@ namespace IceBuilder
         {
             try
             {
-                IceBuilderProjectType projectType = DTEUtil.IsIceBuilderEnabled(project);
+                IceBuilderProjectType projectType = DTEUtil.IsIceBuilderNuGetInstalled(project);
                 if(projectType != IceBuilderProjectType.None)
                 {
                     for(int i = 0; i < filesLength; ++i)
@@ -384,7 +379,6 @@ namespace IceBuilder
             catch(Exception ex)
             {
                 Package.UnexpectedExceptionWarning(ex);
-                throw;
             }
             return 0;
         }

@@ -3,6 +3,8 @@
 #################
 
 generated
+.vs
+IceBuilder/Resources/*.xml
 
 #################
 ## Eclipse

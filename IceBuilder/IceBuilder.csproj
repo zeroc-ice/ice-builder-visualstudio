@@ -25,6 +25,8 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup>
     <DelaySign>false</DelaySign>
@@ -46,7 +48,7 @@
     <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>
     </AssemblyOriginatorKeyFile>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <IncludeAssemblyInVSIXContainer>true</IncludeAssemblyInVSIXContainer>
     <IncludeDebugSymbolsInVSIXContainer>true</IncludeDebugSymbolsInVSIXContainer>
     <IncludeDebugSymbolsInLocalVSIXDeployment>true</IncludeDebugSymbolsInLocalVSIXDeployment>
@@ -58,7 +60,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;VS2017</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CopyVsixExtensionFiles>False</CopyVsixExtensionFiles>
@@ -86,6 +88,7 @@
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Microsoft.Build.Utilities.v4.0" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.VisualStudio.ComponentModelHost, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.OLE.Interop" />
     <Reference Include="Microsoft.VisualStudio.Shell.Immutable.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Shell.Immutable.11.0, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
@@ -137,6 +140,7 @@
     <Compile Include="CSharpConfigurationView.Designer.cs">
       <DependentUpon>CSharpConfigurationView.cs</DependentUpon>
     </Compile>
+    <Compile Include="DTEUtil.cs" />
     <Compile Include="GeneratedFileTracker.cs" />
     <Compile Include="IceHomeEditor.cs">
       <SubType>UserControl</SubType>
@@ -149,14 +153,7 @@
     <Compile Include="PropertyNames.cs" />
     <Compile Include="SolutionEventHandler.cs" />
     <Compile Include="DocumentEventHandler.cs" />
-    <Compile Include="DTEUtil.cs" />
     <Compile Include="FileUtil.cs" />
-    <Compile Include="IncludeDirectories.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="IncludeDirectories.Designer.cs">
-      <DependentUpon>IncludeDirectories.cs</DependentUpon>
-    </Compile>
     <Compile Include="MSBuildUtils.cs" />
     <Compile Include="Project.cs" />
     <Compile Include="ProjectConverter.cs" />
@@ -189,9 +186,6 @@
     <EmbeddedResource Include="IceHomeEditor.resx">
       <DependentUpon>IceHomeEditor.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="IncludeDirectories.resx">
-      <DependentUpon>IncludeDirectories.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="UpgradeDialog.resx">
       <DependentUpon>UpgradeDialog.cs</DependentUpon>
     </EmbeddedResource>
@@ -205,50 +199,24 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Resources\AddinRemoval.exe">
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="Resources\IceBuilder.Cpp.xml">
-      <SubType>Designer</SubType>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="Resources\IceBuilder.Tasks.dll">
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
     <Content Include="Resources\IceBuilder.VS2012.dll">
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\IceBuilder.VS2013.dll">
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\IceBuilder.VS2015.dll">
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\IceBuilder.VS2017.dll">
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\LICENSE.rtf">
       <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="Resources\IceBuilder.Cpp.targets">
-      <SubType>Designer</SubType>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="Resources\IceBuilder.CSharp.targets">
-      <SubType>Designer</SubType>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="Resources\IceBuilder.Common.props">
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <SubType>Designer</SubType>
-    </Content>
-    <Content Include="Resources\IceBuilder.CSharp.props">
-      <SubType>Designer</SubType>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="Resources\IceBuilder.Cpp.props">
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <SubType>Designer</SubType>
     </Content>
     <Content Include="Resources\Package.ico" />
     <Content Include="Resources\Package.png">
@@ -257,34 +225,14 @@
     <Content Include="Resources\Preview.png">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="Resources\Ice.3.6.0.Cpp.props">
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="Resources\IceBuilder.Php.props">
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <SubType>Designer</SubType>
-    </Content>
-    <Content Include="Resources\IceBuilder.Php.targets">
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="Resources\IceBuilder.Python.props">
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <SubType>Designer</SubType>
-    </Content>
-    <Content Include="Resources\IceBuilder.Python.targets">
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <SubType>Designer</SubType>
-    </Content>
+    <None Include="app.config" />
     <None Include="packages.config" />
+    <Content Include="Resources\upgrade.rtf">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <VSCTCompile Include="IceBuilder.vsct">
-      <ResourceName>Menus.ctmenu</ResourceName>
-      <SubType>Designer</SubType>
-    </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IceBuilderTemplates\CSharpSliceItemTemplate\CSharpSliceItemTemplate.csproj">

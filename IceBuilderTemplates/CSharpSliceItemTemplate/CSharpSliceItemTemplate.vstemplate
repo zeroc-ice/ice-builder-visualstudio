@@ -12,6 +12,6 @@
     <DefaultName>New.ice</DefaultName>
   </TemplateData>
   <TemplateContent>
-    <ProjectItem ReplaceParameters="true">New.ice</ProjectItem>
+    <ProjectItem SubType="" ReplaceParameters="true" ItemType="SliceCompile">New.ice</ProjectItem>
   </TemplateContent>
 </VSTemplate>

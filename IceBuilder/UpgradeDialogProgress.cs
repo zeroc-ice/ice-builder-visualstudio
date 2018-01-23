@@ -1,6 +1,6 @@
 // **********************************************************************
 //
-// Copyright (c) 2009-2017 ZeroC, Inc. All rights reserved.
+// Copyright (c) 2009-2018 ZeroC, Inc. All rights reserved.
 //
 // **********************************************************************
 
@@ -64,5 +64,10 @@ namespace IceBuilder
         }
 
         private object _lock = new object();
+
+        private void cancelButton_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

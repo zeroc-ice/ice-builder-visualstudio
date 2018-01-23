@@ -1,6 +1,6 @@
 // **********************************************************************
 //
-// Copyright (c) 2009-2017 ZeroC, Inc. All rights reserved.
+// Copyright (c) 2009-2018 ZeroC, Inc. All rights reserved.
 //
 // **********************************************************************
 
@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell.Interop;
 using System.IO;
 
 namespace IceBuilder
@@ -26,7 +25,14 @@ namespace IceBuilder
         {
             Page = page;
             InitializeComponent();
-            includeDirectories.PropertyPage = Page;
+        }
+
+        public void LoadSettigns(ProjectSettigns settings)
+        {
+            OutputDir = settings.OutputDir;
+            IncludeDirectories = settings.IncludeDirectories;
+            AdditionalOptions = settings.AdditionalOptions;
+            Dirty = false;
         }
 
         public virtual void Initialize(Control parent, Rectangle rect)
@@ -87,61 +93,15 @@ namespace IceBuilder
             }
         }
 
-        public void LoadReferencedAssemblies()
-        {
-            string assembliesDir = Package.Instance.GetAssembliesDir(Page.Project);
-            if(!string.IsNullOrEmpty(assembliesDir))
-            {
-                try
-                {
-                    string[] assemblies = Directory.GetFiles(assembliesDir, "*.dll");
-                    foreach(string assembly in assemblies)
-                    {
-                        string name = Path.GetFileNameWithoutExtension(assembly);
-                        referencedAssemblies.Items.Add(name);
-                        if(ProjectUtil.HasAssemblyReference(DTEUtil.GetProject(Page.Project as IVsHierarchy), name))
-                        {
-                            referencedAssemblies.SetItemCheckState(referencedAssemblies.Items.Count - 1, CheckState.Checked);
-                        }
-                    }
-                }
-                catch(IOException)
-                {
-                }
-            }
-        }
-
-        public List<string> Assemblies
+        public string IncludeDirectories
         {
             get
             {
-                List<string> assemblies = new List<string>();
-                foreach(object o in referencedAssemblies.Items)
-                {
-                    assemblies.Add(o.ToString());
-                }
-                return assemblies;
+                return txtIncludeDirectories.Text;
             }
-        }
-
-        public List<string> ReferencedAssemblies
-        {
-            get
+            set
             {
-                List<string> selected = new List<string>();
-                foreach(object o in referencedAssemblies.CheckedItems)
-                {
-                    selected.Add(o.ToString());
-                }
-                return selected;
-            }
-        }
-
-        public IncludeDirectories IncludeDirectories
-        {
-            get
-            {
-                return includeDirectories;
+                txtIncludeDirectories.Text = value;
             }
         }
 
@@ -155,7 +115,7 @@ namespace IceBuilder
                 OutputDir = string.IsNullOrEmpty(selectedPath) ? "." : selectedPath;
                 if(!txtOutputDir.Text.Equals(Page.Settings.OutputDir))
                 {
-                    Dirty = true;
+                    Dirty = isDirty();
                 }
             }
         }
@@ -164,7 +124,7 @@ namespace IceBuilder
         {
             if(!txtOutputDir.Text.Equals(Page.Settings.OutputDir))
             {
-                Dirty = true;
+                Dirty = isDirty();
             }
         }
 
@@ -172,21 +132,39 @@ namespace IceBuilder
         {
             if(!txtAdditionalOptions.Text.Equals(Page.Settings.AdditionalOptions))
             {
-                Dirty = true;
+                Dirty = isDirty();
             }
-        }
-
-        private void ReferencedAssemblies_ItemChecked(object sender, ItemCheckEventArgs e)
-        {
-            Dirty = true;
         }
 
         private void txtOutputDir_TextChanged(object sender, EventArgs e)
         {
             if(!txtOutputDir.Text.Equals(Page.Settings.OutputDir))
             {
-                Dirty = true;
+                Dirty = isDirty();
             }
+        }
+
+        private void txtIncludeDirectories_TextChanged(object sender, EventArgs e)
+        {
+            if (!txtIncludeDirectories.Text.Equals(Page.Settings.IncludeDirectories))
+            {
+                Dirty = isDirty();
+            }
+        }
+
+        private void txtAdditionalOptions_TextChanged(object sender, EventArgs e)
+        {
+            if (!txtAdditionalOptions.Text.Equals(Page.Settings.AdditionalOptions))
+            {
+                Dirty = isDirty();
+            }
+        }
+
+        private bool isDirty()
+        {
+            return !txtOutputDir.Text.Equals(Page.Settings.OutputDir) ||
+                !txtIncludeDirectories.Text.Equals(Page.Settings.IncludeDirectories) ||
+                !txtAdditionalOptions.Text.Equals(Page.Settings.AdditionalOptions);
         }
     }
 }

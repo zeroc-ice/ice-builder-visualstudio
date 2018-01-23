@@ -80,8 +80,9 @@ namespace IceBuilder
                             ProjectUtil.GetProjectFullPath(p),
                             properties,
                             null,
-                            new string[] { "IceBuilder_Compile" },
+                            new string[] { "SliceCompile" },
                             project.ProjectCollection.HostServices,
+                            BuildRequestDataFlags.ProvideProjectStateAfterBuild |
                             BuildRequestDataFlags.IgnoreExistingProjectState |
                             BuildRequestDataFlags.ReplaceExistingProjectInstance);
 
@@ -97,7 +98,7 @@ namespace IceBuilder
                             BuildManagerAccessor.ReleaseBuildResources(cookie);
                             s.BuildManager.ResetCaches();
                             BuildManagerAccessor.UnregisterLoggers(s.SubmissionId);
-                            buildCallback.EndBuild(submission.BuildResult.OverallResult == BuildResultCode.Success);
+                            buildCallback.EndBuild(s.BuildResult.OverallResult == BuildResultCode.Success);
                         }));
                     }, null);
 

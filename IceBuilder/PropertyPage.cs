@@ -1,6 +1,6 @@
 // **********************************************************************
 //
-// Copyright (c) 2009-2017 ZeroC, Inc. All rights reserved.
+// Copyright (c) 2009-2018 ZeroC, Inc. All rights reserved.
 //
 // **********************************************************************
 
@@ -61,7 +61,6 @@ namespace IceBuilder
             catch(Exception ex)
             {
                 Package.UnexpectedExceptionWarning(ex);
-                throw;
             }
         }
 
@@ -70,36 +69,14 @@ namespace IceBuilder
             try
             {
                 Settings.OutputDir = ConfigurationView.OutputDir;
-                Settings.IncludeDirectories = string.Join(";", ConfigurationView.IncludeDirectories.Values);
+                Settings.IncludeDirectories = ConfigurationView.IncludeDirectories;
                 Settings.AdditionalOptions = ConfigurationView.AdditionalOptions;
-
-                List<string> referencedAssemblies = ConfigurationView.ReferencedAssemblies;
-                string assembliesDir = ProjectUtil.GetEvaluatedProperty(Project, "IceAssembliesDir");
-                foreach(string assembly in ConfigurationView.Assemblies)
-                {
-                    EnvDTE.Project p = DTEUtil.GetProject(Project as IVsHierarchy);
-                    if(ProjectUtil.HasAssemblyReference(p, assembly))
-                    {
-                        if(!referencedAssemblies.Contains(assembly))
-                        {
-                            ProjectUtil.RemoveAssemblyReference(p, assembly);
-                        }
-                    }
-                    else
-                    {
-                        if(referencedAssemblies.Contains(assembly))
-                        {
-                            ProjectUtil.AddAssemblyReference(p, assembliesDir, assembly);
-                        }
-                    }
-                }
                 Settings.Save();
                 ConfigurationView.Dirty = false;
             }
             catch(Exception ex)
             {
                 Package.UnexpectedExceptionWarning(ex);
-                throw;
             }
         }
 
@@ -116,7 +93,6 @@ namespace IceBuilder
             catch(Exception ex)
             {
                 Package.UnexpectedExceptionWarning(ex);
-                throw;
             }
         }
 
@@ -141,7 +117,6 @@ namespace IceBuilder
             catch(Exception ex)
             {
                 Package.UnexpectedExceptionWarning(ex);
-                throw;
             }
         }
 
@@ -151,15 +126,7 @@ namespace IceBuilder
 
         public int IsPageDirty()
         {
-            try
-            {
-                return ConfigurationView.Dirty ? VSConstants.S_OK : VSConstants.S_FALSE;
-            }
-            catch(Exception ex)
-            {
-                Package.UnexpectedExceptionWarning(ex);
-                throw;
-            }
+            return ConfigurationView.Dirty ? VSConstants.S_OK : VSConstants.S_FALSE;
         }
 
         public void Move(RECT[] pRect)
@@ -173,7 +140,6 @@ namespace IceBuilder
             catch(Exception ex)
             {
                 Package.UnexpectedExceptionWarning(ex);
-                throw;
             }
         }
 
@@ -204,14 +170,17 @@ namespace IceBuilder
                         Project = hier as IVsProject;
                         if(Project != null)
                         {
-                            Settings = new ProjectSettigns(Project);
+                            Settings = new ProjectSettigns(Package.Instance.ProjectManagerFactory.GetProjectManager(Project));
                             Settings.Load();
-                            ConfigurationView.OutputDir = Settings.OutputDir;
-                            ConfigurationView.IncludeDirectories.Values = new List<string>(
-                                Settings.IncludeDirectories.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries));
-                            ConfigurationView.AdditionalOptions = Settings.AdditionalOptions;
-                            ConfigurationView.LoadReferencedAssemblies();
-                            ConfigurationView.Dirty = false;
+                            ConfigurationView.LoadSettigns(Settings);
+                            Settings.ProjectManager.ProjectChanged += (sender, args) =>
+                                {
+                                    if(!ConfigurationView.Dirty)
+                                    {
+                                        Settings.Load();
+                                        ConfigurationView.LoadSettigns(Settings);
+                                    }
+                                };
                         }
                     }
                 }
@@ -219,7 +188,6 @@ namespace IceBuilder
             catch(Exception ex)
             {
                 Package.UnexpectedExceptionWarning(ex);
-                throw;
             }
         }
 
@@ -262,19 +230,11 @@ namespace IceBuilder
 
         public int TranslateAccelerator(MSG[] pMsg)
         {
-            try
-            {
-                Message message = Message.Create(pMsg[0].hwnd, (int)pMsg[0].message, pMsg[0].wParam, pMsg[0].lParam);
-                int hr = ConfigurationView.ProcessAccelerator(ref message);
-                pMsg[0].lParam = message.LParam;
-                pMsg[0].wParam = message.WParam;
-                return hr;
-            }
-            catch(Exception ex)
-            {
-                Package.UnexpectedExceptionWarning(ex);
-                throw;
-            }
+            Message message = Message.Create(pMsg[0].hwnd, (int)pMsg[0].message, pMsg[0].wParam, pMsg[0].lParam);
+            int hr = ConfigurationView.ProcessAccelerator(ref message);
+            pMsg[0].lParam = message.LParam;
+            pMsg[0].wParam = message.WParam;
+            return hr;
         }
 
         #endregion

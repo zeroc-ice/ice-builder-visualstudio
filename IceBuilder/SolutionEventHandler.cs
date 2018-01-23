@@ -1,6 +1,6 @@
 // **********************************************************************
 //
-// Copyright (c) 2009-2017 ZeroC, Inc. All rights reserved.
+// Copyright (c) 2009-2018 ZeroC, Inc. All rights reserved.
 //
 // **********************************************************************
 
@@ -29,12 +29,11 @@ namespace IceBuilder
             try
             {
                 Package.Instance.RunningDocumentTableEventHandler.BeginTrack();
-                Package.Instance.InitializeProjects();
+                Package.Instance.InitializeProjects(DTEUtil.GetProjects());
             }
             catch(Exception ex)
             {
                 Package.UnexpectedExceptionWarning(ex);
-                throw;
             }
             return 0;
         }
@@ -77,7 +76,6 @@ namespace IceBuilder
             catch(Exception ex)
             {
                 Package.UnexpectedExceptionWarning(ex);
-                throw;
             }
             return 0;
         }
@@ -100,7 +98,6 @@ namespace IceBuilder
             catch(Exception ex)
             {
                 Package.UnexpectedExceptionWarning(ex);
-                throw;
             }
             return 0;
         }
@@ -132,7 +129,7 @@ namespace IceBuilder
                 IVsProject project = pHierarchy as IVsProject;
                 if(project != null)
                 {
-                    if(DTEUtil.IsIceBuilderEnabled(project) != IceBuilderProjectType.None)
+                    if(DTEUtil.IsIceBuilderNuGetInstalled(project) != IceBuilderProjectType.None)
                     {
                         Package.Instance.FileTracker.Remove(ProjectUtil.GetProjectFullPath(project));
                     }
@@ -141,7 +138,6 @@ namespace IceBuilder
             catch(Exception ex)
             {
                 Package.UnexpectedExceptionWarning(ex);
-                throw;
             }
             return 0;
         }
@@ -174,7 +170,6 @@ namespace IceBuilder
             catch(Exception ex)
             {
                 Package.UnexpectedExceptionWarning(ex);
-                throw;
             }
             return 0;
         }

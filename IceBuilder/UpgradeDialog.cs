@@ -1,12 +1,12 @@
 // **********************************************************************
 //
-// Copyright (c) 2009-2017 ZeroC, Inc. All rights reserved.
+// Copyright (c) 2009-2018 ZeroC, Inc. All rights reserved.
 //
 // **********************************************************************
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Windows.Forms;
 using Microsoft.VisualStudio.Shell.Interop;
 
@@ -17,13 +17,14 @@ namespace IceBuilder
         public UpgradeDialog()
         {
             InitializeComponent();
+            description.Rtf = File.ReadAllText(Path.Combine(Package.ResourcesDirectory, "upgrade.rtf"));
         }
 
         private void OKButton_Clicked(object sender, EventArgs e)
         {
-            List<IVsProject> selected = SelectedProjets;
-            UpgradeDialogProgress proggressDialog = new UpgradeDialogProgress(selected.Count);
-            ProjectConverter.Upgrade(selected, proggressDialog);
+            Hide();
+            UpgradeDialogProgress proggressDialog = new UpgradeDialogProgress(Projects.Count);
+            ProjectConverter.Upgrade(Projects, proggressDialog);
             proggressDialog.StartPosition = FormStartPosition.CenterParent;
             proggressDialog.ShowDialog(this);
             Close();
@@ -34,45 +35,15 @@ namespace IceBuilder
             Close();
         }
 
-        Dictionary<string, IVsProject> _projects;
         public Dictionary<string, IVsProject> Projects
         {
-            get
-            {
-                return _projects;
-            }
-            set
-            {
-                _projects = value;
-                Values = value.Keys.ToList();
-            }
+            get;
+            set;
         }
 
-        public List<string> Values
+        private void description_LinkClicked(object sender, LinkClickedEventArgs e)
         {
-            set
-            {
-                projectList.Items.Clear();
-                foreach(string v in value)
-                {
-                    projectList.Items.Add(v);
-                    projectList.SetItemCheckState(projectList.Items.Count - 1, CheckState.Checked);
-                }
-            }
-        }
-
-        public List<IVsProject> SelectedProjets
-        {
-            get
-            {
-                List<IVsProject> values = new List<IVsProject>();
-                foreach(object o in projectList.CheckedItems)
-                {
-                    values.Add(Projects[o.ToString()]);
-                }
-                return values;
-
-            }
+            System.Diagnostics.Process.Start(e.LinkText);
         }
     }
 }

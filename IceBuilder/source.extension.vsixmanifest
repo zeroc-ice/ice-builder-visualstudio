@@ -1,29 +1,30 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
-  <Metadata>
-    <Identity Id="ef9502be-dbc2-4568-a846-02b8e42d04c2" Version="4.3.10" Language="en-US" Publisher="ZeroC" />
-    <DisplayName>Ice Builder</DisplayName>
-    <Description xml:space="preserve">Ice Builder manages the compilation of Slice (.ice) files to C++ and C#. It compiles your Slice files with slice2cpp and slice2cs, and allows you to specify the parameters provided to these compilers.</Description>
-    <MoreInfo>https://github.com/zeroc-ice/ice-builder-visualstudio</MoreInfo>
-    <License>Resources\LICENSE.rtf</License>
-    <Icon>Resources\Package.png</Icon>
-    <PreviewImage>Resources\Preview.png</PreviewImage>
-    <Tags>ZeroC, Ice, Slice</Tags>
-  </Metadata>
-  <Installation>
-    <InstallationTarget Version="[11.0,15.0]" Id="Microsoft.VisualStudio.Pro" />
-  </Installation>
-  <Dependencies>
-    <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5, 5.0]" />
-    <Dependency Id="Microsoft.VisualStudio.MPF.11.0" DisplayName="Visual Studio MPF 11.0" d:Source="Installed" Version="11.0" />
-  </Dependencies>
-  <Assets>
-    <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
-    <Asset Type="Microsoft.VisualStudio.ItemTemplate" d:Source="Project" d:ProjectName="CSharpSliceItemTemplate" d:TargetPath="|CSharpSliceItemTemplate;TemplateProjectOutputGroup|" Path="ItemTemplates" d:VsixSubPath="ItemTemplates" />
-    <Asset Type="Microsoft.VisualStudio.ItemTemplate" d:Source="Project" d:ProjectName="VCSliceItemTemplate" d:TargetPath="|VCSliceItemTemplate;TemplateProjectOutputGroup|" Path="ItemTemplates" d:VsixSubPath="ItemTemplates" />
-    <Asset Type="Microsoft.VisualStudio.Assembly" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%|" AssemblyName="|%CurrentProject%;AssemblyName|" />
-  </Assets>
-  <Prerequisites>
-    <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0.26004.1,16.0)" DisplayName="Visual Studio core editor" />
-  </Prerequisites>
+    <Metadata>
+        <Identity Id="ef9502be-dbc2-4568-a846-02b8e42d04c2" Version="5.0.0" Language="en-US" Publisher="ZeroC" />
+        <DisplayName>Ice Builder</DisplayName>
+        <Description xml:space="preserve">Ice Builder manages the compilation of Slice (.ice) files to C++ and C#. It compiles your Slice files with slice2cpp and slice2cs, and allows you to specify the parameters provided to these compilers.</Description>
+        <MoreInfo>https://github.com/zeroc-ice/ice-builder-visualstudio</MoreInfo>
+        <License>Resources\LICENSE.rtf</License>
+        <Icon>Resources\Package.png</Icon>
+        <PreviewImage>Resources\Preview.png</PreviewImage>
+        <Tags>ZeroC, Ice, Slice</Tags>
+    </Metadata>
+    <Installation>
+        <InstallationTarget Version="[11.0,15.0]" Id="Microsoft.VisualStudio.Pro" />
+    </Installation>
+    <Dependencies>
+        <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5, 5.0]" />
+        <Dependency Id="Microsoft.VisualStudio.MPF.11.0" DisplayName="Visual Studio MPF 11.0" d:Source="Installed" Version="11.0" />
+    </Dependencies>
+    <Assets>
+        <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
+        <Asset Type="Microsoft.VisualStudio.ItemTemplate" d:Source="Project" d:ProjectName="CSharpSliceItemTemplate" d:TargetPath="|CSharpSliceItemTemplate;TemplateProjectOutputGroup|" Path="ItemTemplates" d:VsixSubPath="ItemTemplates" />
+        <Asset Type="Microsoft.VisualStudio.ItemTemplate" d:Source="Project" d:ProjectName="VCSliceItemTemplate" d:TargetPath="|VCSliceItemTemplate;TemplateProjectOutputGroup|" Path="ItemTemplates" d:VsixSubPath="ItemTemplates" />
+        <Asset Type="Microsoft.VisualStudio.Assembly" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%|" AssemblyName="|%CurrentProject%;AssemblyName|" />
+        <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="File" Path="Resources\IceBuilder.VS2017.dll" />
+    </Assets>
+    <Prerequisites>
+        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0.26004.1,16.0)" DisplayName="Visual Studio core editor" />
+    </Prerequisites>
 </PackageManifest>
