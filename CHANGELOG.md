@@ -9,23 +9,27 @@
     for Ice Builder for MSBuild within the Visual Studio IDE; Ice Builder for
     MSBuild controls the Slice compilation.
 
- - Ice Builder no longer fully supports Ice source installations: if your project 
-   uses Ice built from source (in a source tree), you have to add the path to 
+ - Ice Builder no longer fully supports Ice source installations: if your project
+   uses Ice built from source (in a source tree), you have to add the path to
    the Ice C++ include directory to your C++ include directories (etc.) yourself.
- 
- - You no longer add Ice Builder to your project. As of this release, you add 
+
+ - You no longer add Ice Builder to your project. As of this release, you add
  the NuGet package `zeroc.icebuilder.msbuild` to our project.
- 
+
  - Added support for C# .NET Core projects.
- 
+
  - The Ice Builder 4.x MSBuild properties have been replaced by Ice Builder for
  MSBuild properties with the same names, except the prefix for these properties
  is now `SliceCompile` instead of `IceBuilder`.
- 
+
  - When you open a solution with projects that use Ice Builder 4.x, Ice Builder
  offers you to convert these projects to the 5.0 format. This conversion adds
  `zeroc.icebuilder.msbuild` to the converted projects and is not reversible.
- 
+
+ - The partial support for Visual Studio 2010 in Ice Builder 4.x is now
+ provided by Ice Builder for MSBuild, and as a result Ice Builder for
+ Visual Studio no longer supports Visual Studio 2010.
+
  - Ice Builder no longer converts projects that use the old Ice Visual Studio
  Add-in.
 
