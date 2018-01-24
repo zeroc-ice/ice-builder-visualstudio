@@ -16,7 +16,6 @@ namespace IceBuilder
 {
     class MSBuildUtils
     {
-        public static readonly string IceBuilderProjectFlavorGUID = "{3C53C28F-DC44-46B0-8B85-0C96B85B2042}";
         public static readonly string CSharpProjectGUI = "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}";
 
         public static readonly string IceBuilderCppProps = "$(IceBuilderCppProps)";
@@ -178,7 +177,7 @@ namespace IceBuilder
             {
                 value = HasImport(project, IceBuilderCSharpProps) && HasImport(project, IceBuilderCSharpTargets);
                 value = value || (HasImport(project, IceBuilderCSharpPropsPathOld) && HasImport(project, IceBuilderCSharpTargetsPathOld));
-                value = value && HasProjectFlavor(project, IceBuilderProjectFlavorGUID);
+                value = value && HasProjectFlavor(project, Package.IceBuilderOldFlavor);
             }
             return value;
         }
@@ -414,6 +413,14 @@ namespace IceBuilder
                 SetProperty(project, "IceBuilder", PropertyNames.New.AdditionalOptions, additionalOptions);
             }
 
+            value = GetProperty(project, "ProjectTypeGuids");
+            if (!string.IsNullOrEmpty(value))
+            {
+                value = value.Replace(Package.IceBuilderOldFlavor, Package.IceBuilderNewFlavor);
+                SetProperty(project, "", "ProjectTypeGuids", value);
+                modified = true;
+            }
+
             return modified;
         }
 
@@ -481,7 +488,7 @@ namespace IceBuilder
                     modified = RemoveImport(project, IceBuilderCSharpTargets) || modified;
                     if(!keepProjectFlavor)
                     {
-                        modified = RemoveProjectFlavorIfExists(project, IceBuilderProjectFlavorGUID) || modified;
+                        modified = RemoveProjectFlavorIfExists(project, Package.IceBuilderOldFlavor) || modified;
                     }
                 }
 
@@ -509,39 +516,46 @@ namespace IceBuilder
         public static void SetProperty(Microsoft.Build.Evaluation.Project project, string label, string name, string value)
         {
             DTEUtil.EnsureFileIsCheckout(project.FullPath);
-            ProjectPropertyGroupElement group = project.Xml.PropertyGroups.FirstOrDefault(
-                g => g.Label.Equals(label, StringComparison.CurrentCultureIgnoreCase));
-            if(group == null)
+            if (string.IsNullOrEmpty(label))
             {
-                //
-                // Create our property group after the main language targets are imported so we can use the properties
-                // defined in this files.
-                //
-                ProjectImportElement import = project.Xml.Imports.FirstOrDefault(
-                    p => (p.Project.IndexOf("Microsoft.Cpp.targets", StringComparison.CurrentCultureIgnoreCase) != -1 ||
-                          p.Project.Equals("Microsoft.CSharp.targets", StringComparison.CurrentCultureIgnoreCase)));
-                if(import != null)
-                {
-                    group = project.Xml.CreatePropertyGroupElement();
-                    project.Xml.InsertAfterChild(group, import);
-                }
-                else
-                {
-                    group = project.Xml.CreatePropertyGroupElement();
-                    project.Xml.AppendChild(group);
-                }
-                group.Label = label;
-            }
-
-            ProjectPropertyElement property = group.Properties.FirstOrDefault(
-                p => p.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase));
-            if(property != null)
-            {
-                property.Value = value;
+                project.SetProperty(name, value);
             }
             else
             {
-                group.AddProperty(name, value);
+                ProjectPropertyGroupElement group = project.Xml.PropertyGroups.FirstOrDefault(
+                    g => g.Label.Equals(label, StringComparison.CurrentCultureIgnoreCase));
+                if (group == null)
+                {
+                    //
+                    // Create our property group after the main language targets are imported so we can use the properties
+                    // defined in this files.
+                    //
+                    ProjectImportElement import = project.Xml.Imports.FirstOrDefault(
+                        p => (p.Project.IndexOf("Microsoft.Cpp.targets", StringComparison.CurrentCultureIgnoreCase) != -1 ||
+                              p.Project.Equals("Microsoft.CSharp.targets", StringComparison.CurrentCultureIgnoreCase)));
+                    if (import != null)
+                    {
+                        group = project.Xml.CreatePropertyGroupElement();
+                        project.Xml.InsertAfterChild(group, import);
+                    }
+                    else
+                    {
+                        group = project.Xml.CreatePropertyGroupElement();
+                        project.Xml.AppendChild(group);
+                    }
+                    group.Label = label;
+                }
+
+                ProjectPropertyElement property = group.Properties.FirstOrDefault(
+                    p => p.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase));
+                if (property != null)
+                {
+                    property.Value = value;
+                }
+                else
+                {
+                    group.AddProperty(name, value);
+                }
             }
         }
 

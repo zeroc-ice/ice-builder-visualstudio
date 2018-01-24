@@ -90,4 +90,16 @@ namespace IceBuilder
             get; set;
         }
     }
+
+    public class ProjectOld : FlavoredProjectBase
+    {
+        protected override void SetInnerProject(IntPtr innerIUnknown)
+        {
+            if (serviceProvider == null)
+            {
+                serviceProvider = Package.Instance;
+            }
+            base.SetInnerProject(innerIUnknown);
+        }
+    }
 }

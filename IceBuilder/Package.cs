@@ -24,13 +24,20 @@ namespace IceBuilder
     [InstalledProductRegistration("#110", "#112", "5.0.0", IconResourceID = 400)]
     [ProvideOptionPage(typeof(IceOptionsPage), "Projects", "Ice Builder", 113, 0, true)]
     [ProvideAutoLoad(UIContextGuids80.NoSolution)]
-    [Guid(GuidList.IceBuilderPackageString)]
+    [Guid(Package.IceBuilderPackageString)]
 
     [ProvideObject(typeof(PropertyPage),
         RegisterUsing = RegistrationMethod.CodeBase)]
 
     [ProvideProjectFactory(typeof(ProjectFactory),
         "Ice Builder",
+        null,
+        null,
+        null,
+        @"..\Templates\Projects")]
+
+    [ProvideProjectFactory(typeof(ProjectFactoryOld),
+        "Ice Builder Old",
         null,
         null,
         null,
@@ -451,7 +458,7 @@ namespace IceBuilder
                     {
                         if(MSBuildUtils.AddProjectFlavorIfNotExists(
                              MSBuildUtils.LoadedProject(ProjectUtil.GetProjectFullPath(project), false, true),
-                                MSBuildUtils.IceBuilderProjectFlavorGUID))
+                                IceBuilderNewFlavor))
                         {
                             project.GetDTEProject().Save();
                         }
@@ -482,6 +489,7 @@ namespace IceBuilder
             }
 
             RegisterProjectFactory(new ProjectFactory());
+            RegisterProjectFactory(new ProjectFactoryOld());
 
             if(!CommandLineMode)
             {
@@ -930,10 +938,12 @@ namespace IceBuilder
         public static readonly string IceCSharpAssembleyKey =
             @"HKEY_CURRENT_USER\Software\Microsoft\.NETFramework\v2.0.50727\AssemblyFoldersEx\Ice";
         public static readonly string IceAutoBuilding = "IceAutoBuilding";
-    }
 
-    static class GuidList
-    {
         public const string IceBuilderPackageString = "ef9502be-dbc2-4568-a846-02b8e42d04c2";
-    };
+
+        public const string IceBuilderOldFlavorGuid = "3C53C28F-DC44-46B0-8B85-0C96B85B2042";
+        public const string IceBuilderOldFlavor = "{" + IceBuilderOldFlavorGuid + "}";
+        public const string IceBuilderNewFlavorGuid = "28993779-3132-408A-BCB0-1D78225F4824";
+        public const string IceBuilderNewFlavor = "{" + IceBuilderNewFlavorGuid + "}";
+    }
 }
