@@ -406,16 +406,17 @@ namespace IceBuilder
             }
         }
 
-        public void SaveProject(IVsProject project, Microsoft.Build.Evaluation.Project p)
+        public void SaveProject(IVsProject project)
         {
+            Microsoft.Build.Evaluation.Project msproject = project.GetMSBuildProject(true);
             IVsHierarchy hier = project as IVsHierarchy;
             Guid projectGUID = Guid.Empty;
             IVsSolution.GetGuidOfProject(hier, out projectGUID);
             IVsSolution4.UnloadProject(projectGUID, (uint)_VSProjectUnloadStatus.UNLOADSTATUS_UnloadedByUser);
-            p.Save();
+            msproject.Save();
             try
             {
-                ProjectCollection.GlobalProjectCollection.UnloadProject(p);
+                ProjectCollection.GlobalProjectCollection.UnloadProject(msproject);
             }
             catch (Exception)
             {
@@ -448,19 +449,18 @@ namespace IceBuilder
 
             if (projectType != IceBuilderProjectType.None)
             {
+                var dteproject = project.GetDTEProject();
                 if (projectType == IceBuilderProjectType.CppProjectType)
                 {
-                    VCUtil.SetupSliceFilter(DTEUtil.GetProject(project as IVsHierarchy));
+                    VCUtil.SetupSliceFilter(dteproject);
                 }
                 else
                 {
                     if (project is IVsAggregatableProject)
                     {
-                        if(MSBuildUtils.AddProjectFlavorIfNotExists(
-                             MSBuildUtils.LoadedProject(ProjectUtil.GetProjectFullPath(project), false, true),
-                                IceBuilderNewFlavor))
+                        if(MSBuildUtils.AddProjectFlavorIfNotExists(project.GetMSBuildProject(true), IceBuilderNewFlavor))
                         {
-                            project.GetDTEProject().Save();
+                            dteproject.Save();
                         }
                     }
                 }
@@ -692,9 +692,9 @@ namespace IceBuilder
                     Verbosity = LoggerVerbosity
                 };
                 BuildingProject = project;
-                if(!Builder.Build(project, new BuildCallback(project, OutputPane,
-                    DTEUtil.GetProject(project as IVsHierarchy).ConfigurationManager.ActiveConfiguration),
-                                   logger))
+                var dteproject = project.GetDTEProject();
+                var activeConfiguration = dteproject.ConfigurationManager.ActiveConfiguration;
+                if(!Builder.Build(project, new BuildCallback(project, OutputPane, activeConfiguration), logger))
                 {
                     BuildingProject = null;
                 }

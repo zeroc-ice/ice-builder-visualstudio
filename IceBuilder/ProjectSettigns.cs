@@ -18,16 +18,16 @@ namespace IceBuilder
 
         public void Load()
         {
-            OutputDir = GetProperty(PropertyNames.New.OutputDir);
-            IncludeDirectories = GetProperty(PropertyNames.New.IncludeDirectories);
-            AdditionalOptions = GetProperty(PropertyNames.New.AdditionalOptions);
+            OutputDir = GetProperty(ItemMetadataNames.OutputDir);
+            IncludeDirectories = GetProperty(ItemMetadataNames.IncludeDirectories);
+            AdditionalOptions = GetProperty(ItemMetadataNames.AdditionalOptions);
         }
 
         public void Save()
         {
-            SetPropertyIfChanged(PropertyNames.New.OutputDir, OutputDir);
-            SetPropertyIfChanged(PropertyNames.New.IncludeDirectories, IncludeDirectories);
-            SetPropertyIfChanged(PropertyNames.New.AdditionalOptions, AdditionalOptions);
+            SetPropertyIfChanged(ItemMetadataNames.OutputDir, OutputDir);
+            SetPropertyIfChanged(ItemMetadataNames.IncludeDirectories, IncludeDirectories);
+            SetPropertyIfChanged(ItemMetadataNames.AdditionalOptions, AdditionalOptions);
         }
 
         public string OutputDir
@@ -56,12 +56,12 @@ namespace IceBuilder
 
         private string GetProperty(string name)
         {
-            return ProjectManager.GetProjectProperty(name);
+            return ProjectManager.GetProjectItemMetadata(name, false, string.Empty);
         }
 
         private void SetProperty(string name, string value)
         {
-            ProjectManager.SetProjectProperty(name, value);
+            ProjectManager.SetProjectItemMetadata(name, value);
         }
 
         private void SetPropertyIfChanged(string name, string value)

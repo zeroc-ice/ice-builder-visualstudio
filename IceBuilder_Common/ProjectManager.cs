@@ -63,7 +63,6 @@ namespace IceBuilder
                     using (var projectWriteLock = await ProjectLockService.ReadLockAsync())
                     {
                         var configuredProject = await UnconfiguredProject.GetSuggestedConfiguredProjectAsync();
-
                         MSBuildProject = await projectWriteLock.GetProjectAsync(configuredProject);
                     }
                 });

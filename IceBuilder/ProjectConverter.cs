@@ -81,23 +81,55 @@ namespace IceBuilder
                     IceBuilderProjectType projectType = DTEUtil.IsIceBuilderEnabled(project);
                     if (projectType != IceBuilderProjectType.None)
                     {
+                        bool cpp = projectType == IceBuilderProjectType.CppProjectType;
                         DTE.StatusBar.Text = string.Format("Upgrading project {0} Ice Builder settings", project.GetDTEProject().UniqueName);
+                        var msproject = project.GetMSBuildProject();
                         var fullPath = ProjectUtil.GetProjectFullPath(project);
                         var assemblyDir = ProjectUtil.GetEvaluatedProperty(project, "IceAssembliesDir");
                         if (projectType == IceBuilderProjectType.CsharpProjectType)
                         {
-                            ProjectUtil.UpgradReferencesHintPath(DTEUtil.GetProject(project as IVsHierarchy), assemblyDir);
+                            foreach(VSLangProj80.Reference3 r in dteProject.GetProjectRererences())
+                            {
+                                if(Package.AssemblyNames.Contains(r.Name))
+                                {
+                                    var item = msproject.AllEvaluatedItems.FirstOrDefault(referenceItem =>
+                                        referenceItem.ItemType.Equals("Reference") &&
+                                        referenceItem.EvaluatedInclude.Split(",".ToCharArray()).ElementAt(0).Equals(r.Name));
+                                    if(item != null)
+                                    {
+                                        if(item.HasMetadata("HintPath"))
+                                        {
+                                            var hintPath = item.GetMetadata("HintPath").UnevaluatedValue;
+                                            if(hintPath.Contains("$(IceAssembliesDir)"))
+                                            {
+                                                hintPath = hintPath.Replace("$(IceAssembliesDir)",
+                                                    FileUtil.RelativePath(Path.GetDirectoryName(r.ContainingProject.FullName), assemblyDir));
+                                                //
+                                                // If the HintPath points to the NuGet zeroc.ice.net package we upgrade it to not
+                                                // use IceAssembliesDir otherwise we remove it
+                                                if(hintPath.Contains("packages\\zeroc.ice.net"))
+                                                {
+                                                    item.SetMetadataValue("HintPath", hintPath);
+                                                }
+                                                else
+                                                {
+                                                    item.RemoveMetadata("HintPath");
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
-                        Microsoft.Build.Evaluation.Project p = MSBuildUtils.LoadedProject(
-                                    ProjectUtil.GetProjectFullPath(project), projectType == IceBuilderProjectType.CppProjectType, false);
-                        bool modified = MSBuildUtils.UpgradeProjectImports(p);
-                        modified = MSBuildUtils.UpgradeProjectProperties(p) || modified;
-                        modified = MSBuildUtils.RemoveIceBuilderFromProject(p, true) || modified;
-                        modified = MSBuildUtils.UpgradeProjectItems(p, projectType == IceBuilderProjectType.CppProjectType) || modified;
+
+                        bool modified = MSBuildUtils.UpgradeProjectImports(msproject);
+                        modified = MSBuildUtils.UpgradeProjectProperties(msproject, cpp) || modified;
+                        modified = MSBuildUtils.RemoveIceBuilderFromProject(msproject, true) || modified;
+                        modified = MSBuildUtils.UpgradeProjectItems(msproject, cpp) || modified;
 
                         if (modified)
                         {
-                            builder.SaveProject(project, p);
+                            builder.SaveProject(project);
                         }
                     }
                 }

@@ -6,6 +6,23 @@
 
 namespace IceBuilder
 {
+    public class ItemMetadataNames
+    {
+        //
+        // Common properties
+        //
+        public static readonly string OutputDir = "OutputDir";
+        public static readonly string IncludeDirectories = "IncludeDirectories";
+        public static readonly string AdditionalOptions = "AdditionalOptions";
+
+        //
+        // C++ properties
+        //
+        public static readonly string HeaderOutputDir = "HeaderOutputDir";
+        public static readonly string HeaderExt = "HeaderExt";
+        public static readonly string SourceExt = "SourceExt";
+        public static readonly string BaseDirectoryForGeneratedInclude = "BaseDirectoryForGeneratedInclude";
+    }
     public class PropertyNames
     {
         public class New

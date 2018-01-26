@@ -28,7 +28,7 @@ namespace IceBuilder
 
         public bool Build(IVsProject p, BuildCallback buildCallback, BuildLogger buildLogger)
         {
-            MSBuildProject project = MSBuildUtils.LoadedProject(ProjectUtil.GetProjectFullPath(p), DTEUtil.IsCppProject(p), false);
+            MSBuildProject project = p.GetMSBuildProject(false);
 
             //
             // We need to set this before we acquire the build resources otherwise Msbuild

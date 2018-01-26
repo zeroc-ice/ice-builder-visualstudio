@@ -7,8 +7,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-
+using System.Linq;
 using Microsoft.VisualStudio.VCProjectEngine;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace IceBuilder
 {
@@ -67,29 +68,43 @@ namespace IceBuilder
             return config.Evaluate(value);
         }
 
-        public void AddGeneratedFiles(EnvDTE.Project dteProject, EnvDTE.Configuration config, string filterName,
-                                      List<string> paths, bool generatedFilesPerConfiguration)
+        public void AddGeneratedFile(IVsProject project, VCFilter filter, string path, EnvDTE.Configuration config)
         {
-            VCProject project = dteProject.Object as VCProject;
-
-            VCFilter filter = FindOrCreateFilter(project, filterName);
-            if(generatedFilesPerConfiguration)
+            int found;
+            uint id;
+            VSDOCUMENTPRIORITY[] priority = new VSDOCUMENTPRIORITY[1];
+            project.IsDocumentInProject(path, out found, priority, out id);
+            if(found == 0)
             {
-                filter = FindOrCreateFilter(filter, config.PlatformName);
-                filter = FindOrCreateFilter(filter, config.ConfigurationName);
-            }
+                if(!Directory.Exists(Path.GetDirectoryName(path)))
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(path));
+                }
 
-            string configurationName = config.ConfigurationName;
-            string platformName = config.PlatformName;
-
-            foreach(string path in paths)
-            {
                 if(!File.Exists(path))
                 {
                     File.Create(path).Dispose();
                 }
 
-                VCFile file = filter.AddFile(path);
+                VCFile file = null;
+                if(config == null)
+                {
+                    file = filter.AddFile(path);
+                }
+                else
+                {
+                    filter = FindOrCreateFilter(filter, config.PlatformName);
+                    filter = FindOrCreateFilter(filter, config.ConfigurationName);
+                    file = filter.AddFile(path);
+                    foreach(VCFileConfiguration c in file.FileConfigurations)
+                    {
+                        if(!c.ProjectConfiguration.ConfigurationName.Equals(config.ConfigurationName) ||
+                           !c.ProjectConfiguration.Platform.Name.Equals(config.PlatformName))
+                        {
+                            c.ExcludedFromBuild = true;
+                        }
+                    }
+                }
 
                 try
                 {
@@ -101,19 +116,27 @@ namespace IceBuilder
                 catch(Exception)
                 {
                 }
-                //
-                // Exclude the file from all other configurations
-                //
-                if(generatedFilesPerConfiguration)
+            }
+        }
+
+        public void AddGeneratedFiles(IVsProject project, List<GeneratedFileSet> filesets)
+        {
+            var dteproject = project.GetDTEProject();
+            var vcproject = dteproject.Object as VCProject;
+
+            var sourcesFilter = FindOrCreateFilter(vcproject, "Source Files");
+            var headersFilter = FindOrCreateFilter(vcproject, "Header Files");
+
+            foreach(var fileset in filesets)
+            {
+                foreach(var entry in fileset.sources)
                 {
-                    foreach(VCFileConfiguration c in file.FileConfigurations)
-                    {
-                        if(!c.ProjectConfiguration.ConfigurationName.Equals(configurationName) ||
-                            !c.ProjectConfiguration.Platform.Name.Equals(platformName))
-                        {
-                            c.ExcludedFromBuild = true;
-                        }
-                    }
+                    AddGeneratedFile(project, sourcesFilter, entry.Key, entry.Value.Count == 1 ? entry.Value.First() : null);
+                }
+
+                foreach(var entry in fileset.headers)
+                {
+                    AddGeneratedFile(project, headersFilter, entry.Key, entry.Value.Count == 1 ? entry.Value.First() : null);
                 }
             }
         }

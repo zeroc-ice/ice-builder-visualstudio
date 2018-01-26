@@ -5,7 +5,6 @@
 // **********************************************************************
 
 using System;
-using System.Linq;
 using Microsoft.VisualStudio.Shell.Interop;
 using MSBuildProject = Microsoft.Build.Evaluation.Project;
 
@@ -34,7 +33,13 @@ namespace IceBuilder
         }
         void SetProjectProperty(string name, string value, string label = "");
 
+        void SetProjectItemMetadata(string name, string value);
+
+        void SetProjectItemMetadata(string itemType, string label, string name, string value);
+
         string GetProjectProperty(string name);
+
+        string GetProjectItemMetadata(string name, bool evaluated, string defaultValue);
 
         void UpdateProjectAsync(ProjectUpdateAction update);
 
@@ -71,55 +76,34 @@ namespace IceBuilder
             return property == null ? String.Empty : property.UnevaluatedValue;
         }
 
+        public string GetProjectItemMetadata(string name, bool evaluated, string defaultValue)
+        {
+            return MSBuildProject.GetDefaultItemMetadata(name, evaluated, defaultValue);
+        }
+
         public void SetProjectProperty(string name,
                                        string value,
                                        string label = "")
         {
             UpdateProjectAsync(project =>
                 {
-                    if (string.IsNullOrEmpty(label))
-                    {
-                        project.SetProperty(name, value);
-                    }
-                    else
-                    {
-                        var group = project.Xml.PropertyGroups.FirstOrDefault(
-                            g => g.Label.Equals(label, StringComparison.CurrentCultureIgnoreCase));
-                        if (group == null)
-                        {
-                            //
-                            // Create our property group after the main language targets are imported so we can use the properties
-                            // defined in this files.
-                            //
-                            var import = project.Xml.Imports.FirstOrDefault(
-                                p => (p.Project.IndexOf("Microsoft.Cpp.targets", StringComparison.CurrentCultureIgnoreCase) != -1 ||
-                                      p.Project.Equals("Microsoft.CSharp.targets", StringComparison.CurrentCultureIgnoreCase)));
-                            if (import != null)
-                            {
-                                group = project.Xml.CreatePropertyGroupElement();
-                                project.Xml.InsertAfterChild(group, import);
-                            }
-                            else
-                            {
-                                group = project.Xml.CreatePropertyGroupElement();
-                                project.Xml.AppendChild(group);
-                            }
-                            group.Label = label;
-                        }
-
-                        var property = group.Properties.FirstOrDefault(
-                            p => p.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase));
-                        if (property != null)
-                        {
-                            property.Value = value;
-                        }
-                        else
-                        {
-                            group.AddProperty(name, value);
-                        }
-                    }
+                    project.SetProperty(name, value, label);
                     return true;
                 });
+        }
+
+        public void SetProjectItemMetadata(string name, string value)
+        {
+            SetProjectItemMetadata("SliceCompile", "IceBuilder", name, value);
+        }
+
+        public void SetProjectItemMetadata(string itemType, string label, string name, string value)
+        {
+            UpdateProjectAsync(project =>
+            {
+                project.SetItemMetadata(itemType, label, name, value);
+                return true;
+            });
         }
 
         public abstract void UpdateProjectAsync(ProjectUpdateAction update);

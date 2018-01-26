@@ -4,6 +4,7 @@
 //
 // **********************************************************************
 
+using System.Linq;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.Shell.Interop;
 
@@ -17,8 +18,8 @@ namespace IceBuilder
             Remove(projectFullPath);
             _generated.Add(projectFullPath,
                 type == IceBuilderProjectType.CsharpProjectType ?
-                    ProjectUtil.GetCSharpGeneratedFiles(project) :
-                    ProjectUtil.GetCppGeneratedFiles(ProjectUtil.GetCppGeneratedFiles(project)));
+                    ProjectUtil.GetGeneratedFiles(ProjectUtil.GetCsharpGeneratedFiles(project)) :
+                    ProjectUtil.GetGeneratedFiles(ProjectUtil.GetCppGeneratedFiles(project)));
         }
 
         public void Remove(string project)
@@ -43,11 +44,11 @@ namespace IceBuilder
                     }
                     else
                     {
-                        List<string> newFiles = newGenerated[i.Key];
-                        List<string> outdated = i.Value.FindAll(f => !newFiles.Contains(f));
-                        if(outdated.Count > 0)
+                        var newFiles = newGenerated[i.Key];
+                        var oldFiles = i.Value;
+                        if(oldFiles.Except(newFiles).Any() || newFiles.Except(oldFiles).Any())
                         {
-                            ProjectUtil.DeleteItems(outdated);
+                            ProjectUtil.DeleteItems(oldFiles);
                         }
                     }
                 }

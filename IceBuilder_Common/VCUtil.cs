@@ -5,14 +5,14 @@
 // **********************************************************************
 
 using System.Collections.Generic;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace IceBuilder
 {
     public interface VCUtil
     {
         bool SetupSliceFilter(EnvDTE.Project project);
-        void AddGeneratedFiles(EnvDTE.Project dteProject, EnvDTE.Configuration config, string filterName,
-                               List<string> paths, bool generatedFilesPerConfiguration);
+        void AddGeneratedFiles(IVsProject roject, List<GeneratedFileSet> filesets);
         string Evaluate(EnvDTE.Configuration config, string value);
     }
 }
