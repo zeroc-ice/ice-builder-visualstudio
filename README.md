@@ -70,7 +70,7 @@ Follow these steps:
 
 ### Customizing the Slice to C++ Compilation
 
-Ice Builder allows you to change the options given to `slice2cpp` when compiling a Slice file. You can specify the options that apply to all the Slice files in a project with the `Ice Builder` property page in the `Common Properties` of your project:
+Ice Builder allows you to change the options given to `slice2cpp` when compiling a Slice file. You can specify the options that apply to all the Slice files in a project with the `Ice Builder` property page in the `Configuration Properties` of your project:
 
 ![Missing cpp property page](/Screenshots/cpp-property-page.png)
 
