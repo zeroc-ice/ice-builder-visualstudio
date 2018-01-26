@@ -15,10 +15,10 @@ Ice Builder for Visual Studio is compatible with Visual Studio 2012, 2013, 2015 
   * [Ice Home Configuration (Ice 3.6)](#ice-home-configuration-ice-36)
 * [C++ Usage](#c-usage)
   * [Adding Slice Files to a C++ Project](#adding-slice-files-to-a-c-project)
-  * [Ice Builder Configuration for a C++ Project](#ice-builder-configuration-for-a-c-project)
+  * [Customizing the Slice to C++ Compilation](#customizing-the-slice-to-c-compilation)
 * [C# Usage](#c-usage-1)
   * [Adding Slice Files to a C# Project](#adding-slice-files-to-a-c-project-1)
-  * [Ice Builder Configuration for a C# Project](#ice-builder-configuration-for-a-c-project-1)
+  * [Customizing the Slice to C# Compilation](#customizing-the-slice-to-c-compilation-1)
 * [Migration from the Ice Add-in](#migration-from-the-ice-add-in)
 * [Building Ice Builder from Source](#building-ice-builder-from-source)
   * [Build Requirements](#build-requirements)
@@ -32,7 +32,7 @@ You can also install older versions or preview releases of Ice Builder by downlo
 
 ## Overview
 
-Ice Builder for MSBuild provides support for compiling Slice source files (`.ice` files) within C++ and C# MSBuild projects, including projects created by Visual Studio. It compiles these Slice files using the Slice to C++ compiler (`slice2cpp`) or the Slice to C# compiler (`slice2cs`) provided by your Ice installation.
+Ice Builder for MSBuild provides support for compiling Slice source files (`.ice` files) in MSBuild projects, including projects created by Visual Studio. It compiles these Slice files using the Slice to C++ compiler (`slice2cpp`) or the Slice to C# compiler (`slice2cs`) provided by your Ice installation.
 
 You tell Ice Builder for MSBuild which Slice files to compile by adding these files to your project, as described in the sections below. Ice Builder checks whether Slice files need to be compiled or recompiled each time Visual Studio loads a project, and each time you build a project. And if you remove or rename a Slice file with the Visual Studio IDE, Ice Builder for Visual Studio automatically removes the corresponding generated files.
 
@@ -60,29 +60,35 @@ Follow these steps:
 
    Adding Ice Builder creates a `Slice Files` filter in your project.
 
-2. Add one or more Slice (`.ice`) files to your project. While these Slice files can be anywhere, you may want to select a customary location such as the project's home directory or a sub-directory named `slice`.
+2. Add one or more Slice (`.ice`) files to your project.
 
-3. Review the Ice Builder configuration of your project, as described in the section below.
+3. Add the directory where Ice Builder outputs generated C++ header files (`$(IntDir)` by default) to your project's C/C++ Additional Include Directories:
 
-### Ice Builder Configuration for a C++ Project
+![Missing cpp additional include directories](/Screenshots/cpp-additional-include-directories.png)
 
-Ice Builder adds an `Ice Builder` property page to the `Common Properties` of your C++ project:
+### Customizing the Slice to C++ Compilation
+
+Ice Builder allows you to change the options given to `slice2cpp` when compiling a Slice file. You can specify the options that apply to all the Slice files in a project with the `Ice Builder` property page in the `Common Properties` of your project:
 
 ![Missing cpp property page](/Screenshots/cpp-property-page.png)
 
-These properties are the same for all configurations and platforms, and allow you to specify the options passed to `slice2cpp` when compiling the project's Slice files.
+You can also specify options that apply to a single Slice file with the `Ice Builder` property page of that file (this is less common):
 
-| Property                                | Corresponding MSBuild Property               |
-| --------------------------------------- | -------------------------------------------- |
-| Output Directory                        | SliceCompileOutputDir                        |
-| Header Output Directory                 | SliceCompileHeaderOutputDir                  |
-| Include Directories                     | SliceCompileIncludeDirectories               |
-| Base Directory For Generated #include   | SliceCompileBaseDirectoryForGeneratedInclude |
-| Generated Header Extension              | SliceCompileHeaderExt                        |
-| Generated Source Extension              | SliceCompileSourceExt                        |
-| Additional Options                      | SliceCompileAdditionalOptions                |
+![Missing file cpp property page](/Screenshots/file-cpp-property-page.png)
 
-See [Customizing the Slice to C++ Compilation](https://github.com/zeroc-ice/ice-builder-msbuild/blob/master/README.md#customizing-the-slice-to-c-compilation) for a detailed description of these properties.
+These options are always the same for all configurations and platforms, and map to item metadata of the SliceCompile type:
+
+| Property                              | Corresponding SliceCompile Item Metadata |
+| ------------------------------------- | ---------------------------------------- |
+| Output Directory                      | OutputDir                                |
+| Header Output Directory               | HeaderOutputDir                          |
+| Include Directories                   | IncludeDirectories                       |
+| Base Directory For Generated #include | BaseDirectoryForGeneratedInclude         |
+| Generated Header Extension            | HeaderExt                                |
+| Generated Source Extension            | SourceExt                                |
+| Additional Options                    | AdditionalOptions                        |
+
+See [Customizing the Slice to C++ Compilation](https://github.com/zeroc-ice/ice-builder-msbuild/blob/master/README.md#customizing-the-slice-to-c-compilation) with Ice Builder for MSBuild for a detailed description of these SliceCompile item metadata.
 
 ## C# Usage
 
@@ -96,25 +102,23 @@ Follow these steps:
 
 2. Reload your project if it targets .NET Framework.
 
-3. Add one or more Slice (`.ice`) files to your project. While these Slice files can be anywhere, you may want to select a customary location such as the project's home directory or a sub-directory named `slice`.
+3. Add one or more Slice (`.ice`) files to your project.
 
-4. Review the Ice Builder configuration of your project, as described in the section below.
+### Customizing the Slice to C# Compilation
 
-### Ice Builder Configuration for a C# Project
-
-Ice Builder adds an `Ice Builder` tab to the properties of your C# project:
+Ice Builder allows you to change the options given to `slice2cs` when compiling a Slice file. You can specify the options that apply to all the Slice files in a project with the `Ice Builder` tab of your project's properties:
 
 ![Missing csharp property page](/Screenshots/csharp-property-page.png)
 
-These properties are the same for all configurations and platforms, and allow you to specify the options passed to `slice2cs` when compiling the project's Slice files.
+These options are the same for all configurations and platforms, and map to item metadata of the SliceCompile type:
 
-| Property                                |  Corresponding MSBuild Property |
-| --------------------------------------- | --------------------------------|
-| Output directory                        | SliceCompileOutputDir           |
-| Include directories                     | SliceCompileIncludeDirectories  |
-| Additional options                      | SliceCompileAdditionalOptions   |
+| Property            | Corresponding SliceCompile Item Metadata |
+| ------------------- | -----------------------------------------|
+| Output Directory    | OutputDir                                |
+| Include Directories | IncludeDirectories                       |
+| Additional Options  | AdditionalOptions                        |
 
-See [Customizing the Slice to C# Compilation](https://github.com/zeroc-ice/ice-builder-msbuild/blob/master/README.md#customizing-the-slice-to-c-compilation-1) for a detailed description of these properties.
+See [Customizing the Slice to C# Compilation](https://github.com/zeroc-ice/ice-builder-msbuild/blob/master/README.md#customizing-the-slice-to-c-compilation-1) with Ice Builder for MSBuild for a detailed description of these SliceCompile item metadata.
 
 ## Migration from the Ice Add-in
 
