@@ -66,6 +66,8 @@ Follow these steps:
 
 ![Missing cpp additional include directories](/Screenshots/cpp-additional-include-directories.png)
 
+:memo: Make sure to select `All Configurations` and `All Platforms` as shown above.
+
 ### Customizing the Slice to C++ Compilation
 
 Ice Builder allows you to change the options given to `slice2cpp` when compiling a Slice file. You can specify the options that apply to all the Slice files in a project with the `Ice Builder` property page in the `Common Properties` of your project:
