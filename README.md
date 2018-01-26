@@ -90,7 +90,7 @@ These options are always the same for all configurations and platforms, and map 
 | Generated Source Extension            | SourceExt                                |
 | Additional Options                    | AdditionalOptions                        |
 
-See [Customizing the Slice to C++ Compilation](https://github.com/zeroc-ice/ice-builder-msbuild/blob/master/README.md#customizing-the-slice-to-c-compilation) with Ice Builder for MSBuild for a detailed description of these SliceCompile item metadata.
+See [Customizing the Slice to C++ Compilation](https://github.com/zeroc-ice/ice-builder-msbuild/blob/master/README.md#customizing-the-slice-to-c-compilation) with Ice Builder for MSBuild for further details.
 
 ## C# Usage
 
@@ -120,7 +120,7 @@ These options are the same for all configurations and platforms, and map to item
 | Include Directories | IncludeDirectories                       |
 | Additional Options  | AdditionalOptions                        |
 
-See [Customizing the Slice to C# Compilation](https://github.com/zeroc-ice/ice-builder-msbuild/blob/master/README.md#customizing-the-slice-to-c-compilation-1) with Ice Builder for MSBuild for a detailed description of these SliceCompile item metadata.
+See [Customizing the Slice to C# Compilation](https://github.com/zeroc-ice/ice-builder-msbuild/blob/master/README.md#customizing-the-slice-to-c-compilation-1) with Ice Builder for MSBuild for further details.
 
 ## Migration from the Ice Add-in
 
