@@ -4,16 +4,15 @@
 //
 // **********************************************************************
 
-using System;
 using Microsoft.VisualStudio.Shell.Interop;
 
 namespace IceBuilder
 {
     public class ProjectSettigns
     {
-        public ProjectSettigns(IVsProjectManager projectManager)
+        public ProjectSettigns(IVsProject project)
         {
-            ProjectManager = projectManager;
+            Project = project;
         }
 
         public void Load()
@@ -48,7 +47,7 @@ namespace IceBuilder
             set;
         }
 
-        public IVsProjectManager ProjectManager
+        public IVsProject Project
         {
             get;
             private set;
@@ -56,12 +55,12 @@ namespace IceBuilder
 
         private string GetProperty(string name)
         {
-            return ProjectManager.GetProjectItemMetadata(name, false, string.Empty);
+            return Project.GetDefaultItemMetadata(name, false, string.Empty);
         }
 
         private void SetProperty(string name, string value)
         {
-            ProjectManager.SetProjectItemMetadata(name, value);
+            Project.SetItemMetadata(name, value);
         }
 
         private void SetPropertyIfChanged(string name, string value)

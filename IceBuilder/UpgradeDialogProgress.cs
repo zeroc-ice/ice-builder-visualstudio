@@ -48,6 +48,10 @@ namespace IceBuilder
                 lock(_lock)
                 {
                     _canceled = value;
+                    if(_canceled)
+                    {
+                        Close();
+                    }
                 }
             }
         }
@@ -64,10 +68,5 @@ namespace IceBuilder
         }
 
         private object _lock = new object();
-
-        private void cancelButton_Click(object sender, EventArgs e)
-        {
-
-        }
     }
 }

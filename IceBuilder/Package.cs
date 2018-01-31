@@ -45,13 +45,6 @@ namespace IceBuilder
 
     public sealed class Package : Microsoft.VisualStudio.Shell.Package
     {
-
-        public static readonly string[] CppLibNames =
-        {
-            "Freeze", "Glacier2", "Ice", "IceBox", "IceGrid", "IcePatch2",
-            "IceSSL", "IceStorm", "IceUtil", "IceXML"
-        };
-
         public static readonly string[] AssemblyNames =
         {
             "Glacier2", "Ice", "IceBox", "IceDiscovery", "IceLocatorDiscovery",
@@ -132,12 +125,6 @@ namespace IceBuilder
             private set;
         }
 
-        public GeneratedFileTracker FileTracker
-        {
-            get;
-            private set;
-        }
-
         public EnvDTE.DTEEvents DTEEvents
         {
             get;
@@ -150,7 +137,7 @@ namespace IceBuilder
             private set;
         }
 
-        public IVsProjectManagerFactory ProjectManagerFactory
+        public IVsProjectHelper ProjectHelper
         {
             get;
             private set;
@@ -330,7 +317,7 @@ namespace IceBuilder
         {
             if (project != null)
             {
-                string assembliesDir = ProjectUtil.GetEvaluatedProperty(project, IceAssembliesDir);
+                string assembliesDir = project.GetEvaluatedProperty(IceAssembliesDir);
                 if (Directory.Exists(assembliesDir))
                 {
                     return assembliesDir;
@@ -358,7 +345,7 @@ namespace IceBuilder
             string iceHome = string.Empty;
             if(project != null)
             {
-                iceHome = ProjectUtil.GetEvaluatedProperty(project, IceHomeValue);
+                iceHome = project.GetEvaluatedProperty(IceHomeValue);
             }
 
             if(string.IsNullOrEmpty(iceHome))
@@ -398,7 +385,7 @@ namespace IceBuilder
             {
                 IVsProject p = _buildProjects.ElementAt(0);
                 ProjectUtil.SaveProject(p);
-                ProjectUtil.SetupGenerated(p, DTEUtil.IsIceBuilderNuGetInstalled(p));
+                ProjectUtil.SetupGenerated(p);
                 if(BuildProject(p))
                 {
                     _buildProjects.Remove(p);
@@ -406,22 +393,12 @@ namespace IceBuilder
             }
         }
 
-        public void SaveProject(IVsProject project)
+        public void ReloadProject(IVsProject project)
         {
-            Microsoft.Build.Evaluation.Project msproject = project.GetMSBuildProject(true);
             IVsHierarchy hier = project as IVsHierarchy;
             Guid projectGUID = Guid.Empty;
             IVsSolution.GetGuidOfProject(hier, out projectGUID);
             IVsSolution4.UnloadProject(projectGUID, (uint)_VSProjectUnloadStatus.UNLOADSTATUS_UnloadedByUser);
-            msproject.Save();
-            try
-            {
-                ProjectCollection.GlobalProjectCollection.UnloadProject(msproject);
-            }
-            catch (Exception)
-            {
-                //expected if the project is not in the global project collection
-            }
             IVsSolution4.ReloadProject(ref projectGUID);
         }
 
@@ -445,26 +422,19 @@ namespace IceBuilder
 
         public void InitializeProject(IVsProject project)
         {
-            IceBuilderProjectType projectType = DTEUtil.IsIceBuilderNuGetInstalled(project);
-
-            if (projectType != IceBuilderProjectType.None)
+            if (project.IsMSBuildIceBuilderInstalled())
             {
-                var dteproject = project.GetDTEProject();
-                if (projectType == IceBuilderProjectType.CppProjectType)
+                if (project.IsCppProject())
                 {
-                    VCUtil.SetupSliceFilter(dteproject);
+                    VCUtil.SetupSliceFilter(project.GetDTEProject());
                 }
                 else
                 {
                     if (project is IVsAggregatableProject)
                     {
-                        if(MSBuildUtils.AddProjectFlavorIfNotExists(project.GetMSBuildProject(true), IceBuilderNewFlavor))
-                        {
-                            dteproject.Save();
-                        }
+                        project.AddProjectFlavorIfNotExists(IceBuilderNewFlavor);
                     }
                 }
-                FileTracker.Add(project, projectType);
             }
         }
 
@@ -527,15 +497,16 @@ namespace IceBuilder
                 {
                     assembly = Assembly.LoadFrom(Path.Combine(ResourcesDirectory, "IceBuilder.VS2017.dll"));
                 }
-                VCUtil = assembly.GetType("IceBuilder.VCUtilI").GetConstructor(new Type[] { }).Invoke(
-                    new object[] { }) as VCUtil;
+                var factory = assembly.GetType("IceBuilder.ProjectHelperFactoryI").GetConstructor(new Type[] { }).Invoke(
+                    new object[] { }) as IVsProjectHelperFactory;
 
-                NuGet = assembly.GetType("IceBuilder.NuGetI").GetConstructor(new Type[] { }).Invoke(
-                    new object[] { }) as IceBuilder.NuGet;
+                VCUtil = factory.VCUtil;
+                NuGet = factory.NuGet;
+                ProjectHelper = factory.ProjectHelper;
+
+                ProjectFactoryHelperInstance.Init(factory.VCUtil, factory.NuGet, factory.ProjectHelper);
+
                 NuGet.OnNugetBatchEnd(PackageInstalled);
-
-                ProjectManagerFactory = assembly.GetType("IceBuilder.ProjectManagerFactoryI").GetConstructor(new Type[] { }).Invoke(
-                   new object[] { }) as IVsProjectManagerFactory;
 
                 RunningDocumentTableEventHandler = new RunningDocumentTableEventHandler(
                     GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable);
@@ -552,8 +523,6 @@ namespace IceBuilder
                     GetService(typeof(SVsTrackProjectDocuments)) as IVsTrackProjectDocuments2);
                 DocumentEventHandler.BeginTrack();
 
-                FileTracker = new GeneratedFileTracker();
-
                 BuildEvents = DTE2.Events.BuildEvents;
                 BuildEvents.OnBuildBegin += BuildEvents_OnBuildBegin;
                 BuildEvents.OnBuildDone += BuildEvents_OnBuildDone;
@@ -568,7 +537,7 @@ namespace IceBuilder
                 // Projects that are not being track has not been previous initialized
                 // initialize will do nothing in zeroc.icebuilder.msbuild package is
                 // not installed
-                if(!FileTracker.Contains(ProjectUtil.GetProjectFullPath(project)))
+                if(project.IsMSBuildIceBuilderInstalled())
                 {
                     InitializeProject(project);
                 }
@@ -609,10 +578,9 @@ namespace IceBuilder
 
                 foreach(IVsProject project in projects)
                 {
-                    IceBuilderProjectType type = DTEUtil.IsIceBuilderNuGetInstalled(project);
-                    if(type != IceBuilderProjectType.None)
+                    if(project.IsMSBuildIceBuilderInstalled())
                     {
-                        ProjectUtil.SetupGenerated(project, type);
+                        ProjectUtil.SetupGenerated(project);
                     }
                 }
             }
@@ -635,6 +603,7 @@ namespace IceBuilder
             }
             catch(Exception ex)
             {
+                BuildContext(false);
                 UnexpectedExceptionWarning(ex);
             }
         }

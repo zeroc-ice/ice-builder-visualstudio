@@ -7,36 +7,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.IO;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio;
 using System.Text.RegularExpressions;
+using MSProject = Microsoft.Build.Evaluation.Project;
 
 namespace IceBuilder
 {
     public class ProjectUtil
     {
-        //
-        // Get the Guid that idenifies the type of the project
-        //
-        public static Guid GetProjecTypeGuid(IVsProject project)
-        {
-            IVsHierarchy hierarchy = project as IVsHierarchy;
-            if(hierarchy != null)
-            {
-                try
-                {
-                    Guid type;
-                    ErrorHandler.ThrowOnFailure(hierarchy.GetGuidProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_TypeGuid, out type));
-                    return type;
-                }
-                catch(Exception)
-                {
-                }
-            }
-            return new Guid();
-        }
         public static void SaveProject(IVsProject project)
         {
             ErrorHandler.ThrowOnFailure(Package.Instance.IVsSolution.SaveSolutionElement(
@@ -61,60 +41,6 @@ namespace IceBuilder
             return value as IVsProject;
         }
 
-        public static List<string> GetIceBuilderItems(IVsProject project)
-        {
-            var msproject = project.GetMSBuildProject();
-            return msproject.Items.Where(item => item.ItemType.Equals("SliceCompile"))
-                                  .Select(item => item.EvaluatedInclude)
-                                  .ToList();
-        }
-
-        public static void GetIceBuilderItems(IVsHierarchy h, uint itemId, ref List<String> items)
-        {
-            IntPtr nestedValue = IntPtr.Zero;
-            uint nestedId = 0;
-            Guid nestedGuid = typeof(IVsHierarchy).GUID;
-            int result = h.GetNestedHierarchy(itemId, ref nestedGuid, out nestedValue, out nestedId);
-            if(ErrorHandler.Succeeded(result) && nestedValue != IntPtr.Zero && nestedId == VSConstants.VSITEMID_ROOT)
-            {
-                // Get the nested hierachy
-                IVsProject project = Marshal.GetObjectForIUnknown(nestedValue) as IVsProject;
-                Marshal.Release(nestedValue);
-                if(project != null)
-                {
-                    GetIceBuilderItems(project as IVsHierarchy, VSConstants.VSITEMID_ROOT, ref items);
-                }
-            }
-            else
-            {
-                // Get the first visible child node
-                object value;
-                result = h.GetProperty(itemId, (int)__VSHPROPID.VSHPROPID_FirstVisibleChild, out value);
-                while(result == VSConstants.S_OK && value != null)
-                {
-                    uint child = DTEUtil.GetItemId(value);
-                    if(child == VSConstants.VSITEMID_NIL)
-                    {
-                        // No more nodes
-                        break;
-                    }
-                    else
-                    {
-                        result = h.GetProperty(child, (int)__VSHPROPID.VSHPROPID_Name, out value);
-                        string path = value as string;
-                        if(IsSliceFileName(path))
-                        {
-                            items.Add(path);
-                        }
-                        GetIceBuilderItems(h, child, ref items);
-
-                        // Get the next visible sibling node
-                        result = h.GetProperty(child, (int)__VSHPROPID.VSHPROPID_NextVisibleSibling, out value);
-                    }
-                }
-            }
-        }
-
         public static bool IsSliceFileName(string name)
         {
             return !string.IsNullOrEmpty(name) && Path.GetExtension(name).Equals(".ice");
@@ -128,12 +54,12 @@ namespace IceBuilder
             return GetGeneratedItemPath(sliceName, ".cs");
         }
 
-        public static string GetCppGeneratedSourceItemPath(Microsoft.Build.Evaluation.Project project, string sliceName)
+        public static string GetCppGeneratedSourceItemPath(IVsProject project, string sliceName)
         {
             return GetGeneratedItemPath(sliceName, project.GetDefaultItemMetadata(ItemMetadataNames.SourceExt, true, ".cpp"));
         }
 
-        public static string GetCppGeneratedHeaderItemPath(Microsoft.Build.Evaluation.Project project, string sliceName)
+        public static string GetCppGeneratedHeaderItemPath(IVsProject project, string sliceName)
         {
             return GetGeneratedItemPath(sliceName, project.GetDefaultItemMetadata(ItemMetadataNames.HeaderExt, true, ".h"));
         }
@@ -145,28 +71,7 @@ namespace IceBuilder
 
         public static string GetPathRelativeToProject(IVsProject project, string path)
         {
-            return FileUtil.RelativePath(GetProjectBaseDirectory(project), path);
-        }
-
-        public static string GetProjectBaseDirectory(IVsProject project)
-        {
-            string fullPath;
-            ErrorHandler.ThrowOnFailure(project.GetMkDocument(VSConstants.VSITEMID_ROOT, out fullPath));
-            return Path.GetFullPath(Path.GetDirectoryName(fullPath));
-        }
-
-        public static string GetProjectFullPath(IVsProject project)
-        {
-            try
-            {
-                string fullPath;
-                ErrorHandler.ThrowOnFailure(project.GetMkDocument(VSConstants.VSITEMID_ROOT, out fullPath));
-                return Path.GetFullPath(fullPath);
-            }
-            catch(NotImplementedException)
-            {
-                return string.Empty;
-            }
+            return FileUtil.RelativePath(project.GetProjectBaseDirectory(), path);
         }
 
         public static EnvDTE.ProjectItem GetProjectItem(IVsProject project, uint item)
@@ -180,12 +85,12 @@ namespace IceBuilder
             return value as EnvDTE.ProjectItem;
         }
 
-        public static string GetDefaultOutputDir(Microsoft.Build.Evaluation.Project project, bool evaluated)
+        public static string GetDefaultOutputDir(IVsProject project, bool evaluated)
         {
             return project.GetDefaultItemMetadata(ItemMetadataNames.OutputDir, evaluated);
         }
 
-        public static string GetDefaultHeaderOutputDir(Microsoft.Build.Evaluation.Project project, bool evaluated)
+        public static string GetDefaultHeaderOutputDir(IVsProject project, bool evaluated)
         {
             string outputdir = project.GetDefaultItemMetadata(ItemMetadataNames.HeaderOutputDir, evaluated);
             if(string.IsNullOrEmpty(outputdir))
@@ -193,18 +98,6 @@ namespace IceBuilder
                 outputdir = GetDefaultOutputDir(project, evaluated);
             }
             return outputdir;
-        }
-
-        public static string GetEvaluatedProperty(IVsProject project, string name)
-        {
-            return GetEvaluatedProperty(project, name, string.Empty);
-        }
-
-        public static string GetEvaluatedProperty(IVsProject project, string name, string defaultValue)
-        {
-            var msproject = project.GetMSBuildProject(true);
-            string value = msproject.GetEvaluatedProperty(name);
-            return string.IsNullOrEmpty(value) ? defaultValue : value;
         }
 
         public static string GetProjectName(IVsProject project)
@@ -228,75 +121,54 @@ namespace IceBuilder
             return Package.Instance.DTE2.Solution.FindProjectItem(path);
         }
 
-        public static Dictionary<string, List<string>>
-        GetGeneratedFiles(List<GeneratedFileSet> filesets)
+        public static GeneratedFileSet
+        GetCppGeneratedFiles(IVsProject project, EnvDTE.Project dteproject, VCUtil vcutil, string projectDir, string item)
         {
-            return filesets.ToDictionary(
-                item => item.filename,
-                item => item.sources.Keys.Union(item.headers.Keys).ToList());
-        }
-
-        public static List<GeneratedFileSet>
-        GetCppGeneratedFiles(IVsProject project)
-        {
-            var generated = new List<GeneratedFileSet>();
-            var msproject = project.GetMSBuildProject();
-            var dteproject = project.GetDTEProject();
-            var items = GetIceBuilderItems(project);
-            var propertyStorage = project as IVsBuildPropertyStorage;
-            var projectDir = GetProjectBaseDirectory(project);
-
-            var vcutil = Package.Instance.VCUtil;
-
-            foreach(var item in items)
+            var fileset = new GeneratedFileSet
             {
-                var fileset = new GeneratedFileSet
+                filename = item,
+                sources = new Dictionary<string, List<string>>(),
+                headers = new Dictionary<string, List<string>>()
+            };
+
+            var outputDir = project.GetItemMetadata(item, "OutputDir");
+            var headerOutputDir = project.GetItemMetadata(item, "HeaderOutputDir");
+            var headerExt = project.GetItemMetadata(item, "HeaderExt");
+            var sourceExt = project.GetItemMetadata(item, "SourceExt");
+            foreach(EnvDTE.Configuration configuration in dteproject.ConfigurationManager)
+            {
+                var evaluatedOutputDir = vcutil.Evaluate(configuration, outputDir);
+                var evaluatedHeaderOutputDir = string.IsNullOrEmpty(headerOutputDir) ?
+                    evaluatedOutputDir : vcutil.Evaluate(configuration, headerOutputDir);
+                var cppFilename = string.Format("{0}.{1}", Path.GetFileNameWithoutExtension(item), sourceExt);
+                var hFilename = string.Format("{0}.{1}", Path.GetFileNameWithoutExtension(item), headerExt);
+
+                cppFilename = Path.GetFullPath(Path.Combine(projectDir, evaluatedOutputDir, cppFilename));
+                hFilename = Path.GetFullPath(Path.Combine(projectDir, evaluatedHeaderOutputDir, hFilename));
+
+                if(fileset.sources.ContainsKey(cppFilename))
                 {
-                    filename = item,
-                    sources = new Dictionary<string, List<EnvDTE.Configuration>>(),
-                    headers = new Dictionary<string, List<EnvDTE.Configuration>>()
-                };
-
-                var outputDir = msproject.GetItemMetadata(item, "OutputDir");
-                var headerOutputDir = msproject.GetItemMetadata(item, "HeaderOutputDir");
-                var headerExt = msproject.GetItemMetadata(item, "HeaderExt");
-                var sourceExt = msproject.GetItemMetadata(item, "SourceExt");
-                foreach(EnvDTE.Configuration configuration in dteproject.ConfigurationManager)
-                {
-                    var evaluatedOutputDir = vcutil.Evaluate(configuration, outputDir);
-                    var evaluatedHeaderOutputDir = string.IsNullOrEmpty(headerOutputDir) ?
-                        evaluatedOutputDir : vcutil.Evaluate(configuration, headerOutputDir);
-                    var cppFilename = string.Format("{0}.{1}", Path.GetFileNameWithoutExtension(item), sourceExt);
-                    var hFilename = string.Format("{0}.{1}", Path.GetFileNameWithoutExtension(item), headerExt);
-
-                    cppFilename = Path.GetFullPath(Path.Combine(projectDir, evaluatedOutputDir, cppFilename));
-                    hFilename = Path.GetFullPath(Path.Combine(projectDir, evaluatedHeaderOutputDir, hFilename));
-
-                    if(fileset.sources.ContainsKey(cppFilename))
-                    {
-                        fileset.sources[cppFilename].Add(configuration);
-                    }
-                    else
-                    {
-                        var configurations = new List<EnvDTE.Configuration>();
-                        configurations.Add(configuration);
-                        fileset.sources[cppFilename] = configurations;
-                    }
-
-                    if(fileset.headers.ContainsKey(hFilename))
-                    {
-                        fileset.headers[hFilename].Add(configuration);
-                    }
-                    else
-                    {
-                        var configurations = new List<EnvDTE.Configuration>();
-                        configurations.Add(configuration);
-                        fileset.headers[hFilename] = configurations;
-                    }
+                    fileset.sources[cppFilename].Add(ConfigurationString(configuration));
                 }
-                generated.Add(fileset);
+                else
+                {
+                    var configurations = new List<string>();
+                    configurations.Add(ConfigurationString(configuration));
+                    fileset.sources[cppFilename] = configurations;
+                }
+
+                if(fileset.headers.ContainsKey(hFilename))
+                {
+                    fileset.headers[hFilename].Add(ConfigurationString(configuration));
+                }
+                else
+                {
+                    var configurations = new List<string>();
+                    configurations.Add(ConfigurationString(configuration));
+                    fileset.headers[hFilename] = configurations;
+                }
             }
-            return generated;
+            return fileset;
         }
 
         public static string
@@ -315,63 +187,54 @@ namespace IceBuilder
             return output;
         }
 
-        public static List<GeneratedFileSet>
-        GetCsharpGeneratedFiles(IVsProject project)
+        public static GeneratedFileSet
+        GetCsharpGeneratedFiles(IVsProject project, EnvDTE.Project dteproject, IVsBuildPropertyStorage propertyStorage,
+            string projectDir, string item)
         {
-            var generated = new List<GeneratedFileSet>();
-            var msproject = project.GetMSBuildProject();
-            var dteproject = project.GetDTEProject();
-            var items = GetIceBuilderItems(project);
-            var propertyStorage = project as IVsBuildPropertyStorage;
-            var projectDir = GetProjectBaseDirectory(project);
-
-            foreach(var item in items)
+            var fileset = new GeneratedFileSet
             {
-                var fileset = new GeneratedFileSet
+                filename = item,
+                sources = new Dictionary<string, List<string>>(),
+                headers = new Dictionary<string, List<string>>()
+            };
+
+            var outputDir = project.GetItemMetadata(item, "OutputDir");
+            foreach(EnvDTE.Configuration configuration in dteproject.ConfigurationManager)
+            {
+                var configName = string.Format("{0}|{1}", configuration.ConfigurationName, configuration.PlatformName);
+                var evaluatedOutputDir = Evaluate(propertyStorage, configName, outputDir);
+
+                var csFilename = string.Format("{0}.cs", Path.GetFileNameWithoutExtension(item));
+                csFilename = Path.GetFullPath(Path.Combine(projectDir, evaluatedOutputDir, csFilename));
+
+                if(fileset.sources.ContainsKey(csFilename))
                 {
-                    filename = item,
-                    sources = new Dictionary<string, List<EnvDTE.Configuration>>(),
-                    headers = new Dictionary<string, List<EnvDTE.Configuration>>()
-                };
-
-                var outputDir = msproject.GetItemMetadata(item, "OutputDir");
-                foreach(EnvDTE.Configuration configuration in dteproject.ConfigurationManager)
-                {
-                    var configName = string.Format("{0}|{1}", configuration.ConfigurationName, configuration.PlatformName);
-                    var evaluatedOutputDir = Evaluate(propertyStorage, configName, outputDir);
-
-                    var csFilename = string.Format("{0}.cs", Path.GetFileNameWithoutExtension(item));
-                    csFilename = Path.GetFullPath(Path.Combine(projectDir, evaluatedOutputDir, csFilename));
-
-                    if(fileset.sources.ContainsKey(csFilename))
-                    {
-                        fileset.sources[csFilename].Add(configuration);
-                    }
-                    else
-                    {
-                        var configurations = new List<EnvDTE.Configuration>();
-                        configurations.Add(configuration);
-                        fileset.sources[csFilename] = configurations;
-                    }
+                    fileset.sources[csFilename].Add(
+                        string.Format("{0}|{1}", configuration.ConfigurationName, configuration.PlatformName));
                 }
-                generated.Add(fileset);
+                else
+                {
+                    var configurations = new List<string>();
+                    configurations.Add(
+                        string.Format("{0}|{1}", configuration.ConfigurationName, configuration.PlatformName));
+                    fileset.sources[csFilename] = configurations;
+                }
             }
-            return generated;
+            return fileset;
         }
 
         public static bool
-        CheckGenerateFileIsValid(IVsProject project, IceBuilderProjectType projectType, string path)
+        CheckGenerateFileIsValid(IVsProject project, string path)
         {
             var projectDir = project.GetProjectBaseDirectory();
-            var msproject = project.GetMSBuildProject();
-            if(projectType == IceBuilderProjectType.CsharpProjectType)
+            if(project.IsCSharpProject())
             {
-                string outputDir = GetDefaultOutputDir(msproject, true);
+                string outputDir = GetDefaultOutputDir(project, true);
                 string generatedSource = Path.Combine(projectDir, outputDir, GetCSharpGeneratedItemPath(Path.GetFileName(path)));
                 if(File.Exists(generatedSource))
                 {
                     const string message =
-                        "A file named '{0}' already exists.\nIf you want to add '{1}' first remove '{0}'.";
+                        "A file named '{0}' already exists. If you want to add '{1}' first remove '{0}'.";
 
                     UIUtil.ShowErrorDialog("Ice Builder",
                         string.Format(message,
@@ -380,13 +243,13 @@ namespace IceBuilder
                     return false;
                 }
             }
-            else if(projectType == IceBuilderProjectType.CppProjectType)
+            else
             {
                 var dteproject = project.GetDTEProject();
-                var outputDir = GetDefaultOutputDir(msproject, false);
-                var headerOutputDir = GetDefaultHeaderOutputDir(msproject, false);
-                var source = GetCppGeneratedSourceItemPath(msproject, path);
-                var header = GetCppGeneratedHeaderItemPath(msproject, path);
+                var outputDir = GetDefaultOutputDir(project, false);
+                var headerOutputDir = GetDefaultHeaderOutputDir(project, false);
+                var source = GetCppGeneratedSourceItemPath(project, path);
+                var header = GetCppGeneratedHeaderItemPath(project, path);
 
                 foreach(EnvDTE.Configuration config in dteproject.ConfigurationManager)
                 {
@@ -437,64 +300,214 @@ namespace IceBuilder
                 }
             }
         }
-        static List<string> KnownHeaderExtension = new List<string>(new string[] { ".h", ".hpp", ".hh", ".hxx" });
-        public static void SetupGenerated(IVsProject project, IceBuilderProjectType type)
+
+        public static void AddItem(EnvDTE.Project project, string path)
         {
-            if(type == IceBuilderProjectType.CppProjectType)
+            if(!Directory.Exists(Path.GetDirectoryName(path)))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(path));
+            }
+
+            if(!File.Exists(path))
+            {
+                File.Create(path).Dispose();
+            }
+            project.ProjectItems.AddFromFile(path);
+            try
             {
                 //
-                // This will ensure that property reads don't use a cached project.
+                // Remove the file otherwise it will be considered up to date.
                 //
-                project.GetMSBuildProject(false);
+                File.Delete(path);
+            }
+            catch(Exception)
+            {
+            }
+        }
 
-                var generated = GetCppGeneratedFiles(project);
-                Package.Instance.FileTracker.Reap(GetProjectFullPath(project), GetGeneratedFiles(generated));
-                Package.Instance.VCUtil.AddGeneratedFiles(project, generated);
+        public static void AddGeneratedFiles(IVsProject project, string file)
+        {
+            if(project.IsCppProject())
+            {
+                AddCppGeneratedFiles(project, file);
+            }
+            else
+            {
+                AddCSharpGeneratedFiles(project, file);
+            }
+        }
+
+        public static void AddCSharpGeneratedFiles(IVsProject project, string file)
+        {
+            var projectDir = project.GetProjectBaseDirectory();
+            var dteproject = project.GetDTEProject();
+            var propertyStorage = project as IVsBuildPropertyStorage;
+            var fileset = GetCsharpGeneratedFiles(project, dteproject, propertyStorage, projectDir, file);
+
+            foreach(var entry in fileset.sources)
+            {
+                AddCSharpGeneratedItem(project, dteproject,
+                    projectDir,
+                    FileUtil.RelativePath(projectDir, fileset.filename),
+                    FileUtil.RelativePath(projectDir, entry.Key));
+            }
+        }
+
+        public static void AddCppGeneratedFiles(IVsProject project, string file)
+        {
+            var vcutil = Package.Instance.VCUtil;
+            var projectDir = project.GetProjectBaseDirectory();
+            var dteproject = project.GetDTEProject();
+
+            var fileset = GetCppGeneratedFiles(project, dteproject, vcutil, projectDir, file);
+
+            var allConfigurations = new List<string>();
+            foreach(EnvDTE.Configuration configuration in dteproject.ConfigurationManager)
+            {
+                allConfigurations.Add(ConfigurationString(configuration));
+            }
+
+            foreach(var entry in fileset.sources)
+            {
+                AddCppGeneratedItem(project, dteproject, vcutil,
+                    projectDir,
+                    FileUtil.RelativePath(projectDir, fileset.filename),
+                    FileUtil.RelativePath(projectDir, entry.Key),
+                    "Source Files",
+                    allConfigurations,
+                    entry.Value);
+            }
+
+            foreach(var entry in fileset.headers)
+            {
+                AddCppGeneratedItem(project, dteproject, vcutil,
+                    projectDir,
+                    FileUtil.RelativePath(projectDir, fileset.filename),
+                    FileUtil.RelativePath(projectDir, entry.Key), "Header Files", allConfigurations, entry.Value);
+            }
+        }
+
+        public static void AddCppGeneratedItem(IVsProject project,
+                                       EnvDTE.Project dteproject,
+                                       VCUtil vcutil,
+                                       string projectDir,
+                                       string path,
+                                       string generatedpath,
+                                       string generatedfilter,
+                                       List<string> allConfigurations,
+                                       List<string> configurations)
+        {
+            var item = FindProjectItem(generatedpath);
+            if(item == null)
+            {
+                AddItem(dteproject, Path.Combine(projectDir, generatedpath));
+                var excludedConfigurations = allConfigurations.Where(c => !configurations.Contains(c)).ToList();
+                project.UpdateProject(buildProject =>
+                {
+                    buildProject.SetGeneratedItemCustomMetadata(path, generatedpath, excludedConfigurations);
+                });
+
+                //
+                // If generated item applies only to one platform configuration we move it to the Platform/Configuration filter
+                //
+                if(configurations.Count == 1)
+                {
+                    string configurationName;
+                    string platformName;
+                    ParseConfiguration(configurations.First(), out configurationName, out platformName);
+                    vcutil.AddGenerated(project, generatedpath, generatedfilter, platformName, configurationName);
+                    dteproject.Save();
+                }
+            }
+        }
+
+        public static void AddCSharpGeneratedItem(IVsProject project,
+                                                  EnvDTE.Project dteproject,
+                                                  string projectDir,
+                                                  string path,
+                                                  string generatedpath)
+        {
+            var item = FindProjectItem(generatedpath);
+            if(item == null)
+            {
+                AddItem(dteproject, Path.Combine(projectDir, generatedpath));
+                project.UpdateProject(buildProject =>
+                {
+                    buildProject.SetGeneratedItemCustomMetadata(path, generatedpath);
+                });
+            }
+        }
+
+        public static void ParseConfiguration(string configuration, out string configurationName, out string platformName)
+        {
+            var tokens = configuration.Split('|');
+            configurationName = tokens[0];
+            platformName = tokens[1];
+        }
+
+        public static string ConfigurationString(EnvDTE.Configuration configuration)
+        {
+            return string.Format("{0}|{1}", configuration.ConfigurationName, configuration.PlatformName);
+        }
+
+        public static void SetupGenerated(IVsProject project)
+        {
+            //
+            // Remove all CompileClCompile and ClInclude items that have an associted SliceCompileSource
+            // item metadata that doesn't much any of the project SliceCompile items
+            //
+            if(project.IsCppProject())
+            {
+                DeleteItems(project.WithProject((MSProject msproject) =>
+                {
+                    var sliceCompile = msproject.AllEvaluatedItems.Where(
+                        item => item.ItemType.Equals("SliceCompile")).Select(
+                        item => item.EvaluatedInclude);
+
+                    return msproject.AllEvaluatedItems.Where(
+                        item =>
+                        {
+                            if(item.ItemType.Equals("ClCompile") || item.ItemType.Equals("ClInclude"))
+                            {
+                                if(item.HasMetadata("SliceCompileSource"))
+                                {
+                                    var value = item.GetMetadataValue("SliceCompileSource");
+                                    return !sliceCompile.Contains(value);
+                                }
+                            }
+                            return false;
+                        }).Select(item => item.EvaluatedInclude).ToList();
+                }));
             }
             else // C# project
             {
-                var generated = GetCsharpGeneratedFiles(project);
-                var dteproject = project.GetDTEProject();
-                var activeConfiguration = dteproject.ConfigurationManager.ActiveConfiguration;
-                Package.Instance.FileTracker.Reap(GetProjectFullPath(project), GetGeneratedFiles(generated));
-                string configName = string.Format("{0}|{1}", activeConfiguration.ConfigurationName, activeConfiguration.PlatformName);
-                foreach(var fileset in generated)
-                {
-                    if(fileset.sources.Count > 1)
+                DeleteItems(project.WithProject((MSProject msproject) =>
                     {
-                        const string message =
-                            "The OutputDir SliceCompile item metadata must evaluate to the same value with all project configurations.";
+                        var sliceCompile = msproject.AllEvaluatedItems.Where(
+                            item => item.ItemType.Equals("SliceCompile")).Select(
+                            item => item.EvaluatedInclude);
 
-                        UIUtil.ShowErrorDialog("Ice Builder", message);
-                        break;
-                    }
+                        return msproject.AllEvaluatedItems.Where(
+                            item =>
+                                {
+                                    if(item.ItemType.Equals("Compile"))
+                                    {
+                                        if(item.HasMetadata("SliceCompileSource"))
+                                        {
+                                            var value = item.GetMetadataValue("SliceCompileSource");
+                                            return !sliceCompile.Contains(value);
+                                        }
+                                    }
+                                    return false;
+                                }).Select(item => item.EvaluatedInclude).ToList();
+                    }));
+            }
 
-                    var file = fileset.sources.First().Key;
-                    if(!Directory.Exists(Path.GetDirectoryName(file)))
-                    {
-                        Directory.CreateDirectory(Path.GetDirectoryName(file));
-                    }
-
-                    EnvDTE.ProjectItem item = FindProjectItem(file);
-                    if(item == null)
-                    {
-                        if(!File.Exists(file))
-                        {
-                            File.Create(file).Dispose();
-                        }
-                        dteproject.ProjectItems.AddFromFile(file);
-                        try
-                        {
-                            //
-                            // Remove the file otherwise it will be considered up to date.
-                            //
-                            File.Delete(file);
-                        }
-                        catch(Exception)
-                        {
-                        }
-                    }
-                }
+            // Now add any missing items
+            var sliceItems = project.GetIceBuilderItems();
+            foreach(var item in sliceItems)
+            {
+                AddGeneratedFiles(project, item);
             }
         }
     }

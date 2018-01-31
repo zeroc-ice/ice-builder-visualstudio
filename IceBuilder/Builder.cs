@@ -28,7 +28,7 @@ namespace IceBuilder
 
         public bool Build(IVsProject p, BuildCallback buildCallback, BuildLogger buildLogger)
         {
-            MSBuildProject project = p.GetMSBuildProject(false);
+            MSBuildProject project = p.GetMSBuildProject();
 
             //
             // We need to set this before we acquire the build resources otherwise Msbuild
@@ -77,7 +77,7 @@ namespace IceBuilder
                     properties["Configuration"] = buildCallback.ProjectConfiguration.ConfigurationName;
 
                     BuildRequestData buildRequest = new BuildRequestData(
-                            ProjectUtil.GetProjectFullPath(p),
+                            p.GetProjectFullPath(),
                             properties,
                             null,
                             new string[] { "SliceCompile" },

@@ -5,6 +5,7 @@
 // **********************************************************************
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Build.Evaluation;
 
@@ -14,38 +15,23 @@ namespace IceBuilder
     {
         static readonly ProjectCollection cppProjectColletion = new ProjectCollection();
 
-        public static Project LoadedProject(string path, bool cached)
+        public static Project LoadedProject(string path)
         {
-            Project project = null;
-            bool cpp = path.EndsWith(".vcxproj");
-            ProjectCollection collection = cpp ? cppProjectColletion : ProjectCollection.GlobalProjectCollection;
-            project = collection.GetLoadedProjects(path).FirstOrDefault();
-
-            if(project == null)
-            {
-                project = collection.LoadProject(path);
-            }
-            else
-            {
-                if(cpp && !cached)
-                {
-                    //
-                    // That is required to get C++ project properties re-evaluated
-                    // with Visual Studio 2013 and Visual Studio 2015
-                    //
-                    collection.UnloadProject(project);
-                    collection.UnloadAllProjects();
-                    project = collection.LoadProject(path);
-                }
-            }
-            return project;
+            return ProjectCollection.GlobalProjectCollection.GetLoadedProjects(path).FirstOrDefault();
         }
 
         public static string GetItemMetadata(this Project project, string identity, string name, string defaultValue = "")
         {
             var item = project.AllEvaluatedItems.FirstOrDefault(
                 i => i.ItemType.Equals("SliceCompile") && i.EvaluatedInclude.Equals(identity));
-            return item != null && item.HasMetadata(name) ? item.GetMetadata(name).UnevaluatedValue : defaultValue;
+            if(item == null)
+            {
+                return project.GetDefaultItemMetadata(name, false, defaultValue);
+            }
+            else
+            {
+                return item.HasMetadata(name) ? item.GetMetadata(name).UnevaluatedValue : defaultValue;
+            }
         }
 
         public static string GetDefaultItemMetadata(this Project project, string name, bool evaluated, string defaultValue = "")
@@ -152,10 +138,24 @@ namespace IceBuilder
             return false;
         }
 
+        public static string
+        GetPropertyWithDefault(this Project project, string name, string defaultValue, bool imported = true)
+        {
+            var value = project.GetProperty(name, imported);
+            return string.IsNullOrEmpty(value) ? defaultValue : value;
+        }
+
         public static string GetProperty(this Project project, string name, bool imported = true)
         {
             var property = project.GetProperty(name);
-            return property == null || (!imported && property.IsImported) ? String.Empty : property.UnevaluatedValue;
+            if(property != null)
+            {
+                if(imported || !property.IsImported)
+                {
+                    return property.UnevaluatedValue;
+                }
+            }
+            return string.Empty;
         }
 
         public static string GetEvaluatedProperty(this Project project, string name)
@@ -208,7 +208,7 @@ namespace IceBuilder
             }
         }
 
-        public static bool AddProjectFlavorIfNotExists(this Project project, string flavor)
+        public static void AddProjectFlavorIfNotExists(this Project project, string flavor)
         {
             var property = project.Xml.Properties.FirstOrDefault(
                 p => p.Name.Equals("ProjectTypeGuids", StringComparison.CurrentCultureIgnoreCase));
@@ -225,17 +225,31 @@ namespace IceBuilder
                     {
                         property.Value = string.Format("{0};{1}", flavor, property.Value);
                     }
-                    return true; //ProjectTypeGuids updated
-                }
-                else
-                {
-                    return false; //ProjectTypeGuids already has this flavor
                 }
             }
+            else
+            {
+                project.Xml.AddProperty("ProjectTypeGuids", string.Format("{0};{1}", flavor, CSharpProjectGUI));
+            }
+        }
 
-            // ProjectTypeGuids not present
-            project.Xml.AddProperty("ProjectTypeGuids", string.Format("{0};{1}", flavor, CSharpProjectGUI));
-            return true;
+        public static void SetGeneratedItemCustomMetadata(this Project project, string slice, string generated,
+            List<string> excludedConfigurations = null)
+        {
+            var item = project.AllEvaluatedItems.FirstOrDefault(i => generated.Equals(i.EvaluatedInclude));
+            if(item != null)
+            {
+                var element = item.Xml;
+                if(excludedConfigurations != null)
+                {
+                    foreach(var conf in excludedConfigurations)
+                    {
+                        var metadata = element.AddMetadata("ExcludedFromBuild", "true");
+                        metadata.Condition = string.Format("'$(Configuration)|$(Platform)'=='{0}'", conf);
+                    }
+                }
+                element.AddMetadata("SliceCompileSource", slice);
+            }
         }
 
         public static readonly string CSharpProjectGUI = "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}";

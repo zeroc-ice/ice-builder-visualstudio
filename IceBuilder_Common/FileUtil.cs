@@ -9,7 +9,7 @@ using System.IO;
 
 namespace IceBuilder
 {
-    class FileUtil
+    public class FileUtil
     {
         public static string RelativePath(string mainDirPath, string absoluteFilePath)
         {

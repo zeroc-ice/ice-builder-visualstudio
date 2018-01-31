@@ -71,7 +71,6 @@ namespace IceBuilder
             try
             {
                 Package.Instance.RunningDocumentTableEventHandler.EndTrack();
-                Package.Instance.FileTracker.Clear();
             }
             catch(Exception ex)
             {
@@ -124,21 +123,6 @@ namespace IceBuilder
 
         public int OnBeforeCloseProject(IVsHierarchy pHierarchy, int fRemoved)
         {
-            try
-            {
-                IVsProject project = pHierarchy as IVsProject;
-                if(project != null)
-                {
-                    if(DTEUtil.IsIceBuilderNuGetInstalled(project) != IceBuilderProjectType.None)
-                    {
-                        Package.Instance.FileTracker.Remove(ProjectUtil.GetProjectFullPath(project));
-                    }
-                }
-            }
-            catch(Exception ex)
-            {
-                Package.UnexpectedExceptionWarning(ex);
-            }
             return 0;
         }
 
@@ -159,18 +143,6 @@ namespace IceBuilder
 
         public int OnBeforeUnloadProject(IVsHierarchy pRealHierarchy, IVsHierarchy pStubHierarchy)
         {
-            try
-            {
-                IVsProject project = pRealHierarchy as IVsProject;
-                if(project != null)
-                {
-                    Package.Instance.FileTracker.Remove(ProjectUtil.GetProjectFullPath(project));
-                }
-            }
-            catch(Exception ex)
-            {
-                Package.UnexpectedExceptionWarning(ex);
-            }
             return 0;
         }
 

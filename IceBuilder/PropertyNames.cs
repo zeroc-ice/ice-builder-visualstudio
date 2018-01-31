@@ -25,24 +25,6 @@ namespace IceBuilder
     }
     public class PropertyNames
     {
-        public class New
-        {
-            //
-            // Common properties
-            //
-            public static readonly string OutputDir = "SliceCompileOutputDir";
-            public static readonly string IncludeDirectories = "SliceCompileIncludeDirectories";
-            public static readonly string AdditionalOptions = "SliceCompileAdditionalOptions";
-
-            //
-            // C++ properties
-            //
-            public static readonly string HeaderOutputDir = "SliceCompileHeaderOutputDir";
-            public static readonly string HeaderExt = "SliceCompileHeaderExt";
-            public static readonly string SourceExt = "SliceCompileSourceExt";
-            public static readonly string BaseDirectoryForGeneratedInclude = "SliceCompileBaseDirectoryForGeneratedInclude";
-        }
-
         public class Old
         {
             //

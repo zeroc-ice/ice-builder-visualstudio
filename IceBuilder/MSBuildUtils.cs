@@ -5,12 +5,9 @@
 // **********************************************************************
 
 using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-
-using Microsoft.Build.Evaluation;
 using Microsoft.Build.Construction;
-using Microsoft.VisualStudio.Shell.Interop;
 
 namespace IceBuilder
 {
@@ -58,38 +55,6 @@ namespace IceBuilder
                 p => p.Project.Equals(path, StringComparison.CurrentCultureIgnoreCase)) != null;
         }
 
-        public static bool AddProjectFlavorIfNotExists(Microsoft.Build.Evaluation.Project project, string flavor)
-        {
-            ProjectPropertyElement property = project.Xml.Properties.FirstOrDefault(
-                p => p.Name.Equals("ProjectTypeGuids", StringComparison.CurrentCultureIgnoreCase));
-
-            if(property != null)
-            {
-                if(property.Value.IndexOf(flavor) == -1)
-                {
-                    DTEUtil.EnsureFileIsCheckout(project.FullPath);
-                    if(string.IsNullOrEmpty(property.Value))
-                    {
-                        property.Value = string.Format("{0};{1}", flavor, CSharpProjectGUI);
-                    }
-                    else
-                    {
-                        property.Value = string.Format("{0};{1}", flavor, property.Value);
-                    }
-                    return true; //ProjectTypeGuids updated
-                }
-                else
-                {
-                    return false; //ProjectTypeGuids already has this flavor
-                }
-            }
-
-            // ProjectTypeGuids not present
-            DTEUtil.EnsureFileIsCheckout(project.FullPath);
-            project.Xml.AddProperty("ProjectTypeGuids", string.Format("{0};{1}", flavor, CSharpProjectGUI));
-            return true;
-        }
-
         public static bool RemoveProjectFlavorIfExists(Microsoft.Build.Evaluation.Project project, string flavor)
         {
             ProjectPropertyElement property = project.Xml.Properties.FirstOrDefault(
@@ -97,7 +62,6 @@ namespace IceBuilder
 
             if(property != null && property.Value.IndexOf(flavor) != -1)
             {
-                DTEUtil.EnsureFileIsCheckout(project.FullPath);
                 property.Value = property.Value.Replace(flavor, "").Trim(new char[] { ';' });
                 if(property.Value.Equals(CSharpProjectGUI, StringComparison.CurrentCultureIgnoreCase))
                 {
@@ -162,7 +126,6 @@ namespace IceBuilder
                 p => p.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase));
             if(property != null)
             {
-                DTEUtil.EnsureFileIsCheckout(project.FullPath);
                 globals.RemoveChild(property);
                 return true;
             }
@@ -175,7 +138,6 @@ namespace IceBuilder
                 p => p.Project.Equals(oldValue, StringComparison.CurrentCultureIgnoreCase));
             if(import != null)
             {
-                DTEUtil.EnsureFileIsCheckout(project.FullPath);
                 import.Project = newValue;
                 import.Condition = string.Format("Exists('{0}')", newValue);
                 return true;
@@ -189,7 +151,6 @@ namespace IceBuilder
                 p => p.Project.Equals(import, StringComparison.CurrentCultureIgnoreCase));
             if(element != null)
             {
-                DTEUtil.EnsureFileIsCheckout(project.FullPath);
                 if(element.Parent != null)
                 {
                     element.Parent.RemoveChild(element);
@@ -260,6 +221,7 @@ namespace IceBuilder
                 // but we keep the old default when converted projects by setting it in the project
                 // file
                 project.SetItemMetadata(ItemMetadataNames.OutputDir, "generated");
+                outputDir = "generated";
             }
 
             value = project.GetProperty(PropertyNames.Old.IncludeDirectories, false);
@@ -408,7 +370,7 @@ namespace IceBuilder
             return modified;
         }
 
-        public static bool UpgradeProjectItems(Microsoft.Build.Evaluation.Project project, bool cpp)
+        public static bool UpgradeProjectItems(Microsoft.Build.Evaluation.Project project)
         {
             bool modified = false;
 
@@ -421,6 +383,31 @@ namespace IceBuilder
                 }
             }
 
+            return modified;
+        }
+
+        public static bool UpgradeCSharpGeneratedItems(Microsoft.Build.Evaluation.Project project, string outputDir)
+        {
+            return UpgradeGeneratedItems(project, outputDir, "cs", "Compile");
+        }
+
+        public static bool UpgradeGeneratedItems(Microsoft.Build.Evaluation.Project project, string outputDir, string ext, string itemType)
+        {
+            string projectDir = Path.GetDirectoryName(project.FullPath);
+            bool modified = false;
+            var sliceItems = project.AllEvaluatedItems.Where(item => item.ItemType.Equals("SliceCompile"));
+            foreach(var sliceItem in sliceItems)
+            {
+                var generatedPath = FileUtil.RelativePath(projectDir,
+                    Path.Combine(outputDir, string.Format("{0}.{1}", Path.GetFileNameWithoutExtension(sliceItem.EvaluatedInclude), ext)));
+                var generated = project.AllEvaluatedItems.FirstOrDefault(
+                    item => item.ItemType.Equals(itemType) && item.EvaluatedInclude.Equals(generatedPath));
+                if(generated != null)
+                {
+                    generated.SetMetadataValue("SliceCompileSource", sliceItem.EvaluatedInclude);
+                    modified = true;
+                }
+            }
             return modified;
         }
 
@@ -453,7 +440,6 @@ namespace IceBuilder
                     t => t.Name.Equals("EnsureIceBuilderImports", StringComparison.CurrentCultureIgnoreCase));
                 if(target != null)
                 {
-                    DTEUtil.EnsureFileIsCheckout(project.FullPath);
                     if(target.Parent != null)
                     {
                         target.Parent.RemoveChild(target);
@@ -465,16 +451,6 @@ namespace IceBuilder
                 }
             }
             return modified;
-        }
-
-        public static bool HasIceBuilderPackageReference(Microsoft.Build.Evaluation.Project project)
-        {
-            return project.Items.FirstOrDefault(
-                item =>
-                {
-                    return item.ItemType.Equals("PackageReference") &&
-                           item.EvaluatedInclude.Equals("zeroc.icebuilder.msbuild");
-                }) != null;
         }
     }
 }

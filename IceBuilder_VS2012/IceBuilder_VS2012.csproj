@@ -63,8 +63,11 @@
     <Compile Include="..\IceBuilder_Common\NuGetI.cs">
       <Link>NuGetI.cs</Link>
     </Compile>
-    <Compile Include="..\IceBuilder_Common\ProjectManager.cs">
-      <Link>ProjectManager.cs</Link>
+    <Compile Include="..\IceBuilder_Common\ProjectHelperFactoryI.cs">
+      <Link>ProjectHelperFactoryI.cs</Link>
+    </Compile>
+    <Compile Include="..\IceBuilder_Common\ProjectHelperI.cs">
+      <Link>ProjectHelperI.cs</Link>
     </Compile>
     <Compile Include="..\IceBuilder_Common\VCUtilI.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

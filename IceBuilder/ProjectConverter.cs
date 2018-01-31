@@ -11,12 +11,8 @@ using System.Threading;
 using System.Windows.Threading;
 using System.Windows.Forms;
 using System.IO;
-
-using Microsoft.Build.Evaluation;
-using Microsoft.Build.Construction;
 using Microsoft.VisualStudio.Shell.Interop;
-
-using System.Xml;
+using MSProject = Microsoft.Build.Evaluation.Project;
 
 namespace IceBuilder
 {
@@ -27,7 +23,7 @@ namespace IceBuilder
             Dictionary<string, IVsProject> upgradeProjects = new Dictionary<string, IVsProject>();
             foreach (IVsProject project in projects)
             {
-                IceBuilderProjectType projectType = DTEUtil.IsIceBuilderEnabled(project);
+                IceBuilderProjectType projectType = IsIceBuilderEnabled(project);
                 if (projectType != IceBuilderProjectType.None)
                 {
                     upgradeProjects.Add(project.GetDTEProject().UniqueName, project);
@@ -48,94 +44,185 @@ namespace IceBuilder
             Dispatcher dispatcher = Dispatcher.CurrentDispatcher;
             Thread t = new Thread(() =>
             {
-                var NuGet = Package.Instance.NuGet;
-                var DTE = Package.Instance.DTE;
-                var builder = Package.Instance;
-                int i = 0;
-                int total = projects.Count;
-                foreach(var entry in projects)
+                try
                 {
-                    var project = entry.Value;
-                    var dteProject = project.GetDTEProject();
-                    var name = entry.Key;
-                    i++;
-                    if (progressCallback.Canceled)
+                    var NuGet = Package.Instance.NuGet;
+                    var DTE = Package.Instance.DTE;
+                    var builder = Package.Instance;
+                    int i = 0;
+                    int total = projects.Count;
+                    foreach(var entry in projects)
                     {
-                        break;
-                    }
-
-                    dispatcher.Invoke(
-                        new Action(() =>
+                        var project = entry.Value;
+                        var dteProject = project.GetDTEProject();
+                        var uniqueName = dteProject.UniqueName;
+                        var name = entry.Key;
+                        i++;
+                        if(progressCallback.Canceled)
                         {
-                            progressCallback.ReportProgress(name, i);
-                        }));
+                            break;
+                        }
 
-                    NuGet.Restore(dteProject);
-                    if (!NuGet.IsPackageInstalled(dteProject, Package.NuGetBuilderPackageId))
-                    {
-                        DTE.StatusBar.Text = string.Format("Installing NuGet package {0} in project {1}",
-                            Package.NuGetBuilderPackageId, name);
-                        NuGet.InstallLatestPackage(dteProject, Package.NuGetBuilderPackageId);
-                    }
-
-                    IceBuilderProjectType projectType = DTEUtil.IsIceBuilderEnabled(project);
-                    if (projectType != IceBuilderProjectType.None)
-                    {
-                        bool cpp = projectType == IceBuilderProjectType.CppProjectType;
-                        DTE.StatusBar.Text = string.Format("Upgrading project {0} Ice Builder settings", project.GetDTEProject().UniqueName);
-                        var msproject = project.GetMSBuildProject();
-                        var fullPath = ProjectUtil.GetProjectFullPath(project);
-                        var assemblyDir = ProjectUtil.GetEvaluatedProperty(project, "IceAssembliesDir");
-                        if (projectType == IceBuilderProjectType.CsharpProjectType)
-                        {
-                            foreach(VSLangProj80.Reference3 r in dteProject.GetProjectRererences())
+                        dispatcher.Invoke(
+                            new Action(() =>
                             {
-                                if(Package.AssemblyNames.Contains(r.Name))
+                                progressCallback.ReportProgress(name, i);
+                            }));
+
+                        NuGet.Restore(dteProject);
+                        if(!NuGet.IsPackageInstalled(dteProject, Package.NuGetBuilderPackageId))
+                        {
+                            var retry = 5;
+                            while(retry-- > 0)
+                            {
+                                try
                                 {
-                                    var item = msproject.AllEvaluatedItems.FirstOrDefault(referenceItem =>
-                                        referenceItem.ItemType.Equals("Reference") &&
-                                        referenceItem.EvaluatedInclude.Split(",".ToCharArray()).ElementAt(0).Equals(r.Name));
-                                    if(item != null)
+                                    DTE.StatusBar.Text = string.Format("Installing NuGet package {0} in project {1}",
+                                                                       Package.NuGetBuilderPackageId, name);
+                                    NuGet.InstallLatestPackage(dteProject, Package.NuGetBuilderPackageId);
+                                    break;
+                                }
+                                catch(Exception ex)
+                                {
+                                    if(retry > 0)
                                     {
-                                        if(item.HasMetadata("HintPath"))
-                                        {
-                                            var hintPath = item.GetMetadata("HintPath").UnevaluatedValue;
-                                            if(hintPath.Contains("$(IceAssembliesDir)"))
-                                            {
-                                                hintPath = hintPath.Replace("$(IceAssembliesDir)",
-                                                    FileUtil.RelativePath(Path.GetDirectoryName(r.ContainingProject.FullName), assemblyDir));
-                                                //
-                                                // If the HintPath points to the NuGet zeroc.ice.net package we upgrade it to not
-                                                // use IceAssembliesDir otherwise we remove it
-                                                if(hintPath.Contains("packages\\zeroc.ice.net"))
-                                                {
-                                                    item.SetMetadataValue("HintPath", hintPath);
-                                                }
-                                                else
-                                                {
-                                                    item.RemoveMetadata("HintPath");
-                                                }
-                                            }
-                                        }
+                                        Package.Instance.OutputPane.OutputString(
+                                            "NuGet package zeroc.icebuilder.msbuild isntall failed, retrying.");
+                                    }
+                                    else
+                                    {
+                                        Package.Instance.OutputPane.OutputString(
+                                            String.Format("NuGet package zeroc.icebuilder.msbuild isntall failed:\n{0}", ex.ToString()));
                                     }
                                 }
                             }
                         }
 
-                        bool modified = MSBuildUtils.UpgradeProjectImports(msproject);
-                        modified = MSBuildUtils.UpgradeProjectProperties(msproject, cpp) || modified;
-                        modified = MSBuildUtils.RemoveIceBuilderFromProject(msproject, true) || modified;
-                        modified = MSBuildUtils.UpgradeProjectItems(msproject, cpp) || modified;
-
-                        if (modified)
+                        IceBuilderProjectType projectType = IsIceBuilderEnabled(project);
+                        if(projectType != IceBuilderProjectType.None)
                         {
-                            builder.SaveProject(project);
+                            bool cpp = projectType == IceBuilderProjectType.CppProjectType;
+                            DTE.StatusBar.Text = string.Format("Upgrading project {0} Ice Builder settings", project.GetDTEProject().UniqueName);
+
+                            var fullPath = project.GetProjectFullPath();
+                            var assemblyDir = project.GetEvaluatedProperty("IceAssembliesDir");
+                            var outputDir = project.GetEvaluatedProperty("IceBuilderOutputDir");
+
+                            var outputDirUnevaluated = project.GetPropertyWithDefault("IceBuilderOutputDir", "generated");
+                            var sourceExt = project.GetPropertyWithDefault("IceBuilderSourceExt", "cpp");
+                            var headerOutputDirUnevaluated = project.GetProperty("IceBuilderHeaderOutputDir");
+                            var headerExt = project.GetPropertyWithDefault("IceBuilderHeaderExt", "h");
+
+                            var cppOutputDir = new List<string>();
+                            var cppHeaderOutputDir = new List<string>();
+                            if(cpp)
+                            {
+                                foreach(EnvDTE.Configuration configuration in dteProject.ConfigurationManager)
+                                {
+                                    cppOutputDir.Add(Package.Instance.VCUtil.Evaluate(configuration, outputDirUnevaluated));
+                                    if(string.IsNullOrEmpty(headerOutputDirUnevaluated))
+                                    {
+                                        cppHeaderOutputDir.Add(Package.Instance.VCUtil.Evaluate(configuration, outputDirUnevaluated));
+                                    }
+                                    else
+                                    {
+                                        cppHeaderOutputDir.Add(Package.Instance.VCUtil.Evaluate(configuration, headerOutputDirUnevaluated));
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                foreach(VSLangProj80.Reference3 r in dteProject.GetProjectRererences())
+                                {
+                                    if(Package.AssemblyNames.Contains(r.Name))
+                                    {
+                                        project.UpdateProject((MSProject msproject) =>
+                                            {
+                                                var item = msproject.AllEvaluatedItems.FirstOrDefault(referenceItem =>
+                                                                referenceItem.ItemType.Equals("Reference") &&
+                                                                referenceItem.EvaluatedInclude.Split(",".ToCharArray()).ElementAt(0).Equals(r.Name));
+                                                if(item != null)
+                                                {
+                                                    if(item.HasMetadata("HintPath"))
+                                                    {
+                                                        var hintPath = item.GetMetadata("HintPath").UnevaluatedValue;
+                                                        if(hintPath.Contains("$(IceAssembliesDir)"))
+                                                        {
+                                                            hintPath = hintPath.Replace("$(IceAssembliesDir)",
+                                                                FileUtil.RelativePath(Path.GetDirectoryName(r.ContainingProject.FullName), assemblyDir));
+                                                            //
+                                                            // If the HintPath points to the NuGet zeroc.ice.net package we upgrade it to not
+                                                            // use IceAssembliesDir otherwise we remove it
+                                                            if(hintPath.Contains("packages\\zeroc.ice.net"))
+                                                            {
+                                                                item.SetMetadataValue("HintPath", hintPath);
+                                                            }
+                                                            else
+                                                            {
+                                                                item.RemoveMetadata("HintPath");
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            });
+                                    }
+                                }
+                            }
+
+                            project.UpdateProject((MSProject msproject) =>
+                            {
+                                MSBuildUtils.UpgradeProjectImports(msproject);
+                                MSBuildUtils.UpgradeProjectProperties(msproject, cpp);
+                                MSBuildUtils.RemoveIceBuilderFromProject(msproject, true);
+                                MSBuildUtils.UpgradeProjectItems(msproject);
+                                MSBuildUtils.UpgradeCSharpGeneratedItems(msproject, outputDir);
+                                foreach(var d in cppOutputDir)
+                                {
+                                    MSBuildUtils.UpgradeGeneratedItems(msproject, d, sourceExt, "ClCompile");
+                                }
+
+                                foreach(var d in cppHeaderOutputDir)
+                                {
+                                    MSBuildUtils.UpgradeGeneratedItems(msproject, d, headerExt, "ClInclude");
+                                }
+                            });
+
+                            builder.ReloadProject(project);
                         }
                     }
+                    dispatcher.BeginInvoke(new Action(() => progressCallback.Finished()));
                 }
-                dispatcher.BeginInvoke(new Action(() => progressCallback.Finished()));
+                catch(Exception ex)
+                {
+                    dispatcher.BeginInvoke(new Action(() => progressCallback.Canceled = true));
+                    Package.UnexpectedExceptionWarning(ex);
+                }
             });
             t.Start();
+        }
+
+        //
+        // Check if IceBuilder 4.x is enabled
+        //
+        public static IceBuilderProjectType IsIceBuilderEnabled(IVsProject project)
+        {
+            if(project != null)
+            {
+                IceBuilderProjectType type = project.IsCppProject() ? IceBuilderProjectType.CppProjectType :
+                                             project.IsCSharpProject() ? IceBuilderProjectType.CsharpProjectType : IceBuilderProjectType.None;
+                if(type != IceBuilderProjectType.None)
+                {
+                    return project.WithProject((MSProject msproject) =>
+                        {
+                            if(MSBuildUtils.IsIceBuilderEnabled(msproject))
+                            {
+                                return type;
+                            }
+                            return IceBuilderProjectType.None;
+                        });
+                }
+            }
+            return IceBuilderProjectType.None;
         }
     }
 }

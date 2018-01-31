@@ -16,12 +16,12 @@ namespace IceBuilder
         // Each entry in this dictionary represents a generated source
         // file and the list of configurations for which it is build
         //
-        public Dictionary<string, List<EnvDTE.Configuration>> sources;
+        public Dictionary<string, List<string>> sources;
         //
         // Each entry in this dictionary represents a generated C++ header
         // file and the list of configurations for which it is build for
         // non C++ project this set is will be always empty.
         //
-        public Dictionary<string, List<EnvDTE.Configuration>> headers;
+        public Dictionary<string, List<string>> headers;
     }
 }

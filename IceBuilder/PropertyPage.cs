@@ -21,11 +21,16 @@ namespace IceBuilder
     {
         public const string PropertyPageGUID = "1E2800FE-37C5-4FD3-BC2E-969342EE08AF";
 
-        private CSharpConfigurationView _view;
         public CSharpConfigurationView ConfigurationView
         {
             get;
-            set;
+            private set;
+        }
+
+        public IDisposable ProjectSubscription
+        {
+            get;
+            private set;
         }
 
         public PropertyPage()
@@ -84,10 +89,10 @@ namespace IceBuilder
         {
             try
             {
-                if(_view != null)
+                if(ConfigurationView != null)
                 {
-                    _view.Dispose();
-                    _view = null;
+                    ConfigurationView.Dispose();
+                    ConfigurationView = null;
                 }
             }
             catch(Exception ex)
@@ -170,17 +175,17 @@ namespace IceBuilder
                         Project = hier as IVsProject;
                         if(Project != null)
                         {
-                            Settings = new ProjectSettigns(Package.Instance.ProjectManagerFactory.GetProjectManager(Project));
+                            Settings = new ProjectSettigns(Project);
                             Settings.Load();
                             ConfigurationView.LoadSettigns(Settings);
-                            Settings.ProjectManager.ProjectChanged += (sender, args) =>
+                            ProjectSubscription = Project.OnProjectUpdate(() =>
                                 {
                                     if(!ConfigurationView.Dirty)
                                     {
                                         Settings.Load();
                                         ConfigurationView.LoadSettigns(Settings);
                                     }
-                                };
+                                });
                         }
                     }
                 }

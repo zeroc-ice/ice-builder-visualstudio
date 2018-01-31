@@ -5,7 +5,6 @@
 // **********************************************************************
 
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using Microsoft.VisualStudio;
@@ -29,10 +28,23 @@ namespace IceBuilder
 
         public void LoadSettigns(ProjectSettigns settings)
         {
-            OutputDir = settings.OutputDir;
-            IncludeDirectories = settings.IncludeDirectories;
-            AdditionalOptions = settings.AdditionalOptions;
-            Dirty = false;
+            var enabled = settings.Project.IsMSBuildIceBuilderInstalled();
+            Enable(enabled);
+            if(enabled)
+            {
+                OutputDir = settings.OutputDir;
+                IncludeDirectories = settings.IncludeDirectories;
+                AdditionalOptions = settings.AdditionalOptions;
+                Dirty = false;
+            }
+        }
+
+        private void Enable(bool enabled)
+        {
+            txtOutputDir.Enabled = enabled;
+            txtIncludeDirectories.Enabled = enabled;
+            txtAdditionalOptions.Enabled = enabled;
+            btnOutputDirectoryBrowse.Enabled = enabled;
         }
 
         public virtual void Initialize(Control parent, Rectangle rect)
@@ -107,7 +119,7 @@ namespace IceBuilder
 
         private void btnOutputDirectoryBrowse_Click(object sender, EventArgs e)
         {
-            string projectDir = Path.GetFullPath(Path.GetDirectoryName(ProjectUtil.GetProjectFullPath(Page.Project)));
+            string projectDir = Page.Project.GetProjectBaseDirectory();
             string selectedPath = UIUtil.BrowserFolderDialog(Handle, "Output Directory", projectDir);
             if(!string.IsNullOrEmpty(selectedPath))
             {

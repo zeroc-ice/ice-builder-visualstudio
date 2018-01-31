@@ -12,7 +12,8 @@ namespace IceBuilder
     public interface VCUtil
     {
         bool SetupSliceFilter(EnvDTE.Project project);
-        void AddGeneratedFiles(IVsProject roject, List<GeneratedFileSet> filesets);
         string Evaluate(EnvDTE.Configuration config, string value);
+
+        void AddGenerated(IVsProject project, string path, string filter, string platform, string configuration);
     }
 }

@@ -5,24 +5,15 @@
 // **********************************************************************
 
 using System;
+using System.Linq;
 using Microsoft.VisualStudio.Shell;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-
-using EnvDTE;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 
 namespace IceBuilder
 {
-    public enum IceBuilderProjectType
-    {
-        None,
-        CppProjectType,
-        CsharpProjectType
-    }
-
     public class DTEUtil
     {
         public static uint GetItemId(object value)
@@ -48,6 +39,12 @@ namespace IceBuilder
                 return (uint)(long)value;
             }
             return VSConstants.VSITEMID_NIL;
+        }
+
+        public static IVsProject GetProject(String path)
+        {
+            List<IVsProject> projects = GetProjects();
+            return projects.FirstOrDefault(p => p.GetProjectFullPath().Equals(path));
         }
 
         public static List<IVsProject> GetProjects()
@@ -151,74 +148,5 @@ namespace IceBuilder
             }
             return hier as IVsProject;
         }
-
-        public static bool IsCppProject(IVsProject project)
-        {
-            Guid type = ProjectUtil.GetProjecTypeGuid(project);
-            return type.Equals(cppProjectGUID) || type.Equals(cppStoreAppProjectGUID);
-        }
-
-        public static bool IsCSharpProject(IVsProject p)
-        {
-            return ProjectUtil.GetProjecTypeGuid(p).Equals(csharpProjectGUID) &&
-                MSBuildUtils.IsCSharpProject(p.GetMSBuildProject(true));
-        }
-
-        public static IceBuilderProjectType IsIceBuilderEnabled(IVsProject project)
-        {
-            if(project != null)
-            {
-                IceBuilderProjectType type = IsCppProject(project) ? IceBuilderProjectType.CppProjectType :
-                                             IsCSharpProject(project) ? IceBuilderProjectType.CsharpProjectType : IceBuilderProjectType.None;
-                if(type != IceBuilderProjectType.None)
-                {
-                    if(MSBuildUtils.IsIceBuilderEnabled(project.GetMSBuildProject(true)))
-                    {
-                        return type;
-                    }
-                }
-            }
-            return IceBuilderProjectType.None;
-        }
-
-        public static IceBuilderProjectType IsIceBuilderNuGetInstalled(IVsProject project)
-        {
-            if (project != null)
-            {
-                IceBuilderProjectType type = IsCppProject(project) ? IceBuilderProjectType.CppProjectType :
-                                             IsCSharpProject(project) ? IceBuilderProjectType.CsharpProjectType : IceBuilderProjectType.None;
-                if (type != IceBuilderProjectType.None)
-                {
-                    if(Package.Instance.NuGet.IsPackageInstalled(project.GetDTEProject(), Package.NuGetBuilderPackageId) ||
-                       MSBuildUtils.HasIceBuilderPackageReference(project.GetMSBuildProject(true)))
-                    {
-                        return type;
-                    }
-                }
-            }
-            return IceBuilderProjectType.None;
-        }
-
-        public static bool EnsureFileIsCheckout(string path)
-        {
-            var sc = Package.Instance.DTE.SourceControl;
-            if(sc != null)
-            {
-                if(sc.IsItemUnderSCC(path) && !sc.IsItemCheckedOut(path))
-                {
-                    return sc.CheckOutItem(path);
-                }
-            }
-            return true;
-        }
-
-        public static readonly Guid cppProjectGUID =
-            new Guid("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}");
-        public static readonly Guid cppStoreAppProjectGUID =
-            new Guid("{BC8A1FFA-BEE3-4634-8014-F334798102B3}");
-        public static readonly Guid csharpProjectGUID =
-            new Guid("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}");
-        public static readonly Guid unloadedProjectGUID =
-            new Guid("{67294A52-A4F0-11D2-AA88-00C04F688DDE}");
     }
 }

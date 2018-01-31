@@ -141,7 +141,6 @@
       <DependentUpon>CSharpConfigurationView.cs</DependentUpon>
     </Compile>
     <Compile Include="DTEUtil.cs" />
-    <Compile Include="GeneratedFileTracker.cs" />
     <Compile Include="IceHomeEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -153,7 +152,6 @@
     <Compile Include="PropertyNames.cs" />
     <Compile Include="SolutionEventHandler.cs" />
     <Compile Include="DocumentEventHandler.cs" />
-    <Compile Include="FileUtil.cs" />
     <Compile Include="MSBuildUtils.cs" />
     <Compile Include="Project.cs" />
     <Compile Include="ProjectConverter.cs" />

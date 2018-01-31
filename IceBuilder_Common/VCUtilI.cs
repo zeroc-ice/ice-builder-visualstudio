@@ -48,6 +48,20 @@ namespace IceBuilder
             return parent.AddFilter(name);
         }
 
+        public VCFile FindFile(VCProject project, string name)
+        {
+            foreach(VCFile file in project.Files)
+            {
+                var n = file.Name;
+                var p = file.RelativePath;
+                if(name.Equals(file.RelativePath))
+                {
+                    return file;
+                }
+            }
+            return null;
+        }
+
         public VCFilter FindOrCreateFilter(VCProject parent, string name)
         {
             foreach(VCFilter f in parent.Filters)
@@ -119,25 +133,17 @@ namespace IceBuilder
             }
         }
 
-        public void AddGeneratedFiles(IVsProject project, List<GeneratedFileSet> filesets)
+        public void AddGenerated(IVsProject project, string path, string filter, string platform, string configuration)
         {
             var dteproject = project.GetDTEProject();
             var vcproject = dteproject.Object as VCProject;
-
-            var sourcesFilter = FindOrCreateFilter(vcproject, "Source Files");
-            var headersFilter = FindOrCreateFilter(vcproject, "Header Files");
-
-            foreach(var fileset in filesets)
+            var parent = FindOrCreateFilter(vcproject, filter);
+            parent = FindOrCreateFilter(parent, platform);
+            parent = FindOrCreateFilter(parent, configuration);
+            var file = FindFile(vcproject, path);
+            if(file != null)
             {
-                foreach(var entry in fileset.sources)
-                {
-                    AddGeneratedFile(project, sourcesFilter, entry.Key, entry.Value.Count == 1 ? entry.Value.First() : null);
-                }
-
-                foreach(var entry in fileset.headers)
-                {
-                    AddGeneratedFile(project, headersFilter, entry.Key, entry.Value.Count == 1 ? entry.Value.First() : null);
-                }
+                file.Move(parent);
             }
         }
     }
