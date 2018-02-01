@@ -14,5 +14,7 @@ namespace IceBuilder
         void Restore(EnvDTE.Project project);
         bool IsPackageInstalled(EnvDTE.Project project, string packageId);
         void InstallLatestPackage(EnvDTE.Project project, string packageId);
+
+        bool IsUserConsentGranted();
     }
 }

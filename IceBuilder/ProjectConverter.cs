@@ -47,6 +47,14 @@ namespace IceBuilder
                 try
                 {
                     var NuGet = Package.Instance.NuGet;
+                    if (!NuGet.IsUserConsentGranted())
+                    {
+                        Package.WriteMessage("Ice Builder cannot download the required NuGet packages because " +
+                            "\"Allow NuGet to download missing packages\" is disabled");
+                        dispatcher.Invoke(new Action(() => progressCallback.Finished()));
+                        return;
+                    }
+
                     var DTE = Package.Instance.DTE;
                     var builder = Package.Instance;
                     int i = 0;

@@ -71,5 +71,10 @@ namespace IceBuilder
         {
             BatchEnd = batchEnd;
         }
+
+        public bool IsUserConsentGranted()
+        {
+            return PackageRestorer.IsUserConsentGranted();
+        }
     }
 }
