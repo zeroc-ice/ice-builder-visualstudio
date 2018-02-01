@@ -84,17 +84,17 @@ namespace IceBuilder
                 if(fFirstShow != 0)
                 {
                     IVsProject project = null;
-                    uint item = 0;
+                    uint itemref = 0;
                     string path = null;
-                    GetDocumentInfo(docCookie, ref project, ref item, ref path);
+                    GetDocumentInfo(docCookie, ref project, ref itemref, ref path);
                     if(project != null && !string.IsNullOrEmpty(path))
                     {
                         if(project.IsIceBuilderGeneratedItem(path))
                         {
-                            ProjectItem i = ProjectUtil.GetProjectItem(project, item);
-                            if(i != null)
+                            ProjectItem item = ProjectUtil.GetProjectItem(project, itemref);
+                            if(item != null)
                             {
-                                i.Document.ReadOnly = true;
+                                item.Document.ReadOnly = true;
                             }
                         }
                     }
