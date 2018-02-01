@@ -36,7 +36,7 @@ namespace IceBuilder
 
         public static string GetDefaultItemMetadata(this Project project, string name, bool evaluated, string defaultValue = "")
         {
-            var meta = project.AllEvaluatedItemDefinitionMetadata.FirstOrDefault(
+            var meta = project.AllEvaluatedItemDefinitionMetadata.LastOrDefault(
                 m => m.ItemType.Equals("SliceCompile") && m.Name.Equals(name));
             if(meta != null)
             {
