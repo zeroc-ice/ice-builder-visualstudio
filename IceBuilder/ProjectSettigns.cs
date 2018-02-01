@@ -12,21 +12,26 @@ namespace IceBuilder
     {
         public ProjectSettigns(IVsProject project)
         {
-            Project = project;
+            _project = project;
         }
 
         public void Load()
         {
-            OutputDir = GetProperty(ItemMetadataNames.OutputDir);
-            IncludeDirectories = GetProperty(ItemMetadataNames.IncludeDirectories);
-            AdditionalOptions = GetProperty(ItemMetadataNames.AdditionalOptions);
+            OutputDir = _project.GetDefaultItemMetadata(ItemMetadataNames.OutputDir, false);
+            IncludeDirectories = _project.GetDefaultItemMetadata(ItemMetadataNames.IncludeDirectories, false);
+            AdditionalOptions = _project.GetDefaultItemMetadata(ItemMetadataNames.AdditionalOptions, false);
         }
 
         public void Save()
         {
-            SetPropertyIfChanged(ItemMetadataNames.OutputDir, OutputDir);
-            SetPropertyIfChanged(ItemMetadataNames.IncludeDirectories, IncludeDirectories);
-            SetPropertyIfChanged(ItemMetadataNames.AdditionalOptions, AdditionalOptions);
+            _project.SetItemMetadata(ItemMetadataNames.OutputDir, OutputDir);
+            _project.SetItemMetadata(ItemMetadataNames.IncludeDirectories, IncludeDirectories);
+            _project.SetItemMetadata(ItemMetadataNames.AdditionalOptions, AdditionalOptions);
+        }
+
+        public bool IsMSBuildIceBuilderInstalled()
+        {
+            return _project.IsMSBuildIceBuilderInstalled();
         }
 
         public string OutputDir
@@ -47,28 +52,6 @@ namespace IceBuilder
             set;
         }
 
-        public IVsProject Project
-        {
-            get;
-            private set;
-        }
-
-        private string GetProperty(string name)
-        {
-            return Project.GetDefaultItemMetadata(name, false, string.Empty);
-        }
-
-        private void SetProperty(string name, string value)
-        {
-            Project.SetItemMetadata(name, value);
-        }
-
-        private void SetPropertyIfChanged(string name, string value)
-        {
-            if(!GetProperty(name).Equals(value))
-            {
-                SetProperty(name, value);
-            }
-        }
+        public IVsProject _project;
     }
 }

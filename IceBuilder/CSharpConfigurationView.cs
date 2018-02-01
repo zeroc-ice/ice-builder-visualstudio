@@ -8,7 +8,6 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 using Microsoft.VisualStudio;
-using System.IO;
 
 namespace IceBuilder
 {
@@ -28,7 +27,7 @@ namespace IceBuilder
 
         public void LoadSettigns(ProjectSettigns settings)
         {
-            var enabled = settings.Project.IsMSBuildIceBuilderInstalled();
+            var enabled = settings.IsMSBuildIceBuilderInstalled();
             Enable(enabled);
             if(enabled)
             {
