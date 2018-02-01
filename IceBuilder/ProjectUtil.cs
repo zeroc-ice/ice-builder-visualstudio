@@ -344,6 +344,26 @@ namespace IceBuilder
             var propertyStorage = project as IVsBuildPropertyStorage;
             var fileset = GetCsharpGeneratedFiles(project, dteproject, propertyStorage, projectDir, file);
 
+            //
+            // First remove any generated items that are not in the
+            // current generated items set for this Slice file
+            //
+            DeleteItems(project.WithProject((MSProject msproject) =>
+                {
+                    return msproject.AllEvaluatedItems.Where(
+                        item =>
+                        {
+                            if(item.ItemType.Equals("Compile") && item.HasMetadata("SliceCompileSource"))
+                            {
+                                if(item.GetMetadataValue("SliceCompileSource").Equals(fileset.filename))
+                                {
+                                    return !fileset.sources.ContainsKey(Path.GetFullPath(Path.Combine(projectDir, item.EvaluatedInclude)));
+                                }
+                            }
+                            return false;
+                        }).Select(item => Path.Combine(projectDir, item.EvaluatedInclude)).ToList() ;
+                }));
+
             foreach(var entry in fileset.sources)
             {
                 AddCSharpGeneratedItem(project, dteproject,
@@ -367,7 +387,34 @@ namespace IceBuilder
                 allConfigurations.Add(ConfigurationString(configuration));
             }
 
-            foreach(var entry in fileset.sources)
+            //
+            // First remove any generated items that are not in the
+            // current generated items set for this Slice file
+            //
+            DeleteItems(project.WithProject((MSProject msproject) =>
+            {
+                return msproject.AllEvaluatedItems.Where(
+                    item =>
+                    {
+                        if (item.ItemType.Equals("ClCompile") && item.HasMetadata("SliceCompileSource"))
+                        {
+                            if (item.GetMetadataValue("SliceCompileSource").Equals(fileset.filename))
+                            {
+                                return !fileset.sources.ContainsKey(Path.GetFullPath(Path.Combine(projectDir, item.EvaluatedInclude)));
+                            }
+                        }
+                        else if (item.ItemType.Equals("ClInclude") && item.HasMetadata("SliceCompileSource"))
+                        {
+                            if (item.GetMetadataValue("SliceCompileSource").Equals(fileset.filename))
+                            {
+                                return !fileset.headers.ContainsKey(Path.GetFullPath(Path.Combine(projectDir, item.EvaluatedInclude)));
+                            }
+                        }
+                        return false;
+                    }).Select(item => Path.Combine(projectDir, item.EvaluatedInclude)).ToList();
+            }));
+
+            foreach (var entry in fileset.sources)
             {
                 AddCppGeneratedItem(project, dteproject, vcutil,
                     projectDir,
@@ -397,7 +444,7 @@ namespace IceBuilder
                                        List<string> allConfigurations,
                                        List<string> configurations)
         {
-            var item = FindProjectItem(generatedpath);
+            var item = FindProjectItem(Path.Combine(projectDir, generatedpath));
             if(item == null)
             {
                 AddItem(dteproject, Path.Combine(projectDir, generatedpath));
@@ -427,7 +474,7 @@ namespace IceBuilder
                                                   string path,
                                                   string generatedpath)
         {
-            var item = FindProjectItem(generatedpath);
+            var item = FindProjectItem(Path.Combine(projectDir, generatedpath));
             if(item == null)
             {
                 AddItem(dteproject, Path.Combine(projectDir, generatedpath));
@@ -452,6 +499,8 @@ namespace IceBuilder
 
         public static void SetupGenerated(IVsProject project)
         {
+            var projectDir = project.GetProjectBaseDirectory();
+
             //
             // Remove all CompileClCompile and ClInclude items that have an associted SliceCompileSource
             // item metadata that doesn't much any of the project SliceCompile items
@@ -476,7 +525,7 @@ namespace IceBuilder
                                 }
                             }
                             return false;
-                        }).Select(item => item.EvaluatedInclude).ToList();
+                        }).Select(item => Path.Combine(projectDir, item.EvaluatedInclude)).ToList();
                 }));
             }
             else // C# project
@@ -499,7 +548,7 @@ namespace IceBuilder
                                         }
                                     }
                                     return false;
-                                }).Select(item => item.EvaluatedInclude).ToList();
+                                }).Select(item => Path.Combine(projectDir, item.EvaluatedInclude)).ToList();
                     }));
             }
 
