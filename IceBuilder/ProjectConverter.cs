@@ -87,12 +87,12 @@ namespace IceBuilder
                                     if(retry > 0)
                                     {
                                         Package.Instance.OutputPane.OutputString(
-                                            "NuGet package zeroc.icebuilder.msbuild isntall failed, retrying.");
+                                            "NuGet package zeroc.icebuilder.msbuild install failed, retrying.");
                                     }
                                     else
                                     {
                                         Package.Instance.OutputPane.OutputString(
-                                            String.Format("NuGet package zeroc.icebuilder.msbuild isntall failed:\n{0}", ex.ToString()));
+                                            String.Format("NuGet package zeroc.icebuilder.msbuild install failed:\n{0}", ex.ToString()));
                                     }
                                 }
                             }
