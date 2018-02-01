@@ -190,6 +190,18 @@ namespace IceBuilder
                             string path = names[i];
                             if(ProjectUtil.IsSliceFileName(path))
                             {
+                                //
+                                // Ensure the .ice file item has SliceCompile ItemType
+                                //
+                                var projectItem = ProjectUtil.FindProjectItem(path);
+                                if (projectItem != null)
+                                {
+                                    var property = projectItem.Properties.Item("ItemType");
+                                    if (property != null && !property.Value.Equals("SliceCompile"))
+                                    {
+                                        property.Value = "SliceCompile";
+                                    }
+                                }
                                 ProjectUtil.AddGeneratedFiles(project, path);
                                 break;
                             }
