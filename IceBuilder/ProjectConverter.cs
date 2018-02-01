@@ -81,7 +81,7 @@ namespace IceBuilder
                         if(!NuGet.IsPackageInstalled(dteProject, Package.NuGetBuilderPackageId))
                         {
                             var retry = 5;
-                            while(retry-- > 0)
+                            while(true)
                             {
                                 try
                                 {
@@ -92,12 +92,13 @@ namespace IceBuilder
                                 }
                                 catch(Exception ex)
                                 {
-                                    if(retry == 4)
+                                    retry--;
+                                    if (retry == 4)
                                     {
                                         Package.WriteMessage(
                                             "NuGet package zeroc.icebuilder.msbuild install failed, retrying .");
                                     }
-                                    else if(retry > 0)
+                                    else if(retry >= 0)
                                     {
                                         Package.WriteMessage(".");
                                     }
