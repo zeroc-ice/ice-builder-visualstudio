@@ -156,6 +156,12 @@ namespace IceBuilder
             }
         }
 
+        public static void WriteMessage(string message)
+        {
+            Instance.OutputPane.Activate();
+            Instance.OutputPane.OutputString(message);
+        }
+
         bool autoBuilding;
         public bool AutoBuilding
         {
