@@ -71,7 +71,7 @@ namespace IceBuilder
                     // existing PropertyGroup
                     //
                     var lastPropertyGroup = project.Xml.PropertyGroups.LastOrDefault();
-                    if(lastItemDefinitionGroups != null)
+                    if(lastPropertyGroup != null)
                     {
                         project.Xml.InsertAfterChild(group, lastPropertyGroup);
                         break;
