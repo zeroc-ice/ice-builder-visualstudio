@@ -153,7 +153,7 @@ namespace IceBuilder
                                     item.ItemType.Equals("ClCompile") ||
                                     item.ItemType.Equals("ClInclude")) &&
                                     item.EvaluatedInclude.Equals(includeValue) &&
-                                    item.HasMetadata("SliceCompile");
+                                    item.HasMetadata("SliceCompileSource");
                         }) != null;
                 });
         }
