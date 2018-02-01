@@ -200,6 +200,12 @@ namespace IceBuilder
                                 {
                                     MSBuildUtils.UpgradeGeneratedItems(msproject, d, headerExt, "ClInclude");
                                 }
+
+                                var propertyGroup = msproject.Xml.PropertyGroups.FirstOrDefault(group => group.Label.Equals("IceBuilder"));
+                                if(propertyGroup != null)
+                                {
+                                    propertyGroup.Parent.RemoveChild(propertyGroup);
+                                }
                             });
 
                             builder.ReloadProject(project);
