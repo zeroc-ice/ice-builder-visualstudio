@@ -15,7 +15,7 @@ Ice Builder for Visual Studio is compatible with Visual Studio 2012, 2013, 2015 
   * [Ice Home Configuration (Ice 3.6)](#ice-home-configuration-ice-36)
 * [C++ Usage](#c-usage)
   * [Adding Slice Files to a C++ Project](#adding-slice-files-to-a-c-project)
-  * (Selecting the Slice to C++ Mapping)(#selecting-the-slice-to-c-mapping)
+  * [Selecting the Slice to C++ Mapping](#selecting-the-slice-to-c-mapping)
   * [Customizing the Slice to C++ Compilation](#customizing-the-slice-to-c-compilation)
 * [C# Usage](#c-usage-1)
   * [Adding Slice Files to a C# Project](#adding-slice-files-to-a-c-project-1)
