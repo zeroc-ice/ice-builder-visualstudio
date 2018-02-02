@@ -15,6 +15,7 @@ Ice Builder for Visual Studio is compatible with Visual Studio 2012, 2013, 2015 
   * [Ice Home Configuration (Ice 3.6)](#ice-home-configuration-ice-36)
 * [C++ Usage](#c-usage)
   * [Adding Slice Files to a C++ Project](#adding-slice-files-to-a-c-project)
+  * (Selecting the Slice to C++ Mapping)(#selecting-the-slice-to-c-mapping)
   * [Customizing the Slice to C++ Compilation](#customizing-the-slice-to-c-compilation)
 * [C# Usage](#c-usage-1)
   * [Adding Slice Files to a C# Project](#adding-slice-files-to-a-c-project-1)
@@ -67,6 +68,20 @@ Follow these steps:
 ![Missing cpp additional include directories](/Screenshots/cpp-additional-include-directories.png)
 
 :memo: Make sure to select `All Configurations` and `All Platforms` as shown above.
+
+### Selecting the Slice to C++ Mapping
+
+As of Ice 3.7, `slice2cpp` generates C++ code for two mappings, the [Slice to C++11](https://doc.zeroc.com/pages/viewpage.action?pageId=18255283) mapping and the [Slice to C++98](https://doc.zeroc.com/pages/viewpage.action?pageId=18255332) mapping. You select the C++ mapping used by your C++ code by defining or not defining `ICE_CPP11_MAPPING` during C++ compilation.
+
+Ice Builder selects C++11 as the default mapping when using Visual Studio 2015 or greater, and C++98 as the default mapping with older versions of Visual Studio.
+
+You can overwrite this default selection by setting `C++ Mapping` on the `Ice Builder` property page in the `Configuration Properties` of your project:
+
+![Missing cpp mapping](/Screenshots/cpp-mapping.png)
+
+This selection always applies to all configurations and platforms. See [Selecting the Slice to C++ Mapping](https://github.com/zeroc-ice/ice-builder-msbuild/blob/master/README.md#selecting-the-slice-to-c-mapping) with Ice Builder for MSBuild for further details.
+
+:memo: When the C++ Mapping is set to C++11, Ice Builder defines `ICE_CPP11_MAPPING` during C++ compilation of your project even though you don't see `ICE_CPP11_MAPPING` among the C/C++ Preprocessor Definitions in the Visual Studio IDE.
 
 ### Customizing the Slice to C++ Compilation
 
