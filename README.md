@@ -102,7 +102,7 @@ Follow these steps:
 
    Adding Ice Builder creates a `Slice Files` filter in your project.
 
-2. Reload your project if it targets .NET Framework.
+2. Reload your project if it targets the .NET Framework and you want to customize the Slice to C# compilation described in the next paragraph. If you skip this step, Ice Builder is fully functional except there is no `Ice Builder` tab in your projects's properties.
 
 3. Add one or more Slice (`.ice`) files to your project.
 
