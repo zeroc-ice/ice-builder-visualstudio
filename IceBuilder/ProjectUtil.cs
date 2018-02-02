@@ -46,34 +46,6 @@ namespace IceBuilder
             return !string.IsNullOrEmpty(name) && Path.GetExtension(name).Equals(".ice");
         }
 
-        //
-        // Non DTE
-        //
-        public static string GetCSharpGeneratedItemPath(string sliceName)
-        {
-            return GetGeneratedItemPath(sliceName, ".cs");
-        }
-
-        public static string GetCppGeneratedSourceItemPath(IVsProject project, string sliceName)
-        {
-            return GetGeneratedItemPath(sliceName, project.GetDefaultItemMetadata(ItemMetadataNames.SourceExt, true, ".cpp"));
-        }
-
-        public static string GetCppGeneratedHeaderItemPath(IVsProject project, string sliceName)
-        {
-            return GetGeneratedItemPath(sliceName, project.GetDefaultItemMetadata(ItemMetadataNames.HeaderExt, true, ".h"));
-        }
-
-        private static string GetGeneratedItemPath(string sliceName, string extension)
-        {
-            return Path.GetFileName(Path.ChangeExtension(sliceName, extension));
-        }
-
-        public static string GetPathRelativeToProject(IVsProject project, string path)
-        {
-            return FileUtil.RelativePath(project.GetProjectBaseDirectory(), path);
-        }
-
         public static EnvDTE.ProjectItem GetProjectItem(IVsProject project, uint item)
         {
             IVsHierarchy hierarchy = project as IVsHierarchy;
