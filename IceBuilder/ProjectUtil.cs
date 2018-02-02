@@ -160,8 +160,7 @@ namespace IceBuilder
         }
 
         public static GeneratedFileSet
-        GetCsharpGeneratedFiles(IVsProject project, EnvDTE.Project dteproject, IVsBuildPropertyStorage propertyStorage,
-            string projectDir, string item)
+        GetCsharpGeneratedFiles(IVsProject project, EnvDTE.Project dteproject, string projectDir, string item)
         {
             var fileset = new GeneratedFileSet
             {
@@ -169,7 +168,7 @@ namespace IceBuilder
                 sources = new Dictionary<string, List<string>>(),
                 headers = new Dictionary<string, List<string>>()
             };
-
+            var propertyStorage = project as IVsBuildPropertyStorage;
             var outputDir = project.GetItemMetadata(item, "OutputDir");
             foreach(EnvDTE.Configuration configuration in dteproject.ConfigurationManager)
             {
@@ -199,49 +198,55 @@ namespace IceBuilder
         CheckGenerateFileIsValid(IVsProject project, string path)
         {
             var projectDir = project.GetProjectBaseDirectory();
+            var dteproject = project.GetDTEProject();
             if(project.IsCSharpProject())
             {
-                string outputDir = GetDefaultOutputDir(project, true);
-                string generatedSource = Path.Combine(projectDir, outputDir, GetCSharpGeneratedItemPath(Path.GetFileName(path)));
-                if(File.Exists(generatedSource))
+                var fileset = GetCsharpGeneratedFiles(project, dteproject, projectDir, path);
+                foreach(var source in fileset.sources.Keys)
                 {
-                    const string message =
+                    if (File.Exists(source))
+                    {
+                        const string message =
                         "A file named '{0}' already exists. If you want to add '{1}' first remove '{0}'.";
 
-                    UIUtil.ShowErrorDialog("Ice Builder",
-                        string.Format(message,
-                            GetPathRelativeToProject(project, generatedSource),
-                            GetPathRelativeToProject(project, path)));
-                    return false;
+                        UIUtil.ShowErrorDialog("Ice Builder",
+                            string.Format(message,
+                                FileUtil.RelativePath(projectDir, source),
+                                FileUtil.RelativePath(projectDir, path)));
+                        return false;
+                    }
                 }
             }
             else
             {
-                var dteproject = project.GetDTEProject();
-                var outputDir = GetDefaultOutputDir(project, false);
-                var headerOutputDir = GetDefaultHeaderOutputDir(project, false);
-                var source = GetCppGeneratedSourceItemPath(project, path);
-                var header = GetCppGeneratedHeaderItemPath(project, path);
+                var fileset = GetCppGeneratedFiles(project, dteproject, ProjectFactoryHelperInstance.VCUtil, projectDir, path);
 
-                foreach(EnvDTE.Configuration config in dteproject.ConfigurationManager)
+                foreach (var source in fileset.sources.Keys)
                 {
-                    var evaluatedOutputDir = Package.Instance.VCUtil.Evaluate(config, outputDir);
-                    var evaluatedHeaderOutputDir = headerOutputDir.Equals(outputDir) ? evaluatedOutputDir :
-                        Package.Instance.VCUtil.Evaluate(config, headerOutputDir);
-
-                    string generatedSource = Path.GetFullPath(Path.Combine(projectDir, evaluatedOutputDir, source));
-                    string generatedHeader = Path.GetFullPath(Path.Combine(projectDir, evaluatedHeaderOutputDir, header));
-
-                    if(File.Exists(generatedSource) || File.Exists(generatedHeader))
+                    if (File.Exists(source))
                     {
                         const string message =
-                            "A file named '{0}' or '{1}' already exists. If you want to add '{2}' first remove '{0}' and '{1}'.";
+                            "A file named '{0}' already exists. If you want to add '{1}' first remove '{0}' .";
 
                         UIUtil.ShowErrorDialog("Ice Builder",
                             string.Format(message,
-                                GetPathRelativeToProject(project, generatedSource),
-                                GetPathRelativeToProject(project, generatedHeader),
-                                GetPathRelativeToProject(project, path)));
+                                FileUtil.RelativePath(projectDir, source),
+                                FileUtil.RelativePath(projectDir, path)));
+                        return false;
+                    }
+                }
+
+                foreach (var header in fileset.headers.Keys)
+                {
+                    if (File.Exists(header))
+                    {
+                        const string message =
+                            "A file named '{0}' already exists. If you want to add '{1}' first remove '{0}' .";
+
+                        UIUtil.ShowErrorDialog("Ice Builder",
+                            string.Format(message,
+                                FileUtil.RelativePath(projectDir, header),
+                                FileUtil.RelativePath(projectDir, path)));
                         return false;
                     }
                 }
@@ -313,8 +318,7 @@ namespace IceBuilder
         {
             var projectDir = project.GetProjectBaseDirectory();
             var dteproject = project.GetDTEProject();
-            var propertyStorage = project as IVsBuildPropertyStorage;
-            var fileset = GetCsharpGeneratedFiles(project, dteproject, propertyStorage, projectDir, file);
+            var fileset = GetCsharpGeneratedFiles(project, dteproject, projectDir, file);
 
             //
             // First remove any generated items that are not in the
@@ -524,7 +528,7 @@ namespace IceBuilder
                     }));
             }
 
-            // Now add any missing items
+            // Now add any missing generated items
             var sliceItems = project.GetIceBuilderItems();
             foreach(var item in sliceItems)
             {
