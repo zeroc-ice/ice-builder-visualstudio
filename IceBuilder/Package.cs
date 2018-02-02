@@ -669,7 +669,11 @@ namespace IceBuilder
                 BuildingProject = project;
                 var dteproject = project.GetDTEProject();
                 var activeConfiguration = dteproject.ConfigurationManager.ActiveConfiguration;
-                if(!Builder.Build(project, new BuildCallback(project, OutputPane, activeConfiguration), logger))
+                Dictionary<string, string> properties = new Dictionary<string, string>();
+                string platform = activeConfiguration.PlatformName.Equals("Any CPU") ? "AnyCPU" : activeConfiguration.PlatformName;
+                string configuration = activeConfiguration.ConfigurationName;
+
+                if(!Builder.Build(project, new BuildCallback(project, OutputPane), logger, platform, configuration))
                 {
                     BuildingProject = null;
                 }

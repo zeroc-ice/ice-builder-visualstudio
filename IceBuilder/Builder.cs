@@ -26,92 +26,95 @@ namespace IceBuilder
             Dispatcher = Dispatcher.CurrentDispatcher;
         }
 
-        public bool Build(IVsProject p, BuildCallback buildCallback, BuildLogger buildLogger)
+        public bool Build(IVsProject project, BuildCallback buildCallback, BuildLogger buildLogger, string platform, string configuration)
         {
-            MSBuildProject project = p.GetMSBuildProject();
-
-            //
-            // We need to set this before we acquire the build resources otherwise Msbuild
-            // will not see the changes.
-            //
-            bool onlyLogCriticalEvents = project.ProjectCollection.OnlyLogCriticalEvents;
-            project.ProjectCollection.Loggers.Add(buildLogger);
-            project.ProjectCollection.OnlyLogCriticalEvents = false;
-
-            uint cookie;
-            int err = BuildManagerAccessor.AcquireBuildResources(VSBUILDMANAGERRESOURCE.VSBUILDMANAGERRESOURCE_DESIGNTIME |
-                                                                 VSBUILDMANAGERRESOURCE.VSBUILDMANAGERRESOURCE_UITHREAD, out cookie);
-
-            if(err != VSConstants.E_PENDING && err != VSConstants.S_OK)
-            {
-                ErrorHandler.ThrowOnFailure(err);
-            }
-
-            if(err == VSConstants.E_PENDING)
-            {
-                project.ProjectCollection.Loggers.Remove(buildLogger);
-                project.ProjectCollection.OnlyLogCriticalEvents = onlyLogCriticalEvents;
-
-                Dispatcher = Dispatcher.CurrentDispatcher;
-                BuildAvailableEvent = new ManualResetEvent(false);
-                BuildAvailableEvent.SafeWaitHandle = new SafeWaitHandle(BuildManagerAccessor.DesignTimeBuildAvailable, false);
-
-                Thread t = new Thread(() =>
+            return project.WithProject((MSBuildProject msproject) =>
                 {
-                    BuildAvailableEvent.WaitOne();
-                    Dispatcher.BeginInvoke(new Action(() =>
-                    {
-                        Package.Instance.BuildNextProject();
-                    }));
-                });
-                t.Start();
-                return false;
-            }
-            else
-            {
-                try
-                {
-                    Dictionary<string, string> properties = new Dictionary<string, string>();
-                    string platform = buildCallback.ProjectConfiguration.PlatformName;
-                    properties["Platform"] = platform.Equals("Any CPU") ? "AnyCPU" : platform;
-                    properties["Configuration"] = buildCallback.ProjectConfiguration.ConfigurationName;
+                    //
+                    // We need to set this before we acquire the build resources otherwise Msbuild
+                    // will not see the changes.
+                    //
+                    bool onlyLogCriticalEvents = msproject.ProjectCollection.OnlyLogCriticalEvents;
+                    msproject.ProjectCollection.Loggers.Add(buildLogger);
+                    msproject.ProjectCollection.OnlyLogCriticalEvents = false;
 
-                    BuildRequestData buildRequest = new BuildRequestData(
-                            p.GetProjectFullPath(),
-                            properties,
-                            null,
-                            new string[] { "SliceCompile" },
-                            project.ProjectCollection.HostServices,
-                            BuildRequestDataFlags.ProvideProjectStateAfterBuild |
-                            BuildRequestDataFlags.IgnoreExistingProjectState |
-                            BuildRequestDataFlags.ReplaceExistingProjectInstance);
+                    uint cookie;
+                    int err = BuildManagerAccessor.AcquireBuildResources(VSBUILDMANAGERRESOURCE.VSBUILDMANAGERRESOURCE_DESIGNTIME |
+                                                                         VSBUILDMANAGERRESOURCE.VSBUILDMANAGERRESOURCE_UITHREAD, out cookie);
 
-                    BuildSubmission submission = BuildManager.DefaultBuildManager.PendBuildRequest(buildRequest);
-                    ErrorHandler.ThrowOnFailure(BuildManagerAccessor.RegisterLogger(submission.SubmissionId, buildLogger));
-                    buildCallback.BeginBuild();
-                    submission.ExecuteAsync(s =>
+                    if (err != VSConstants.E_PENDING && err != VSConstants.S_OK)
                     {
-                        Dispatcher.BeginInvoke(DispatcherPriority.Send, new Action(() =>
+                        ErrorHandler.ThrowOnFailure(err);
+                    }
+
+                    if (err == VSConstants.E_PENDING)
+                    {
+                        msproject.ProjectCollection.Loggers.Remove(buildLogger);
+                        msproject.ProjectCollection.OnlyLogCriticalEvents = onlyLogCriticalEvents;
+
+                        Dispatcher = Dispatcher.CurrentDispatcher;
+                        BuildAvailableEvent = new ManualResetEvent(false);
+                        BuildAvailableEvent.SafeWaitHandle = new SafeWaitHandle(BuildManagerAccessor.DesignTimeBuildAvailable, false);
+
+                        Thread t = new Thread(() =>
                         {
-                            project.ProjectCollection.Loggers.Remove(buildLogger);
-                            project.ProjectCollection.OnlyLogCriticalEvents = onlyLogCriticalEvents;
-                            BuildManagerAccessor.ReleaseBuildResources(cookie);
-                            s.BuildManager.ResetCaches();
-                            BuildManagerAccessor.UnregisterLoggers(s.SubmissionId);
-                            buildCallback.EndBuild(s.BuildResult.OverallResult == BuildResultCode.Success);
-                        }));
-                    }, null);
+                            BuildAvailableEvent.WaitOne();
+                            Dispatcher.BeginInvoke(new Action(() =>
+                            {
+                                Package.Instance.BuildNextProject();
+                            }));
+                        });
+                        t.Start();
+                        return false;
+                    }
+                    else
+                    {
+                        try
+                        {
+                            Dictionary<string, string> properties = new Dictionary<string, string>();
+                            properties["Platform"] = platform;
+                            properties["Configuration"] = configuration;
 
-                    return true;
-                }
-                catch(Exception)
-                {
-                    project.ProjectCollection.Loggers.Remove(buildLogger);
-                    project.ProjectCollection.OnlyLogCriticalEvents = onlyLogCriticalEvents;
-                    BuildManagerAccessor.ReleaseBuildResources(cookie);
-                    throw;
-                }
-            }
+                            BuildRequestData buildRequest = new BuildRequestData(
+                                    project.GetProjectFullPath(),
+                                    properties,
+                                    null,
+                                    new string[] { "SliceCompile" },
+                                    msproject.ProjectCollection.HostServices,
+                                    BuildRequestDataFlags.ProvideProjectStateAfterBuild |
+                                    BuildRequestDataFlags.IgnoreExistingProjectState |
+                                    BuildRequestDataFlags.ReplaceExistingProjectInstance);
+
+                            BuildSubmission submission = BuildManager.DefaultBuildManager.PendBuildRequest(buildRequest);
+                            ErrorHandler.ThrowOnFailure(BuildManagerAccessor.RegisterLogger(submission.SubmissionId, buildLogger));
+                            Dispatcher.BeginInvoke(DispatcherPriority.Send, new Action(() =>
+                                {
+                                    buildCallback.BeginBuild(platform, configuration);
+                                }));
+                            submission.ExecuteAsync(s =>
+                            {
+                                Dispatcher.BeginInvoke(DispatcherPriority.Send, new Action(() =>
+                                {
+                                    msproject.ProjectCollection.Loggers.Remove(buildLogger);
+                                    msproject.ProjectCollection.OnlyLogCriticalEvents = onlyLogCriticalEvents;
+                                    BuildManagerAccessor.ReleaseBuildResources(cookie);
+                                    s.BuildManager.ResetCaches();
+                                    BuildManagerAccessor.UnregisterLoggers(s.SubmissionId);
+                                    buildCallback.EndBuild(s.BuildResult.OverallResult == BuildResultCode.Success);
+                                }));
+                            }, null);
+
+                            return true;
+                        }
+                        catch (Exception)
+                        {
+                            msproject.ProjectCollection.Loggers.Remove(buildLogger);
+                            msproject.ProjectCollection.OnlyLogCriticalEvents = onlyLogCriticalEvents;
+                            BuildManagerAccessor.ReleaseBuildResources(cookie);
+                            throw;
+                        }
+                    }
+                });
         }
 
         private ManualResetEvent BuildAvailableEvent
@@ -135,48 +138,27 @@ namespace IceBuilder
 
     public class BuildCallback
     {
-        public BuildCallback(IVsProject project, EnvDTE.OutputWindowPane outputPane,
-                      EnvDTE.Configuration projectConfiguration)
+        public BuildCallback(IVsProject project, EnvDTE.OutputWindowPane outputPane)
         {
-
-            Project = project;
-            OutputPane = outputPane;
-            ProjectConfiguration = projectConfiguration;
-
+            _project = project;
+            _outputPane = outputPane;
         }
 
-        public void BeginBuild()
+        public void BeginBuild(string platform, string configuration)
         {
-            OutputPane.OutputString(
+            _outputPane.OutputString(
                 string.Format("------ Ice Builder Build started: Project: {0}, Configuration: {1} {2} ------\n",
-                    ProjectUtil.GetProjectName(Project),
-                    ProjectConfiguration.ConfigurationName,
-                    ProjectConfiguration.PlatformName));
+                    ProjectUtil.GetProjectName(_project), configuration, platform));
         }
 
         public void EndBuild(bool succeed)
         {
-            OutputPane.OutputString(
+            _outputPane.OutputString(
                 string.Format("------ Build {0} ------\n\n", (succeed ? "succeeded" : "failed")));
             Package.Instance.BuildDone();
         }
 
-        IVsProject Project
-        {
-            get;
-            set;
-        }
-
-        EnvDTE.OutputWindowPane OutputPane
-        {
-            get;
-            set;
-        }
-
-        public EnvDTE.Configuration ProjectConfiguration
-        {
-            get;
-            set;
-        }
+        private IVsProject _project;
+        private EnvDTE.OutputWindowPane _outputPane;
     }
 }
