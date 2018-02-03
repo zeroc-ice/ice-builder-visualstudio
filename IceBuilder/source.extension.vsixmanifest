@@ -7,7 +7,7 @@
         <MoreInfo>https://github.com/zeroc-ice/ice-builder-visualstudio</MoreInfo>
         <License>Resources\LICENSE.rtf</License>
         <Icon>Resources\Package.png</Icon>
-        <PreviewImage>Resources\Preview.png</PreviewImage>
+        <PreviewImage>Resources\Package.png</PreviewImage>
         <Tags>ZeroC, Ice, Slice</Tags>
     </Metadata>
     <Installation>

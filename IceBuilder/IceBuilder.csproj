@@ -216,11 +216,8 @@
     <Content Include="Resources\LICENSE.rtf">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="Resources\Package.ico" />
+    <Resource Include="Resources\Package.ico" />
     <Content Include="Resources\Package.png">
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="Resources\Preview.png">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <None Include="app.config" />
