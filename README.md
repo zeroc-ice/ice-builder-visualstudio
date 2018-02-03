@@ -21,6 +21,7 @@ Ice Builder for Visual Studio is compatible with Visual Studio 2012, 2013, 2015 
 * [C# Usage](#c-usage-1)
   * [Adding Slice Files to a C# Project](#adding-slice-files-to-a-c-project-1)
   * [Customizing the Slice to C# Compilation](#customizing-the-slice-to-c-compilation-1)
+* [Upgrading your Projects from Ice Builder 4.x](#upgrading-your-projects-from-ice-builder-4-x)
 * [Migration from the Ice Add-in](#migration-from-the-ice-add-in)
 * [Building Ice Builder from Source](#building-ice-builder-from-source)
   * [Build Requirements](#build-requirements)
@@ -143,6 +144,16 @@ These options are the same for all configurations and platforms, and map to item
 | Additional Options  | AdditionalOptions                        |
 
 See [Customizing the Slice to C# Compilation](https://github.com/zeroc-ice/ice-builder-msbuild/blob/master/README.md#customizing-the-slice-to-c-compilation-1) with Ice Builder for MSBuild for further details.
+
+## Upgrading your Projects from Ice Builder 4.x
+
+When you open a solution with one or more projects that use the Ice Builder 4.x extension, Ice Builder offers you to upgrade these projects to the latest format. We recommend you backup your projects before performing this upgrade.
+
+If you decline this upgrade, the solution loads but Ice Builder ignores the Ice Builder 4.x configuration.
+
+If you proceed with this upgrade, all upgraded C++ projects are configured with `C++ Mapping` set to `C++98`. If you are using the Slice to C++11 mapping, you should then:
+ * change `C++ Mapping` to `C++11`, as shown on [Selecting the Slice to C++ Mapping](#selecting-the-slice-to-c-mapping) above 
+ * remove the now redundant `ICE_CPP11_MAPPING` definition from your projects' C/C++ Preprocessor Definitions
 
 ## Migration from the Ice Add-in
 
