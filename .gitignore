@@ -230,3 +230,5 @@ pip-log.txt
 # Nuget packages diretory
 #
 packages
+
+\#*\#
