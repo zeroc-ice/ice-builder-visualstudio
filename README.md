@@ -21,7 +21,7 @@ Ice Builder for Visual Studio is compatible with Visual Studio 2012, 2013, 2015 
 * [C# Usage](#c-usage-1)
   * [Adding Slice Files to a C# Project](#adding-slice-files-to-a-c-project-1)
   * [Customizing the Slice to C# Compilation](#customizing-the-slice-to-c-compilation-1)
-* [Upgrading your Projects from Ice Builder 4.x](#upgrading-your-projects-from-ice-builder-4-x)
+* [Upgrading your Projects from Ice Builder 4.x](#upgrading-your-projects-from-ice-builder-4x)
 * [Migration from the Ice Add-in](#migration-from-the-ice-add-in)
 * [Building Ice Builder from Source](#building-ice-builder-from-source)
   * [Build Requirements](#build-requirements)
