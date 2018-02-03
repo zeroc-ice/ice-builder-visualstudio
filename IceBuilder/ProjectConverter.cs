@@ -206,6 +206,13 @@ namespace IceBuilder
                                 {
                                     propertyGroup.Parent.RemoveChild(propertyGroup);
                                 }
+
+                                if(cpp)
+                                {
+                                    propertyGroup = msproject.Xml.AddPropertyGroup();
+                                    propertyGroup.Label = "IceBuilder";
+                                    propertyGroup.AddProperty("IceCppMapping", "cpp98");
+                                }
                             });
 
                             builder.ReloadProject(project);
