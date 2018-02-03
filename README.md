@@ -9,6 +9,7 @@ Ice Builder for Visual Studio is compatible with Visual Studio 2012, 2013, 2015 
 ## Contents
 
 * [Installation](#installation)
+* [Feedback](#feedback)
 * [Overview](#overview)
 * [Ice Builder Options](#ice-builder-options)
   * [Compile on Save Configuration](#compile-on-save-configuration)
@@ -27,9 +28,15 @@ Ice Builder for Visual Studio is compatible with Visual Studio 2012, 2013, 2015 
 
 ## Installation
 
-The latest version of Ice Builder is published in the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=ZeroCInc.IceBuilder).
+The latest version of Ice Builder is published in the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=ZeroCInc.IceBuilder) and can be installed directly using Visual Studio's Tools > Extensions and Updates.
 
 You can also install older versions or preview releases of Ice Builder by downloading the desired `IceBuilder.vsix` from the [GitHub Releases page](https://github.com/zeroc-ice/ice-builder-visualstudio/releases), and then double-clicking on `IceBuilder.vsix`.
+
+## Feedback
+
+We encourage you to [rate and review](https://marketplace.visualstudio.com/items?itemName=ZeroCInc.IceBuilder#review-details) Ice Builder in the Visual Studio Marketplace.
+
+You can also report issues here in GitHub, and ask questions on the [community forums](https://forums.zeroc.com) or on Ice Builder's [Q & A](https://marketplace.visualstudio.com/items?itemName=ZeroCInc.IceBuilder#qna) page.
 
 ## Overview
 
