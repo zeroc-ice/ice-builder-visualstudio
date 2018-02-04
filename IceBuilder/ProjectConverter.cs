@@ -132,18 +132,24 @@ namespace IceBuilder
                             var cppHeaderOutputDir = new List<string>();
                             if(cpp)
                             {
-                                foreach(EnvDTE.Configuration configuration in dteProject.ConfigurationManager)
-                                {
-                                    cppOutputDir.Add(Package.Instance.VCUtil.Evaluate(configuration, outputDirUnevaluated));
-                                    if(string.IsNullOrEmpty(headerOutputDirUnevaluated))
+                                var waitEvent = new ManualResetEvent(false);
+                                dispatcher.BeginInvoke(new Action(() =>
                                     {
-                                        cppHeaderOutputDir.Add(Package.Instance.VCUtil.Evaluate(configuration, outputDirUnevaluated));
-                                    }
-                                    else
-                                    {
-                                        cppHeaderOutputDir.Add(Package.Instance.VCUtil.Evaluate(configuration, headerOutputDirUnevaluated));
-                                    }
-                                }
+                                        foreach (EnvDTE.Configuration configuration in dteProject.ConfigurationManager)
+                                        {
+                                            cppOutputDir.Add(Package.Instance.VCUtil.Evaluate(configuration, outputDirUnevaluated));
+                                            if (string.IsNullOrEmpty(headerOutputDirUnevaluated))
+                                            {
+                                                cppHeaderOutputDir.Add(Package.Instance.VCUtil.Evaluate(configuration, outputDirUnevaluated));
+                                            }
+                                            else
+                                            {
+                                                cppHeaderOutputDir.Add(Package.Instance.VCUtil.Evaluate(configuration, headerOutputDirUnevaluated));
+                                            }
+                                        }
+                                        waitEvent.Set();
+                                    }));
+                                waitEvent.WaitOne();
                             }
                             else
                             {
