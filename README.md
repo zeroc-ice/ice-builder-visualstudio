@@ -37,7 +37,7 @@ You can also install older versions or preview releases of Ice Builder by downlo
 
 We encourage you to [rate and review](https://marketplace.visualstudio.com/items?itemName=ZeroCInc.IceBuilder#review-details) Ice Builder in the Visual Studio Marketplace.
 
-You can also report issues here in GitHub, and ask questions on the [community forums](https://forums.zeroc.com) or on Ice Builder's [Q & A](https://marketplace.visualstudio.com/items?itemName=ZeroCInc.IceBuilder#qna) page.
+You can also report issues [here on GitHub](https://github.com/zeroc-ice/ice-builder-visualstudio/issues), and ask questions on the [community forums](https://forums.zeroc.com) or on Ice Builder's [Q & A](https://marketplace.visualstudio.com/items?itemName=ZeroCInc.IceBuilder#qna) page.
 
 ## Overview
 
