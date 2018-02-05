@@ -76,7 +76,7 @@ namespace IceBuilder
                             properties["Configuration"] = configuration;
 
                             BuildRequestData buildRequest = new BuildRequestData(
-                                    project.GetProjectFullPath(),
+                                    msproject.FullPath,
                                     properties,
                                     null,
                                     new string[] { "SliceCompile" },
