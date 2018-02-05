@@ -44,7 +44,7 @@ The Ice Builder relies on a specific Ice installation on your system. In Visual 
 
 For Ice versions < 3.7, this installation can correspond to a binary distribution, such as `C:\Program Files (x86)\ZeroC\Ice-3.6.4`. For Ice 3.7.0 and higher, Ice binaries are provided with NuGet packages so it can be left blank. It can also be set to a source tree, such as `C:\users\mike\github\zeroc-ice\ice`.
 
-![Ice home screenshot](https://github.com/zeroc-ice/ice-builder-visualstudio/raw/master/Screenshots/vs2015-options.png)
+![Ice home screenshot](Screenshots/vs2015-options.png)
 
 :warning: The Ice Home setting is ignored when a project uses an Ice NuGet package. Installing an Ice NuGet package into a project automatically configures the project to use the Ice SDK provided by that NuGet package.
 
@@ -76,7 +76,7 @@ Follow these steps:
 
 The Ice Builder adds an `Ice Builder` property page to the `Common Properties` of your C++ project:
 
-![Alt text](https://github.com/zeroc-ice/ice-builder-visualstudio/raw/master/Screenshots/cpp-property-page.png)
+![Alt text](Screenshots/cpp-property-page.png)
 
 These properties are the same for all configurations and platforms, and allow you to specify the [parameters](https://doc.zeroc.com/display/Ice36/slice2cpp+Command-Line+Options) passed to `slice2cpp` when compiling the project's Slice files.
 
@@ -110,7 +110,7 @@ Follow these steps:
 
 The Ice Builder adds an `Ice Builder` tab to the properties of your C# project:
 
-![Alt text](https://github.com/zeroc-ice/ice-builder-visualstudio/raw/master/Screenshots/csharp-property-page.png)
+![Alt text](Screenshots/csharp-property-page.png)
 
 These properties are the same for all configurations and platforms, and allow you to specify the [parameters](https://doc.zeroc.com/display/Ice36/slice2cs+Command-Line+Options) passed to `slice2cs` when compiling the project's Slice files.
 
