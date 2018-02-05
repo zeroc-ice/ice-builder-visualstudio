@@ -49,7 +49,7 @@ You tell Ice Builder for MSBuild which Slice files to compile by adding these fi
 
 You can configure the Ice Builder global options on the `Tools` > `Options` > `Project and Solutions` > `Ice Builder` page.
 
-![Ice home screenshot](/Screenshots/options.png)
+![Ice home screenshot](Screenshots/options.png)
 
 ### Compile on Save Configuration
 
@@ -73,7 +73,7 @@ Follow these steps:
 
 3. Add the directory where Ice Builder outputs generated C++ header files (`$(IntDir)` by default) to your project's C/C++ Additional Include Directories:
 
-![Missing cpp additional include directories](/Screenshots/cpp-additional-include-directories.png)
+![Missing cpp additional include directories](Screenshots/cpp-additional-include-directories.png)
 
 :memo: Make sure to select `All Configurations` and `All Platforms` as shown above.
 
@@ -85,7 +85,7 @@ Ice Builder selects C++11 as the default mapping when using Visual Studio 2015 o
 
 You can overwrite this default selection by setting `C++ Mapping` on the `Ice Builder` property page in the `Configuration Properties` of your project:
 
-![Missing cpp mapping](/Screenshots/cpp-mapping.png)
+![Missing cpp mapping](Screenshots/cpp-mapping.png)
 
 This selection always applies to all configurations and platforms. See [Selecting the Slice to C++ Mapping](https://github.com/zeroc-ice/ice-builder-msbuild/blob/master/README.md#selecting-the-slice-to-c-mapping) with Ice Builder for MSBuild for further details.
 
@@ -95,11 +95,11 @@ This selection always applies to all configurations and platforms. See [Selectin
 
 Ice Builder allows you to change the options given to `slice2cpp` when compiling a Slice file. You can specify the options that apply to all Slice files in a project with the `Ice Builder` property page in the `Configuration Properties` of your project:
 
-![Missing cpp property page](/Screenshots/cpp-property-page.png)
+![Missing cpp property page](Screenshots/cpp-property-page.png)
 
 You can also specify options that apply to a single Slice file with the `Ice Builder` property page of that file (this is less common):
 
-![Missing file cpp property page](/Screenshots/file-cpp-property-page.png)
+![Missing file cpp property page](Screenshots/file-cpp-property-page.png)
 
 These options are always the same for all configurations and platforms, and map to item metadata of the SliceCompile type:
 
@@ -133,7 +133,7 @@ Follow these steps:
 
 Ice Builder allows you to change the options given to `slice2cs` when compiling a Slice file. You can specify the options that apply to all Slice files in a project with the `Ice Builder` tab of your project's properties:
 
-![Missing csharp property page](/Screenshots/csharp-property-page.png)
+![Missing csharp property page](Screenshots/csharp-property-page.png)
 
 These options are the same for all configurations and platforms, and map to item metadata of the SliceCompile type:
 
@@ -152,7 +152,7 @@ When you open a solution with one or more projects that use the Ice Builder 4.x 
 If you decline this upgrade, the solution loads but Ice Builder ignores the Ice Builder 4.x configuration.
 
 If you proceed with this upgrade, all upgraded C++ projects are configured with `C++ Mapping` set to `C++98`. If you are using the Slice to C++11 mapping, you should then:
- * change `C++ Mapping` to `C++11`, as shown on [Selecting the Slice to C++ Mapping](#selecting-the-slice-to-c-mapping) above 
+ * change `C++ Mapping` to `C++11`, as shown on [Selecting the Slice to C++ Mapping](#selecting-the-slice-to-c-mapping) above
  * remove the now redundant `ICE_CPP11_MAPPING` definition from your projects' C/C++ Preprocessor Definitions
 
 ## Migration from the Ice Add-in
