@@ -5,7 +5,7 @@
     as a NuGet package on nuget.org.
   - Ice Builder for Visual Studio, a Visual Studio extension, distributed in the
     Visual Studio Marketplace.
-    Ice Builder for Visual Studio is now just a front-end to edit the configuration
+    Ice Builder for Visual Studio is just a front-end to edit the configuration
     for Ice Builder for MSBuild within the Visual Studio IDE; Ice Builder for
     MSBuild controls the Slice compilation.
 
@@ -18,9 +18,12 @@
 
  - Added support for C# .NET Core projects.
 
- - The Ice Builder 4.x MSBuild properties have been replaced by Ice Builder for
- MSBuild properties with the same names, except the prefix for these properties
- is now `SliceCompile` instead of `IceBuilder`.
+ - The Ice Builder 4.x MSBuild properties have been replaced by item metadata
+ of SliceCompile in Ice Builder for MSBuild. The names have remained mostly the
+ same, except without the IceBuilder prefix.
+ 
+ - Added C++ Mapping property to C++ projects. It defaults to C++11 with Visual
+ Studio 2015 and greater, and to C++98 with earlier Visual Studio releases.
 
  - When you open a solution with projects that use Ice Builder 4.x, Ice Builder
  offers you to convert these projects to the 5.0 format. This conversion adds
