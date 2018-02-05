@@ -77,39 +77,32 @@ namespace IceBuilder
                                 progressCallback.ReportProgress(name, i);
                             }));
 
-                        NuGet.Restore(dteProject);
+                        try
+                        {
+                            NuGet.Restore(dteProject);
+                        }
+                        catch (Exception ex)
+                        {
+                            Package.WriteMessage(
+                                            string.Format("\nNuGet package restore failed:\n{0}\n", ex.Message));
+                            dispatcher.Invoke(new Action(() => progressCallback.Finished()));
+                            break;
+                        }
+
                         if(!NuGet.IsPackageInstalled(dteProject, Package.NuGetBuilderPackageId))
                         {
-                            var retry = 5;
-                            while(true)
+                            try
                             {
-                                try
-                                {
-                                    DTE.StatusBar.Text = string.Format("Installing NuGet package {0} in project {1}",
-                                                                       Package.NuGetBuilderPackageId, name);
-                                    NuGet.InstallLatestPackage(dteProject, Package.NuGetBuilderPackageId);
-                                    break;
-                                }
-                                catch(Exception ex)
-                                {
-                                    retry--;
-                                    if (retry == 4)
-                                    {
-                                        Package.WriteMessage(
-                                            "NuGet package zeroc.icebuilder.msbuild install failed, retrying .");
-                                    }
-                                    else if(retry >= 0)
-                                    {
-                                        Package.WriteMessage(".");
-                                    }
-                                    else
-                                    {
-                                        Package.WriteMessage(
-                                            string.Format("\nNuGet package zeroc.icebuilder.msbuild install failed:\n{0}\n", ex.Message));
-                                        dispatcher.Invoke(new Action(() => progressCallback.Finished()));
-                                        return;
-                                    }
-                                }
+                                DTE.StatusBar.Text = string.Format("Installing NuGet package {0} in project {1}",
+                                                                    Package.NuGetBuilderPackageId, name);
+                                NuGet.InstallLatestPackage(dteProject, Package.NuGetBuilderPackageId);
+                            }
+                            catch(Exception ex)
+                            {
+                                Package.WriteMessage(
+                                    string.Format("\nNuGet package zeroc.icebuilder.msbuild install failed:\n{0}\n", ex.Message));
+                                dispatcher.Invoke(new Action(() => progressCallback.Finished()));
+                                break;
                             }
                         }
 
