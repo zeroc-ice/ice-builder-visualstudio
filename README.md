@@ -75,7 +75,7 @@ Follow these steps:
 
 ![Missing cpp additional include directories](Screenshots/cpp-additional-include-directories.png)
 
-:memo: Make sure to select `All Configurations` and `All Platforms` as shown above.
+> :white_check_mark: Make sure to select `All Configurations` and `All Platforms` as shown above.
 
 ### Selecting the Slice to C++ Mapping
 
@@ -87,9 +87,11 @@ You can overwrite this default selection by setting `C++ Mapping` on the `Ice Bu
 
 ![Missing cpp mapping](Screenshots/cpp-mapping.png)
 
-This selection always applies to all configurations and platforms. See [Selecting the Slice to C++ Mapping](https://github.com/zeroc-ice/ice-builder-msbuild/blob/master/README.md#selecting-the-slice-to-c-mapping) with Ice Builder for MSBuild for further details.
+> :arrows_counterclockwise: Ice Builder's property page appears after you add `zeroc.icebuilder.msbuild` to your project, but not immediately after you restore this NuGet package in your project. You need to reload your project or solution after a NuGet restore to see this page.
 
-:memo: When the C++ Mapping is set to C++11, Ice Builder defines `ICE_CPP11_MAPPING` during C++ compilation of your project even though you don't see `ICE_CPP11_MAPPING` among the C/C++ Preprocessor Definitions in the Visual Studio IDE.
+This C++ Mapping selection always applies to all configurations and platforms. See [Selecting the Slice to C++ Mapping](https://github.com/zeroc-ice/ice-builder-msbuild/blob/master/README.md#selecting-the-slice-to-c-mapping) with Ice Builder for MSBuild for further details.
+
+> :information_source: When C++ Mapping is set to C++11, Ice Builder defines `ICE_CPP11_MAPPING` during C++ compilation of your project even though you don't see `ICE_CPP11_MAPPING` among the C/C++ Preprocessor Definitions in the Visual Studio IDE.
 
 ### Customizing the Slice to C++ Compilation
 
@@ -100,6 +102,8 @@ Ice Builder allows you to change the options given to `slice2cpp` when compiling
 You can also specify options that apply to a single Slice file with the `Ice Builder` property page of that file (this is less common):
 
 ![Missing file cpp property page](Screenshots/file-cpp-property-page.png)
+
+> :arrows_counterclockwise: Ice Builder's property pages appear after you add `zeroc.icebuilder.msbuild` to your project, but not immediately after you restore this NuGet package in your project. You need to reload your project or solution after a NuGet restore to see these pages.
 
 These options are always the same for all configurations and platforms, and map to item metadata of the SliceCompile type:
 
