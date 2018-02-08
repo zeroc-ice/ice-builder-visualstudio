@@ -200,34 +200,42 @@
     <Content Include="..\IceBuilder_VS2012\bin\IceBuilder.VS2012.dll">
       <Link>Resources\IceBuilder.VS2012.dll</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <VSIXSubPath>Resources</VSIXSubPath>
     </Content>
     <Content Include="..\IceBuilder_VS2012\bin\IceBuilder.VS2012.pdb">
       <Link>Resources\IceBuilder.VS2012.pdb</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <VSIXSubPath>Resources</VSIXSubPath>
     </Content>
     <Content Include="..\IceBuilder_VS2013\bin\IceBuilder.VS2013.dll">
       <Link>Resources\IceBuilder.VS2013.dll</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <VSIXSubPath>Resources</VSIXSubPath>
     </Content>
     <Content Include="..\IceBuilder_VS2013\bin\IceBuilder.VS2013.pdb">
       <Link>Resources\IceBuilder.VS2013.pdb</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <VSIXSubPath>Resources</VSIXSubPath>
     </Content>
     <Content Include="..\IceBuilder_VS2015\bin\IceBuilder.VS2015.dll">
       <Link>Resources\IceBuilder.VS2015.dll</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <VSIXSubPath>Resources</VSIXSubPath>
     </Content>
     <Content Include="..\IceBuilder_VS2015\bin\IceBuilder.VS2015.pdb">
       <Link>Resources\IceBuilder.VS2015.pdb</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <VSIXSubPath>Resources</VSIXSubPath>
     </Content>
     <Content Include="..\IceBuilder_VS2017\bin\IceBuilder.VS2017.dll">
       <Link>Resources\IceBuilder.VS2017.dll</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <VSIXSubPath>Resources</VSIXSubPath>
     </Content>
     <Content Include="..\IceBuilder_VS2017\bin\IceBuilder.VS2017.pdb">
       <Link>Resources\IceBuilder.VS2017.pdb</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <VSIXSubPath>Resources</VSIXSubPath>
     </Content>
     <Content Include="Resources\LICENSE.rtf">
       <IncludeInVSIX>true</IncludeInVSIX>
