@@ -389,12 +389,12 @@ namespace IceBuilder
             }
             else if(!Building && BuildingProject == null)
             {
-                IVsProject p = _buildProjects.ElementAt(0);
-                ProjectUtil.SaveProject(p);
-                ProjectUtil.SetupGenerated(p);
-                if(BuildProject(p))
+                IVsProject project = _buildProjects.ElementAt(0);
+                ProjectUtil.SaveProject(project);
+                ProjectUtil.SetupGenerated(project);
+                if(BuildProject(project))
                 {
-                    _buildProjects.Remove(p);
+                    _buildProjects.Remove(project);
                 }
             }
         }
