@@ -1,3 +1,16 @@
+## Changes in Ice Builder for Visual Studio 5.0.1
+
+- Fixes to support .NET Core project system:
+  - Fixed renaming of SliceCompile items in .NET Core project,
+    that was causing Visual Studio to Freeze while adding the
+    new generated item see dotnet/project-system#3229
+
+  - Non generated items removed by Ice Builder in .NET Core
+    projects that use EnableDefaultItems. SliceCompileSource
+    metadata used to mark generated items was attach to the
+    glob causing all files that originate in the glob to be
+    mark as generated and eventually removed.
+
 ## Changes in Ice Builder for Visual Studio 5.0.0
 
 - Split Ice Builder in two components:
@@ -21,7 +34,7 @@
  - The Ice Builder 4.x MSBuild properties have been replaced by item metadata
  of SliceCompile in Ice Builder for MSBuild. The names have remained mostly the
  same, except without the IceBuilder prefix.
- 
+
  - Added C++ Mapping property to C++ projects. It defaults to C++11 with Visual
  Studio 2015 and greater, and to C++98 with earlier Visual Studio releases.
 
