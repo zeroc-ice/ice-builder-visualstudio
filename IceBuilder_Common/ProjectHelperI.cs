@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.Shell.Interop;
 using MSProject = Microsoft.Build.Evaluation.Project;
 using Microsoft.VisualStudio.Shell;
+using System.Linq;
+using System.Collections.Generic;
+using System.IO;
 
 #if VS2017
 using System.Threading.Tasks.Dataflow;
@@ -171,6 +174,182 @@ namespace IceBuilder
             UpdateProject(project, (MSProject msproject) =>
                 {
                     msproject.SetItemMetadata("SliceCompile", "IceBuilder", name, value);
+                });
+        }
+
+        public void DeleteItems(IVsProject project, List<string> paths)
+        {
+            foreach (string path in paths)
+            {
+                //
+                // First remove the physical file, if it was included as part of
+                // a glob that will be enough
+                //
+                if (File.Exists(path))
+                 {
+                    try
+                    {
+                        File.Delete(path);
+                    }
+                    catch (IOException)
+                    {
+                        // can happen if the file is being used by other process
+                    }
+                }
+
+                EnvDTE.ProjectItem item = project.GetProjectItem(path);
+                if (item != null)
+                {
+                    item.Remove();
+                }
+            }
+#if VS2017
+            //
+            // With .NET Core the project ends up adding Compile Remove="XXX.cs" for
+            // files that have been removed, we can get rid of those.
+            //
+            if(paths.Count > 0)
+            {
+                if (!project.IsCppProject() && GetUnconfiguredProject(project) != null)
+                {
+                    project.UpdateProject((MSProject msproject) =>
+                    {
+                        var projectDir = Path.GetDirectoryName(msproject.FullPath);
+                        var removeItems = msproject.Xml.Items.Where(i =>
+                        {
+                            return paths.Contains(Path.Combine(projectDir, i.Remove)) &&
+                                   !File.Exists(Path.Combine(projectDir, i.Remove));
+                        });
+                        foreach (var item in removeItems)
+                        {
+                            item.Parent.RemoveChild(item);
+                        }
+                    });
+                }
+            }
+#endif
+        }
+
+        public void AddFromFile(IVsProject project, string file)
+        {
+#if VS2017
+            if(project.IsCppProject() || GetUnconfiguredProject(project) == null)
+            {
+                project.GetDTEProject().ProjectItems.AddFromFile(file);
+            }
+            else
+            {
+                project.UpdateProject((MSProject msproject) =>
+                    {
+                        if(Path.GetExtension(file).Equals(".cs", StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            var path = FileUtil.RelativePath(Path.GetDirectoryName(msproject.FullPath), file);
+                            var items = msproject.GetItemsByEvaluatedInclude(path);
+                            if(items.Count == 0)
+                            {
+                                msproject.AddItem("Compile", path);
+                            }
+                        }
+                    });
+            }
+#else
+            project.GetDTEProject().ProjectItems.AddFromFile(file);
+#endif
+        }
+
+        public void RemoveGeneratedItemDuplicates(IVsProject project)
+        {
+#if VS2017
+            //
+            // With .NET Core project system when default compile items is enabled we
+            // can end up with duplicate generated items, as the call to AddItem doesn't
+            // detect that the new create file is already part of a glob and adds a
+            // second item with the given include.
+            //
+            if (!project.IsCppProject() && GetUnconfiguredProject(project) != null)
+            {
+                project.UpdateProject((MSProject msproject) =>
+                    {
+                        var all = msproject.Xml.Items.Where(item => item.ItemType.Equals("Compile"));
+
+                        foreach(var item in all)
+                        {
+                            //
+                            // If there is a glob item that already match the evaluated include path we
+                            // can remove the non glob item as it is a duplicate
+                            //
+                            var globItem = msproject.AllEvaluatedItems.FirstOrDefault(i =>
+                                {
+                                    return i.HasMetadata("SliceCompileSource") &&
+                                           !i.EvaluatedInclude.Equals(i.UnevaluatedInclude) &&
+                                           i.EvaluatedInclude.Equals(item.Include);
+                                });
+                            if(globItem != null)
+                            {
+                                item.Parent.RemoveChild(item);
+                            }
+                        }
+                    });
+            }
+#endif
+        }
+
+            public void SetGeneratedItemCustomMetadata(IVsProject project, string slice, string generated,
+            List<string> excludedConfigurations = null)
+        {
+            project.UpdateProject((MSProject msproject) =>
+                {
+                    var item = msproject.AllEvaluatedItems.FirstOrDefault(i => generated.Equals(i.EvaluatedInclude));
+                    if (item != null)
+                    {
+                        var element = item.Xml;
+                        if (excludedConfigurations != null)
+                        {
+                            foreach (var conf in excludedConfigurations)
+                            {
+                                var metadata = element.AddMetadata("ExcludedFromBuild", "true");
+                                metadata.Condition = string.Format("'$(Configuration)|$(Platform)'=='{0}'", conf);
+                            }
+                        }
+                        //
+                        // Only set SliceCompileSource if the item doesn't originate
+                        // from a glob expression
+                        //
+                        if (item.EvaluatedInclude.Equals(item.UnevaluatedInclude))
+                        {
+                            item.SetMetadataValue("SliceCompileSource", slice);
+                        }
+#if VS2017
+                        //
+                        // With Visual Studio 2017 if the imte originate from a glob we
+                        // add update the item medata using the Update attribute
+                        //
+                        else
+                        {
+                            var updateItem = msproject.Xml.Items.FirstOrDefault(i => generated.Equals(i.Update));
+                            if(updateItem == null)
+                            {
+                                updateItem = msproject.Xml.CreateItemElement(item.ItemType);
+                                var group = msproject.Xml.ItemGroups.FirstOrDefault();
+                                if (group == null)
+                                {
+                                    group = msproject.Xml.AddItemGroup();
+                                }
+                                updateItem.Update = generated;
+                                group.AppendChild(updateItem);
+                            }
+                            var metadata = updateItem.Metadata.FirstOrDefault(m => m.Name.Equals("SliceCompileSource"));
+                            if(metadata != null)
+                            {
+                                metadata.Value = slice;
+                            }
+                            else
+                            {
+                                updateItem.AddMetadata("SliceCompileSource", slice);
+                            }
+                        }
+#endif
+                    }
                 });
         }
 

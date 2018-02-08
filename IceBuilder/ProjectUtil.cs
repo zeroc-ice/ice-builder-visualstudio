@@ -46,17 +46,6 @@ namespace IceBuilder
             return !string.IsNullOrEmpty(name) && Path.GetExtension(name).Equals(".ice");
         }
 
-        public static EnvDTE.ProjectItem GetProjectItem(IVsProject project, uint item)
-        {
-            IVsHierarchy hierarchy = project as IVsHierarchy;
-            object value = null;
-            if(hierarchy != null)
-            {
-                hierarchy.GetProperty(item, (int)__VSHPROPID.VSHPROPID_ExtObject, out value);
-            }
-            return value as EnvDTE.ProjectItem;
-        }
-
         public static string GetDefaultOutputDir(IVsProject project, bool evaluated)
         {
             return project.GetDefaultItemMetadata(ItemMetadataNames.OutputDir, evaluated);
@@ -88,10 +77,10 @@ namespace IceBuilder
         //
         // Using DTE
         //
-        public static EnvDTE.ProjectItem FindProjectItem(string path)
+        /*public static EnvDTE.ProjectItem FindProjectItem(string path)
         {
             return Package.Instance.DTE2.Solution.FindProjectItem(path);
-        }
+        }*/
 
         public static GeneratedFileSet
         GetCppGeneratedFiles(IVsProject project, EnvDTE.Project dteproject, VCUtil vcutil, string projectDir, string item)
@@ -254,52 +243,32 @@ namespace IceBuilder
             return true;
         }
 
-        public static void DeleteItems(List<string> paths)
+        public static bool TryAddItem(IVsProject project, string path)
         {
-            foreach(string path in paths)
+            var item = project.GetProjectItem(path);
+            if (item == null)
             {
-                EnvDTE.ProjectItem item = FindProjectItem(path);
-                if(item != null)
+                if (!Directory.Exists(Path.GetDirectoryName(path)))
                 {
-                    item.Remove();
+                    Directory.CreateDirectory(Path.GetDirectoryName(path));
                 }
 
-                if(File.Exists(path))
+                if (!File.Exists(path))
                 {
-                    try
-                    {
-                        File.Delete(path);
-                    }
-                    catch(IOException)
-                    {
-                        // can happen if the file is being used by other process
-                    }
+                    File.Create(path).Dispose();
                 }
-            }
-        }
-
-        public static void AddItem(EnvDTE.Project project, string path)
-        {
-            if(!Directory.Exists(Path.GetDirectoryName(path)))
-            {
-                Directory.CreateDirectory(Path.GetDirectoryName(path));
-            }
-
-            if(!File.Exists(path))
-            {
-                File.Create(path).Dispose();
-            }
-            project.ProjectItems.AddFromFile(path);
-            try
-            {
                 //
-                // Remove the file otherwise it will be considered up to date.
+                // Check again in case the item gets auto included once the file
+                // has been created
                 //
-                File.Delete(path);
+                item = project.GetProjectItem(path);
+                if(item == null)
+                {
+                    project.AddFromFile(path);
+                }
+                return true;
             }
-            catch(Exception)
-            {
-            }
+            return false;
         }
 
         public static void AddGeneratedFiles(IVsProject project, string file)
@@ -311,6 +280,10 @@ namespace IceBuilder
             else
             {
                 AddCSharpGeneratedFiles(project, file);
+                //
+                // Workaround for .NET Core project system adding duplicate
+                // items when the added item is part of a glob
+                project.RemoveGeneratedItemDuplicates();
             }
         }
 
@@ -324,7 +297,7 @@ namespace IceBuilder
             // First remove any generated items that are not in the
             // current generated items set for this Slice file
             //
-            DeleteItems(project.WithProject((MSProject msproject) =>
+            project.DeleteItems(project.WithProject((MSProject msproject) =>
                 {
                     return msproject.AllEvaluatedItems.Where(
                         item =>
@@ -367,7 +340,7 @@ namespace IceBuilder
             // First remove any generated items that are not in the
             // current generated items set for this Slice file
             //
-            DeleteItems(project.WithProject((MSProject msproject) =>
+            project.DeleteItems(project.WithProject((MSProject msproject) =>
             {
                 return msproject.AllEvaluatedItems.Where(
                     item =>
@@ -420,15 +393,10 @@ namespace IceBuilder
                                        List<string> allConfigurations,
                                        List<string> configurations)
         {
-            var item = FindProjectItem(Path.Combine(projectDir, generatedpath));
-            if(item == null)
+            if(TryAddItem(project, Path.Combine(projectDir, generatedpath)))
             {
-                AddItem(dteproject, Path.Combine(projectDir, generatedpath));
                 var excludedConfigurations = allConfigurations.Where(c => !configurations.Contains(c)).ToList();
-                project.UpdateProject(buildProject =>
-                {
-                    buildProject.SetGeneratedItemCustomMetadata(path, generatedpath, excludedConfigurations);
-                });
+                project.SetGeneratedItemCustomMetadata(path, generatedpath, excludedConfigurations);
 
                 //
                 // If generated item applies only to one platform configuration we move it to the Platform/Configuration filter
@@ -450,14 +418,9 @@ namespace IceBuilder
                                                   string path,
                                                   string generatedpath)
         {
-            var item = FindProjectItem(Path.Combine(projectDir, generatedpath));
-            if(item == null)
+            if(TryAddItem(project, Path.Combine(projectDir, generatedpath)))
             {
-                AddItem(dteproject, Path.Combine(projectDir, generatedpath));
-                project.UpdateProject(buildProject =>
-                {
-                    buildProject.SetGeneratedItemCustomMetadata(path, generatedpath);
-                });
+                project.SetGeneratedItemCustomMetadata(path, generatedpath);
             }
         }
 
@@ -483,7 +446,7 @@ namespace IceBuilder
             //
             if(project.IsCppProject())
             {
-                DeleteItems(project.WithProject((MSProject msproject) =>
+                project.DeleteItems(project.WithProject((MSProject msproject) =>
                 {
                     var sliceCompile = msproject.AllEvaluatedItems.Where(
                         item => item.ItemType.Equals("SliceCompile")).Select(
@@ -506,7 +469,7 @@ namespace IceBuilder
             }
             else // C# project
             {
-                DeleteItems(project.WithProject((MSProject msproject) =>
+                project.DeleteItems(project.WithProject((MSProject msproject) =>
                     {
                         var sliceCompile = msproject.AllEvaluatedItems.Where(
                             item => item.ItemType.Equals("SliceCompile")).Select(

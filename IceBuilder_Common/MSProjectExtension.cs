@@ -233,25 +233,6 @@ namespace IceBuilder
             }
         }
 
-        public static void SetGeneratedItemCustomMetadata(this Project project, string slice, string generated,
-            List<string> excludedConfigurations = null)
-        {
-            var item = project.AllEvaluatedItems.FirstOrDefault(i => generated.Equals(i.EvaluatedInclude));
-            if(item != null)
-            {
-                var element = item.Xml;
-                if(excludedConfigurations != null)
-                {
-                    foreach(var conf in excludedConfigurations)
-                    {
-                        var metadata = element.AddMetadata("ExcludedFromBuild", "true");
-                        metadata.Condition = string.Format("'$(Configuration)|$(Platform)'=='{0}'", conf);
-                    }
-                }
-                element.AddMetadata("SliceCompileSource", slice);
-            }
-        }
-
         public static readonly string CSharpProjectGUI = "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}";
     }
 }

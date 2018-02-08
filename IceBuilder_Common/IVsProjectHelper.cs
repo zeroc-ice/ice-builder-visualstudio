@@ -26,5 +26,14 @@ namespace IceBuilder
         void SetItemMetadata(IVsProject project, string itemType, string label, string name, string value);
 
         void SetItemMetadata(IVsProject project, string name, string value);
+
+        void SetGeneratedItemCustomMetadata(IVsProject project, string slice, string generated,
+                                            List<string> excludedConfigurations = null);
+
+        void AddFromFile(IVsProject project, string file);
+
+        void DeleteItems(IVsProject project, List<string> paths);
+
+        void RemoveGeneratedItemDuplicates(IVsProject project);
     }
 }

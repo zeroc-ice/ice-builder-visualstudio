@@ -202,6 +202,12 @@ namespace IceBuilder
                 });
         }
 
+        public static void SetGeneratedItemCustomMetadata(this IVsProject project, string slice, string generated,
+                                                          List<string> excludedConfigurations = null)
+        {
+            ProjectFactoryHelperInstance.ProjectHelper.SetGeneratedItemCustomMetadata(project, slice, generated, excludedConfigurations);
+        }
+
         public static string GetEvaluatedProperty(this IVsProject project, string name)
         {
             return project.GetEvaluatedProperty(name, string.Empty);
@@ -230,6 +236,45 @@ namespace IceBuilder
                 var value = msproject.GetEvaluatedProperty(name);
                 return string.IsNullOrEmpty(value) ? defaultValue : value;
             });
+        }
+
+        public static EnvDTE.ProjectItem GetProjectItem(this IVsProject project, uint item)
+        {
+            IVsHierarchy hierarchy = project as IVsHierarchy;
+            object value = null;
+            if (hierarchy != null)
+            {
+                hierarchy.GetProperty(item, (int)__VSHPROPID.VSHPROPID_ExtObject, out value);
+            }
+            return value as EnvDTE.ProjectItem;
+        }
+
+        public static EnvDTE.ProjectItem GetProjectItem(this IVsProject project, string path)
+        {
+            int found;
+            uint item;
+            var priority = new VSDOCUMENTPRIORITY[1];
+            ErrorHandler.ThrowOnFailure(project.IsDocumentInProject(path, out found, priority, out item));
+            if (found == 0 || (priority[0] != VSDOCUMENTPRIORITY.DP_Standard && priority[0] != VSDOCUMENTPRIORITY.DP_Intrinsic))
+            {
+                return null;
+            }
+            return project.GetProjectItem(item);
+        }
+
+        public static void AddFromFile(this IVsProject project, string file)
+        {
+            ProjectFactoryHelperInstance.ProjectHelper.AddFromFile(project, file);
+        }
+
+        public static void DeleteItems(this IVsProject project, List<string> paths)
+        {
+            ProjectFactoryHelperInstance.ProjectHelper.DeleteItems(project, paths);
+        }
+
+        public static void RemoveGeneratedItemDuplicates(this IVsProject project)
+        {
+            ProjectFactoryHelperInstance.ProjectHelper.RemoveGeneratedItemDuplicates(project);
         }
 
         public static readonly Guid cppProjectGUID =

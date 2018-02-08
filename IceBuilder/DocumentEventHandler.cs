@@ -91,7 +91,7 @@ namespace IceBuilder
                     {
                         if(project.IsIceBuilderGeneratedItem(path))
                         {
-                            ProjectItem item = ProjectUtil.GetProjectItem(project, itemref);
+                            ProjectItem item = project.GetProjectItem(itemref);
                             if(item != null)
                             {
                                 item.Document.ReadOnly = true;
@@ -193,7 +193,7 @@ namespace IceBuilder
                                 //
                                 // Ensure the .ice file item has SliceCompile ItemType
                                 //
-                                var projectItem = ProjectUtil.FindProjectItem(path);
+                                var projectItem = project.GetProjectItem(path);
                                 if (projectItem != null)
                                 {
                                     var property = projectItem.Properties.Item("ItemType");
@@ -280,7 +280,6 @@ namespace IceBuilder
                             if(ProjectUtil.IsSliceFileName(oldPath) || ProjectUtil.IsSliceFileName(newPath))
                             {
                                 ProjectUtil.SetupGenerated(project);
-                                break;
                             }
                         }
                     }
@@ -323,6 +322,7 @@ namespace IceBuilder
                             {
                                 if(!ProjectUtil.CheckGenerateFileIsValid(project, files[i]))
                                 {
+                                    rgResults[i] = VSQUERYADDFILERESULTS.VSQUERYADDFILERESULTS_AddNotOK;
                                     pSummaryResult[i] = VSQUERYADDFILERESULTS.VSQUERYADDFILERESULTS_AddNotOK;
                                 }
                             }
@@ -377,6 +377,7 @@ namespace IceBuilder
                             if(!ProjectUtil.CheckGenerateFileIsValid(project, newNames[i]))
                             {
                                 rgResults[i] = VSQUERYRENAMEFILERESULTS.VSQUERYRENAMEFILERESULTS_RenameNotOK;
+                                pSummaryResult[i] = VSQUERYRENAMEFILERESULTS.VSQUERYRENAMEFILERESULTS_RenameNotOK;
                             }
                         }
                     }
