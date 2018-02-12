@@ -177,59 +177,6 @@ namespace IceBuilder
                 });
         }
 
-        public void DeleteItems(IVsProject project, List<string> paths)
-        {
-            foreach (string path in paths)
-            {
-                //
-                // First remove the physical file, if it was included as part of
-                // a glob that will be enough
-                //
-                if (File.Exists(path))
-                 {
-                    try
-                    {
-                        File.Delete(path);
-                    }
-                    catch (IOException)
-                    {
-                        // can happen if the file is being used by other process
-                    }
-                }
-
-                EnvDTE.ProjectItem item = project.GetProjectItem(path);
-                if (item != null)
-                {
-                    item.Remove();
-                }
-            }
-#if VS2017
-            //
-            // With .NET Core the project ends up adding Compile Remove="XXX.cs" for
-            // files that have been removed, we can get rid of those.
-            //
-            if(paths.Count > 0)
-            {
-                if (!project.IsCppProject() && GetUnconfiguredProject(project) != null)
-                {
-                    project.UpdateProject((MSProject msproject) =>
-                    {
-                        var projectDir = Path.GetDirectoryName(msproject.FullPath);
-                        var removeItems = msproject.Xml.Items.Where(i =>
-                        {
-                            return paths.Contains(Path.Combine(projectDir, i.Remove)) &&
-                                   !File.Exists(Path.Combine(projectDir, i.Remove));
-                        });
-                        foreach (var item in removeItems)
-                        {
-                            item.Parent.RemoveChild(item);
-                        }
-                    });
-                }
-            }
-#endif
-        }
-
         public void AddFromFile(IVsProject project, string file)
         {
 #if VS2017

@@ -269,7 +269,21 @@ namespace IceBuilder
 
         public static void DeleteItems(this IVsProject project, List<string> paths)
         {
-            ProjectFactoryHelperInstance.ProjectHelper.DeleteItems(project, paths);
+            foreach (string path in paths)
+            {
+                EnvDTE.ProjectItem item = project.GetProjectItem(path);
+                if (item != null)
+                {
+                    if(File.Exists(path))
+                    {
+                        item.Delete();
+                    }
+                    else
+                    {
+                        item.Remove();
+                    }
+                }
+            }
         }
 
         public static void RemoveGeneratedItemDuplicates(this IVsProject project)

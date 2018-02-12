@@ -32,8 +32,6 @@ namespace IceBuilder
 
         void AddFromFile(IVsProject project, string file);
 
-        void DeleteItems(IVsProject project, List<string> paths);
-
         void RemoveGeneratedItemDuplicates(IVsProject project);
     }
 }
