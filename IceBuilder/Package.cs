@@ -21,7 +21,7 @@ using Microsoft.Build.Evaluation;
 namespace IceBuilder
 {
     [PackageRegistration(UseManagedResourcesOnly = true)]
-    [InstalledProductRegistration("#110", "#112", "5.0.1", IconResourceID = 400)]
+    [InstalledProductRegistration("#110", "#112", "5.0.2", IconResourceID = 400)]
     [ProvideOptionPage(typeof(IceOptionsPage), "Projects", "Ice Builder", 113, 0, true)]
     [ProvideAutoLoad(UIContextGuids80.NoSolution)]
     [Guid(Package.IceBuilderPackageString)]
