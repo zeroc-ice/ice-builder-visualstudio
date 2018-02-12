@@ -284,6 +284,27 @@ namespace IceBuilder
                     }
                 }
             }
+
+            var sliceCompileDependencies = paths.Select(
+                p =>
+                {
+                    return Path.Combine(Path.GetDirectoryName(p),
+                        string.Format("SliceCompile.{0}.d", Path.GetFileNameWithoutExtension(p)));
+                }).Distinct().ToList();
+
+            foreach (var path in sliceCompileDependencies)
+            {
+                if(File.Exists(path))
+                {
+                    try
+                    {
+                        File.Delete(path);
+                    }
+                    catch (IOException)
+                    {
+                    }
+                }
+            }
         }
 
         public static void RemoveGeneratedItemDuplicates(this IVsProject project)
