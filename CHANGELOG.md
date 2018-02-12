@@ -1,3 +1,10 @@
+## Changes in Ice Builder for Visual Studio 5.0.2
+
+- Fixes errors during .NET Core project clean.
+
+- Fix deletion of SliceCompile dependency items
+  for renamed or removed SliceCompile items.
+
 ## Changes in Ice Builder for Visual Studio 5.0.1
 
 - Fixes to support .NET Core project system:
