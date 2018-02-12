@@ -565,28 +565,28 @@ namespace IceBuilder
                         return;
                     }
                     Building = true;
-                }
 
-                List<IVsProject> projects = new List<IVsProject>();
-                if(scope.Equals(EnvDTE.vsBuildScope.vsBuildScopeSolution))
-                {
-                    projects = DTEUtil.GetProjects();
-                }
-                else
-                {
-                    IVsProject selected = DTEUtil.GetSelectedProject();
-                    if(selected != null)
+                    List<IVsProject> projects = new List<IVsProject>();
+                    if (scope.Equals(EnvDTE.vsBuildScope.vsBuildScopeSolution))
                     {
-                        projects.Add(selected);
-                        DTEUtil.GetSubProjects(selected, ref projects);
+                        projects = DTEUtil.GetProjects();
                     }
-                }
-
-                foreach(IVsProject project in projects)
-                {
-                    if(project.IsMSBuildIceBuilderInstalled())
+                    else
                     {
-                        ProjectUtil.SetupGenerated(project);
+                        IVsProject selected = DTEUtil.GetSelectedProject();
+                        if (selected != null)
+                        {
+                            projects.Add(selected);
+                            DTEUtil.GetSubProjects(selected, ref projects);
+                        }
+                    }
+
+                    foreach (IVsProject project in projects)
+                    {
+                        if (project.IsMSBuildIceBuilderInstalled())
+                        {
+                            ProjectUtil.SetupGenerated(project);
+                        }
                     }
                 }
             }
