@@ -248,6 +248,7 @@ namespace IceBuilder
             var item = project.GetProjectItem(path);
             if (item == null)
             {
+                project.EnsureIsCheckout();
                 if (!Directory.Exists(Path.GetDirectoryName(path)))
                 {
                     Directory.CreateDirectory(Path.GetDirectoryName(path));

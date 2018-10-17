@@ -196,6 +196,7 @@ namespace IceBuilder
                                 var projectItem = project.GetProjectItem(path);
                                 if (projectItem != null)
                                 {
+                                    project.EnsureIsCheckout();
                                     var property = projectItem.Properties.Item("ItemType");
                                     if (property != null && !property.Value.Equals("SliceCompile"))
                                     {

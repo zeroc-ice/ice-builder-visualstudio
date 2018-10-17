@@ -2,6 +2,8 @@
 
 - Add Slice syntax highlighting
 
+- Only checkout projects in TFS when they are being modified
+
 ## Changes in Ice Builder for Visual Studio 5.0.2
 
 - Fixes errors during .NET Core project clean.

@@ -16,7 +16,7 @@ namespace IceBuilder
 {
     public static class IVsProjectExtension
     {
-        private static void EnsureIsCheckout(IVsProject project)
+        public static void EnsureIsCheckout(this IVsProject project)
         {
             EnsureIsCheckout(project.GetDTEProject(), project.GetProjectFullPath());
         }
@@ -42,7 +42,6 @@ namespace IceBuilder
                 hierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_ExtObject, out obj);
             }
             var dteproject = obj as EnvDTE.Project;
-            EnsureIsCheckout(dteproject, project.GetProjectFullPath());
             return dteproject;
         }
 
@@ -56,7 +55,6 @@ namespace IceBuilder
 
         public static MSProject GetMSBuildProject(this IVsProject project)
         {
-            EnsureIsCheckout(project);
             return MSProjectExtension.LoadedProject(project.GetProjectFullPath());
         }
 
@@ -185,11 +183,13 @@ namespace IceBuilder
 
         public static void SetItemMetadata(this IVsProject project, string itemType, string label, string name, string value)
         {
+            project.EnsureIsCheckout();
             ProjectFactoryHelperInstance.ProjectHelper.SetItemMetadata(project, itemType, label, name, value);
         }
 
         public static void SetItemMetadata(this IVsProject project, string name, string value)
         {
+            project.EnsureIsCheckout();
             ProjectFactoryHelperInstance.ProjectHelper.SetItemMetadata(project, name, value);
         }
 
@@ -205,6 +205,7 @@ namespace IceBuilder
         public static void SetGeneratedItemCustomMetadata(this IVsProject project, string slice, string generated,
                                                           List<string> excludedConfigurations = null)
         {
+            project.EnsureIsCheckout();
             ProjectFactoryHelperInstance.ProjectHelper.SetGeneratedItemCustomMetadata(project, slice, generated, excludedConfigurations);
         }
 
@@ -264,11 +265,13 @@ namespace IceBuilder
 
         public static void AddFromFile(this IVsProject project, string file)
         {
+            project.EnsureIsCheckout();
             ProjectFactoryHelperInstance.ProjectHelper.AddFromFile(project, file);
         }
 
         public static void DeleteItems(this IVsProject project, List<string> paths)
         {
+            project.EnsureIsCheckout();
             foreach (string path in paths)
             {
                 EnvDTE.ProjectItem item = project.GetProjectItem(path);
@@ -292,7 +295,7 @@ namespace IceBuilder
                         string.Format("SliceCompile.{0}.d", Path.GetFileNameWithoutExtension(p)));
                 }).Distinct().ToList();
 
-            foreach (var path in sliceCompileDependencies)
+            foreach(var path in sliceCompileDependencies)
             {
                 if(File.Exists(path))
                 {
@@ -309,6 +312,7 @@ namespace IceBuilder
 
         public static void RemoveGeneratedItemDuplicates(this IVsProject project)
         {
+            project.EnsureIsCheckout();
             ProjectFactoryHelperInstance.ProjectHelper.RemoveGeneratedItemDuplicates(project);
         }
 

@@ -30,6 +30,7 @@ namespace IceBuilder
 #if VS2012
         public void UpdateProject(IVsProject project, Action<MSProject> action)
         {
+            project.EnsureIsCheckout();
             var msproject = project.GetMSBuildProject();
             msproject.ReevaluateIfNecessary();
             action(msproject);
@@ -64,6 +65,7 @@ namespace IceBuilder
         }
         public void UpdateProject(IVsProject project, Action<MSProject> action)
         {
+            project.EnsureIsCheckout();
             ThreadHelper.JoinableTaskFactory.Run(async () =>
                 {
                     var unconfiguredProject = GetUnconfiguredProject(project);
