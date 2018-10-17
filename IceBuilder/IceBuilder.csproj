@@ -237,6 +237,9 @@
       <IncludeInVSIX>true</IncludeInVSIX>
       <VSIXSubPath>Resources</VSIXSubPath>
     </Content>
+    <Content Include="Grammars.pkgdef">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="Resources\LICENSE.rtf">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
@@ -245,6 +248,9 @@
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <None Include="app.config" />
+    <Content Include="Grammars\slice.tmLanguage.json">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <None Include="packages.config" />
     <Content Include="Resources\upgrade.rtf">
       <IncludeInVSIX>true</IncludeInVSIX>

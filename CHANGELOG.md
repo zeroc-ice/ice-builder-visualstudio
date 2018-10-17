@@ -1,3 +1,7 @@
+## Changes in Ice Builder for Visual Studio 5.0.3
+
+- Add Slice syntax highlighting
+
 ## Changes in Ice Builder for Visual Studio 5.0.2
 
 - Fixes errors during .NET Core project clean.
