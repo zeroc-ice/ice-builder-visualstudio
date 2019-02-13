@@ -1,6 +1,6 @@
 // **********************************************************************
 //
-// Copyright (c) 2009-2018 ZeroC, Inc. All rights reserved.
+// Copyright (c) ZeroC, Inc. All rights reserved.
 //
 // **********************************************************************
 
@@ -11,6 +11,6 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("Ice Builder Visual Studio Extension")]
 [assembly: AssemblyCompany("ZeroC, Inc.")]
 [assembly: AssemblyProduct("Ice Builder")]
-[assembly: AssemblyCopyright("Copyright (c) 2009-2018 ZeroC, Inc.")]
+[assembly: AssemblyCopyright("Copyright (c) ZeroC, Inc.")]
 [assembly: AssemblyVersion("5.0.2")]
 [assembly: ComVisibleAttribute(false)]
