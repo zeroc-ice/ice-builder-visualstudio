@@ -4,8 +4,7 @@
         <TimeStampServer Condition="'$(SIGN_TIMESTAMPSERVER)' == ''">http://timestamp.verisign.com/scripts/timstamp.dll</TimeStampServer>
     	<SignToolPath Condition="Exists('$(WindowsSDK80Path)bin\x86\signtool.exe')">$(WindowsSDK80Path)bin\x86\signtool.exe</SignToolPath>
     	<SignCommand Condition="Exists('$(SIGN_CERTIFICATE)')">"$(SignToolPath)" sign /f "$(SIGN_CERTIFICATE)" /p $(SIGN_PASSWORD) /t $(TimeStampServer)</SignCommand>
-    	<VsixSignTool Condition="Exists('$(MSBuildThisFileDirectory)packages\Microsoft.VSSDK.Vsixsigntool.14.2.25123\tools\vssdk\vsixsigntool.exe')">$(MSBuildThisFileDirectory)packages\Microsoft.VSSDK.Vsixsigntool.14.2.25123\tools\vssdk\vsixsigntool.exe</VsixSignTool>
-    	<sha1>64 67 62 0b b4 7e 98 02  51 c4 87 7e 38 af cd bb 4c 36 1c 53</sha1>
-    	<VsixSignCommand Condition="Exists('$(SIGN_CERTIFICATE)')">$(VsixSignTool) sign /f $(SIGN_CERTIFICATE) /p $(SIGN_PASSWORD) /sha1 "$(sha1)" /fd SHA1</VsixSignCommand>
+    	<VsixSignTool Condition="Exists('$(MSBuildThisFileDirectory)packages\Microsoft.VSSDK.Vsixsigntool.15.9.28307\tools\vssdk\vsixsigntool.exe')">$(MSBuildThisFileDirectory)packages\Microsoft.VSSDK.Vsixsigntool.15.9.28307\tools\vssdk\vsixsigntool.exe</VsixSignTool>
+    	<VsixSignCommand Condition="Exists('$(SIGN_CERTIFICATE)')">$(VsixSignTool) sign /f $(SIGN_CERTIFICATE) /p $(SIGN_PASSWORD) /fd sha1</VsixSignCommand>
     </PropertyGroup>
 </Project>
