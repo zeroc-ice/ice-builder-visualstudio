@@ -11,5 +11,5 @@ using System.Reflection;
 [assembly: AssemblyCompany("ZeroC, Inc.")]
 [assembly: AssemblyProduct("Ice Visual Studio Extension")]
 [assembly: AssemblyCopyright("Copyright (c) ZeroC, Inc.")]
-[assembly: AssemblyVersion("5.0.2")]
+[assembly: AssemblyVersion("5.0.3")]
 [assembly: AssemblyDelaySign(false)]
