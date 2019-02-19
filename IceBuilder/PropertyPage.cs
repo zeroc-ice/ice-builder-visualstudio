@@ -12,6 +12,7 @@ using System.Windows.Forms;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Shell;
 
 namespace IceBuilder
 {
@@ -57,6 +58,7 @@ namespace IceBuilder
 
         public void Activate(IntPtr parentHandle, RECT[] pRect, int modal)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             try
             {
                 RECT rect = pRect[0];
@@ -71,6 +73,7 @@ namespace IceBuilder
 
         public void Apply()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             try
             {
                 Settings.OutputDir = ConfigurationView.OutputDir;
@@ -87,6 +90,7 @@ namespace IceBuilder
 
         public void Deactivate()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             try
             {
                 if(ConfigurationView != null)
@@ -107,6 +111,7 @@ namespace IceBuilder
 
         public void GetPageInfo(PROPPAGEINFO[] pageInfo)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             try
             {
                 PROPPAGEINFO proppageinfo;
@@ -136,6 +141,7 @@ namespace IceBuilder
 
         public void Move(RECT[] pRect)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             try
             {
                 Rectangle rect = Rectangle.FromLTRB(pRect[0].left, pRect[0].top, pRect[0].right, pRect[0].bottom);
@@ -162,6 +168,7 @@ namespace IceBuilder
 
         public void SetObjects(uint cObjects, object[] objects)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             try
             {
                 if(objects != null && cObjects > 0)
@@ -247,6 +254,7 @@ namespace IceBuilder
         #region IPropertyPage methods
         int IPropertyPage.Apply()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             Apply();
             return VSConstants.S_OK;
         }

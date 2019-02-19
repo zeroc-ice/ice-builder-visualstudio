@@ -15,6 +15,7 @@ using System.Windows.Threading;
 using System.Threading;
 using Microsoft.Win32.SafeHandles;
 using System.Collections.Generic;
+using Microsoft.VisualStudio.Shell;
 
 namespace IceBuilder
 {
@@ -146,6 +147,7 @@ namespace IceBuilder
 
         public void BeginBuild(string platform, string configuration)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             _outputPane.OutputString(
                 string.Format("------ Ice Builder Build started: Project: {0}, Configuration: {1} {2} ------\n",
                     ProjectUtil.GetProjectName(_project), configuration, platform));
@@ -153,6 +155,7 @@ namespace IceBuilder
 
         public void EndBuild(bool succeed)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             _outputPane.OutputString(
                 string.Format("------ Build {0} ------\n\n", (succeed ? "succeeded" : "failed")));
             Package.Instance.BuildDone();

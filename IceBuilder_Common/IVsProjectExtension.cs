@@ -202,6 +202,12 @@ namespace IceBuilder
                 });
         }
 
+        public static void RemoveGeneratedItemCustomMetadata(this IVsProject project, List<string> paths)
+        {
+            project.EnsureIsCheckout();
+            ProjectFactoryHelperInstance.ProjectHelper.RemoveGeneratedItemCustomMetadata(project, paths);
+        }
+
         public static void SetGeneratedItemCustomMetadata(this IVsProject project, string slice, string generated,
                                                           List<string> excludedConfigurations = null)
         {
@@ -272,21 +278,9 @@ namespace IceBuilder
         public static void DeleteItems(this IVsProject project, List<string> paths)
         {
             project.EnsureIsCheckout();
-            foreach (string path in paths)
-            {
-                EnvDTE.ProjectItem item = project.GetProjectItem(path);
-                if (item != null)
-                {
-                    if(File.Exists(path))
-                    {
-                        item.Delete();
-                    }
-                    else
-                    {
-                        item.Remove();
-                    }
-                }
-            }
+            var projectDir = project.GetProjectBaseDirectory();
+
+            project.RemoveGeneratedItemCustomMetadata(paths);
 
             var sliceCompileDependencies = paths.Select(
                 p =>

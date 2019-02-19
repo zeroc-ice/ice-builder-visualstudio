@@ -11,46 +11,29 @@ using MSProject = Microsoft.Build.Evaluation.Project;
 using Microsoft.VisualStudio.Shell;
 using System.Linq;
 using System.Collections.Generic;
-using System.IO;
 
-#if VS2017
+#if VS2017 || VS2019
+using System.IO;
 using System.Threading.Tasks.Dataflow;
-using Microsoft.VisualStudio.ProjectSystem;
-using Microsoft.VisualStudio.ProjectSystem.Properties;
-#elif VS2013 || VS2015
+#else
 using Microsoft.VisualStudio.Threading;
-using Microsoft.VisualStudio.ProjectSystem;
 using Microsoft.VisualStudio.ProjectSystem.Designers;
 #endif
+
+using Microsoft.VisualStudio.ProjectSystem;
+using Microsoft.VisualStudio.ProjectSystem.Properties;
 
 namespace IceBuilder
 {
     class ProjectHelper : IVsProjectHelper
     {
-#if VS2012
-        public void UpdateProject(IVsProject project, Action<MSProject> action)
-        {
-            project.EnsureIsCheckout();
-            var msproject = project.GetMSBuildProject();
-            msproject.ReevaluateIfNecessary();
-            action(msproject);
-            project.GetDTEProject().Save();
-        }
-
-        public T WithProject<T>(IVsProject project, Func<MSProject, T> func)
-        {
-            var msproject = project.GetMSBuildProject();
-            msproject.ReevaluateIfNecessary();
-            return func(msproject);
-        }
-#else
         public T WithProject<T>(IVsProject project, Func<MSProject, T> func)
         {
             var data = default(T);
             ThreadHelper.JoinableTaskFactory.Run(async () =>
             {
                 var unconfiguredProject = GetUnconfiguredProject(project);
-                if(unconfiguredProject != null)
+                if (unconfiguredProject != null)
                 {
                     data = await WithProjectAsync(unconfiguredProject, func);
                 }
@@ -69,7 +52,7 @@ namespace IceBuilder
             ThreadHelper.JoinableTaskFactory.Run(async () =>
                 {
                     var unconfiguredProject = GetUnconfiguredProject(project);
-                    if(unconfiguredProject != null)
+                    if (unconfiguredProject != null)
                     {
                         await UpdateProjectAsync(unconfiguredProject, action);
                     }
@@ -82,21 +65,19 @@ namespace IceBuilder
                 });
             project.GetDTEProject().Save();
         }
-#endif
 
-#if !VS2012
         protected static async Task<T>
         WithProjectAsync<T>(UnconfiguredProject unconfiguredProject, Func<MSProject, T> func)
         {
             T result = default(T);
             var service = unconfiguredProject.ProjectService.Services.ProjectLockService;
-            if(service != null)
+            if (service != null)
             {
-                using(var access = await service.ReadLockAsync())
+                using (var access = await service.ReadLockAsync())
                 {
                     var configuredProject = await unconfiguredProject.GetSuggestedConfiguredProjectAsync();
                     var buildProject = await access.GetProjectAsync(configuredProject);
-                    if(buildProject != null)
+                    if (buildProject != null)
                     {
                         result = func(buildProject);
                     }
@@ -110,14 +91,14 @@ namespace IceBuilder
         protected static async System.Threading.Tasks.Task UpdateProjectAsync(UnconfiguredProject unconfiguredProject, Action<MSProject> action)
         {
             var service = unconfiguredProject.ProjectService.Services.ProjectLockService;
-            if(service != null)
+            if (service != null)
             {
-                using(var access = await service.WriteLockAsync())
+                using (var access = await service.WriteLockAsync())
                 {
                     await access.CheckoutAsync(unconfiguredProject.FullPath);
                     var configuredProject = await unconfiguredProject.GetSuggestedConfiguredProjectAsync();
                     var buildProject = await access.GetProjectAsync(configuredProject);
-                    if(buildProject != null)
+                    if (buildProject != null)
                     {
                         action(buildProject);
                     }
@@ -133,10 +114,10 @@ namespace IceBuilder
                 {
                     await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
                     IVsBrowseObjectContext context = project as IVsBrowseObjectContext;
-                    if(context == null)
+                    if (context == null)
                     {
                         var dteproject = project.GetDTEProject();
-                        if(dteproject != null)
+                        if (dteproject != null)
                         {
                             context = dteproject.Object as IVsBrowseObjectContext;
                         }
@@ -145,7 +126,6 @@ namespace IceBuilder
                 });
             return unconfiguredProject;
         }
-#endif
 
         public string GetItemMetadata(IVsProject project, string identity, string name, string defaultValue = "")
         {
@@ -181,8 +161,8 @@ namespace IceBuilder
 
         public void AddFromFile(IVsProject project, string file)
         {
-#if VS2017
-            if(project.IsCppProject() || GetUnconfiguredProject(project) == null)
+#if VS2017 || VS2019
+            if (project.IsCppProject() || GetUnconfiguredProject(project) == null)
             {
                 project.GetDTEProject().ProjectItems.AddFromFile(file);
             }
@@ -190,11 +170,11 @@ namespace IceBuilder
             {
                 project.UpdateProject((MSProject msproject) =>
                     {
-                        if(Path.GetExtension(file).Equals(".cs", StringComparison.CurrentCultureIgnoreCase))
+                        if (Path.GetExtension(file).Equals(".cs", StringComparison.CurrentCultureIgnoreCase))
                         {
                             var path = FileUtil.RelativePath(Path.GetDirectoryName(msproject.FullPath), file);
                             var items = msproject.GetItemsByEvaluatedInclude(path);
-                            if(items.Count == 0)
+                            if (items.Count == 0)
                             {
                                 msproject.AddItem("Compile", path);
                             }
@@ -208,7 +188,7 @@ namespace IceBuilder
 
         public void RemoveGeneratedItemDuplicates(IVsProject project)
         {
-#if VS2017
+#if VS2017 || VS2019
             //
             // With .NET Core project system when default compile items is enabled we
             // can end up with duplicate generated items, as the call to AddItem doesn't
@@ -221,7 +201,7 @@ namespace IceBuilder
                     {
                         var all = msproject.Xml.Items.Where(item => item.ItemType.Equals("Compile"));
 
-                        foreach(var item in all)
+                        foreach (var item in all)
                         {
                             //
                             // If there is a glob item that already match the evaluated include path we
@@ -233,7 +213,7 @@ namespace IceBuilder
                                            !i.EvaluatedInclude.Equals(i.UnevaluatedInclude) &&
                                            i.EvaluatedInclude.Equals(item.Include);
                                 });
-                            if(globItem != null)
+                            if (globItem != null)
                             {
                                 item.Parent.RemoveChild(item);
                             }
@@ -243,7 +223,33 @@ namespace IceBuilder
 #endif
         }
 
-            public void SetGeneratedItemCustomMetadata(IVsProject project, string slice, string generated,
+        public void RemoveGeneratedItemCustomMetadata(IVsProject project, List<string> paths)
+        {
+#if VS2017 || VS2019
+            var projectDir = project.GetProjectBaseDirectory();
+            project.UpdateProject((MSProject msproject) =>
+                {
+                    var items = msproject.Xml.Items.Where(item =>
+                        {
+                            if(item.ItemType.Equals("Compile") || item.ItemType.Equals("ClCompile") || item.ItemType.Equals("ClInclude"))
+                            {
+                                return paths.Contains(Path.Combine(projectDir, item.Update));
+                            }
+                            else
+                            {
+                                return false;
+                            }
+                        });
+
+                    foreach(var item in items)
+                    {
+                        item.Parent.RemoveChild(item);
+                    }
+                });
+#endif
+        }
+
+        public void SetGeneratedItemCustomMetadata(IVsProject project, string slice, string generated,
             List<string> excludedConfigurations = null)
         {
             project.UpdateProject((MSProject msproject) =>
@@ -268,10 +274,10 @@ namespace IceBuilder
                         {
                             item.SetMetadataValue("SliceCompileSource", slice);
                         }
-#if VS2017
+#if VS2017 || VS2019
                         //
-                        // With Visual Studio 2017 if the imte originate from a glob we
-                        // add update the item medata using the Update attribute
+                        // With Visual Studio 2017 if the item originate from a glob we
+                        // update the item medata using the Update attribute
                         //
                         else
                         {
@@ -304,7 +310,7 @@ namespace IceBuilder
 
         public IDisposable OnProjectUpdate(IVsProject project, Action onProjectUpdate)
         {
-#if VS2017
+#if VS2017 || VS2019
             var unconfiguredProject = GetUnconfiguredProject(project);
             if(unconfiguredProject != null)
             {

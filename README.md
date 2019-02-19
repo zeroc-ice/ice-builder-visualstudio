@@ -2,9 +2,8 @@
 
 Ice Builder for Visual Studio is a Visual Studio extension that configures [Ice Builder for MSBuild](https://github.com/zeroc-ice/ice-builder-msbuild) for your C++ and C# projects, all within the Visual Studio IDE. It serves as a front-end for Ice Builder for MSBuild: all the build-time processing is performed by Ice Builder for MSBuild.
 
-Ice Builder for Visual Studio is compatible with Visual Studio 2012, 2013, 2015 and 2017, and works best with the following Ice installations:
+Ice Builder for Visual Studio is compatible with Visual Studio 2017 or 2019, and works best with the following Ice installations:
  * Ice NuGet package for Ice 3.7 or greater
- * Ice Web installation or MSI installation for Ice 3.6
 
 ## Contents
 

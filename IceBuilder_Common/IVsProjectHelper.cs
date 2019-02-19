@@ -8,6 +8,7 @@ using System;
 using Microsoft.VisualStudio.Shell.Interop;
 using MSProject = Microsoft.Build.Evaluation.Project;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace IceBuilder
 {
@@ -29,6 +30,8 @@ namespace IceBuilder
 
         void SetGeneratedItemCustomMetadata(IVsProject project, string slice, string generated,
                                             List<string> excludedConfigurations = null);
+
+        void RemoveGeneratedItemCustomMetadata(IVsProject project, List<string> paths);
 
         void AddFromFile(IVsProject project, string file);
 

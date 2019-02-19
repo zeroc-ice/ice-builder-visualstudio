@@ -7,6 +7,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Diagnostics;
@@ -18,12 +19,14 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.Build.Evaluation;
 
+using Task = System.Threading.Tasks.Task;
+
 namespace IceBuilder
 {
-    [PackageRegistration(UseManagedResourcesOnly = true)]
-    [InstalledProductRegistration("#110", "#112", "5.0.3", IconResourceID = 400)]
+    [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
+    [InstalledProductRegistration("#110", "#112", "6.0.0", IconResourceID = 400)]
     [ProvideOptionPage(typeof(IceOptionsPage), "Projects", "Ice Builder", 113, 0, true)]
-    [ProvideAutoLoad(UIContextGuids80.NoSolution)]
+    [ProvideAutoLoad(UIContextGuids80.NoSolution, PackageAutoLoadFlags.BackgroundLoad)]
     [Guid(Package.IceBuilderPackageString)]
 
     [ProvideObject(typeof(PropertyPage),
@@ -43,7 +46,7 @@ namespace IceBuilder
         null,
         @"..\Templates\Projects")]
 
-    public sealed class Package : Microsoft.VisualStudio.Shell.Package
+    public sealed class Package : Microsoft.VisualStudio.Shell.AsyncPackage
     {
         public static readonly string[] AssemblyNames =
         {
@@ -52,8 +55,6 @@ namespace IceBuilder
         };
 
         public static readonly string NuGetBuilderPackageId = "zeroc.icebuilder.msbuild";
-
-        #region Visual Studio Services
 
         public IVsShell Shell
         {
@@ -117,8 +118,6 @@ namespace IceBuilder
             set;
         }
 
-        #endregion
-
         public static Package Instance
         {
             get;
@@ -145,11 +144,12 @@ namespace IceBuilder
 
         public static void UnexpectedExceptionWarning(Exception ex)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             try
             {
                 Instance.OutputPane.Activate();
                 Instance.OutputPane.OutputString(
-                    String.Format("The Ice Builder has raised an unexpected exception:\n{0}", ex.ToString()));
+                    string.Format("The Ice Builder has raised an unexpected exception:\n{0}", ex.ToString()));
             }
             catch(Exception)
             {
@@ -158,6 +158,7 @@ namespace IceBuilder
 
         public static void WriteMessage(string message)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             Instance.OutputPane.Activate();
             Instance.OutputPane.OutputString(message);
         }
@@ -308,10 +309,10 @@ namespace IceBuilder
 
                     Registry.SetValue(IceBuilderKey, IceVersionValue, v.ToString(), RegistryValueKind.String);
 
-                    string iceIntVersion = String.Format("{0}{1:00}{2:00}", v.Major, v.Minor, v.Build);
+                    var iceIntVersion = string.Format("{0}{1:00}{2:00}", v.Major, v.Minor, v.Build);
                     Registry.SetValue(IceBuilderKey, IceIntVersionValue, iceIntVersion, RegistryValueKind.String);
 
-                    string iceVersionMM = string.Format("{0}.{1}", v.Major, v.Minor);
+                    var iceVersionMM = string.Format("{0}.{1}", v.Major, v.Minor);
                     Registry.SetValue(IceBuilderKey, IceVersionMMValue, iceVersionMM, RegistryValueKind.String);
 
                     Registry.SetValue(IceCSharpAssembleyKey, "", GetAssembliesDir(), RegistryValueKind.String);
@@ -365,6 +366,7 @@ namespace IceBuilder
 
         public void QueueProjectsForBuilding(ICollection<IVsProject> projects)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             BuildContext(true);
             OutputPane.Clear();
             OutputPane.Activate();
@@ -401,6 +403,7 @@ namespace IceBuilder
 
         public void ReloadProject(IVsProject project)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             IVsHierarchy hier = project as IVsHierarchy;
             Guid projectGUID = Guid.Empty;
             IVsSolution.GetGuidOfProject(hier, out projectGUID);
@@ -428,6 +431,7 @@ namespace IceBuilder
 
         public void InitializeProject(IVsProject project)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             if (project.IsMSBuildIceBuilderInstalled())
             {
                 if (project.IsCppProject())
@@ -450,34 +454,61 @@ namespace IceBuilder
             private set;
         }
 
-        protected override void Initialize()
+        protected override async Task InitializeAsync(CancellationToken cancel,
+            IProgress<Microsoft.VisualStudio.Shell.ServiceProgressData> progress)
         {
-            base.Initialize();
             Instance = this;
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
             AutoBuilding = GetAutoBuilding();
 
+            object value = null;
             {
-                Shell = GetService(typeof(IVsShell)) as IVsShell;
-                object value;
+                Shell = await GetServiceAsync(typeof(IVsShell)) as IVsShell;
+                if (Shell == null)
+                {
+                    throw new PackageInitializationException("Error initializing Shell");
+                }
                 Shell.GetProperty((int)__VSSPROPID.VSSPROPID_IsInCommandLineMode, out value);
                 CommandLineMode = (bool)value;
             }
-
-            RegisterProjectFactory(new ProjectFactory());
-            RegisterProjectFactory(new ProjectFactoryOld());
 
             if(!CommandLineMode)
             {
                 InstallDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 ResourcesDirectory = Path.Combine(InstallDirectory, "Resources");
 
-                DTE2 = (EnvDTE80.DTE2)GetService(typeof(EnvDTE.DTE));
+                DTE2 = await GetServiceAsync(typeof(EnvDTE.DTE)) as EnvDTE80.DTE2;
+                if (DTE2 == null)
+                {
+                    throw new PackageInitializationException("Error initializing DTE2");
+                }
+
                 DTEEvents = DTE.Events.DTEEvents;
-                IVsSolution = GetService(typeof(SVsSolution)) as IVsSolution;
-                IVsSolution4 = GetService(typeof(SVsSolution)) as IVsSolution4;
-                UIShell = Instance.GetService(typeof(SVsUIShell)) as IVsUIShell;
-                MonitorSelection = GetGlobalService(typeof(SVsShellMonitorSelection)) as IVsMonitorSelection;
+
+                IVsSolution = await GetServiceAsync(typeof(SVsSolution)) as IVsSolution;
+                if (IVsSolution == null)
+                {
+                    throw new PackageInitializationException("Error initializing IVsSolution");
+                }
+
+                IVsSolution4 = await GetServiceAsync(typeof(SVsSolution)) as IVsSolution4;
+                if(IVsSolution4 == null)
+                {
+                    throw new PackageInitializationException("Error initializing IVsSolution4");
+                }
+
+                UIShell = await GetServiceAsync(typeof(SVsUIShell)) as IVsUIShell;
+                if(UIShell == null)
+                {
+                    throw new PackageInitializationException("Error initializing UIShell");
+                }
+
+                MonitorSelection = await GetServiceAsync(typeof(SVsShellMonitorSelection)) as IVsMonitorSelection;
+                if(MonitorSelection == null)
+                {
+                    throw new PackageInitializationException("Error initializing MonitorSelection");
+                }
 
                 //
                 // Update the InstallDir this was previously used in project imports, but is still usefull if you
@@ -487,21 +518,17 @@ namespace IceBuilder
                                   RegistryValueKind.String);
 
                 Assembly assembly = null;
-                if(DTE.Version.StartsWith("11.0"))
-                {
-                    assembly = Assembly.LoadFrom(Path.Combine(ResourcesDirectory, "IceBuilder.VS2012.dll"));
-                }
-                else if (DTE.Version.StartsWith("12.0"))
-                {
-                    assembly = Assembly.LoadFrom(Path.Combine(ResourcesDirectory, "IceBuilder.VS2013.dll"));
-                }
-                else if (DTE.Version.StartsWith("14.0"))
+                if(DTE.Version.StartsWith("14.0"))
                 {
                     assembly = Assembly.LoadFrom(Path.Combine(ResourcesDirectory, "IceBuilder.VS2015.dll"));
                 }
-                else
+                else if(DTE.Version.StartsWith("15.0"))
                 {
                     assembly = Assembly.LoadFrom(Path.Combine(ResourcesDirectory, "IceBuilder.VS2017.dll"));
+                }
+                else
+                {
+                    assembly = Assembly.LoadFrom(Path.Combine(ResourcesDirectory, "IceBuilder.VS2019.dll"));
                 }
                 var factory = assembly.GetType("IceBuilder.ProjectHelperFactoryI").GetConstructor(new Type[] { }).Invoke(
                     new object[] { }) as IVsProjectHelperFactory;
@@ -510,14 +537,14 @@ namespace IceBuilder
                 NuGet = factory.NuGet;
                 ProjectHelper = factory.ProjectHelper;
 
-                ProjectFactoryHelperInstance.Init(factory.VCUtil, factory.NuGet, factory.ProjectHelper);
+                ProjectFactoryHelperInstance.Init(VCUtil, NuGet, ProjectHelper);
 
                 NuGet.OnNugetBatchEnd(PackageInstalled);
 
                 RunningDocumentTableEventHandler = new RunningDocumentTableEventHandler(
-                    GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable);
+                    await GetServiceAsync(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable);
 
-                Builder = new Builder(GetService(typeof(SVsBuildManagerAccessor)) as IVsBuildManagerAccessor2);
+                Builder = new Builder(await GetServiceAsync(typeof(SVsBuildManagerAccessor)) as IVsBuildManagerAccessor2);
 
                 //
                 // Subscribe to solution events.
@@ -526,12 +553,24 @@ namespace IceBuilder
                 SolutionEventHandler.BeginTrack();
 
                 DocumentEventHandler = new DocumentEventHandler(
-                    GetService(typeof(SVsTrackProjectDocuments)) as IVsTrackProjectDocuments2);
+                    await GetServiceAsync(typeof(SVsTrackProjectDocuments)) as IVsTrackProjectDocuments2);
                 DocumentEventHandler.BeginTrack();
 
                 BuildEvents = DTE2.Events.BuildEvents;
                 BuildEvents.OnBuildBegin += BuildEvents_OnBuildBegin;
                 BuildEvents.OnBuildDone += BuildEvents_OnBuildDone;
+            }
+
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+            RegisterProjectFactory(new ProjectFactory());
+            RegisterProjectFactory(new ProjectFactoryOld());
+
+            value = null;
+            IVsSolution.GetProperty((int)__VSPROPID.VSPROPID_IsSolutionOpen, out value);
+            if((bool)value)
+            {
+                RunningDocumentTableEventHandler.BeginTrack();
+                InitializeProjects(DTEUtil.GetProjects());
             }
         }
 
@@ -616,6 +655,7 @@ namespace IceBuilder
 
         private void SetCmdUIContext(Guid context, bool enabled)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             uint cookie;
             ErrorHandler.ThrowOnFailure(MonitorSelection.GetCmdUIContextCookie(ref context, out cookie));
             if(cookie != 0)
@@ -626,6 +666,7 @@ namespace IceBuilder
 
         private bool IsCmdUIContextActive(Guid context)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             uint cookie;
             ErrorHandler.ThrowOnFailure(MonitorSelection.GetCmdUIContextCookie(ref context, out cookie));
             int active = 0;
@@ -660,6 +701,7 @@ namespace IceBuilder
 
         private bool BuildProject(IVsProject project)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             try
             {
                 BuildLogger logger = new BuildLogger(OutputPane)
@@ -691,6 +733,7 @@ namespace IceBuilder
         //
         private string GetSliceCompilerVersion(string iceHome)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             string sliceCompiler = GetSliceCompilerPath(null, iceHome);
             if(!File.Exists(sliceCompiler))
             {
@@ -698,7 +741,7 @@ namespace IceBuilder
                 OutputPane.OutputTaskItemString(
                     message,
                     EnvDTE.vsTaskPriority.vsTaskPriorityHigh,
-                    EnvDTE.vsTaskCategories.vsTaskCategoryBuildCompile,
+                    "BuildCompile",
                     EnvDTE.vsTaskIcon.vsTaskIconCompile,
                     sliceCompiler,
                     0,
@@ -745,7 +788,7 @@ namespace IceBuilder
                     OutputPane.OutputTaskItemString(
                         message,
                         EnvDTE.vsTaskPriority.vsTaskPriorityHigh,
-                        EnvDTE.vsTaskCategories.vsTaskCategoryBuildCompile,
+                        "BuildCompile",
                         EnvDTE.vsTaskIcon.vsTaskIconCompile,
                         sliceCompiler,
                         0,
@@ -769,7 +812,7 @@ namespace IceBuilder
                 OutputPane.OutputTaskItemString(
                     message,
                     EnvDTE.vsTaskPriority.vsTaskPriorityHigh,
-                    EnvDTE.vsTaskCategories.vsTaskCategoryBuildCompile,
+                    "BuildCompile",
                     EnvDTE.vsTaskIcon.vsTaskIconCompile,
                     sliceCompiler,
                     0,
@@ -784,6 +827,7 @@ namespace IceBuilder
 
         private string GetSliceCompilerPath(Microsoft.Build.Evaluation.Project project, string iceHome)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             string compiler = MSBuildUtils.IsCSharpProject(project) ? "slice2cs.exe" : "slice2cpp.exe";
             if(!string.IsNullOrEmpty(iceHome))
             {
@@ -810,7 +854,7 @@ namespace IceBuilder
             OutputPane.OutputTaskItemString(
                 message,
                 EnvDTE.vsTaskPriority.vsTaskPriorityHigh,
-                EnvDTE.vsTaskCategories.vsTaskCategoryBuildCompile,
+                "BuildCompile",
                 EnvDTE.vsTaskIcon.vsTaskIconCompile,
                 compiler,
                 0,
@@ -824,9 +868,11 @@ namespace IceBuilder
         {
             get
             {
-                if(_outputPane == null)
+                ThreadHelper.ThrowIfNotOnUIThread();
+                if (_outputPane == null)
                 {
-                    EnvDTE.Window window = DTE2.Windows.Item(EnvDTE.Constants.vsWindowKindOutput);
+                    const string vsWindowKindOutput = "{34E76E81-EE4A-11D0-AE2E-00A0C90FFFC3}";
+                    EnvDTE.Window window = DTE2.Windows.Item(vsWindowKindOutput);
                     EnvDTE.OutputWindow outputWindow = window.Object as EnvDTE.OutputWindow;
                     foreach(EnvDTE.OutputWindowPane pane in outputWindow.OutputWindowPanes)
                     {
@@ -863,6 +909,7 @@ namespace IceBuilder
         {
             get
             {
+                ThreadHelper.ThrowIfNotOnUIThread();
                 object value = Registry.GetValue(
                     Path.Combine("HKEY_CURRENT_USER", DTE.RegistryRoot, "General"),
                     "MSBuildLoggerVerbosity", 2);

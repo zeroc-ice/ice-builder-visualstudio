@@ -87,7 +87,10 @@ namespace IceBuilder
                     uint itemref = 0;
                     string path = null;
                     GetDocumentInfo(docCookie, ref project, ref itemref, ref path);
-                    if(project != null && !string.IsNullOrEmpty(path))
+                    if(project != null && !string.IsNullOrEmpty(path) &&
+                       (path.EndsWith(".cs", StringComparison.CurrentCultureIgnoreCase) ||
+                        path.EndsWith(".cpp", StringComparison.CurrentCultureIgnoreCase) ||
+                        path.EndsWith(".h", StringComparison.CurrentCultureIgnoreCase)))
                     {
                         if(project.IsIceBuilderGeneratedItem(path))
                         {
@@ -198,7 +201,7 @@ namespace IceBuilder
                                 {
                                     project.EnsureIsCheckout();
                                     var property = projectItem.Properties.Item("ItemType");
-                                    if (property != null && !property.Value.Equals("SliceCompile"))
+                                    if(property != null && !property.Value.Equals("SliceCompile"))
                                     {
                                         property.Value = "SliceCompile";
                                     }

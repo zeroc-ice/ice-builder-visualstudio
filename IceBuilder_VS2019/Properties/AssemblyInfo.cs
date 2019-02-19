@@ -7,7 +7,7 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("IceBuilder.VS2013")]
+[assembly: AssemblyTitle("IceBuilder.VS2019")]
 [assembly: AssemblyDescription("Ice Builder Visual Studio Extension")]
 [assembly: AssemblyCompany("ZeroC, Inc.")]
 [assembly: AssemblyProduct("Ice Builder")]
