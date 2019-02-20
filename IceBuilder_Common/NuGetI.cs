@@ -61,10 +61,14 @@ namespace IceBuilder
         }
         private void PackageInstallerEvents_PackageInstalled(IVsPackageMetadata metadata)
         {
-            if (BatchEnd != null)
+            ThreadHelper.JoinableTaskFactory.Run(async () =>
             {
-                BatchEnd();
-            }
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                if(BatchEnd != null)
+                {
+                    BatchEnd();
+                }
+            });
         }
 
         void NuGet.OnNugetBatchEnd(NuGetBatchEnd batchEnd)
