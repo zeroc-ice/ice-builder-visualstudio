@@ -45,14 +45,12 @@ namespace IceBuilder
 
         void eventSource_ProjectStarted(object sender, ProjectStartedEventArgs e)
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
             Stopwatch = Stopwatch.StartNew();
             WriteMessage(string.Format("Build started {0}.", DateTime.Now));
         }
 
         void eventSource_ProjectFinished(object sender, ProjectFinishedEventArgs e)
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
             Stopwatch.Stop();
             WriteMessage(string.Format("\nBuild {0}.", (e.Succeeded ? "succeeded" : "FAILED")));
             WriteMessage(string.Format("Time Elapsed {0:00}:{1:00}:{2:00}.{3:00}",
@@ -65,7 +63,6 @@ namespace IceBuilder
 
         public void eventSource_TargetStarted(object sender, TargetStartedEventArgs e)
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
             if (e.TargetName.Equals("SliceCompile") || IsVerbosityAtLeast(LoggerVerbosity.Detailed))
             {
                 WriteMessage(string.Format("{0}:", e.TargetName));
@@ -80,7 +77,6 @@ namespace IceBuilder
 
         public void eventSource_MessageRaised(object sender, BuildMessageEventArgs e)
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
             if ((e.Importance == MessageImportance.High && IsVerbosityAtLeast(LoggerVerbosity.Minimal)) ||
                (e.Importance == MessageImportance.Normal && IsVerbosityAtLeast(LoggerVerbosity.Normal)) ||
                (e.Importance == MessageImportance.Low && IsVerbosityAtLeast(LoggerVerbosity.Detailed)))
@@ -91,37 +87,42 @@ namespace IceBuilder
 
         public void WriteMessage(string message)
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
-            StringBuilder s = new StringBuilder();
-            for(int i = 0; i < Indent; ++i)
+            ThreadHelper.JoinableTaskFactory.Run(async () =>
             {
-                s.Append(" ");
-            }
-            s.AppendLine(message);
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                StringBuilder s = new StringBuilder();
+                for(int i = 0; i < Indent; ++i)
+                {
+                    s.Append(" ");
+                }
+                s.AppendLine(message);
 
-            OutputPane.Activate();
-            OutputPane.OutputString(s.ToString());
+                OutputPane.Activate();
+                OutputPane.OutputString(s.ToString());
+            });
         }
 
         private void OutputTaskItem(string message, EnvDTE.vsTaskPriority priority, string subcategory,
                                     string file, int line, string description)
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
-            OutputPane.Activate();
-            OutputPane.OutputTaskItemString(
-                message,
-                priority,
-                EnvDTE.vsTaskCategories.vsTaskCategoryBuildCompile,
-                EnvDTE.vsTaskIcon.vsTaskIconCompile,
-                file,
-                line,
-                description,
-                true);
+            ThreadHelper.JoinableTaskFactory.Run(async () =>
+                {
+                    await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                    OutputPane.Activate();
+                    OutputPane.OutputTaskItemString(
+                        message,
+                        priority,
+                        EnvDTE.vsTaskCategories.vsTaskCategoryBuildCompile,
+                        EnvDTE.vsTaskIcon.vsTaskIconCompile,
+                        file,
+                        line,
+                        description,
+                        true);
+            });
         }
 
         void eventSource_WarningRaised(object sender, BuildWarningEventArgs e)
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
             OutputTaskItem(
                     string.Format("{0}({1}): warning : {2}",
                         Path.Combine(Path.GetDirectoryName(e.ProjectFile), e.File),
@@ -135,7 +136,6 @@ namespace IceBuilder
 
         void eventSource_ErrorRaised(object sender, BuildErrorEventArgs e)
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
             OutputTaskItem(
                 string.Format("{0}({1}): error : {2}",
                     Path.Combine(Path.GetDirectoryName(e.ProjectFile), e.File),
