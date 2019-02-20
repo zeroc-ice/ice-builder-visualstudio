@@ -8,6 +8,7 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell;
 
 namespace IceBuilder
 {
@@ -27,6 +28,7 @@ namespace IceBuilder
 
         public void LoadSettigns(ProjectSettigns settings)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             var enabled = settings.IsMSBuildIceBuilderInstalled();
             Enable(enabled);
             if(enabled)
@@ -72,6 +74,7 @@ namespace IceBuilder
             }
             set
             {
+                ThreadHelper.ThrowIfNotOnUIThread();
                 _dirty = value;
                 if(Page.PageSite != null)
                 {
@@ -118,6 +121,7 @@ namespace IceBuilder
 
         private void btnOutputDirectoryBrowse_Click(object sender, EventArgs e)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             string projectDir = Page.Project.GetProjectBaseDirectory();
             string selectedPath = UIUtil.BrowserFolderDialog(Handle, "Output Directory", projectDir);
             if(!string.IsNullOrEmpty(selectedPath))
@@ -133,7 +137,8 @@ namespace IceBuilder
 
         private void OutputDirectory_Leave(object sender, EventArgs e)
         {
-            if(!txtOutputDir.Text.Equals(Page.Settings.OutputDir))
+            ThreadHelper.ThrowIfNotOnUIThread();
+            if (!txtOutputDir.Text.Equals(Page.Settings.OutputDir))
             {
                 Dirty = isDirty();
             }
@@ -141,7 +146,8 @@ namespace IceBuilder
 
         private void AdditionalOptions_Leave(object sender, EventArgs e)
         {
-            if(!txtAdditionalOptions.Text.Equals(Page.Settings.AdditionalOptions))
+            ThreadHelper.ThrowIfNotOnUIThread();
+            if (!txtAdditionalOptions.Text.Equals(Page.Settings.AdditionalOptions))
             {
                 Dirty = isDirty();
             }
@@ -149,7 +155,8 @@ namespace IceBuilder
 
         private void txtOutputDir_TextChanged(object sender, EventArgs e)
         {
-            if(!txtOutputDir.Text.Equals(Page.Settings.OutputDir))
+            ThreadHelper.ThrowIfNotOnUIThread();
+            if (!txtOutputDir.Text.Equals(Page.Settings.OutputDir))
             {
                 Dirty = isDirty();
             }
@@ -157,6 +164,7 @@ namespace IceBuilder
 
         private void txtIncludeDirectories_TextChanged(object sender, EventArgs e)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             if (!txtIncludeDirectories.Text.Equals(Page.Settings.IncludeDirectories))
             {
                 Dirty = isDirty();
@@ -165,6 +173,7 @@ namespace IceBuilder
 
         private void txtAdditionalOptions_TextChanged(object sender, EventArgs e)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             if (!txtAdditionalOptions.Text.Equals(Page.Settings.AdditionalOptions))
             {
                 Dirty = isDirty();

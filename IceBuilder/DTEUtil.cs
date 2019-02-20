@@ -43,12 +43,14 @@ namespace IceBuilder
 
         public static IVsProject GetProject(String path)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             List<IVsProject> projects = GetProjects();
             return projects.FirstOrDefault(p => p.GetProjectFullPath().Equals(path));
         }
 
         public static List<IVsProject> GetProjects()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             IEnumHierarchies enumHierarchies;
             Guid guid = Guid.Empty;
             uint flags = (uint)__VSENUMPROJFLAGS.EPF_ALLPROJECTS;
@@ -76,6 +78,7 @@ namespace IceBuilder
 
         public static void GetSubProjects(IVsProject p, ref List<IVsProject> projects)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             IVsHierarchy h = p as IVsHierarchy;
             // Get the first visible child node
             object value;
@@ -101,6 +104,7 @@ namespace IceBuilder
 
         public static void GetSubProjects(IVsHierarchy h, uint itemId, ref List<IVsProject> projects)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             IntPtr nestedValue = IntPtr.Zero;
             uint nestedId = 0;
             Guid nestedGuid = typeof(IVsHierarchy).GUID;
@@ -120,6 +124,7 @@ namespace IceBuilder
 
         public static IVsProject GetSelectedProject()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             IVsHierarchy hier = null;
             var sp = new ServiceProvider(Package.Instance.DTE as Microsoft.VisualStudio.OLE.Interop.IServiceProvider);
             IVsMonitorSelection selectionMonitor = sp.GetService(typeof(IVsMonitorSelection)) as IVsMonitorSelection;

@@ -39,6 +39,7 @@ namespace IceBuilder
 
         protected override void OnApply(PageApplyEventArgs e)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             try
             {
                 if(Editor.SetIceHome(Editor.IceHome))
@@ -60,6 +61,7 @@ namespace IceBuilder
 
         protected override void OnActivate(CancelEventArgs e)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             try
             {
                 Editor.IceHome = Package.Instance.GetIceHome();

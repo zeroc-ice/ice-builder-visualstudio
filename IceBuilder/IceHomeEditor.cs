@@ -5,9 +5,8 @@
 // **********************************************************************
 
 using System;
-using System.Collections.Generic;
 using System.Windows.Forms;
-
+using Microsoft.VisualStudio.Shell;
 using System.IO;
 
 namespace IceBuilder
@@ -55,6 +54,7 @@ namespace IceBuilder
 
         private void btnIceHome_Click(object sender, EventArgs e)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             string selectedPath = UIUtil.BrowserFolderDialog(Handle, "Select Folder",
                 string.IsNullOrEmpty(txtIceHome.Text) ?
                     Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) : txtIceHome.Text);

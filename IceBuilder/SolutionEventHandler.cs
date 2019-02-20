@@ -6,7 +6,7 @@
 
 using System;
 using System.Collections.Generic;
-
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
 namespace IceBuilder
@@ -15,26 +15,37 @@ namespace IceBuilder
     {
         public void BeginTrack()
         {
-            Package.Instance.IVsSolution.AdviseSolutionEvents(this, out _cookie);
+            ThreadHelper.JoinableTaskFactory.Run(async () =>
+            {
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                Package.Instance.IVsSolution.AdviseSolutionEvents(this, out _cookie);
+            });
         }
 
         public void EndTrack()
         {
-            Package.Instance.IVsSolution.UnadviseSolutionEvents(_cookie);
+            ThreadHelper.JoinableTaskFactory.Run(async () =>
+            {
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                Package.Instance.IVsSolution.UnadviseSolutionEvents(_cookie);
+            });
         }
 
-        #region IVsSolutionLoadEvents
         public int OnAfterBackgroundSolutionLoadComplete()
         {
-            try
+            ThreadHelper.JoinableTaskFactory.Run(async () =>
             {
-                Package.Instance.RunningDocumentTableEventHandler.BeginTrack();
-                Package.Instance.InitializeProjects(DTEUtil.GetProjects());
-            }
-            catch(Exception ex)
-            {
-                Package.UnexpectedExceptionWarning(ex);
-            }
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                try
+                {
+                    Package.Instance.RunningDocumentTableEventHandler.BeginTrack();
+                    Package.Instance.InitializeProjects(DTEUtil.GetProjects());
+                }
+                catch (Exception ex)
+                {
+                    Package.UnexpectedExceptionWarning(ex);
+                }
+            });
             return 0;
         }
 
@@ -63,19 +74,21 @@ namespace IceBuilder
             pfShouldDelayLoadToNextIdle = false;
             return 0;
         }
-        #endregion
 
-        #region IVsSolutionEvents3
         public int OnAfterCloseSolution(object pUnkReserved)
         {
-            try
+            ThreadHelper.JoinableTaskFactory.Run(async () =>
             {
-                Package.Instance.RunningDocumentTableEventHandler.EndTrack();
-            }
-            catch(Exception ex)
-            {
-                Package.UnexpectedExceptionWarning(ex);
-            }
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                try
+                {
+                    Package.Instance.RunningDocumentTableEventHandler.EndTrack();
+                }
+                catch (Exception ex)
+                {
+                    Package.UnexpectedExceptionWarning(ex);
+                }
+            });
             return 0;
         }
 
@@ -86,18 +99,22 @@ namespace IceBuilder
 
         public int OnAfterLoadProject(IVsHierarchy hierarchyOld, IVsHierarchy hierarchyNew)
         {
-            try
+            ThreadHelper.JoinableTaskFactory.Run(async () =>
             {
-                IVsProject project = hierarchyNew as IVsProject;
-                if(project != null)
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                try
                 {
-                    Package.Instance.InitializeProjects(new List<IVsProject>(new IVsProject[] { project }));
+                    var project = hierarchyNew as IVsProject;
+                    if (project != null)
+                    {
+                        Package.Instance.InitializeProjects(new List<IVsProject>(new IVsProject[] { project }));
+                    }
                 }
-            }
-            catch(Exception ex)
-            {
-                Package.UnexpectedExceptionWarning(ex);
-            }
+                catch (Exception ex)
+                {
+                    Package.UnexpectedExceptionWarning(ex);
+                }
+            });
             return 0;
         }
 
@@ -163,7 +180,6 @@ namespace IceBuilder
             pfCancel = 0;
             return 0;
         }
-        #endregion IVsSolutionEvents3
 
         uint _cookie;
     }

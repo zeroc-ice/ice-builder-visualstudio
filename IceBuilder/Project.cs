@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Flavor;
 using Microsoft.VisualStudio.Shell.Interop;
 
@@ -21,6 +22,7 @@ namespace IceBuilder
 
         protected override void SetInnerProject(IntPtr innerIUnknown)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             object objectForIUnknown = null;
             objectForIUnknown = Marshal.GetObjectForIUnknown(innerIUnknown);
             if(serviceProvider == null)

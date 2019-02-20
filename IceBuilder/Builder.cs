@@ -31,6 +31,7 @@ namespace IceBuilder
         {
             return project.WithProject((MSBuildProject msproject) =>
                 {
+                    ThreadHelper.ThrowIfNotOnUIThread();
                     //
                     // We need to set this before we acquire the build resources otherwise Msbuild
                     // will not see the changes.
@@ -48,7 +49,7 @@ namespace IceBuilder
                         ErrorHandler.ThrowOnFailure(err);
                     }
 
-                    if (err == VSConstants.E_PENDING)
+                    if(err == VSConstants.E_PENDING)
                     {
                         msproject.ProjectCollection.Loggers.Remove(buildLogger);
                         msproject.ProjectCollection.OnlyLogCriticalEvents = onlyLogCriticalEvents;
@@ -57,15 +58,12 @@ namespace IceBuilder
                         BuildAvailableEvent = new ManualResetEvent(false);
                         BuildAvailableEvent.SafeWaitHandle = new SafeWaitHandle(BuildManagerAccessor.DesignTimeBuildAvailable, false);
 
-                        Thread t = new Thread(() =>
+                        ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
                         {
                             BuildAvailableEvent.WaitOne();
-                            Dispatcher.BeginInvoke(new Action(() =>
-                            {
-                                Package.Instance.BuildNextProject();
-                            }));
+                            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                            Package.Instance.BuildNextProject();
                         });
-                        t.Start();
                         return false;
                     }
                     else
@@ -88,21 +86,20 @@ namespace IceBuilder
 
                             BuildSubmission submission = BuildManager.DefaultBuildManager.PendBuildRequest(buildRequest);
                             ErrorHandler.ThrowOnFailure(BuildManagerAccessor.RegisterLogger(submission.SubmissionId, buildLogger));
-                            Dispatcher.BeginInvoke(DispatcherPriority.Send, new Action(() =>
-                                {
-                                    buildCallback.BeginBuild(platform, configuration);
-                                }));
+                            buildCallback.BeginBuild(platform, configuration);
+
                             submission.ExecuteAsync(s =>
                             {
-                                Dispatcher.BeginInvoke(DispatcherPriority.Send, new Action(() =>
-                                {
-                                    msproject.ProjectCollection.Loggers.Remove(buildLogger);
-                                    msproject.ProjectCollection.OnlyLogCriticalEvents = onlyLogCriticalEvents;
-                                    BuildManagerAccessor.ReleaseBuildResources(cookie);
-                                    s.BuildManager.ResetCaches();
-                                    BuildManagerAccessor.UnregisterLoggers(s.SubmissionId);
-                                    buildCallback.EndBuild(s.BuildResult.OverallResult == BuildResultCode.Success);
-                                }));
+                                ThreadHelper.JoinableTaskFactory.Run(async () =>
+                                    {
+                                        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                                        msproject.ProjectCollection.Loggers.Remove(buildLogger);
+                                        msproject.ProjectCollection.OnlyLogCriticalEvents = onlyLogCriticalEvents;
+                                        BuildManagerAccessor.ReleaseBuildResources(cookie);
+                                        s.BuildManager.ResetCaches();
+                                        BuildManagerAccessor.UnregisterLoggers(s.SubmissionId);
+                                        buildCallback.EndBuild(s.BuildResult.OverallResult == BuildResultCode.Success);
+                                    });
                             }, null);
 
                             return true;
@@ -115,7 +112,7 @@ namespace IceBuilder
                             throw;
                         }
                     }
-                });
+                }, true);
         }
 
         private ManualResetEvent BuildAvailableEvent

@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
 namespace IceBuilder
@@ -22,6 +23,7 @@ namespace IceBuilder
 
         private void OKButton_Clicked(object sender, EventArgs e)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             Hide();
             UpgradeDialogProgress proggressDialog = new UpgradeDialogProgress(Projects.Count);
             ProjectConverter.Upgrade(Projects, proggressDialog);

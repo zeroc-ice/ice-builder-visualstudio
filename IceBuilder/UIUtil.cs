@@ -8,6 +8,7 @@ using System;
 using System.Runtime.InteropServices;
 
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
 using System.Windows.Forms;
@@ -32,6 +33,7 @@ namespace IceBuilder
         //
         public static string BrowserFolderDialog(IntPtr owner, string title, string initialDirectory)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             IVsUIShell shell = Package.Instance.UIShell;
 
             VSBROWSEINFOW[] browseInfo = new VSBROWSEINFOW[1];

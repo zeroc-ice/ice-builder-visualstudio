@@ -223,7 +223,8 @@ namespace IceBuilder
 
         public void SetIceHome(string value)
         {
-            if(string.IsNullOrEmpty(value))
+            ThreadHelper.ThrowIfNotOnUIThread();
+            if (string.IsNullOrEmpty(value))
             {
                 //
                 // Remove all registry settings.
@@ -379,13 +380,15 @@ namespace IceBuilder
 
         public void BuildDone()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             BuildingProject = null;
             BuildNextProject();
         }
 
         public void BuildNextProject()
         {
-            if(_buildProjects.Count == 0)
+            ThreadHelper.ThrowIfNotOnUIThread();
+            if (_buildProjects.Count == 0)
             {
                 BuildContext(false);
             }
@@ -413,6 +416,7 @@ namespace IceBuilder
 
         public void InitializeProjects(List<IVsProject> projects)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             try
             {
                 NuGet.OnNugetBatchEnd(null);
@@ -576,6 +580,7 @@ namespace IceBuilder
 
         private void PackageInstalled()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             var projects = DTEUtil.GetProjects();
             foreach (IVsProject project in projects)
             {
@@ -591,6 +596,7 @@ namespace IceBuilder
 
         private void BuildEvents_OnBuildBegin(EnvDTE.vsBuildScope scope, EnvDTE.vsBuildAction action)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             try
             {
                 if(action == EnvDTE.vsBuildAction.vsBuildActionBuild ||
@@ -637,6 +643,7 @@ namespace IceBuilder
 
         private void BuildEvents_OnBuildDone(EnvDTE.vsBuildScope scope, EnvDTE.vsBuildAction action)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             try
             {
                 Building = false;
@@ -679,6 +686,7 @@ namespace IceBuilder
 
         private void BuildContext(bool enabled)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             SetCmdUIContext(VSConstants.UICONTEXT.SolutionBuilding_guid, enabled);
             if(enabled)
             {

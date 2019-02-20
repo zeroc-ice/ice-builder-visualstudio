@@ -4,12 +4,12 @@
 //
 // **********************************************************************
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
-using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 using System.Text.RegularExpressions;
 using MSProject = Microsoft.Build.Evaluation.Project;
 
@@ -19,6 +19,7 @@ namespace IceBuilder
     {
         public static void SaveProject(IVsProject project)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             ErrorHandler.ThrowOnFailure(Package.Instance.IVsSolution.SaveSolutionElement(
                 (uint)__VSSLNSAVEOPTIONS.SLNSAVEOPT_ForceSave, project as IVsHierarchy, 0));
         }
@@ -28,6 +29,7 @@ namespace IceBuilder
         //
         public static string GetItemName(IVsProject project, uint itemid)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             object value;
             (project as IVsHierarchy).GetProperty(itemid, (int)__VSHPROPID.VSHPROPID_Name, out value);
             return value == null ? string.Empty : value.ToString();
@@ -35,6 +37,7 @@ namespace IceBuilder
 
         public static IVsProject GetParentProject(IVsProject project)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             object value = null;
             ErrorHandler.ThrowOnFailure(((IVsHierarchy)project).GetProperty(
                 VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_ParentHierarchy, out value));
@@ -63,6 +66,7 @@ namespace IceBuilder
 
         public static string GetProjectName(IVsProject project)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             IVsProject parent = GetParentProject(project);
             if(parent != null)
             {
@@ -74,17 +78,10 @@ namespace IceBuilder
             }
         }
 
-        //
-        // Using DTE
-        //
-        /*public static EnvDTE.ProjectItem FindProjectItem(string path)
-        {
-            return Package.Instance.DTE2.Solution.FindProjectItem(path);
-        }*/
-
         public static GeneratedFileSet
         GetCppGeneratedFiles(IVsProject project, EnvDTE.Project dteproject, VCUtil vcutil, string projectDir, string item)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             var fileset = new GeneratedFileSet
             {
                 filename = item,
@@ -135,6 +132,7 @@ namespace IceBuilder
         public static string
         Evaluate(IVsBuildPropertyStorage propertyStorage, string configName, string input)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             const string pattern = @"\$\((\w+)\)";
             MatchCollection matches = Regex.Matches(input, pattern);
             var output = input;
@@ -151,6 +149,7 @@ namespace IceBuilder
         public static GeneratedFileSet
         GetCsharpGeneratedFiles(IVsProject project, EnvDTE.Project dteproject, string projectDir, string item)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             var fileset = new GeneratedFileSet
             {
                 filename = item,
@@ -186,6 +185,7 @@ namespace IceBuilder
         public static bool
         CheckGenerateFileIsValid(IVsProject project, string path)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             var projectDir = project.GetProjectBaseDirectory();
             var dteproject = project.GetDTEProject();
             if(project.IsCSharpProject())
@@ -274,7 +274,8 @@ namespace IceBuilder
 
         public static void AddGeneratedFiles(IVsProject project, string file)
         {
-            if(project.IsCppProject())
+            ThreadHelper.ThrowIfNotOnUIThread();
+            if (project.IsCppProject())
             {
                 AddCppGeneratedFiles(project, file);
             }
@@ -290,6 +291,7 @@ namespace IceBuilder
 
         public static void AddCSharpGeneratedFiles(IVsProject project, string file)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             var projectDir = project.GetProjectBaseDirectory();
             var dteproject = project.GetDTEProject();
             var fileset = GetCsharpGeneratedFiles(project, dteproject, projectDir, file);
@@ -325,6 +327,7 @@ namespace IceBuilder
 
         public static void AddCppGeneratedFiles(IVsProject project, string file)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             var vcutil = Package.Instance.VCUtil;
             var projectDir = project.GetProjectBaseDirectory();
             var dteproject = project.GetDTEProject();
@@ -364,7 +367,7 @@ namespace IceBuilder
                     }).Select(item => Path.Combine(projectDir, item.EvaluatedInclude)).ToList();
             }));
 
-            foreach (var entry in fileset.sources)
+            foreach(var entry in fileset.sources)
             {
                 AddCppGeneratedItem(project, dteproject, vcutil,
                     projectDir,
@@ -394,7 +397,8 @@ namespace IceBuilder
                                        List<string> allConfigurations,
                                        List<string> configurations)
         {
-            if(TryAddItem(project, Path.Combine(projectDir, generatedpath)))
+            ThreadHelper.ThrowIfNotOnUIThread();
+            if (TryAddItem(project, Path.Combine(projectDir, generatedpath)))
             {
                 var excludedConfigurations = allConfigurations.Where(c => !configurations.Contains(c)).ToList();
                 project.SetGeneratedItemCustomMetadata(path, generatedpath, excludedConfigurations);
@@ -434,11 +438,13 @@ namespace IceBuilder
 
         public static string ConfigurationString(EnvDTE.Configuration configuration)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             return string.Format("{0}|{1}", configuration.ConfigurationName, configuration.PlatformName);
         }
 
         public static void SetupGenerated(IVsProject project)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             var projectDir = project.GetProjectBaseDirectory();
 
             //

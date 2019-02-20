@@ -156,14 +156,14 @@ namespace IceBuilder
                 });
         }
 
-        public static void UpdateProject(this IVsProject project, Action<MSProject> action)
+        public static void UpdateProject(this IVsProject project, Action<MSProject> action, bool switchToMainThread = false)
         {
-            ProjectFactoryHelperInstance.ProjectHelper.UpdateProject(project, action);
+            ProjectFactoryHelperInstance.ProjectHelper.UpdateProject(project, action, switchToMainThread);
         }
 
-        public static T WithProject<T>(this IVsProject project, Func<MSProject, T> func)
+        public static T WithProject<T>(this IVsProject project, Func<MSProject, T> func, bool switchToMainThread = false)
         {
-            return ProjectFactoryHelperInstance.ProjectHelper.WithProject(project, func);
+            return ProjectFactoryHelperInstance.ProjectHelper.WithProject(project, func, switchToMainThread);
         }
 
         public static IDisposable OnProjectUpdate(this IVsProject project, Action onProjectUpdate)

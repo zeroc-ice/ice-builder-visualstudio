@@ -14,9 +14,9 @@ namespace IceBuilder
 {
     public interface IVsProjectHelper
     {
-        void UpdateProject(IVsProject project, Action<MSProject> action);
+        void UpdateProject(IVsProject project, Action<MSProject> action, bool switchToMainThread = false);
 
-        T WithProject<T>(IVsProject project, Func<MSProject, T> func);
+        T WithProject<T>(IVsProject project, Func<MSProject, T> func, bool switchToMainThread = false);
 
         IDisposable OnProjectUpdate(IVsProject project, Action onProjectUpdate);
 

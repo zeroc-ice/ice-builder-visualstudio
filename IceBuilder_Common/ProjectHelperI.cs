@@ -27,7 +27,7 @@ namespace IceBuilder
 {
     class ProjectHelper : IVsProjectHelper
     {
-        public T WithProject<T>(IVsProject project, Func<MSProject, T> func)
+        public T WithProject<T>(IVsProject project, Func<MSProject, T> func, bool switchToMainThread = false)
         {
             var data = default(T);
             ThreadHelper.JoinableTaskFactory.Run(async () =>
@@ -35,18 +35,22 @@ namespace IceBuilder
                 var unconfiguredProject = GetUnconfiguredProject(project);
                 if (unconfiguredProject != null)
                 {
-                    data = await WithProjectAsync(unconfiguredProject, func);
+                    data = await WithProjectAsync(unconfiguredProject, func, switchToMainThread);
                 }
                 else
                 {
                     var msproject = project.GetMSBuildProject();
                     msproject.ReevaluateIfNecessary();
+                    if (switchToMainThread)
+                    {
+                        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                    }
                     data = func(msproject);
                 }
             });
             return data;
         }
-        public void UpdateProject(IVsProject project, Action<MSProject> action)
+        public void UpdateProject(IVsProject project, Action<MSProject> action, bool switchToMainThread = false)
         {
             project.EnsureIsCheckout();
             ThreadHelper.JoinableTaskFactory.Run(async () =>
@@ -54,12 +58,16 @@ namespace IceBuilder
                     var unconfiguredProject = GetUnconfiguredProject(project);
                     if (unconfiguredProject != null)
                     {
-                        await UpdateProjectAsync(unconfiguredProject, action);
+                        await UpdateProjectAsync(unconfiguredProject, action, switchToMainThread);
                     }
                     else
                     {
                         var msproject = project.GetMSBuildProject();
                         msproject.ReevaluateIfNecessary();
+                        if(switchToMainThread)
+                        {
+                            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                        }
                         action(msproject);
                     }
                 });
@@ -67,7 +75,7 @@ namespace IceBuilder
         }
 
         protected static async Task<T>
-        WithProjectAsync<T>(UnconfiguredProject unconfiguredProject, Func<MSProject, T> func)
+        WithProjectAsync<T>(UnconfiguredProject unconfiguredProject, Func<MSProject, T> func, bool switchToMainThread = false)
         {
             T result = default(T);
             var service = unconfiguredProject.ProjectService.Services.ProjectLockService;
@@ -79,6 +87,10 @@ namespace IceBuilder
                     var buildProject = await access.GetProjectAsync(configuredProject);
                     if (buildProject != null)
                     {
+                        if(switchToMainThread)
+                        {
+                            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                        }
                         result = func(buildProject);
                     }
                     await access.ReleaseAsync();
@@ -88,7 +100,8 @@ namespace IceBuilder
             return result;
         }
 
-        protected static async System.Threading.Tasks.Task UpdateProjectAsync(UnconfiguredProject unconfiguredProject, Action<MSProject> action)
+        protected static async System.Threading.Tasks.Task UpdateProjectAsync(UnconfiguredProject unconfiguredProject, Action<MSProject> action,
+                                                                              bool switchToMainThread = false)
         {
             var service = unconfiguredProject.ProjectService.Services.ProjectLockService;
             if (service != null)
@@ -100,6 +113,10 @@ namespace IceBuilder
                     var buildProject = await access.GetProjectAsync(configuredProject);
                     if (buildProject != null)
                     {
+                        if(switchToMainThread)
+                        {
+                            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                        }
                         action(buildProject);
                     }
                     await access.ReleaseAsync();

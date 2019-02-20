@@ -10,6 +10,7 @@ using System.Linq;
 
 using EnvDTE;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
 namespace IceBuilder
@@ -23,12 +24,20 @@ namespace IceBuilder
 
         public void BeginTrack()
         {
-            RunningDocumentTable.AdviseRunningDocTableEvents(this, out _cookie);
+            ThreadHelper.JoinableTaskFactory.Run(async () =>
+            {
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                RunningDocumentTable.AdviseRunningDocTableEvents(this, out _cookie);
+            });
         }
 
         public void EndTrack()
         {
-            RunningDocumentTable.UnadviseRunningDocTableEvents(_cookie);
+            ThreadHelper.JoinableTaskFactory.Run(async () =>
+            {
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                RunningDocumentTable.UnadviseRunningDocTableEvents(_cookie);
+            });
         }
 
         public int OnAfterAttributeChange(uint docCookie, uint grfAttribs)
@@ -56,57 +65,65 @@ namespace IceBuilder
 
         public int OnAfterSave(uint docCookie)
         {
-            try
+            ThreadHelper.JoinableTaskFactory.Run(async () =>
             {
-                if(Package.Instance.AutoBuilding)
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                try
                 {
-                    IVsProject project = null;
-                    uint item = 0;
-                    string path = null;
-                    GetDocumentInfo(docCookie, ref project, ref item, ref path);
-                    if(ProjectUtil.IsSliceFileName(path) && project.IsMSBuildIceBuilderInstalled())
+                    if (Package.Instance.AutoBuilding)
                     {
-                        Package.Instance.QueueProjectsForBuilding(new List<IVsProject>(new IVsProject[] { project }));
+                        IVsProject project = null;
+                        uint item = 0;
+                        string path = null;
+                        GetDocumentInfo(docCookie, ref project, ref item, ref path);
+                        if (ProjectUtil.IsSliceFileName(path) && project.IsMSBuildIceBuilderInstalled())
+                        {
+                            Package.Instance.QueueProjectsForBuilding(new List<IVsProject>(new IVsProject[] { project }));
+                        }
                     }
                 }
-            }
-            catch(Exception ex)
-            {
-                Package.UnexpectedExceptionWarning(ex);
-            }
+                catch (Exception ex)
+                {
+                    Package.UnexpectedExceptionWarning(ex);
+                }
+            });
             return 0;
         }
 
         public int OnBeforeDocumentWindowShow(uint docCookie, int fFirstShow, IVsWindowFrame pFrame)
         {
-            try
+            ThreadHelper.JoinableTaskFactory.Run(async () =>
             {
-                if(fFirstShow != 0)
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                try
                 {
-                    IVsProject project = null;
-                    uint itemref = 0;
-                    string path = null;
-                    GetDocumentInfo(docCookie, ref project, ref itemref, ref path);
-                    if(project != null && !string.IsNullOrEmpty(path) &&
-                       (path.EndsWith(".cs", StringComparison.CurrentCultureIgnoreCase) ||
-                        path.EndsWith(".cpp", StringComparison.CurrentCultureIgnoreCase) ||
-                        path.EndsWith(".h", StringComparison.CurrentCultureIgnoreCase)))
+                    if (fFirstShow != 0)
                     {
-                        if(project.IsIceBuilderGeneratedItem(path))
+                        IVsProject project = null;
+                        uint itemref = 0;
+                        string path = null;
+                        GetDocumentInfo(docCookie, ref project, ref itemref, ref path);
+                        if (project != null && !string.IsNullOrEmpty(path) &&
+                           (path.EndsWith(".cs", StringComparison.CurrentCultureIgnoreCase) ||
+                            path.EndsWith(".cpp", StringComparison.CurrentCultureIgnoreCase) ||
+                            path.EndsWith(".h", StringComparison.CurrentCultureIgnoreCase)))
                         {
-                            ProjectItem item = project.GetProjectItem(itemref);
-                            if(item != null)
+                            if (project.IsIceBuilderGeneratedItem(path))
                             {
-                                item.Document.ReadOnly = true;
+                                ProjectItem item = project.GetProjectItem(itemref);
+                                if (item != null)
+                                {
+                                    item.Document.ReadOnly = true;
+                                }
                             }
                         }
                     }
                 }
-            }
-            catch(Exception)
-            {
-                // Could happend with some document types
-            }
+                catch (Exception)
+                {
+                    // Could happend with some document types
+                }
+            });
             return 0;
         }
 
@@ -118,15 +135,21 @@ namespace IceBuilder
 
         private void GetDocumentInfo(uint cookie, ref IVsProject project, ref uint item, ref string path)
         {
-            uint pgrfRDTFlags;
-            uint pdwReadLocks;
-            uint pdwEditLocks;
-            string pbstrMkDocument;
-            IVsHierarchy ppHier;
-            uint pitemid;
-            IntPtr ppunkDocData;
+            string pbstrMkDocument = "";
+            IVsProject pProject = null;
+            uint pitemid = 0;
 
-            ErrorHandler.ThrowOnFailure(RunningDocumentTable.GetDocumentInfo(
+            ThreadHelper.JoinableTaskFactory.Run(async () =>
+            {
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+                uint pgrfRDTFlags;
+                uint pdwReadLocks;
+                uint pdwEditLocks;
+                IVsHierarchy ppHier;
+                IntPtr ppunkDocData;
+
+                ErrorHandler.ThrowOnFailure(RunningDocumentTable.GetDocumentInfo(
                     cookie,
                     out pgrfRDTFlags,
                     out pdwReadLocks,
@@ -135,8 +158,10 @@ namespace IceBuilder
                     out ppHier,
                     out pitemid,
                     out ppunkDocData));
+                pProject = ppHier as IVsProject;
+            });
 
-            project = ppHier as IVsProject;
+            project = pProject;
             path = pbstrMkDocument;
             item = pitemid;
         }
@@ -160,15 +185,22 @@ namespace IceBuilder
 
         public void BeginTrack()
         {
-            TrackProjectDocuments2.AdviseTrackProjectDocumentsEvents(this, out _cookie);
+            ThreadHelper.JoinableTaskFactory.Run(async () =>
+            {
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                TrackProjectDocuments2.AdviseTrackProjectDocumentsEvents(this, out _cookie);
+            });
         }
 
         public void EndTrack()
         {
-            TrackProjectDocuments2.UnadviseTrackProjectDocumentsEvents(_cookie);
+            ThreadHelper.JoinableTaskFactory.Run(async () =>
+            {
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                TrackProjectDocuments2.UnadviseTrackProjectDocumentsEvents(_cookie);
+            });
         }
 
-        #region IVsTrackProjectDocumentsEvents2
         public int OnAfterAddDirectoriesEx(int cProjects, int cDirectories, IVsProject[] rgpProjects,
                                            int[] rgFirstIndices, string[] rgpszMkDocuments,
                                            VSADDDIRECTORYFLAGS[] rgFlags)
@@ -179,44 +211,48 @@ namespace IceBuilder
         public int OnAfterAddFilesEx(int projectsLength, int filesLength, IVsProject[] projects, int[] indices,
                                      string[] names, VSADDFILEFLAGS[] rgFlags)
         {
-            try
+            ThreadHelper.JoinableTaskFactory.Run(async () =>
             {
-                for(int i = 0; i < projectsLength; ++i)
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                try
                 {
-                    IVsProject project = projects[i];
-                    if(project.IsMSBuildIceBuilderInstalled())
+                    for (int i = 0; i < projectsLength; ++i)
                     {
-                        int j = indices[i];
-                        int k = i < (projectsLength - 1) ? indices[i + 1] : filesLength;
-                        for(; j < k; ++j)
+                        IVsProject project = projects[i];
+                        if (project.IsMSBuildIceBuilderInstalled())
                         {
-                            string path = names[i];
-                            if(ProjectUtil.IsSliceFileName(path))
+                            int j = indices[i];
+                            int k = i < (projectsLength - 1) ? indices[i + 1] : filesLength;
+                            for (; j < k; ++j)
                             {
-                                //
-                                // Ensure the .ice file item has SliceCompile ItemType
-                                //
-                                var projectItem = project.GetProjectItem(path);
-                                if (projectItem != null)
+                                string path = names[i];
+                                if (ProjectUtil.IsSliceFileName(path))
                                 {
-                                    project.EnsureIsCheckout();
-                                    var property = projectItem.Properties.Item("ItemType");
-                                    if(property != null && !property.Value.Equals("SliceCompile"))
+                                    //
+                                    // Ensure the .ice file item has SliceCompile ItemType
+                                    //
+                                    var projectItem = project.GetProjectItem(path);
+                                    if (projectItem != null)
                                     {
-                                        property.Value = "SliceCompile";
+                                        project.EnsureIsCheckout();
+                                        var property = projectItem.Properties.Item("ItemType");
+                                        if (property != null && !property.Value.Equals("SliceCompile"))
+                                        {
+                                            property.Value = "SliceCompile";
+                                        }
                                     }
+                                    ProjectUtil.AddGeneratedFiles(project, path);
+                                    break;
                                 }
-                                ProjectUtil.AddGeneratedFiles(project, path);
-                                break;
                             }
                         }
                     }
                 }
-            }
-            catch(Exception ex)
-            {
-                Package.UnexpectedExceptionWarning(ex);
-            }
+                catch (Exception ex)
+                {
+                    Package.UnexpectedExceptionWarning(ex);
+                }
+            });
             return 0;
         }
 
@@ -230,31 +266,35 @@ namespace IceBuilder
         public int OnAfterRemoveFiles(int projectsLength, int filesLength, IVsProject[] projects, int[] indices,
                                       string[] names, VSREMOVEFILEFLAGS[] rgFlags)
         {
-            try
+            ThreadHelper.JoinableTaskFactory.Run(async () =>
             {
-                for(int i = 0; i < projectsLength; ++i)
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                try
                 {
-                    IVsProject project = projects[i];
-                    if(project.IsMSBuildIceBuilderInstalled())
+                    for (int i = 0; i < projectsLength; ++i)
                     {
-                        int j = indices[i];
-                        int k = i < (projectsLength - 1) ? indices[i + 1] : filesLength;
-                        for(; j < k; ++j)
+                        IVsProject project = projects[i];
+                        if (project.IsMSBuildIceBuilderInstalled())
                         {
-                            string path = names[i];
-                            if(ProjectUtil.IsSliceFileName(path))
+                            int j = indices[i];
+                            int k = i < (projectsLength - 1) ? indices[i + 1] : filesLength;
+                            for (; j < k; ++j)
                             {
-                                ProjectUtil.SetupGenerated(project);
-                                break;
+                                string path = names[i];
+                                if (ProjectUtil.IsSliceFileName(path))
+                                {
+                                    ProjectUtil.SetupGenerated(project);
+                                    break;
+                                }
                             }
                         }
                     }
                 }
-            }
-            catch(Exception ex)
-            {
-                Package.UnexpectedExceptionWarning(ex);
-            }
+                catch (Exception ex)
+                {
+                    Package.UnexpectedExceptionWarning(ex);
+                }
+            });
             return 0;
         }
 
@@ -268,31 +308,35 @@ namespace IceBuilder
         public int OnAfterRenameFiles(int projectsLength, int filesLength, IVsProject[] projects, int[] indices,
                                       string[] oldNames, string[] newNames, VSRENAMEFILEFLAGS[] rgFlags)
         {
-            try
+            ThreadHelper.JoinableTaskFactory.Run(async () =>
             {
-                for(int i = 0; i < projectsLength; ++i)
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                try
                 {
-                    IVsProject project = projects[i];
-                    if(project.IsMSBuildIceBuilderInstalled())
+                    for (int i = 0; i < projectsLength; ++i)
                     {
-                        int j = indices[i];
-                        int k = i < (projectsLength - 1) ? indices[i + 1] : filesLength;
-                        for(; j < k; ++j)
+                        IVsProject project = projects[i];
+                        if (project.IsMSBuildIceBuilderInstalled())
                         {
-                            string oldPath = oldNames[i];
-                            string newPath = newNames[j];
-                            if(ProjectUtil.IsSliceFileName(oldPath) || ProjectUtil.IsSliceFileName(newPath))
+                            int j = indices[i];
+                            int k = i < (projectsLength - 1) ? indices[i + 1] : filesLength;
+                            for (; j < k; ++j)
                             {
-                                ProjectUtil.SetupGenerated(project);
+                                string oldPath = oldNames[i];
+                                string newPath = newNames[j];
+                                if (ProjectUtil.IsSliceFileName(oldPath) || ProjectUtil.IsSliceFileName(newPath))
+                                {
+                                    ProjectUtil.SetupGenerated(project);
+                                }
                             }
                         }
                     }
                 }
-            }
-            catch(Exception ex)
-            {
-                Package.UnexpectedExceptionWarning(ex);
-            }
+                catch (Exception ex)
+                {
+                    Package.UnexpectedExceptionWarning(ex);
+                }
+            });
             return 0;
         }
 
@@ -314,30 +358,34 @@ namespace IceBuilder
                                    VSQUERYADDFILEFLAGS[] rgFlags, VSQUERYADDFILERESULTS[] pSummaryResult,
                                    VSQUERYADDFILERESULTS[] rgResults)
         {
-            try
+            ThreadHelper.JoinableTaskFactory.Run(async () =>
             {
-                if(files.Any(f => ProjectUtil.IsSliceFileName(f)))
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                try
                 {
-                    if(project.IsMSBuildIceBuilderInstalled())
+                    if (files.Any(f => ProjectUtil.IsSliceFileName(f)))
                     {
-                        for(int i = 0; i < length; ++i)
+                        if (project.IsMSBuildIceBuilderInstalled())
                         {
-                            if(ProjectUtil.IsSliceFileName(files[i]))
+                            for (int i = 0; i < length; ++i)
                             {
-                                if(!ProjectUtil.CheckGenerateFileIsValid(project, files[i]))
+                                if (ProjectUtil.IsSliceFileName(files[i]))
                                 {
-                                    rgResults[i] = VSQUERYADDFILERESULTS.VSQUERYADDFILERESULTS_AddNotOK;
-                                    pSummaryResult[i] = VSQUERYADDFILERESULTS.VSQUERYADDFILERESULTS_AddNotOK;
+                                    if (!ProjectUtil.CheckGenerateFileIsValid(project, files[i]))
+                                    {
+                                        rgResults[i] = VSQUERYADDFILERESULTS.VSQUERYADDFILERESULTS_AddNotOK;
+                                        pSummaryResult[i] = VSQUERYADDFILERESULTS.VSQUERYADDFILERESULTS_AddNotOK;
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
-            catch(Exception ex)
-            {
-                Package.UnexpectedExceptionWarning(ex);
-            }
+                catch (Exception ex)
+                {
+                    Package.UnexpectedExceptionWarning(ex);
+                }
+            });
             return 0;
         }
 
@@ -369,31 +417,34 @@ namespace IceBuilder
                                       VSQUERYRENAMEFILEFLAGS[] rgFlags, VSQUERYRENAMEFILERESULTS[] pSummaryResult,
                                       VSQUERYRENAMEFILERESULTS[] rgResults)
         {
-            try
+            ThreadHelper.JoinableTaskFactory.Run(async () =>
             {
-                if(project.IsMSBuildIceBuilderInstalled())
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                try
                 {
-                    for(int i = 0; i < filesLength; ++i)
+                    if (project.IsMSBuildIceBuilderInstalled())
                     {
-                        if(ProjectUtil.IsSliceFileName(newNames[i]))
+                        for (int i = 0; i < filesLength; ++i)
                         {
-
-                            if(!ProjectUtil.CheckGenerateFileIsValid(project, newNames[i]))
+                            if (ProjectUtil.IsSliceFileName(newNames[i]))
                             {
-                                rgResults[i] = VSQUERYRENAMEFILERESULTS.VSQUERYRENAMEFILERESULTS_RenameNotOK;
-                                pSummaryResult[i] = VSQUERYRENAMEFILERESULTS.VSQUERYRENAMEFILERESULTS_RenameNotOK;
+
+                                if (!ProjectUtil.CheckGenerateFileIsValid(project, newNames[i]))
+                                {
+                                    rgResults[i] = VSQUERYRENAMEFILERESULTS.VSQUERYRENAMEFILERESULTS_RenameNotOK;
+                                    pSummaryResult[i] = VSQUERYRENAMEFILERESULTS.VSQUERYRENAMEFILERESULTS_RenameNotOK;
+                                }
                             }
                         }
                     }
                 }
-            }
-            catch(Exception ex)
-            {
-                Package.UnexpectedExceptionWarning(ex);
-            }
+                catch (Exception ex)
+                {
+                    Package.UnexpectedExceptionWarning(ex);
+                }
+            });
             return 0;
         }
-        #endregion IVsTrackProjectDocumentsEvents2
 
         IVsTrackProjectDocuments2 TrackProjectDocuments2
         {
