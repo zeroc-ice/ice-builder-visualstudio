@@ -248,6 +248,10 @@ namespace IceBuilder
                         }
                     }
                 }
+                catch (OperationCanceledException)
+                {
+                    // Ignore, this could happen if the project is reloaded
+                }
                 catch (Exception ex)
                 {
                     Package.UnexpectedExceptionWarning(ex);

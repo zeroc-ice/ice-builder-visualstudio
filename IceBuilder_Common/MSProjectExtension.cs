@@ -13,14 +13,14 @@ namespace IceBuilder
 {
     public static class MSProjectExtension
     {
-        static readonly ProjectCollection cppProjectColletion = new ProjectCollection();
-
         public static Project LoadedProject(string path)
         {
-            return ProjectCollection.GlobalProjectCollection.GetLoadedProjects(path).FirstOrDefault();
+            return ProjectCollection.GlobalProjectCollection.GetLoadedProjects(path).FirstOrDefault() ??
+                   ProjectCollection.GlobalProjectCollection.LoadProject(path);
         }
 
-        public static string GetItemMetadata(this Project project, string identity, string name, string defaultValue = "")
+        public static string GetItemMetadata(this Project project, string identity, string name,
+                                             string defaultValue = "")
         {
             var item = project.AllEvaluatedItems.FirstOrDefault(
                 i => i.ItemType.Equals("SliceCompile") && i.EvaluatedInclude.Equals(identity));
@@ -34,7 +34,8 @@ namespace IceBuilder
             }
         }
 
-        public static string GetDefaultItemMetadata(this Project project, string name, bool evaluated, string defaultValue = "")
+        public static string GetDefaultItemMetadata(this Project project, string name, bool evaluated,
+                                                    string defaultValue = "")
         {
             var meta = project.AllEvaluatedItemDefinitionMetadata.LastOrDefault(
                 m => m.ItemType.Equals("SliceCompile") && m.Name.Equals(name));
@@ -206,6 +207,13 @@ namespace IceBuilder
                     group.AddProperty(name, value);
                 }
             }
+        }
+
+        public static bool HasProjectFlavor(this Project project, string flavor)
+        {
+            var property = project.Xml.Properties.FirstOrDefault(
+               p => p.Name.Equals("ProjectTypeGuids", StringComparison.CurrentCultureIgnoreCase));
+            return property != null && property.Value.IndexOf(flavor) != -1;
         }
 
         public static void AddProjectFlavorIfNotExists(this Project project, string flavor)

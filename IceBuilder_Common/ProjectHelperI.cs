@@ -75,7 +75,8 @@ namespace IceBuilder
         }
 
         protected static async Task<T>
-        WithProjectAsync<T>(UnconfiguredProject unconfiguredProject, Func<MSProject, T> func, bool switchToMainThread = false)
+        WithProjectAsync<T>(UnconfiguredProject unconfiguredProject, Func<MSProject, T> func,
+                            bool switchToMainThread = false)
         {
             T result = default(T);
             var service = unconfiguredProject.ProjectService.Services.ProjectLockService;

@@ -444,7 +444,7 @@ namespace IceBuilder
                 }
                 else
                 {
-                    if (project is IVsAggregatableProject)
+                    if (project is IVsAggregatableProject && !project.HasProjectFlavor(IceBuilderNewFlavor))
                     {
                         project.AddProjectFlavorIfNotExists(IceBuilderNewFlavor);
                     }
@@ -584,13 +584,7 @@ namespace IceBuilder
             var projects = DTEUtil.GetProjects();
             foreach (IVsProject project in projects)
             {
-                // Projects that are not being track has not been previous initialized
-                // initialize will do nothing if zeroc.icebuilder.msbuild package is
-                // not installed
-                if(project.IsMSBuildIceBuilderInstalled())
-                {
-                    InitializeProject(project);
-                }
+                InitializeProject(project);
             }
         }
 

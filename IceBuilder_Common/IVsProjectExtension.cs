@@ -193,13 +193,21 @@ namespace IceBuilder
             ProjectFactoryHelperInstance.ProjectHelper.SetItemMetadata(project, name, value);
         }
 
+        public static bool HasProjectFlavor(this IVsProject project, string flavor)
+        {
+            return project.WithProject((MSProject msproject) =>
+                {
+                    return msproject.HasProjectFlavor(flavor);
+                }, true);
+        }
+
         public static void AddProjectFlavorIfNotExists(this IVsProject project, string flavor)
         {
             ProjectFactoryHelperInstance.ProjectHelper.UpdateProject(project,
                 (MSProject msproject) =>
                 {
                     msproject.AddProjectFlavorIfNotExists(flavor);
-                });
+                }, true);
         }
 
         public static void RemoveGeneratedItemCustomMetadata(this IVsProject project, List<string> paths)

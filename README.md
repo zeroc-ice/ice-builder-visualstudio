@@ -2,7 +2,7 @@
 
 Ice Builder for Visual Studio is a Visual Studio extension that configures [Ice Builder for MSBuild](https://github.com/zeroc-ice/ice-builder-msbuild) for your C++ and C# projects, all within the Visual Studio IDE. It serves as a front-end for Ice Builder for MSBuild: all the build-time processing is performed by Ice Builder for MSBuild.
 
-Ice Builder for Visual Studio is compatible with Visual Studio 2017 or 2019, and works best with the following Ice installations:
+Ice Builder for Visual Studio is compatible with Visual Studio 2015, 2017 or 2019, and works best with the following Ice installations:
  * Ice NuGet package for Ice 3.7 or greater
 
 ## Contents
@@ -168,19 +168,17 @@ Ice Builder no longer supports direct migration from the old Ice add-in for Visu
 
 ### Build Requirements
 
-You need Visual Studio 2017
+You need Visual Studio 2019
 
 **AND**
 
 to install ALL of the following Visual Studio SDKs:
-- [Visual Studio 2012 SDK](https://www.microsoft.com/en-us/download/details.aspx?id=30668)
-- [Visual Studio 2013 SDK](https://www.microsoft.com/en-us/download/details.aspx?id=40758)
 - [Visual Studio 2015 SDK](https://msdn.microsoft.com/en-us/library/bb166441.aspx)
 - [Visual Studio 2017 SDK](https://docs.microsoft.com/en-us/visualstudio/extensibility/installing-the-visual-studio-sdk)
 
 ### Build Instructions
 
-Open the `IceBuilder.sln` solution file in Visual Studio 2017.
+Open the `IceBuilder.sln` solution file in Visual Studio 2019.
 
 After building the Ice Builder extension, the VSIX package will be placed in the build output directory:
 `IceBuilder\bin\Debug\IceBuilder.vsix` for debug builds, and `IceBuilder\bin\Release\IceBuilder.vsix`

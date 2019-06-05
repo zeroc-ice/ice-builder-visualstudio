@@ -42,7 +42,19 @@ namespace IceBuilder
             PackageInstaller = model.GetService<IVsPackageInstaller>();
             PackageRestorer = model.GetService<IVsPackageRestorer>();
             PackageInstallerEvents = model.GetService<IVsPackageInstallerEvents>();
-            PackageInstallerEvents.PackageInstalled += PackageInstallerEvents_PackageInstalled;
+            PackageInstallerEvents.PackageReferenceAdded += PackageInstallerEvents_PackageReferenceAdded;
+        }
+
+        private void PackageInstallerEvents_PackageReferenceAdded(IVsPackageMetadata metadata)
+        {
+            ThreadHelper.JoinableTaskFactory.Run(async () =>
+            {
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                if (BatchEnd != null)
+                {
+                    BatchEnd();
+                }
+            });
         }
 
         public bool IsPackageInstalled(EnvDTE.Project project, string packageId)
