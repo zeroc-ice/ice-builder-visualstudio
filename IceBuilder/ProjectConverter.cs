@@ -214,15 +214,22 @@ namespace IceBuilder
                                 }
                             });
 
-                            builder.ReloadProject(project);
+                            dispatcher.BeginInvoke(new Action(() =>
+                                {
+                                    builder.ReloadProject(project);
+                                }));
+
                         }
                     }
                     dispatcher.BeginInvoke(new Action(() => progressCallback.Finished()));
                 }
                 catch(Exception ex)
                 {
-                    dispatcher.BeginInvoke(new Action(() => progressCallback.Canceled = true));
-                    Package.UnexpectedExceptionWarning(ex);
+                    dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            progressCallback.Canceled = true;
+                            Package.UnexpectedExceptionWarning(ex);
+                        }));
                 }
             });
             t.Start();
