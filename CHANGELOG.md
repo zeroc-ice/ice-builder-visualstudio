@@ -1,3 +1,14 @@
+## Changes in Ice Builder for Visual Studio 6.0.1
+
+- Fixed a bug that can result in a Visual Studio crash when upgrading projects
+  from 4.3.10 to 6.0.0
+
+## Changes in Ice Builder for Visual Studio 6.0.0
+
+- Add Support for Visual Studio 2019
+
+- Drop Visual Studio 2012 and Visual Studio 2013 support
+
 ## Changes in Ice Builder for Visual Studio 5.0.3
 
 - Add Slice syntax highlighting
