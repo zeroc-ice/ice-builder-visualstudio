@@ -204,6 +204,39 @@ namespace IceBuilder
 #endif
         }
 
+        private bool HasGeneratedItemDuplicates(IVsProject project)
+        {
+#if VS2017 || VS2019
+            if (!project.IsCppProject() && GetUnconfiguredProject(project) != null)
+            {
+                return project.WithProject((MSProject msproject) =>
+                {
+                    var all = msproject.Xml.Items.Where(item => item.ItemType.Equals("Compile"));
+
+                    foreach (var item in all)
+                    {
+                        //
+                        // If there is a glob item that already match the evaluated include path we
+                        // can remove the non glob item as it is a duplicate
+                        //
+                        var globItem = msproject.AllEvaluatedItems.FirstOrDefault(i =>
+                        {
+                            return i.HasMetadata("SliceCompileSource") &&
+                                   !i.EvaluatedInclude.Equals(i.UnevaluatedInclude) &&
+                                   i.EvaluatedInclude.Equals(item.Include);
+                        });
+                        if (globItem != null)
+                        {
+                            return true;
+                        }
+                    }
+                    return false;
+                });
+            }
+#endif
+            return false;
+        }
+
         public void RemoveGeneratedItemDuplicates(IVsProject project)
         {
 #if VS2017 || VS2019
@@ -213,7 +246,7 @@ namespace IceBuilder
             // detect that the new create file is already part of a glob and adds a
             // second item with the given include.
             //
-            if (!project.IsCppProject() && GetUnconfiguredProject(project) != null)
+            if (HasGeneratedItemDuplicates(project))
             {
                 project.UpdateProject((MSProject msproject) =>
                     {

@@ -285,28 +285,31 @@ namespace IceBuilder
 
         public static void DeleteItems(this IVsProject project, List<string> paths)
         {
-            project.EnsureIsCheckout();
-            var projectDir = project.GetProjectBaseDirectory();
-
-            project.RemoveGeneratedItemCustomMetadata(paths);
-
-            var sliceCompileDependencies = paths.Select(
-                p =>
-                {
-                    return Path.Combine(Path.GetDirectoryName(p),
-                        string.Format("SliceCompile.{0}.d", Path.GetFileNameWithoutExtension(p)));
-                }).Distinct().ToList();
-
-            foreach(var path in sliceCompileDependencies)
+            if (paths.Count > 0)
             {
-                if(File.Exists(path))
+                project.EnsureIsCheckout();
+                var projectDir = project.GetProjectBaseDirectory();
+
+                project.RemoveGeneratedItemCustomMetadata(paths);
+
+                var sliceCompileDependencies = paths.Select(
+                    p =>
+                    {
+                        return Path.Combine(Path.GetDirectoryName(p),
+                            string.Format("SliceCompile.{0}.d", Path.GetFileNameWithoutExtension(p)));
+                    }).Distinct().ToList();
+
+                foreach (var path in sliceCompileDependencies)
                 {
-                    try
+                    if (File.Exists(path))
                     {
-                        File.Delete(path);
-                    }
-                    catch (IOException)
-                    {
+                        try
+                        {
+                            File.Delete(path);
+                        }
+                        catch (IOException)
+                        {
+                        }
                     }
                 }
             }
@@ -314,7 +317,6 @@ namespace IceBuilder
 
         public static void RemoveGeneratedItemDuplicates(this IVsProject project)
         {
-            project.EnsureIsCheckout();
             ProjectFactoryHelperInstance.ProjectHelper.RemoveGeneratedItemDuplicates(project);
         }
 
