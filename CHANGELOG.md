@@ -1,3 +1,10 @@
+## Changes in Ice Builder for Visual Studio 6.0.2
+- Fixed a bug that cause TFS projects checkout during build, even if there is
+  no project modifications.
+
+- Fixed the handling of Slice file renaming and deletion to ensure that the
+  corresponding generated files are also removed.
+
 ## Changes in Ice Builder for Visual Studio 6.0.1
 
 - Fixed a bug that can result in a Visual Studio crash when upgrading projects
