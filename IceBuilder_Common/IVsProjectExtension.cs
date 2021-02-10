@@ -292,14 +292,14 @@ namespace IceBuilder
 
                 project.RemoveGeneratedItemCustomMetadata(paths);
 
-                var sliceCompileDependencies = paths.Select(
+                var sliceCompileDependencies = paths.Distinct().Select(
                     p =>
                     {
                         return Path.Combine(Path.GetDirectoryName(p),
                             string.Format("SliceCompile.{0}.d", Path.GetFileNameWithoutExtension(p)));
-                    }).Distinct().ToList();
+                    });
 
-                foreach (var path in sliceCompileDependencies)
+                foreach (var path in paths.Concat(sliceCompileDependencies))
                 {
                     if (File.Exists(path))
                     {
@@ -308,6 +308,18 @@ namespace IceBuilder
                             File.Delete(path);
                         }
                         catch (IOException)
+                        {
+                        }
+                    }
+
+                    var projectItem = project.GetProjectItem(path);
+                    if (projectItem != null)
+                    {
+                        try
+                        {
+                            projectItem.Remove();
+                        }
+                        catch
                         {
                         }
                     }

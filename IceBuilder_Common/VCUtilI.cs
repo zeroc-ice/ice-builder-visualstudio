@@ -52,8 +52,6 @@ namespace IceBuilder
         {
             foreach(VCFile file in project.Files)
             {
-                var n = file.Name;
-                var p = file.RelativePath;
                 if(name.Equals(file.RelativePath))
                 {
                     return file;
@@ -100,16 +98,15 @@ namespace IceBuilder
                     File.Create(path).Dispose();
                 }
 
-                VCFile file = null;
                 if(config == null)
                 {
-                    file = filter.AddFile(path);
+                    filter.AddFile(path);
                 }
                 else
                 {
                     filter = FindOrCreateFilter(filter, config.PlatformName);
                     filter = FindOrCreateFilter(filter, config.ConfigurationName);
-                    file = filter.AddFile(path);
+                    VCFile file = filter.AddFile(path);
                     foreach(VCFileConfiguration c in file.FileConfigurations)
                     {
                         if(!c.ProjectConfiguration.ConfigurationName.Equals(config.ConfigurationName) ||

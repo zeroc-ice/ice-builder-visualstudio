@@ -172,7 +172,6 @@ namespace IceBuilder
             set;
         }
 
-        private HashSet<EnvDTE.Project> _buildProjects = new HashSet<EnvDTE.Project>();
         private uint _cookie;
     }
 
@@ -234,14 +233,14 @@ namespace IceBuilder
                                     var projectItem = project.GetProjectItem(path);
                                     if (projectItem != null)
                                     {
-                                        project.EnsureIsCheckout();
                                         var property = projectItem.Properties.Item("ItemType");
                                         if (property != null && !property.Value.Equals("SliceCompile"))
                                         {
+                                            project.EnsureIsCheckout();
                                             property.Value = "SliceCompile";
+                                            ProjectUtil.AddGeneratedFiles(project, path);
                                         }
                                     }
-                                    ProjectUtil.AddGeneratedFiles(project, path);
                                     break;
                                 }
                             }
@@ -377,8 +376,11 @@ namespace IceBuilder
                                 {
                                     if (!ProjectUtil.CheckGenerateFileIsValid(project, files[i]))
                                     {
-                                        rgResults[i] = VSQUERYADDFILERESULTS.VSQUERYADDFILERESULTS_AddNotOK;
-                                        pSummaryResult[i] = VSQUERYADDFILERESULTS.VSQUERYADDFILERESULTS_AddNotOK;
+                                        if (rgResults != null)
+                                        {
+                                            rgResults[i] = VSQUERYADDFILERESULTS.VSQUERYADDFILERESULTS_AddNotOK;
+                                        }
+                                        pSummaryResult[0] = VSQUERYADDFILERESULTS.VSQUERYADDFILERESULTS_AddNotOK;
                                     }
                                 }
                             }
@@ -435,8 +437,11 @@ namespace IceBuilder
 
                                 if (!ProjectUtil.CheckGenerateFileIsValid(project, newNames[i]))
                                 {
-                                    rgResults[i] = VSQUERYRENAMEFILERESULTS.VSQUERYRENAMEFILERESULTS_RenameNotOK;
-                                    pSummaryResult[i] = VSQUERYRENAMEFILERESULTS.VSQUERYRENAMEFILERESULTS_RenameNotOK;
+                                    if (rgResults != null)
+                                    {
+                                        rgResults[i] = VSQUERYRENAMEFILERESULTS.VSQUERYRENAMEFILERESULTS_RenameNotOK;
+                                    }
+                                    pSummaryResult[0] = VSQUERYRENAMEFILERESULTS.VSQUERYRENAMEFILERESULTS_RenameNotOK;
                                 }
                             }
                         }
