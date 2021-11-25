@@ -1,33 +1,19 @@
-﻿using NuGet.VisualStudio;
+﻿// Copyright (c) ZeroC, Inc. All rights reserved.
+
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
+using NuGet.VisualStudio;
 
 namespace IceBuilder
 {
-    public class NuGetI : NuGet
+    public class NuGetI : INuGet
     {
-        IVsPackageInstallerEvents PackageInstallerEvents
-        {
-            get;
-            set;
-        }
+        IVsPackageInstallerEvents PackageInstallerEvents { get; set; }
 
-        IVsPackageInstallerServices PackageInstallerServices
-        {
-            get;
-            set;
-        }
-        IVsPackageInstaller PackageInstaller
-        {
-            get;
-            set;
-        }
+        IVsPackageInstallerServices PackageInstallerServices { get; set; }
+        IVsPackageInstaller PackageInstaller { get; set; }
 
-        IVsPackageRestorer PackageRestorer
-        {
-            get;
-            set;
-        }
+        IVsPackageRestorer PackageRestorer { get; set; }
 
         NuGetBatchEnd BatchEnd
         {
@@ -50,10 +36,7 @@ namespace IceBuilder
             ThreadHelper.JoinableTaskFactory.Run(async () =>
             {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-                if (BatchEnd != null)
-                {
-                    BatchEnd();
-                }
+                BatchEnd?.Invoke();
             });
         }
 
@@ -71,19 +54,8 @@ namespace IceBuilder
         {
             PackageRestorer.RestorePackages(project);
         }
-        private void PackageInstallerEvents_PackageInstalled(IVsPackageMetadata metadata)
-        {
-            ThreadHelper.JoinableTaskFactory.Run(async () =>
-            {
-                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-                if(BatchEnd != null)
-                {
-                    BatchEnd();
-                }
-            });
-        }
 
-        void NuGet.OnNugetBatchEnd(NuGetBatchEnd batchEnd)
+        void INuGet.OnNugetBatchEnd(NuGetBatchEnd batchEnd)
         {
             BatchEnd = batchEnd;
         }

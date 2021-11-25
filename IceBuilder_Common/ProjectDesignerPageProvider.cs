@@ -1,16 +1,12 @@
-﻿// **********************************************************************
-//
-// Copyright (c) ZeroC, Inc. All rights reserved.
-//
-// **********************************************************************
+﻿// Copyright (c) ZeroC, Inc. All rights reserved.
 
-using System.Collections.Generic;
-using System.Composition;
-using System.Threading.Tasks;
 using Microsoft.VisualStudio.ProjectSystem;
-using System.Collections.Immutable;
 using Microsoft.VisualStudio.ProjectSystem.VS.Properties;
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Composition;
+using System.Threading.Tasks;
 
 namespace IceBuilder
 {

@@ -1,3 +1,6 @@
+## Changes in Ice Builder for Visual Studio 6.0.3
+- Add support for Visual Studio 2022.
+
 ## Changes in Ice Builder for Visual Studio 6.0.2
 - Fixed a bug that cause TFS projects checkout during build, even if there is
   no project modifications.

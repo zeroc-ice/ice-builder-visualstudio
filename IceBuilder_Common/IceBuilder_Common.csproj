@@ -59,18 +59,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DTEProjectExtension.cs" />
-    <Compile Include="FileUtil.cs" />
-    <Compile Include="GeneratedFileSet.cs" />
-    <Compile Include="IVsProjectExtension.cs" />
-    <Compile Include="IVsProjectHelperFactory.cs" />
-    <Compile Include="IVsProjectHelper.cs" />
-    <Compile Include="MSProjectExtension.cs" />
-    <Compile Include="NuGet.cs" />
-    <Compile Include="PackageInitializationException.cs" />
-    <Compile Include="VCUtil.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <Import Project="..\IceBuilder_Common.Shared\IceBuilder_Common.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\Sign.targets" />
   <Target Name="AfterBuild" Condition="Exists('$(SIGN_CERTIFICATE)')">
