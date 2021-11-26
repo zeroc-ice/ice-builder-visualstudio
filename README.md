@@ -168,7 +168,7 @@ Ice Builder no longer supports direct migration from the old Ice add-in for Visu
 
 ### Build Requirements
 
-You need Visual Studio 2022
+You need Visual Studio 2022 or Visual Studio 2019
 
 **AND**
 
@@ -178,13 +178,24 @@ to install ALL of the following Visual Studio SDKs:
 
 ### Build Instructions
 
-Open the `IceBuilder.sln` solution file in Visual Studio 2022.
+#### Building Visual Studio 2022 extension
 
-After building the Ice Builder extension, there would be two VSIX packages:
+Open the `IceBuilder.sln` solution file in Visual Studio 2022 and build the `IceBuilder.Next` project.
 
-- For Visual Studio 2022 or above use `IceBuilder.Next\bin\Debug\IceBuilder.vsix`
-- For Visual Studio 2019 or earlier use `IceBuilder\bin\Debug\IceBuilder.vsix`
+After building the Ice Builder extension, there would be a VSIX package in:
+
+- `IceBuilder.Next\bin\Debug\IceBuilder.vsix` or `IceBuilder.Next\bin\Release\IceBuilder.vsix`
+
+#### Building Visual Studio 2019, 2017 and 2015 extension
+
+Open the `IceBuilder.sln` solution file in Visual Studio 2019 and build the `IceBuilder` project.
+
+After building the Ice Builder extension, there would be a VSIX package in:
+
+- `IceBuilder\bin\Debug\IceBuilder.vsix` or `IceBuilder\bin\Release\IceBuilder.vsix`
+
+### Signing
 
 You can sign your extension with Authenticode by setting the environment variable `SIGN_CERTIFICATE` to
-the path of your PFX certificate store, and the `SIGN_PASSWORD` environment variable to the password
-used by your certificate store.
+the path of your PFX certificate store, the `SIGN_PASSWORD` environment variable to the password
+used by your certificate store and `SIGN_CERTIFICATE_SHA1` to the SHA1 hash of your certificate.
