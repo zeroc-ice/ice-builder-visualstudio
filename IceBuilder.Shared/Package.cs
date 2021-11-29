@@ -831,7 +831,12 @@ namespace IceBuilder
             @"HKEY_CURRENT_USER\Software\Microsoft\.NETFramework\v2.0.50727\AssemblyFoldersEx\Ice";
         public static readonly string IceAutoBuilding = "IceAutoBuilding";
 
-        public const string IceBuilderPackageString = "ef9502be-dbc2-4568-a846-02b8e42d04c2";
+        public const string IceBuilderPackageString =
+#if VS2022
+            "0CEF9F9D-FA1F-45D0-9D1E-BBD2A86D5F62";
+#else
+            "ef9502be-dbc2-4568-a846-02b8e42d04c2";
+#endif
 
         public const string IceBuilderOldFlavorGuid = "3C53C28F-DC44-46B0-8B85-0C96B85B2042";
         public const string IceBuilderOldFlavor = "{" + IceBuilderOldFlavorGuid + "}";
