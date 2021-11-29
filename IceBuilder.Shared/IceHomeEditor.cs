@@ -15,10 +15,7 @@ namespace IceBuilder
 
         public string IceHome
         {
-            get
-            {
-                return txtIceHome.Text;
-            }
+            get => txtIceHome.Text;
             set
             {
                 txtIceHome.Text = value;
@@ -37,8 +34,7 @@ namespace IceBuilder
                 }
                 else
                 {
-                    lblInfo.Text =
-                        string.Format("Invalid Ice home directory:\r\n\"{0}\"\r\n", path);
+                    lblInfo.Text = $"Invalid Ice home directory:\r\n\"{path}\"\r\n";
                     return false;
                 }
             }
@@ -53,7 +49,6 @@ namespace IceBuilder
                     Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) : txtIceHome.Text);
 
             lblInfo.Text = "";
-
             SetIceHome(selectedPath);
         }
 
