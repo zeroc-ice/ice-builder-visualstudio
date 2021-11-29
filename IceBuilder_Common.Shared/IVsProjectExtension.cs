@@ -66,7 +66,7 @@ namespace IceBuilder
             }
         }
 
-        // Get the Guid that idenifies the type of the project
+        // Get the Guid that identifies the type of the project
         public static Guid GetProjecTypeGuid(this IVsProject project)
         {
             if (project is IVsHierarchy hierarchy)

@@ -131,8 +131,11 @@ namespace IceBuilder
             return false;
         }
 
-        public static string
-        GetPropertyWithDefault(this Project project, string name, string defaultValue, bool imported = true)
+        public static string GetPropertyWithDefault(
+            this Project project,
+            string name,
+            string defaultValue,
+            bool imported = true)
         {
             var value = project.GetProperty(name, imported);
             return string.IsNullOrEmpty(value) ? defaultValue : value;
@@ -151,10 +154,8 @@ namespace IceBuilder
             return string.Empty;
         }
 
-        public static string GetEvaluatedProperty(this Project project, string name)
-        {
-            return project.GetPropertyValue(name);
-        }
+        public static string GetEvaluatedProperty(this Project project, string name) =>
+            project.GetPropertyValue(name);
 
         public static void SetProperty(this Project project, string name, string value, string label)
         {

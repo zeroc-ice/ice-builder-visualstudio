@@ -361,7 +361,10 @@ namespace IceBuilder
                 {
                     if (files.Any(f => ProjectUtil.IsSliceFileName(f)))
                     {
-                        if (project.IsMSBuildIceBuilderInstalled())
+                        if (project.IsMSBuildIceBuilderInstalled() &&
+                            project.GetEvaluatedProperty("EnableDefaultItems").Equals(
+                                "false",
+                                StringComparison.InvariantCultureIgnoreCase))
                         {
                             for (int i = 0; i < length; ++i)
                             {
