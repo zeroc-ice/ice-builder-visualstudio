@@ -117,10 +117,8 @@ namespace IceBuilder
         {
         }
 
-        public int IsPageDirty()
-        {
-            return ConfigurationView.Dirty ? VSConstants.S_OK : VSConstants.S_FALSE;
-        }
+        public int IsPageDirty() =>
+            ConfigurationView.Dirty ? VSConstants.S_OK : VSConstants.S_FALSE;
 
         public void Move(RECT[] pRect)
         {
@@ -137,17 +135,9 @@ namespace IceBuilder
             }
         }
 
-        public ProjectSettigns Settings
-        {
-            get;
-            private set;
-        }
+        public ProjectSettigns Settings { get; private set; }
 
-        public IVsProject Project
-        {
-            get;
-            private set;
-        }
+        public IVsProject Project { get; private set; }
 
         public void SetObjects(uint cObjects, object[] objects)
         {
@@ -156,12 +146,9 @@ namespace IceBuilder
             {
                 if (objects != null && cObjects > 0)
                 {
-                    IVsBrowseObject browse = objects[0] as IVsBrowseObject;
-                    if (browse != null)
+                    if (objects[0] is IVsBrowseObject browse)
                     {
-                        IVsHierarchy hier;
-                        uint id;
-                        browse.GetProjectItem(out hier, out id);
+                        browse.GetProjectItem(out IVsHierarchy hier, out uint id);
                         Project = hier as IVsProject;
                         if (Project != null)
                         {
@@ -186,16 +173,9 @@ namespace IceBuilder
             }
         }
 
-        public IPropertyPageSite PageSite
-        {
-            get;
-            private set;
-        }
+        public IPropertyPageSite PageSite { get; private set; }
 
-        public void SetPageSite(IPropertyPageSite site)
-        {
-            PageSite = site;
-        }
+        public void SetPageSite(IPropertyPageSite site) => PageSite = site;
 
         public const int SW_SHOW = 5;
         public const int SW_SHOWNORMAL = 1;

@@ -18,8 +18,7 @@ namespace IceBuilder
         protected override void SetInnerProject(IntPtr innerIUnknown)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
-            object objectForIUnknown = null;
-            objectForIUnknown = Marshal.GetObjectForIUnknown(innerIUnknown);
+            object objectForIUnknown = Marshal.GetObjectForIUnknown(innerIUnknown);
             if (serviceProvider == null)
             {
                 serviceProvider = Package;

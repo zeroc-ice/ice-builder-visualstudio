@@ -52,9 +52,6 @@
     <Compile Include="..\IceBuilder_Common\NuGetI.cs">
       <Link>NuGetI.cs</Link>
     </Compile>
-    <Compile Include="..\IceBuilder_Common\ProjectDesignerPageProvider.cs">
-      <Link>ProjectDesignerPageProvider.cs</Link>
-    </Compile>
     <Compile Include="..\IceBuilder_Common\ProjectHelperFactoryI.cs">
       <Link>ProjectHelperFactoryI.cs</Link>
     </Compile>

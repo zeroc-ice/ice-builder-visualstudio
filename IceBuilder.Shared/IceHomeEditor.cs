@@ -9,10 +9,7 @@ namespace IceBuilder
 {
     public partial class IceHomeEditor : UserControl
     {
-        public IceHomeEditor()
-        {
-            InitializeComponent();
-        }
+        public IceHomeEditor() => InitializeComponent();
 
         internal IceOptionsPage optionsPage;
 
@@ -34,7 +31,7 @@ namespace IceBuilder
             if (!string.IsNullOrEmpty(path))
             {
                 if (File.Exists(Path.Combine(path, "config", "ice.props")) ||
-                   File.Exists(Path.Combine(path, "config", "icebuilder.props")))
+                    File.Exists(Path.Combine(path, "config", "icebuilder.props")))
                 {
                     txtIceHome.Text = path;
                 }
@@ -62,14 +59,8 @@ namespace IceBuilder
 
         public bool AutoBuilding
         {
-            set
-            {
-                autoBuild.Checked = value;
-            }
-            get
-            {
-                return autoBuild.Checked;
-            }
+            set => autoBuild.Checked = value;
+            get => autoBuild.Checked;
         }
     }
 }

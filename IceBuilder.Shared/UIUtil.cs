@@ -11,8 +11,7 @@ namespace IceBuilder
 {
     class UIUtil
     {
-        public static void ShowErrorDialog(string title, string message)
-        {
+        public static void ShowErrorDialog(string title, string message) =>
             MessageBox.Show(
                 message,
                 title,
@@ -20,7 +19,6 @@ namespace IceBuilder
                 MessageBoxIcon.Error,
                 MessageBoxDefaultButton.Button1,
                 0);
-        }
 
         // Open the Visual Studio native dialog for selecting a directory
         public static string BrowserFolderDialog(IntPtr owner, string title, string initialDirectory)

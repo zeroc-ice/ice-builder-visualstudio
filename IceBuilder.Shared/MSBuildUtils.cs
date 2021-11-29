@@ -155,10 +155,8 @@ namespace IceBuilder
             return element != null;
         }
 
-        private static bool RemoveGlobalProperties(Microsoft.Build.Evaluation.Project project)
-        {
-            return RemoveGlobalProperty(project, "IceBuilderInstallDir");
-        }
+        private static bool RemoveGlobalProperties(Microsoft.Build.Evaluation.Project project) =>
+            RemoveGlobalProperty(project, "IceBuilderInstallDir");
 
         private static bool RemoveCppGlobalProperties(Microsoft.Build.Evaluation.Project project)
         {
@@ -209,9 +207,8 @@ namespace IceBuilder
             }
             else if (cpp)
             {
-                // The default output directory for C++ generated items was changed to $(IntDir)
-                // but we keep the old default when converted projects by setting it in the project
-                // file
+                // The default output directory for C++ generated items was changed to $(IntDir) but we keep the old
+                // default when converted projects by setting it in the project file.
                 project.SetItemMetadata(ItemMetadataNames.OutputDir, "generated");
                 outputDir = "generated";
             }

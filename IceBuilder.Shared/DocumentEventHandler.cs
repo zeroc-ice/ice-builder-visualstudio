@@ -12,10 +12,8 @@ namespace IceBuilder
 {
     public class RunningDocumentTableEventHandler : IVsRunningDocTableEvents2
     {
-        public RunningDocumentTableEventHandler(IVsRunningDocumentTable runningDocumentTable)
-        {
+        public RunningDocumentTableEventHandler(IVsRunningDocumentTable runningDocumentTable) =>
             RunningDocumentTable = runningDocumentTable;
-        }
 
         public void BeginTrack()
         {
@@ -26,37 +24,31 @@ namespace IceBuilder
             });
         }
 
-        public void EndTrack()
-        {
+        public void EndTrack() =>
             ThreadHelper.JoinableTaskFactory.Run(async () =>
             {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
                 RunningDocumentTable.UnadviseRunningDocTableEvents(_cookie);
             });
-        }
 
-        public int OnAfterAttributeChange(uint docCookie, uint grfAttribs)
-        {
-            return 0;
-        }
+        public int OnAfterAttributeChange(uint docCookie, uint grfAttribs) => 0;
 
-        public int OnAfterAttributeChangeEx(uint docCookie, uint grfAttribs, IVsHierarchy pHierOld, uint itemidOld,
-                                            string pszMkDocumentOld, IVsHierarchy pHierNew, uint itemidNew,
-                                            string pszMkDocumentNew)
-        {
-            return 0;
-        }
+        public int OnAfterAttributeChangeEx(
+            uint docCookie, uint grfAttribs,
+            IVsHierarchy pHierOld,
+            uint itemidOld,
+            string pszMkDocumentOld,
+            IVsHierarchy pHierNew,
+            uint itemidNew,
+            string pszMkDocumentNew) => 0;
 
-        public int OnAfterDocumentWindowHide(uint docCookie, IVsWindowFrame pFrame)
-        {
-            return 0;
-        }
+        public int OnAfterDocumentWindowHide(uint docCookie, IVsWindowFrame pFrame) => 0;
 
-        public int OnAfterFirstDocumentLock(uint docCookie, uint dwRDTLockType, uint dwReadLocksRemaining,
-                                            uint dwEditLocksRemaining)
-        {
-            return 0;
-        }
+        public int OnAfterFirstDocumentLock(
+            uint docCookie,
+            uint dwRDTLockType,
+            uint dwReadLocksRemaining,
+            uint dwEditLocksRemaining) => 0;
 
         public int OnAfterSave(uint docCookie)
         {
@@ -116,17 +108,17 @@ namespace IceBuilder
                 }
                 catch (Exception)
                 {
-                    // Could happend with some document types
+                    // Could happen with some document types
                 }
             });
             return 0;
         }
 
-        public int OnBeforeLastDocumentUnlock(uint docCookie, uint dwRDTLockType, uint dwReadLocksRemaining,
-                                              uint dwEditLocksRemaining)
-        {
-            return 0;
-        }
+        public int OnBeforeLastDocumentUnlock(
+            uint docCookie,
+            uint dwRDTLockType,
+            uint dwReadLocksRemaining,
+            uint dwEditLocksRemaining) => 0;
 
         private void GetDocumentInfo(uint cookie, ref IVsProject project, ref uint item, ref string path)
         {
@@ -154,49 +146,45 @@ namespace IceBuilder
             item = pitemid;
         }
 
-        IVsRunningDocumentTable RunningDocumentTable
-        {
-            get;
-            set;
-        }
+        IVsRunningDocumentTable RunningDocumentTable { get; set; }
 
         private uint _cookie;
     }
 
     public class DocumentEventHandler : IVsTrackProjectDocumentsEvents2
     {
-        public DocumentEventHandler(IVsTrackProjectDocuments2 trackProjectDocuments2)
-        {
+        public DocumentEventHandler(IVsTrackProjectDocuments2 trackProjectDocuments2) =>
             TrackProjectDocuments2 = trackProjectDocuments2;
-        }
 
-        public void BeginTrack()
-        {
+        public void BeginTrack() =>
             ThreadHelper.JoinableTaskFactory.Run(async () =>
             {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
                 TrackProjectDocuments2.AdviseTrackProjectDocumentsEvents(this, out _cookie);
             });
-        }
 
-        public void EndTrack()
-        {
+        public void EndTrack() =>
             ThreadHelper.JoinableTaskFactory.Run(async () =>
             {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
                 TrackProjectDocuments2.UnadviseTrackProjectDocumentsEvents(_cookie);
             });
-        }
 
-        public int OnAfterAddDirectoriesEx(int cProjects, int cDirectories, IVsProject[] rgpProjects,
-                                           int[] rgFirstIndices, string[] rgpszMkDocuments,
-                                           VSADDDIRECTORYFLAGS[] rgFlags)
-        {
-            return 0;
-        }
+        public int OnAfterAddDirectoriesEx(
+            int cProjects,
+            int cDirectories,
+            IVsProject[] rgpProjects,
+            int[] rgFirstIndices,
+            string[] rgpszMkDocuments,
+            VSADDDIRECTORYFLAGS[] rgFlags) => 0;
 
-        public int OnAfterAddFilesEx(int projectsLength, int filesLength, IVsProject[] projects, int[] indices,
-                                     string[] names, VSADDFILEFLAGS[] rgFlags)
+        public int OnAfterAddFilesEx(
+            int projectsLength,
+            int filesLength,
+            IVsProject[] projects,
+            int[] indices,
+            string[] names,
+            VSADDFILEFLAGS[] rgFlags)
         {
             ThreadHelper.JoinableTaskFactory.Run(async () =>
             {
@@ -215,9 +203,7 @@ namespace IceBuilder
                                 string path = names[i];
                                 if (ProjectUtil.IsSliceFileName(path))
                                 {
-                                    //
                                     // Ensure the .ice file item has SliceCompile ItemType
-                                    //
                                     var projectItem = project.GetProjectItem(path);
                                     if (projectItem != null)
                                     {
@@ -247,15 +233,21 @@ namespace IceBuilder
             return 0;
         }
 
-        public int OnAfterRemoveDirectories(int cProjects, int cDirectories, IVsProject[] rgpProjects,
-                                            int[] rgFirstIndices, string[] rgpszMkDocuments,
-                                            VSREMOVEDIRECTORYFLAGS[] rgFlags)
-        {
-            return 0;
-        }
+        public int OnAfterRemoveDirectories(
+            int cProjects,
+            int cDirectories,
+            IVsProject[] rgpProjects,
+            int[] rgFirstIndices,
+            string[] rgpszMkDocuments,
+            VSREMOVEDIRECTORYFLAGS[] rgFlags) => 0;
 
-        public int OnAfterRemoveFiles(int projectsLength, int filesLength, IVsProject[] projects, int[] indices,
-                                      string[] names, VSREMOVEFILEFLAGS[] rgFlags)
+        public int OnAfterRemoveFiles(
+            int projectsLength,
+            int filesLength,
+            IVsProject[] projects,
+            int[] indices,
+            string[] names,
+            VSREMOVEFILEFLAGS[] rgFlags)
         {
             ThreadHelper.JoinableTaskFactory.Run(async () =>
             {
@@ -289,15 +281,23 @@ namespace IceBuilder
             return 0;
         }
 
-        public int OnAfterRenameDirectories(int cProjects, int cDirs, IVsProject[] rgpProjects, int[] rgFirstIndices,
-                                            string[] rgszMkOldNames, string[] rgszMkNewNames,
-                                            VSRENAMEDIRECTORYFLAGS[] rgFlags)
-        {
-            return 0;
-        }
+        public int OnAfterRenameDirectories(
+            int cProjects,
+            int cDirs,
+            IVsProject[] rgpProjects,
+            int[] rgFirstIndices,
+            string[] rgszMkOldNames,
+            string[] rgszMkNewNames,
+            VSRENAMEDIRECTORYFLAGS[] rgFlags) => 0;
 
-        public int OnAfterRenameFiles(int projectsLength, int filesLength, IVsProject[] projects, int[] indices,
-                                      string[] oldNames, string[] newNames, VSRENAMEFILEFLAGS[] rgFlags)
+        public int OnAfterRenameFiles(
+            int projectsLength,
+            int filesLength,
+            IVsProject[] projects,
+            int[] indices,
+            string[] oldNames,
+            string[] newNames,
+            VSRENAMEFILEFLAGS[] rgFlags)
         {
             ThreadHelper.JoinableTaskFactory.Run(async () =>
             {
@@ -331,23 +331,28 @@ namespace IceBuilder
             return 0;
         }
 
-        public int OnAfterSccStatusChanged(int cProjects, int cFiles, IVsProject[] rgpProjects, int[] rgFirstIndices,
-                                           string[] rgpszMkDocuments, uint[] rgdwSccStatus)
-        {
-            return 0;
-        }
+        public int OnAfterSccStatusChanged(
+            int cProjects,
+            int cFiles,
+            IVsProject[] rgpProjects,
+            int[] rgFirstIndices,
+            string[] rgpszMkDocuments,
+            uint[] rgdwSccStatus) => 0;
 
-        public int OnQueryAddDirectories(IVsProject pProject, int cDirectories, string[] rgpszMkDocuments,
-                                         VSQUERYADDDIRECTORYFLAGS[] rgFlags,
-                                         VSQUERYADDDIRECTORYRESULTS[] pSummaryResult,
-                                         VSQUERYADDDIRECTORYRESULTS[] rgResults)
-        {
-            return 0;
-        }
+        public int OnQueryAddDirectories(
+            IVsProject pProject,
+            int cDirectories,
+            string[] rgpszMkDocuments,
+            VSQUERYADDDIRECTORYFLAGS[] rgFlags,
+            VSQUERYADDDIRECTORYRESULTS[] pSummaryResult,
+            VSQUERYADDDIRECTORYRESULTS[] rgResults) => 0;
 
-        public int OnQueryAddFiles(IVsProject project, int length, string[] files,
-                                   VSQUERYADDFILEFLAGS[] rgFlags, VSQUERYADDFILERESULTS[] pSummaryResult,
-                                   VSQUERYADDFILERESULTS[] rgResults)
+        public int OnQueryAddFiles(
+            IVsProject project,
+            int length, string[] files,
+            VSQUERYADDFILEFLAGS[] rgFlags,
+            VSQUERYADDFILERESULTS[] pSummaryResult,
+            VSQUERYADDFILERESULTS[] rgResults)
         {
             ThreadHelper.JoinableTaskFactory.Run(async () =>
             {
@@ -383,33 +388,39 @@ namespace IceBuilder
             return 0;
         }
 
-        public int OnQueryRemoveDirectories(IVsProject pProject, int cDirectories, string[] rgpszMkDocuments,
-                                            VSQUERYREMOVEDIRECTORYFLAGS[] rgFlags,
-                                            VSQUERYREMOVEDIRECTORYRESULTS[] pSummaryResult,
-                                            VSQUERYREMOVEDIRECTORYRESULTS[] rgResults)
-        {
-            return 0;
-        }
+        public int OnQueryRemoveDirectories(
+            IVsProject pProject,
+            int cDirectories,
+            string[] rgpszMkDocuments,
+            VSQUERYREMOVEDIRECTORYFLAGS[] rgFlags,
+            VSQUERYREMOVEDIRECTORYRESULTS[] pSummaryResult,
+            VSQUERYREMOVEDIRECTORYRESULTS[] rgResults) => 0;
 
-        public int OnQueryRemoveFiles(IVsProject pProject, int cFiles, string[] rgpszMkDocuments,
-                                      VSQUERYREMOVEFILEFLAGS[] rgFlags,
-                                      VSQUERYREMOVEFILERESULTS[] pSummaryResult,
-                                      VSQUERYREMOVEFILERESULTS[] rgResults)
-        {
-            return 0;
-        }
+        public int OnQueryRemoveFiles(
+            IVsProject pProject,
+            int cFiles,
+            string[] rgpszMkDocuments,
+            VSQUERYREMOVEFILEFLAGS[] rgFlags,
+            VSQUERYREMOVEFILERESULTS[] pSummaryResult,
+            VSQUERYREMOVEFILERESULTS[] rgResults) => 0;
 
-        public int OnQueryRenameDirectories(IVsProject pProject, int cDirs, string[] rgszMkOldNames,
-                                            string[] rgszMkNewNames, VSQUERYRENAMEDIRECTORYFLAGS[] rgFlags,
-                                            VSQUERYRENAMEDIRECTORYRESULTS[] pSummaryResult,
-                                            VSQUERYRENAMEDIRECTORYRESULTS[] rgResults)
-        {
-            return 0;
-        }
+        public int OnQueryRenameDirectories(
+            IVsProject pProject,
+            int cDirs,
+            string[] rgszMkOldNames,
+            string[] rgszMkNewNames,
+            VSQUERYRENAMEDIRECTORYFLAGS[] rgFlags,
+            VSQUERYRENAMEDIRECTORYRESULTS[] pSummaryResult,
+            VSQUERYRENAMEDIRECTORYRESULTS[] rgResults) => 0;
 
-        public int OnQueryRenameFiles(IVsProject project, int filesLength, string[] oldNames, string[] newNames,
-                                      VSQUERYRENAMEFILEFLAGS[] rgFlags, VSQUERYRENAMEFILERESULTS[] pSummaryResult,
-                                      VSQUERYRENAMEFILERESULTS[] rgResults)
+        public int OnQueryRenameFiles(
+            IVsProject project,
+            int filesLength,
+            string[] oldNames,
+            string[] newNames,
+            VSQUERYRENAMEFILEFLAGS[] rgFlags,
+            VSQUERYRENAMEFILERESULTS[] pSummaryResult,
+            VSQUERYRENAMEFILERESULTS[] rgResults)
         {
             ThreadHelper.JoinableTaskFactory.Run(async () =>
             {
@@ -443,11 +454,7 @@ namespace IceBuilder
             return 0;
         }
 
-        IVsTrackProjectDocuments2 TrackProjectDocuments2
-        {
-            get;
-            set;
-        }
+        IVsTrackProjectDocuments2 TrackProjectDocuments2 { get; set; }
 
         private uint _cookie = 0;
     }

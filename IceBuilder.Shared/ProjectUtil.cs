@@ -42,16 +42,6 @@ namespace IceBuilder
         public static string GetDefaultOutputDir(IVsProject project, bool evaluated) =>
             project.GetDefaultItemMetadata(ItemMetadataNames.OutputDir, evaluated);
 
-        public static string GetDefaultHeaderOutputDir(IVsProject project, bool evaluated)
-        {
-            string outputdir = project.GetDefaultItemMetadata(ItemMetadataNames.HeaderOutputDir, evaluated);
-            if (string.IsNullOrEmpty(outputdir))
-            {
-                outputdir = GetDefaultOutputDir(project, evaluated);
-            }
-            return outputdir;
-        }
-
         public static string GetProjectName(IVsProject project)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -197,7 +187,7 @@ namespace IceBuilder
                     if (File.Exists(source))
                     {
                         const string message =
-                        "A file named '{0}' already exists. If you want to add '{1}' first remove '{0}'.";
+                            "A file named '{0}' already exists. If you want to add '{1}' first remove '{0}'.";
 
                         UIUtil.ShowErrorDialog("Ice Builder",
                             string.Format(message,

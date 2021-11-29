@@ -9,23 +9,19 @@ namespace IceBuilder
 {
     public class SolutionEventHandler : IVsSolutionEvents3, IVsSolutionLoadEvents
     {
-        public void BeginTrack()
-        {
+        public void BeginTrack() =>
             ThreadHelper.JoinableTaskFactory.Run(async () =>
             {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
                 Package.Instance.IVsSolution.AdviseSolutionEvents(this, out _cookie);
             });
-        }
 
-        public void EndTrack()
-        {
+        public void EndTrack() =>
             ThreadHelper.JoinableTaskFactory.Run(async () =>
             {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
                 Package.Instance.IVsSolution.UnadviseSolutionEvents(_cookie);
             });
-        }
 
         public int OnAfterBackgroundSolutionLoadComplete()
         {

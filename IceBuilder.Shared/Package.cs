@@ -24,112 +24,46 @@ namespace IceBuilder
     [ProvideAutoLoad(UIContextGuids80.NoSolution, PackageAutoLoadFlags.BackgroundLoad)]
     [Guid(IceBuilderPackageString)]
 
-    [ProvideObject(typeof(PropertyPage),
-        RegisterUsing = RegistrationMethod.CodeBase)]
+#if !VS2022
+    [ProvideObject(typeof(PropertyPage), RegisterUsing = RegistrationMethod.CodeBase)]
+#endif
 
-    [ProvideProjectFactory(typeof(ProjectFactory),
-        "Ice Builder",
-        null,
-        null,
-        null,
-        @"..\Templates\Projects")]
-
-    [ProvideProjectFactory(typeof(ProjectFactoryOld),
-        "Ice Builder Old",
-        null,
-        null,
-        null,
-        @"..\Templates\Projects")]
+    [ProvideProjectFactory(typeof(ProjectFactory), "Ice Builder", null, null, null, @"..\Templates\Projects")]
+    [ProvideProjectFactory(typeof(ProjectFactoryOld), "Ice Builder Old", null, null, null, @"..\Templates\Projects")]
 
     public sealed class Package : AsyncPackage
     {
         public static readonly string[] AssemblyNames =
         {
-            "Glacier2", "Ice", "IceBox", "IceDiscovery", "IceLocatorDiscovery",
-            "IceGrid", "IcePatch2", "IceSSL", "IceStorm"
+            "Glacier2",
+            "Ice",
+            "IceBox",
+            "IceDiscovery",
+            "IceLocatorDiscovery",
+            "IceGrid",
+            "IcePatch2",
+            "IceSSL",
+            "IceStorm"
         };
 
         public static readonly string NuGetBuilderPackageId = "zeroc.icebuilder.msbuild";
 
-        public IVsShell Shell
-        {
-            get;
-            private set;
-        }
+        public IVsShell Shell { get; private set; }
+        public EnvDTE.DTE DTE => DTE2.DTE;
+        public EnvDTE80.DTE2 DTE2 { get; private set; }
+        public IVsUIShell UIShell { get; private set; }
+        public IVsSolution IVsSolution { get; private set; }
+        public IVsSolution4 IVsSolution4 { get; private set; }
+        private SolutionEventHandler SolutionEventHandler { get; set; }
+        public RunningDocumentTableEventHandler RunningDocumentTableEventHandler { get; private set; }
+        public IVsMonitorSelection MonitorSelection { get; set; }
+        private EnvDTE.BuildEvents BuildEvents { get; set; }
 
-        public EnvDTE.DTE DTE
-        {
-            get
-            {
-                return DTE2.DTE;
-            }
-        }
+        public static Package Instance { get; private set; }
 
-        public EnvDTE80.DTE2 DTE2
-        {
-            get;
-            private set;
-        }
+        public INuGet NuGet { get; private set; }
 
-        public IVsUIShell UIShell
-        {
-            get;
-            private set;
-        }
-
-        public IVsSolution IVsSolution
-        {
-            get;
-            private set;
-        }
-
-        public IVsSolution4 IVsSolution4
-        {
-            get;
-            private set;
-        }
-
-        private SolutionEventHandler SolutionEventHandler
-        {
-            get;
-            set;
-        }
-
-        public RunningDocumentTableEventHandler RunningDocumentTableEventHandler
-        {
-            get;
-            private set;
-        }
-
-        public IVsMonitorSelection MonitorSelection
-        {
-            get;
-            set;
-        }
-
-        private EnvDTE.BuildEvents BuildEvents
-        {
-            get;
-            set;
-        }
-
-        public static Package Instance
-        {
-            get;
-            private set;
-        }
-
-        public INuGet NuGet
-        {
-            get;
-            private set;
-        }
-
-        public IVsProjectHelper ProjectHelper
-        {
-            get;
-            private set;
-        }
+        public IVsProjectHelper ProjectHelper { get; private set; }
 
         public static void UnexpectedExceptionWarning(Exception ex)
         {
@@ -137,10 +71,9 @@ namespace IceBuilder
             try
             {
                 Instance.OutputPane.Activate();
-                Instance.OutputPane.OutputString(
-                    string.Format("The Ice Builder has raised an unexpected exception:\n{0}", ex.ToString()));
+                Instance.OutputPane.OutputString($"The Ice Builder has raised an unexpected exception:\n{ex}");
             }
-            catch (Exception)
+            catch
             {
             }
         }
@@ -187,7 +120,7 @@ namespace IceBuilder
                     key.DeleteSubKey("Ice");
                 }
             }
-            catch (Exception)
+            catch
             {
             }
             finally
@@ -204,9 +137,7 @@ namespace IceBuilder
             ThreadHelper.ThrowIfNotOnUIThread();
             if (string.IsNullOrEmpty(value))
             {
-                //
                 // Remove all registry settings.
-                //
                 Registry.SetValue(IceBuilderKey, IceHomeValue, "", RegistryValueKind.String);
                 Registry.SetValue(IceBuilderKey, IceVersionValue, "", RegistryValueKind.String);
                 Registry.SetValue(IceBuilderKey, IceIntVersionValue, "", RegistryValueKind.String);
@@ -260,14 +191,13 @@ namespace IceBuilder
                         string compiler = GetSliceCompilerVersion(value);
                         if (string.IsNullOrEmpty(compiler))
                         {
-                            string err = "Unable to find a valid Ice installation in `" + value + "'";
-
-                            MessageBox.Show(err,
-                                            "Ice Builder",
-                                            MessageBoxButtons.OK,
-                                            MessageBoxIcon.Error,
-                                            MessageBoxDefaultButton.Button1,
-                                            0);
+                            MessageBox.Show(
+                                $"Unable to find a valid Ice installation in `${value}'",
+                                "Ice Builder",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error,
+                                MessageBoxDefaultButton.Button1,
+                                0);
                             return;
                         }
                         else
@@ -277,11 +207,13 @@ namespace IceBuilder
                     }
                     catch (Exception ex)
                     {
-                        string err = "Failed to run Slice compiler using Ice installation from `" + value + "'"
-                            + "\n" + ex.ToString();
-
-                        MessageBox.Show(err, "Ice Builder",
-                                        MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, 0);
+                        MessageBox.Show(
+                            $"Failed to run Slice compiler using Ice installation from `{value}'\n{ex}",
+                            "Ice Builder",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Error,
+                            MessageBoxDefaultButton.Button1,
+                            0);
                         return;
                     }
                     Registry.SetValue(IceBuilderKey, IceHomeValue, value, RegistryValueKind.String);
@@ -309,6 +241,7 @@ namespace IceBuilder
                     return assembliesDir;
                 }
             }
+
             string iceHome = GetIceHome(project);
             if (Directory.Exists(Path.Combine(iceHome, "Assemblies")))
             {
@@ -429,11 +362,7 @@ namespace IceBuilder
             }
         }
 
-        public bool CommandLineMode
-        {
-            get;
-            private set;
-        }
+        public bool CommandLineMode { get; private set; }
 
         protected override async Task InitializeAsync(CancellationToken cancel, IProgress<ServiceProgressData> progress)
         {
@@ -488,13 +417,14 @@ namespace IceBuilder
                     throw new PackageInitializationException("Error initializing MonitorSelection");
                 }
 
-                //
                 // Update the InstallDir this was previously used in project imports, but is still usefull if you
                 // need to detect the extension install dir.
-                //
                 string version = DTE2.Version;
-                Registry.SetValue(IceBuilderKey, string.Format("InstallDir.{0}", version), InstallDirectory,
-                                  RegistryValueKind.String);
+                Registry.SetValue(
+                    IceBuilderKey,
+                    string.Format("InstallDir.{0}", version),
+                    InstallDirectory,
+                    RegistryValueKind.String);
 
                 Assembly assembly = null;
                 if (version.StartsWith("14.0"))
@@ -511,7 +441,7 @@ namespace IceBuilder
                 }
                 else
                 {
-                    assembly = Assembly.LoadFrom(Path.Combine(ResourcesDirectory, "IceBuilder.VS2022.dll"));
+                    assembly = Assembly.LoadFrom(Path.Combine(InstallDirectory, "IceBuilder.VS2022.dll"));
                 }
 
                 var factory = assembly.GetType("IceBuilder.ProjectHelperFactoryI").GetConstructor(new Type[] { }).Invoke(
@@ -530,9 +460,7 @@ namespace IceBuilder
 
                 Builder = new Builder(await GetServiceAsync(typeof(SVsBuildManagerAccessor)) as IVsBuildManagerAccessor2);
 
-                //
                 // Subscribe to solution events.
-                //
                 SolutionEventHandler = new SolutionEventHandler();
                 SolutionEventHandler.BeginTrack();
 
@@ -576,9 +504,7 @@ namespace IceBuilder
                 if (action == EnvDTE.vsBuildAction.vsBuildActionBuild ||
                     action == EnvDTE.vsBuildAction.vsBuildActionRebuildAll)
                 {
-                    //
                     // Ensure this runs once for parallel builds.
-                    //
                     if (Building)
                     {
                         return;
@@ -673,11 +599,7 @@ namespace IceBuilder
             }
         }
 
-        private IVsProject BuildingProject
-        {
-            get;
-            set;
-        }
+        private IVsProject BuildingProject { get; set; }
 
         private bool BuildProject(IVsProject project)
         {
@@ -708,9 +630,7 @@ namespace IceBuilder
             }
         }
 
-        //
         // With Ice >= 3.7.0 we get the compiler version from Ice.props
-        //
         private string GetSliceCompilerVersion(string iceHome)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -745,19 +665,13 @@ namespace IceBuilder
             {
                 process.Start();
 
-                //
-                // When StandardError and StandardOutput are redirected, at least one
-                // should use asynchronous reads to prevent deadlocks when calling
-                // process.WaitForExit; the other can be read synchronously using ReadToEnd.
-                //
-                // See the Remarks section in the below link:
+                // When StandardError and StandardOutput are redirected, at least one should use asynchronous reads
+                // to prevent deadlocks when calling process.WaitForExit; the other can be read synchronously using
+                // ReadToEnd. See the Remarks section at:
                 //
                 // http://msdn.microsoft.com/en-us/library/system.diagnostics.process.standarderror.aspx
-                //
 
-                // Start the asynchronous read of the standard output stream.
                 process.BeginOutputReadLine();
-                // Read Standard error.
                 string version = process.StandardError.ReadToEnd().Trim();
                 process.WaitForExit();
 
@@ -776,9 +690,7 @@ namespace IceBuilder
                     return null;
                 }
 
-                //
                 // Convert beta version to is numeric value
-                //
                 if (version.EndsWith("b"))
                 {
                     version = string.Format("{0}.{1}", version.Substring(0, version.Length - 1), 51);
@@ -867,23 +779,11 @@ namespace IceBuilder
             }
         }
 
-        private DocumentEventHandler DocumentEventHandler
-        {
-            get;
-            set;
-        }
+        private DocumentEventHandler DocumentEventHandler { get; set; }
 
-        public IVCUtil VCUtil
-        {
-            get;
-            private set;
-        }
+        public IVCUtil VCUtil { get; private set; }
 
-        private Builder Builder
-        {
-            get;
-            set;
-        }
+        private Builder Builder { get; set; }
 
         private Microsoft.Build.Framework.LoggerVerbosity LoggerVerbosity
         {
@@ -915,22 +815,9 @@ namespace IceBuilder
             }
         }
 
-        private string InstallDirectory
-        {
-            get;
-            set;
-        }
-        public static string ResourcesDirectory
-        {
-            get;
-            private set;
-        }
-
-        private bool Building
-        {
-            get;
-            set;
-        }
+        private string InstallDirectory { get; set; }
+        public static string ResourcesDirectory { get; private set; }
+        private bool Building { get; set; }
 
         private readonly HashSet<IVsProject> _buildProjects = new HashSet<IVsProject>();
 

@@ -110,7 +110,7 @@
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="..\IceBuilder_VS2022\bin\IceBuilder.VS2022.dll">
-      <Link>Resources\IceBuilder.VS2022.dll</Link>
+      <Link>IceBuilder.VS2022.dll</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

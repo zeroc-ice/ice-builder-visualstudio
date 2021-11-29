@@ -13,16 +13,9 @@ namespace IceBuilder
     [Category("Projects and Solutions")]
     public class IceOptionsPage : DialogPage
     {
-        IceHomeEditor Editor
-        {
-            get;
-            set;
-        }
+        IceHomeEditor Editor { get; set; }
 
-        public IceOptionsPage()
-        {
-            Editor = new IceHomeEditor();
-        }
+        public IceOptionsPage() => Editor = new IceHomeEditor();
 
         protected override IWin32Window Window
         {

@@ -115,31 +115,21 @@ namespace IceBuilder
                 });
         }
 
-        void EventSource_WarningRaised(object sender, BuildWarningEventArgs e)
-        {
+        void EventSource_WarningRaised(object sender, BuildWarningEventArgs e) =>
             OutputTaskItem(
-                    string.Format("{0}({1}): warning : {2}",
-                        Path.Combine(Path.GetDirectoryName(e.ProjectFile), e.File),
-                        e.LineNumber,
-                        e.Message),
-                    EnvDTE.vsTaskPriority.vsTaskPriorityMedium,
-                    e.File,
-                    e.LineNumber,
-                    e.Message);
-        }
+                $"{Path.Combine(Path.GetDirectoryName(e.ProjectFile), e.File)}({e.LineNumber}: warning : {e.Message}",
+                EnvDTE.vsTaskPriority.vsTaskPriorityMedium,
+                e.File,
+                e.LineNumber,
+                e.Message);
 
-        void EventSource_ErrorRaised(object sender, BuildErrorEventArgs e)
-        {
+        void EventSource_ErrorRaised(object sender, BuildErrorEventArgs e) =>
             OutputTaskItem(
-                string.Format("{0}({1}): error : {2}",
-                    Path.Combine(Path.GetDirectoryName(e.ProjectFile), e.File),
-                    e.LineNumber,
-                    e.Message),
+                $"{Path.Combine(Path.GetDirectoryName(e.ProjectFile), e.File)}({e.LineNumber}): error : {e.Message}",
                 EnvDTE.vsTaskPriority.vsTaskPriorityHigh,
                 e.File,
                 e.LineNumber,
                 e.Message);
-        }
 
         public override void Shutdown()
         {

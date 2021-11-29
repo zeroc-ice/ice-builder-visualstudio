@@ -70,9 +70,10 @@ namespace IceBuilder
             project.GetDTEProject().Save();
         }
 
-        protected static async Task<T>
-        WithProjectAsync<T>(UnconfiguredProject unconfiguredProject, Func<MSProject, T> func,
-                            bool switchToMainThread = false)
+        protected static async Task<T> WithProjectAsync<T>(
+            UnconfiguredProject unconfiguredProject,
+            Func<MSProject, T> func,
+            bool switchToMainThread = false)
         {
             T result = default;
             var service = unconfiguredProject.ProjectService.Services.ProjectLockService;

@@ -15,11 +15,7 @@ namespace IceBuilder
 
         IVsPackageRestorer PackageRestorer { get; set; }
 
-        NuGetBatchEnd BatchEnd
-        {
-            get;
-            set;
-        }
+        NuGetBatchEnd BatchEnd { get; set; }
 
         public NuGetI()
         {
@@ -31,38 +27,26 @@ namespace IceBuilder
             PackageInstallerEvents.PackageReferenceAdded += PackageInstallerEvents_PackageReferenceAdded;
         }
 
-        private void PackageInstallerEvents_PackageReferenceAdded(IVsPackageMetadata metadata)
-        {
+        private void PackageInstallerEvents_PackageReferenceAdded(IVsPackageMetadata metadata) =>
             ThreadHelper.JoinableTaskFactory.Run(async () =>
             {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
                 BatchEnd?.Invoke();
             });
-        }
 
-        public bool IsPackageInstalled(EnvDTE.Project project, string packageId)
-        {
-            return PackageInstallerServices.IsPackageInstalled(project, packageId);
-        }
+        public bool IsPackageInstalled(EnvDTE.Project project, string packageId) =>
+            PackageInstallerServices.IsPackageInstalled(project, packageId);
 
-        public void InstallLatestPackage(EnvDTE.Project project, string packageId)
-        {
+        public void InstallLatestPackage(EnvDTE.Project project, string packageId) =>
             PackageInstaller.InstallPackage(null, project, packageId, (string)null, false);
-        }
 
-        public void Restore(EnvDTE.Project project)
-        {
+        public void Restore(EnvDTE.Project project) =>
             PackageRestorer.RestorePackages(project);
-        }
 
-        void INuGet.OnNugetBatchEnd(NuGetBatchEnd batchEnd)
-        {
+        void INuGet.OnNugetBatchEnd(NuGetBatchEnd batchEnd) =>
             BatchEnd = batchEnd;
-        }
 
-        public bool IsUserConsentGranted()
-        {
-            return PackageRestorer.IsUserConsentGranted();
-        }
+        public bool IsUserConsentGranted() =>
+            PackageRestorer.IsUserConsentGranted();
     }
 }
