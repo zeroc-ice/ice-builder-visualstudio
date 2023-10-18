@@ -57,8 +57,8 @@
       <Link>Resources\upgrade.rtf</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="..\assets\slice.tmLanguage.json">
-      <Link>Grammars\slice.tmLanguage.json</Link>
+    <Content Include="..\assets\ice.tmLanguage.json">
+      <Link>Grammars\ice.tmLanguage.json</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <None Include="source.extension.vsixmanifest">

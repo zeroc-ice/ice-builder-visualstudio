@@ -1,0 +1,1695 @@
+{
+    "name": "Slice",
+    "scopeName": "source.ice",
+    "fileTypes":
+    [
+        "ice"
+    ],
+
+    "patterns": [
+        {"include": "#comment"},
+        {"include": "#preprocessor"},
+        {"include": "#metadata.global"},
+        {"include": "#storage.module"}
+    ],
+
+    "repository": {
+        "comment": {
+            "patterns": [
+                {"include": "#comment.line"},
+                {"include": "#comment.block"}
+            ]
+        },
+        "comment.line": {
+            "name": "comment.line.ice",
+            "contentName": "text.ice",
+            "begin": "\\/\\/",
+            "end": "$",
+            "beginCaptures": {
+                "0": {"name": "punctuation.definition.comment.line.begin.ice"}
+            },
+            "patterns": [
+                {"include": "#annotation"},
+                {"include": "#link"},
+                {"include": "#line.continuation"}
+            ]
+        },
+        "comment.block": {
+            "name": "comment.block.ice",
+            "contentName": "text.ice",
+            "begin": "\\/\\*",
+            "end": "\\*\\/",
+            "beginCaptures": {
+                "0": {"name": "punctuation.definition.comment.block.begin.ice"}
+            },
+            "endCaptures": {
+                "0": {"name": "punctuation.definition.comment.block.end.ice"}
+            },
+            "patterns": [
+                {"include": "#annotation"},
+                {"include": "#link"},
+                {"include": "#line.continuation"}
+            ]
+        },
+        "annotation": {
+            "name": "storage.type.annotation.ice",
+            "match": "(@)\\S*\\b",
+            "captures": {
+                "1": {"name": "punctuation.definition.annotation.ice"}
+            }
+        },
+        "link": {
+            "name": "variable.link.ice",
+            "match": "(\\b\\S*)?(#)\\S*\\b",
+            "captures": {
+                "1": {"name": "punctuation.definition.link.ice"}
+            }
+        },
+
+        "preprocessor": {
+            "patterns": [
+                {"include": "#preprocessor.if"},
+                {"include": "#preprocessor.ifdef"},
+                {"include": "#preprocessor.ifndef"},
+                {"include": "#preprocessor.elif"},
+                {"include": "#preprocessor.else"},
+                {"include": "#preprocessor.endif"},
+                {"include": "#preprocessor.define"},
+                {"include": "#preprocessor.undef"},
+                {"include": "#preprocessor.include"},
+                {"include": "#preprocessor.pragma"},
+                {"include": "#preprocessor.line"},
+                {"include": "#preprocessor.error"},
+                {"include": "#preprocessor.null"}
+            ]
+        },
+        "preprocessor.ifdef": {
+            "name": "meta.preprocessor.ifdef.ice",
+            "begin": "(#)\\s*ifdef\\b",
+            "end": "$",
+            "beginCaptures": {
+                "0": {"name": "keyword.control.preprocessor.ifdef.ice"},
+                "1": {"name": "punctuation.definition.preprocessor.ice"}
+            },
+            "patterns": [
+                {"include": "#standardP"},
+                {
+                    "begin": "\\b\\w+\\b",
+                    "end": "$",
+                    "beginCaptures": {
+                        "0": {"patterns": [{"include": "#preprocessor.identifier"}]}
+                    },
+                    "patterns": [
+                        {"include": "#standardP"}
+                    ]
+                }
+            ]
+        },
+        "preprocessor.ifndef": {
+            "name": "meta.preprocessor.ifndef.ice",
+            "begin": "(#)\\s*ifndef\\b",
+            "end": "$",
+            "beginCaptures": {
+                "0": {"name": "keyword.control.preprocessor.ifndef.ice"},
+                "1": {"name": "punctuation.definition.preprocessor.ice"}
+            },
+            "patterns": [
+                {"include": "#standardP"},
+                {
+                    "begin": "\\b\\w+\\b",
+                    "end": "$",
+                    "beginCaptures": {
+                        "0": {"patterns": [{"include": "#preprocessor.identifier"}]}
+                    },
+                    "patterns": [
+                        {"include": "#standardP"}
+                    ]
+                }
+            ]
+        },
+        "preprocessor.if": {
+            "name": "meta.preprocessor.if.ice",
+            "begin": "(#)\\s*if\\b",
+            "end": "$",
+            "beginCaptures": {
+                "0": {"name": "keyword.control.preprocessor.if.ice"},
+                "1": {"name": "punctuation.definition.preprocessor.ice"}
+            },
+            "patterns": [
+                {"include": "#standardP"}
+            ]
+        },
+        "preprocessor.elif": {
+            "name": "meta.preprocessor.elif.ice",
+            "begin": "(#)\\s*elif\\b",
+            "end": "$",
+            "beginCaptures": {
+                "0": {"name": "keyword.control.preprocessor.elif.ice"},
+                "1": {"name": "punctuation.definition.preprocessor.ice"}
+            },
+            "patterns": [
+                {"include": "#standardP"}
+            ]
+        },
+        "preprocessor.else": {
+            "name": "meta.preprocessor.endif.ice",
+            "begin": "(#)\\s*else\\b",
+            "end": "$",
+            "beginCaptures": {
+                "0": {"name": "keyword.control.preprocessor.else.ice"},
+                "1": {"name": "punctuation.definition.preprocessor.ice"}
+            },
+            "patterns": [
+                {"include": "#standardP"}
+            ]
+        },
+        "preprocessor.endif": {
+            "name": "meta.preprocessor.endif.ice",
+            "begin": "(#)\\s*endif\\b",
+            "end": "$",
+            "beginCaptures": {
+                "0": {"name": "keyword.control.preprocessor.endif.ice"},
+                "1": {"name": "punctuation.definition.preprocessor.ice"}
+            },
+            "patterns": [
+                {"include": "#standardP"}
+            ]
+        },
+        "preprocessor.define": {
+            "name": "meta.preprocessor.define.ice",
+            "begin": "(#)\\s*define\\b",
+            "end": "$",
+            "beginCaptures": {
+                "0": {"name": "keyword.control.preprocessor.define.ice"},
+                "1": {"name": "punctuation.definition.preprocessor.ice"}
+            },
+            "patterns": [
+                {"include": "#standardP"},
+                {
+                    "begin": "\\b(\\w+)((\\())",
+                    "end": "$",
+                    "beginCaptures": {
+                        "1": {"patterns": [{"include": "#preprocessor.identifier"}]},
+                        "2": {"name": "meta.group.parameters.preprocessor.ice"},
+                        "3": {"name": "punctuation.section.group.parameters.begin.ice"}
+                    },
+                    "patterns": [
+                        {"include": "#standardP"},
+                        {
+                            "begin": "\\b\\w+\\b",
+                            "end": "(?=\\))|(,)|($)",
+                            "beginCaptures": {
+                                "0": {"patterns": [{"include": "#preprocessor.identifier"}]}
+                            },
+                            "endCaptures": {
+                                "1": {"name": "punctuation.separator.parameter.preprocessor.ice"},
+                                "2": {"name": "invalid.mismatched.parenthesis.ice"}
+                            },
+                            "patterns": [
+                                {"include": "#standardP"}
+                            ]
+                        },
+                        {
+                            "begin": "\\b\\w+\\b",
+                            "end": "(?=\\))|((,))|($)",
+                            "beginCaptures": {
+                                "0": {"name": "punctuation.variable.parameter.preprocessor.ice"}
+                            },
+                            "endCaptures": {
+                                "1": {"name": "punctuation.separator.parameter.preprocessor.ice"},
+                                "2": {"name": "invalid.trailing-comma.ice"},
+                                "3": {"name": "invalid.mismatched.parenthesis.ice"}
+                            },
+                            "patterns": [
+                                {"include": "#standardP"}
+                            ]
+                        },
+                        {
+                            "begin": "(\\))",
+                            "end": "$",
+                            "beginCaptures": {
+                                "0": {"name": "meta.group.parameters.preprocessor.ice"},
+                                "1": {"name": "punctuation.section.group.parameters.end.ice"}
+                            },
+                            "patterns": [
+                                {"include": "#standardP"},
+                                {
+                                    "name": "constant.preprocessor.ice",
+                                    "match": "\\S"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "begin": "\\b\\w+\\b",
+                    "end": "$",
+                    "beginCaptures": {
+                        "0": {"patterns": [{"include": "#preprocessor.identifier"}]}
+                    },
+                    "patterns": [
+                        {"include": "#standardP"},
+                        {
+                            "name": "constant.preprocessor.ice",
+                            "match": "\\S"
+                        }
+                    ]
+                }
+            ]
+        },
+        "preprocessor.undef": {
+            "name": "meta.preprocessor.undef.ice",
+            "begin": "((#)\\s*undef)\\b",
+            "end": "$",
+            "beginCaptures": {
+                "1": {"name": "keyword.control.preprocessor.undef.ice"},
+                "2": {"name": "punctuation.definition.preprocessor.ice"}
+            },
+            "patterns": [
+                {"include": "#standardP"},
+                {
+                    "begin": "\\b\\w+\\b",
+                    "end": "$",
+                    "beginCaptures": {
+                        "0": {"patterns": [{"include": "#preprocessor.identifier"}]}
+                    },
+                    "patterns": [
+                        {"include": "#standardP"}
+                    ]
+                }
+            ]
+        },
+        "preprocessor.include" : {
+            "name": "meta.preprocessor.include.ice",
+            "begin": "((#)\\s*include)\\b",
+            "end": "$",
+            "beginCaptures": {
+                "1": {"name": "keyword.control.preprocessor.include.ice"},
+                "2": {"name": "punctuation.definition.preprocessor.ice"}
+            },
+            "patterns": [
+                {"include": "#standardP"},
+                {
+                    "begin": "(?<=\"|>)",
+                    "end": "$",
+                    "patterns": [
+                        {"include": "#standardP"}
+                    ]
+                },
+                {
+                    "name": "string.quoted.double.ice",
+                    "contentName": "entity.name.header.ice",
+                    "begin": "\"",
+                    "end": "(\")|($)",
+                    "beginCaptures": {
+                        "0": {"name": "punctuation.definition.string.begin.ice"}
+                    },
+                    "endCaptures": {
+                        "1": {"name": "punctuation.definition.string.end.ice"},
+                        "2": {"name": "invalid.illegal.mismatched-quotes.ice"}
+                    },
+                    "patterns": [
+                        {
+                            "match": "\\\\."
+                        },
+                        {"include": "#line.continuation"}
+                    ]
+                },
+                {
+                    "name": "string.quoted.other.angle.ice",
+                    "contentName": "entity.name.header.ice",
+                    "begin": "<",
+                    "end": "(>)|($)",
+                    "beginCaptures": {
+                        "0": {"name": "punctuation.definition.string.begin.ice"}
+                    },
+                    "endCaptures": {
+                        "1": {"name": "punctuation.definition.string.end.ice"},
+                        "2": {"name": "invalid.illegal.mismatched-quotes.ice"}
+                    },
+                    "patterns": [
+                        {
+                            "match": "\\\\."
+                        },
+                        {"include": "#line.continuation"}
+                    ]
+                }
+            ]
+        },
+        "preprocessor.pragma": {
+            "name": "meta.preprocessor.pragma.ice",
+            "begin": "((#)\\s*pragma)\\b",
+            "end": "$",
+            "beginCaptures": {
+                "1": {"name": "keyword.control.preprocessor.pragma.ice"},
+                "2": {"name": "punctuation.definition.preprocessor.ice"}
+            },
+            "patterns": [
+                {"include": "#standardP"},
+                {
+                    "begin": "\\b\\S+\\b",
+                    "end": "$",
+                    "beginCaptures": {
+                        "0": {"name": "keyword.control.preprocessor.pragma.other.ice"}
+                    },
+                    "patterns": [
+                        {"include": "#standardP"}
+                    ]
+                }
+            ]
+        },
+        "preprocessor.line": {
+            "name": "meta.preprocessor.line.ice",
+            "begin": "((#)\\s*line)\\b",
+            "end": "$",
+            "beginCaptures": {
+                "1": {"name": "keyword.control.preprocessor.line.ice"},
+                "2": {"name": "punctuation.definition.preprocessor.ice"}
+            },
+            "patterns": [
+                {"include": "#standardP"},
+                {
+                    "begin": "\\b[\\d]+\\b",
+                    "end": "$",
+                    "beginCaptures": {
+                        "0": {"patterns": [{"include": "#constant.numeric.dec"}]}
+                    },
+                    "patterns": [
+                        {"include": "#standardP"},
+                        {
+                            "begin": "(?<=\")",
+                            "end": "$",
+                            "patterns": [
+                                {"include": "#standardP"}
+                            ]
+                        },
+                        {
+                            "name": "string.quoted.double.ice",
+                            "contentName": "entity.name.file.ice",
+                            "begin": "\"",
+                            "end": "(\")|($)",
+                            "beginCaptures": {
+                                "0": {"name": "punctuation.definition.string.begin.ice"}
+                            },
+                            "endCaptures": {
+                                "1": {"name": "punctuation.definition.string.end.ice"},
+                                "2": {"name": "invalid.illegal.mismatched-quotes.ice"}
+                            },
+                            "patterns": [
+                                {
+                                    "match": "\\\\."
+                                },
+                                {"include": "#line.continuation"}
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "preprocessor.error": {
+            "name": "meta.preprocessor.error.ice",
+            "begin": "((#)\\s*error)\\b",
+            "end": "$",
+            "beginCaptures": {
+                "1": {"name": "keyword.control.preprocessor.error.ice"},
+                "2": {"name": "punctuation.definition.preprocessor.ice"}
+            },
+            "patterns": [
+                {"include": "#standardP"},
+                {
+                    "name": "text.error.ice",
+                    "match": "."
+                }
+            ]
+        },
+        "preprocessor.null": {
+            "name": "meta.preprocessor.null.ice",
+            "begin": "(#)",
+            "end": "$",
+            "beginCaptures": {
+                "0": {"name": "punctuation.definition.preprocessor.ice"},
+                "1": {"name": "keyword.control.preprocessor.null.ice"}
+            },
+            "patterns": [
+                {"include": "#standardP"}
+            ]
+        },
+        "preprocessor.identifier": {
+            "patterns": [
+                {
+                    "name": "entity.identifier.preprocessor.ice",
+                    "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*\\b"
+                },
+                {"include": "#invalid"}
+            ]
+        },
+
+        "metadata": {
+            "patterns": [
+                {"include": "#metadata.global"},
+                {"include": "#metadata.local"}
+            ]
+        },
+        "metadata.global": {
+            "name": "meta.metadata.global.ice",
+            "begin": "\\[\\[",
+            "end": "\\]\\]",
+            "beginCaptures": {
+                "0": {"name": "punctuation.definition.metadata.global.begin.ice"}
+            },
+            "endCaptures": {
+                "0": {"name": "punctuation.definition.metadata.global.end.ice"}
+            },
+            "patterns": [
+                {"include": "#metadata.content"}
+            ]
+        },
+        "metadata.local": {
+            "name": "meta.metadata.local.ice",
+            "begin": "\\[",
+            "end": "\\]",
+            "beginCaptures": {
+                "0": {"name": "punctuation.definition.metadata.local.begin.ice"}
+            },
+            "endCaptures": {
+                "0": {"name": "punctuation.definition.metadata.local.end.ice"}
+            },
+            "patterns": [
+                {"include": "#metadata.content"}
+            ]
+        },
+        "metadata.content": {
+            "patterns": [
+                {"include": "#standard"},
+                {
+                    "begin": "(\")",
+                    "end": "(?=\\])|(?<=,)",
+                    "beginCaptures": {
+                        "0": {"name": "string.quoted.double.ice"},
+                        "1": {"name": "punctuation.definition.string.begin.ice"}
+                    },
+                    "patterns": [
+                        {"include": "#line.continuation"},
+                        {
+                            "name": "string.quoted.double.ice",
+                            "match": "((?:[^\\\\\"]|\\\\.)+)",
+                            "captures": {
+                                "1": {"patterns": [{"include": "#metadata.identifier"}]}
+                            }
+                        },
+                        {
+                            "begin": "(\")",
+                            "end": "(?=\\])|(,)",
+                            "beginCaptures": {
+                                "0": {"name": "string.quoted.double.ice"},
+                                "1": {"name": "punctuation.definition.string.end.ice"}
+                            },
+                            "endCaptures": {
+                                "1": {"name": "punctuation.separator.metadata.ice"}
+                            },
+                            "patterns": [
+                                {"include": "#standard"}
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "metadata.identifier": {
+            "name": "entity.metadata.directive.ice",
+            "match": "\\S+"
+        },
+
+        "storage": {
+            "patterns": [
+                {"include": "#storage.module"},
+                {"include": "#storage.enum"},
+                {"include": "#storage.struct"},
+                {"include": "#storage.sequence"},
+                {"include": "#storage.dictionary"},
+                {"include": "#storage.interface"},
+                {"include": "#storage.exception"},
+                {"include": "#storage.class"},
+                {"include": "#storage.basic"}
+            ]
+        },
+        "storage.module": {
+            "patterns": [
+                {"include": "#storage.modifier"},
+                {
+                    "name": "meta.module.ice",
+                    "begin": "(?<!\\\\)\\bmodule\\b",
+                    "end": "}",
+                    "beginCaptures": {
+                        "0": {"name": "storage.type.module.ice"}
+                    },
+                    "endCaptures": {
+                        "0": {"name": "punctuation.section.block.end.ice"}
+                    },
+                    "patterns": [
+                        {"include": "#standard"},
+                        {
+                            "begin": "\\\\?\\b\\w+\\b",
+                            "end": "(?=})",
+                            "beginCaptures": {
+                                "0": {
+                                    "name": "entity.name.module.ice",
+                                    "patterns": [{"include": "#storage.identifier"}]
+                                }
+                            },
+                            "patterns": [
+                                {"include": "#standard"},
+                                {
+                                    "begin": "{",
+                                    "end": "(?=})",
+                                    "beginCaptures": {
+                                        "0": {"name": "punctuation.section.block.begin.ice"}
+                                    },
+                                    "patterns": [
+                                        {"include": "#standard"},
+                                        {"include": "#storage"}
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "storage.enum": {
+            "patterns": [
+                {"include": "#storage.modifier"},
+                {
+                    "name": "meta.enum.ice",
+                    "begin": "(?<!\\\\)\\benum\\b",
+                    "end": "}",
+                    "beginCaptures": {
+                        "0": {"name": "storage.type.enum.ice"}
+                    },
+                    "endCaptures": {
+                        "0": {"name": "punctuation.section.block.end.ice"}
+                    },
+                    "patterns": [
+                        {"include": "#standard"},
+                        {
+                            "begin": "\\\\?\\b\\w+\\b",
+                            "end": "(?=})",
+                            "beginCaptures": {
+                                "0": {
+                                    "name": "entity.name.enum.ice",
+                                    "patterns": [{"include": "#storage.identifier"}]
+                                }
+                            },
+                            "patterns": [
+                                {"include": "#standard"},
+                                {
+                                    "begin": "{",
+                                    "end": "(?=})",
+                                    "beginCaptures": {
+                                        "0": {"name": "punctuation.section.block.begin.ice"}
+                                    },
+                                    "patterns": [
+                                        {"include": "#standard"},
+                                        {
+                                            "begin": "\\\\?\\b\\w+\\b",
+                                            "end": "(?=})|(,)",
+                                            "beginCaptures": {
+                                                "0": {
+                                                    "name": "constant.other.enum.ice",
+                                                    "patterns": [{"include": "#identifier"}]
+                                                }
+                                            },
+                                            "endCaptures": {
+                                                "1": {"name": "punctuation.separator.enum.ice"}
+                                            },
+                                            "patterns": [
+                                                {"include": "#standard"},
+                                                {
+                                                    "begin": "=",
+                                                    "end": "(?=})|(?=,)",
+                                                    "beginCaptures": {
+                                                        "0": {"name": "keyword.operator.assignment.ice"}
+                                                    },
+                                                    "patterns": [
+                                                        {"include": "#standard"},
+                                                        {"include": "#constant"}
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "storage.struct": {
+            "patterns": [
+                {"include": "#storage.modifier"},
+                {
+                    "name": "meta.struct.ice",
+                    "begin": "(?<!\\\\)\\bstruct\\b",
+                    "end": "}",
+                    "beginCaptures": {
+                        "0": {"name": "storage.type.struct.ice"}
+                    },
+                    "endCaptures": {
+                        "0": {"name": "punctuation.section.block.end.ice"}
+                    },
+                    "patterns": [
+                        {"include": "#standard"},
+                        {
+                            "begin": "\\\\?\\b\\w+\\b",
+                            "end": "(?=})",
+                            "beginCaptures": {
+                                "0": {
+                                    "name": "entity.name.struct.ice",
+                                    "patterns": [{"include": "#storage.identifier"}]
+                                }
+                            },
+                            "patterns": [
+                                {"include": "#standard"},
+                                {
+                                    "begin": "{",
+                                    "end": "(?=})",
+                                    "beginCaptures": {
+                                        "0": {"name": "punctuation.section.block.begin.ice"}
+                                    },
+                                    "patterns": [
+                                        {"include": "#standard"},
+                                        {"include": "#storage.basic"}
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "storage.sequence": {
+            "patterns": [
+                {"include": "#storage.modifier"},
+                {
+                    "name": "meta.sequence.ice",
+                    "begin": "(?<!\\\\)\\bsequence\\b",
+                    "end": "(;)|((?=}))",
+                    "beginCaptures": {
+                        "0": {"name": "storage.type.sequence.ice"}
+                    },
+                    "endCaptures": {
+                        "1": {"name": "punctuation.terminator.semicolon.ice"},
+                        "2": {"name": "invalid.illegal.missing.semicolon.ice"}
+                    },
+                    "patterns": [
+                        {"include": "#standard"},
+                        {
+                            "begin": "(\\<)",
+                            "end": "(?=;|})",
+                            "beginCaptures": {
+                                "0": {"name": "meta.generic.sequence.ice"},
+                                "1": {"name": "punctuation.definition.generic.begin.ice"}
+                            },
+                            "patterns": [
+                                {"include": "#standard"},
+                                {
+                                    "begin": "(\\\\?[:\\w]+)|(?=\\>)",
+                                    "end": "(?=;|})",
+                                    "beginCaptures": {
+                                        "1": {
+                                            "name": "meta.generic.sequence.ice",
+                                            "patterns": [{"include": "#storage.types"}]
+                                        },
+                                        "2": {"name": "invalid.illegal.missing-type.ice"}
+                                    },
+                                    "patterns": [
+                                        {"include": "#standard"},
+                                        {
+                                            "begin": "(\\>)",
+                                            "end": "(?=;|})",
+                                            "beginCaptures": {
+                                                "0": {"name": "meta.generic.sequence.ice"},
+                                                "1": {"name": "punctuation.definition.generic.end.ice"}
+                                            },
+                                            "patterns": [
+                                                {"include": "#standard"},
+                                                {
+                                                    "begin": "\\\\?\\b\\w+\\b",
+                                                    "end": "(?=;|})",
+                                                    "beginCaptures": {
+                                                        "0": {
+                                                            "name": "entity.name.sequence.ice",
+                                                            "patterns": [{"include": "#storage.identifier"}]
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "storage.dictionary": {
+            "patterns": [
+                {"include": "#storage.modifier"},
+                {
+                    "name": "meta.dictionary.ice",
+                    "begin": "(?<!\\\\)\\bdictionary\\b",
+                    "end": "(;)|((?=}))",
+                    "beginCaptures": {
+                        "0": {"name": "storage.type.dictionary.ice"}
+                    },
+                    "endCaptures": {
+                        "1": {"name": "punctuation.terminator.semicolon.ice"},
+                        "2": {"name": "invalid.illegal.missing.semicolon.ice"}
+                    },
+                    "patterns": [
+                        {"include": "#standard"},
+                        {
+                            "begin": "(\\<)",
+                            "end": "(?=;|})",
+                            "beginCaptures": {
+                                "0": {"name": "meta.generic.dictionary.ice"},
+                                "1": {"name": "punctuation.definition.generic.begin.ice"}
+                            },
+                            "patterns": [
+                                {"include": "#standard"},
+                                {
+                                    "begin": "(\\\\?[:\\w]+)|(?=\\>)",
+                                    "end": "(?=;|})",
+                                    "beginCaptures": {
+                                        "1": {
+                                            "name": "meta.generic.dictionary.ice",
+                                            "patterns": [{"include": "#storage.types"}]
+                                        },
+                                        "2": {"name": "invalid.illegal.missing-type.ice"}
+                                    },
+                                    "patterns": [
+                                        {"include": "#standard"},
+                                        {
+                                            "begin": "(,)|(?=\\>)",
+                                            "end": "(?=;|{|})",
+                                            "beginCaptures": {
+                                                "0":{"name": "meta.generic.dictionary.ice"},
+                                                "1": {"name": "punctuation.separator.dictionary.ice"},
+                                                "2": {"name": "invalid.illegal.missing-type.ice"}
+                                            },
+                                            "patterns": [
+                                                {"include": "#standard"},
+                                                {
+                                                    "begin": "(\\\\?[:\\w]+)|(?=\\>)",
+                                                    "end": "(?=;|})",
+                                                    "beginCaptures": {
+                                                        "1": {
+                                                            "name": "meta.generic.dictionary.ice",
+                                                            "patterns": [{"include": "#storage.types"}]
+                                                        },
+                                                        "2": {"name": "invalid.illegal.missing-type.ice"}
+                                                    },
+                                                    "patterns": [
+                                                        {"include": "#standard"},
+                                                        {
+                                                            "begin": "(\\>)",
+                                                            "end": "(?=;|})",
+                                                            "beginCaptures": {
+                                                                "0": {"name": "meta.generic.dictionary.ice"},
+                                                                "1": {"name": "punctuation.definition.generic.end.ice"}
+                                                            },
+                                                            "patterns": [
+                                                                {"include": "#standard"},
+                                                                {
+                                                                    "begin": "\\\\?\\b\\w+\\b",
+                                                                    "end": "(?=;|})",
+                                                                    "beginCaptures": {
+                                                                        "0": {
+                                                                            "name": "entity.name.dictionary.ice",
+                                                                            "patterns": [{"include": "#storage.identifier"}]
+                                                                        }
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "storage.interface": {
+            "patterns": [
+                {"include": "#storage.modifier"},
+                {
+                    "name": "meta.interface.ice",
+                    "begin": "(?<!\\\\)\\binterface\\b",
+                    "end": "(})|(;)",
+                    "beginCaptures": {
+                        "0": {"name": "storage.type.interface.ice"}
+                    },
+                    "endCaptures": {
+                        "1": {"name": "punctuation.section.block.end.ice"},
+                        "2": {"name": "punctuation.terminator.semicolon.ice"}
+                    },
+                    "patterns": [
+                        {"include": "#standard"},
+                        {
+                            "begin": "\\\\?\\b\\w+\\b",
+                            "end": "(?=}|;)",
+                            "beginCaptures": {
+                                "0": {
+                                    "name": "entity.name.interface.ice",
+                                    "patterns": [{"include": "#storage.identifier"}]
+                                }
+                            },
+                            "patterns": [
+                                {"include": "#standard"},
+                                {
+                                    "begin": "(?<!\\\\)\\bextends\\b",
+                                    "end": "(?=})|((?=;))",
+                                    "beginCaptures": {
+                                        "0": {"name": "storage.modifier.extends.ice"}
+                                    },
+                                    "endCaptures": {
+                                        "1": {"name": "invalid.illegal.missing-brace.ice"}
+                                    },
+                                    "patterns": [
+                                        {"include": "#standard"},
+                                        {
+                                            "begin": "\\\\?[:\\w]+",
+                                            "end": "(?={|}|;)|(,)",
+                                            "beginCaptures": {
+                                                "0": {"patterns": [{"include": "#storage.types"}]}
+                                            },
+                                            "endCaptures": {
+                                                "1": {"name": "punctuation.separator.interface.extends.ice"}
+                                            },
+                                            "patterns": [
+                                                {"include": "#standard"}
+                                            ]
+                                        },
+                                        {"include": "#storage.interface.body"}
+                                    ]
+                                },
+                                {"include": "#storage.interface.body"}
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "storage.interface.body": {
+            "begin": "{",
+            "end": "(?=})",
+            "beginCaptures": {
+                "0": {"name": "punctuation.section.block.begin.ice"}
+            },
+            "patterns": [
+                {"include": "#standard"},
+                {"include": "#storage.operation"}
+            ]
+        },
+        "storage.operation": {
+            "patterns": [
+                {"include": "#storage.modifier"},
+                {
+                    "name": "meta.operation.ice",
+                    "begin": "\\\\?[:\\w]+",
+                    "end": "(;)|((?=}))",
+                    "beginCaptures": {
+                        "0": {"patterns": [
+                            {"include": "#storage.types.void"},
+                            {"include": "#storage.types"}
+                        ]}
+                    },
+                    "endCaptures": {
+                        "1": {"name": "punctuation.terminator.semicolon.ice"},
+                        "2": {"name": "invalid.illegal.missing-brace.ice"}
+                    },
+                    "patterns": [
+                        {"include": "#standard"},
+                        {
+                            "begin": "\\\\?\\b\\w+\\b",
+                            "end": "(?=;|})",
+                            "beginCaptures": {
+                                "0": {
+                                    "name": "entity.name.function.ice",
+                                    "patterns": [{"include": "#storage.identifier"}]
+                                }
+                            },
+                            "patterns": [
+                                {"include": "#standard"},
+                                {
+                                    "begin": "\\(",
+                                    "end": "(?=;|})",
+                                    "beginCaptures": {
+                                        "0": {"name": "punctuation.section.group.operation.parameters.begin.ice"}
+                                    },
+                                    "patterns": [
+                                        {"include": "#standard"},
+                                        {
+                                            "begin": "\\)",
+                                            "end": "(?=;|})",
+                                            "beginCaptures": {
+                                                "0": {"name": "punctuation.section.group.operation.parameters.end.ice"}
+                                            },
+                                            "patterns": [
+                                                {"include": "#standard"},
+                                                {
+                                                    "begin": "(?<!\\\\)\\bthrows\\b",
+                                                    "end": "(?=;|})",
+                                                    "beginCaptures": {
+                                                        "0": {"name": "storage.modifier.throws.ice"}
+                                                    },
+                                                    "patterns": [
+                                                        {"include": "#standard"},
+                                                        {
+                                                            "begin": "\\\\?[:\\w]+",
+                                                            "end": "(?=;|})|(,)",
+                                                            "beginCaptures": {
+                                                                "0": {"patterns": [{"include": "#storage.types"}]}
+                                                            },
+                                                            "endCaptures": {
+                                                                "1": {"name": "punctuation.separator.operation.throws.ice"}
+                                                            },
+                                                            "patterns": [
+                                                                {"include": "#standard"}
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {"include": "#storage.modifier"},
+                                        {
+                                            "begin": "\\\\?[:\\w]+",
+                                            "end": "(?=\\))|(?<=,)",
+                                            "beginCaptures": {
+                                                "0": {"patterns": [{"include": "#storage.types"}]}
+                                            },
+                                            "patterns": [
+                                                {
+                                                    "begin": "\\\\?\\b\\w+\\b",
+                                                    "end": "(?=\\))|(,)",
+                                                    "beginCaptures": {
+                                                        "0": {
+                                                            "name": "entity.name.operation.parameter",
+                                                            "patterns": [{"include": "#storage.identifier"}]
+                                                        }
+                                                    },
+                                                    "endCaptures": {
+                                                        "1": {"name": "punctuation.separator.operation.parameter.ice"}
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "storage.exception": {
+            "patterns": [
+                {"include": "#storage.modifier"},
+                {
+                    "name": "meta.exception.ice",
+                    "begin": "(?<!\\\\)\\bexception\\b",
+                    "end": "}",
+                    "beginCaptures": {
+                        "0": {"name": "storage.type.exception.ice"}
+                    },
+                    "endCaptures": {
+                        "0": {"name": "punctuation.section.block.end.ice"}
+                    },
+                    "patterns": [
+                        {"include": "#standard"},
+                        {
+                            "begin": "\\\\?\\b\\w+\\b",
+                            "end": "(?=})",
+                            "beginCaptures": {
+                                "0": {
+                                    "name": "entity.name.exception.ice",
+                                    "patterns": [{"include": "#storage.identifier"}]
+                                }
+                            },
+                            "patterns": [
+                                {"include": "#standard"},
+                                {
+                                    "begin": "(?<!\\\\)\\bextends\\b",
+                                    "end": "(?=})",
+                                    "beginCaptures": {
+                                        "0": {"name": "storage.modifier.extends.ice"}
+                                    },
+                                    "patterns": [
+                                        {"include": "#standard"},
+                                        {
+                                            "begin": "\\\\?[:\\w]+",
+                                            "end": "(?={|})|(,)",
+                                            "beginCaptures": {
+                                                "0": {"patterns": [{"include": "#storage.types"}]}
+                                            },
+                                            "endCaptures": {
+                                                "1": {"name": "punctuation.separator.exception.extends.ice"}
+                                            },
+                                            "patterns": [
+                                                {"include": "#standard"}
+                                            ]
+                                        },
+                                        {"include": "#storage.exception.body"}
+                                    ]
+                                },
+                                {"include": "#storage.exception.body"}
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "storage.exception.body": {
+            "begin": "{",
+            "end": "(?=})",
+            "beginCaptures": {
+                "0": {"name": "punctuation.section.block.begin.ice"}
+            },
+            "patterns": [
+                {"include": "#standard"},
+                {"include": "#storage.basic"}
+            ]
+        },
+        "storage.class": {
+            "patterns": [
+                {"include": "#storage.modifier"},
+                {
+                    "name": "meta.class.ice",
+                    "begin": "(?<!\\\\)\\bclass\\b",
+                    "end": "(})|(;)",
+                    "beginCaptures": {
+                        "0": {"name": "storage.type.class.ice"}
+                    },
+                    "endCaptures": {
+                        "1": {"name": "punctuation.section.block.end.ice"},
+                        "2": {"name": "punctuation.terminator.semicolon.ice"}
+                    },
+                    "patterns": [
+                        {"include": "#standard"},
+                        {
+                            "begin": "\\\\?\\b\\w+\\b",
+                            "end": "(?=}|;)",
+                            "beginCaptures": {
+                                "0": {
+                                    "name": "entity.name.class.ice",
+                                    "patterns": [{"include": "#storage.identifier"}]
+                                }
+                            },
+                            "patterns": [
+                                {"include": "#standard"},
+                                {
+                                    "begin": "(?<!\\\\)\\bextends\\b",
+                                    "end": "(?=})|((?=;))",
+                                    "beginCaptures": {
+                                        "0": {"name": "storage.modifier.extends.ice"}
+                                    },
+                                    "endCaptures": {
+                                        "1": {"name": "invalid.illegal.missing-brace.ice"}
+                                    },
+                                    "patterns": [
+                                        {"include": "#standard"},
+                                        {
+                                            "begin": "\\\\?[:\\w]+",
+                                            "end": "(?=}|;)",
+                                            "beginCaptures": {
+                                                "0": {"patterns": [{"include": "#storage.types"}]}
+                                            },
+                                            "patterns": [
+                                                {"include": "#standard"},
+                                                {"include": "#storage.class.implements"}
+                                            ]
+                                        },
+                                        {
+                                            "name": "invalid.illegal.missing-types.ice",
+                                            "include": "#storage.class.implements"
+                                        }
+                                    ]
+                                },
+                                {"include": "#storage.class.implements"}
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "storage.class.implements": {
+            "patterns": [
+                {
+                    "begin": "(?<!\\\\)\\bimplements\\b",
+                    "end": "(?=})|((?=;))",
+                    "beginCaptures": {
+                        "0": {"name": "storage.modifier.implements.ice"}
+                    },
+                    "endCaptures": {
+                        "1": {"name": "invalid.illegal.missing-brace.ice"}
+                    },
+                    "patterns": [
+                        {"include": "#standard"},
+                        {
+                            "begin": "\\\\?[:\\w]+",
+                            "end": "(?={|}|;)|(,)",
+                            "beginCaptures": {
+                                "0": {"patterns": [{"include": "#storage.types"}]}
+                            },
+                            "endCaptures": {
+                                "1": {"name": "punctuation.separator.class.implements.ice"}
+                            },
+                            "patterns": [
+                                {"include": "#standard"}
+                            ]
+                        },
+                        {"include": "#storage.class.body"}
+                    ]
+                },
+                {"include": "#storage.class.body"}
+            ]
+        },
+        "storage.class.body": {
+            "begin": "{",
+            "end": "(?=})",
+            "beginCaptures": {
+                "0": {"name": "punctuation.section.block.begin.ice"}
+            },
+            "patterns": [
+                {"include": "#standard"},
+                {"include": "#storage.basic"}
+            ]
+        },
+        "storage.basic": {
+            "patterns": [
+                {"include": "#storage.modifier"},
+                {
+                    "name": "meta.bool.ice",
+                    "begin": "\\\\?\\bbool\\b",
+                    "end": "(;)|((?=}))",
+                    "beginCaptures": {
+                        "0": {"patterns": [{"include": "#storage.types"}]}
+                    },
+                    "endCaptures": {
+                        "1": {"name": "punctuation.terminator.semicolon.ice"},
+                        "2": {"name": "invalid.illegal.missing.semicolon.ice"}
+                    },
+                    "patterns": [
+                        {"include": "#standard"},
+                        {
+                            "begin": "\\\\?\\b\\w+\\b",
+                            "end": "(?=;|})",
+                            "beginCaptures": {
+                                "0": {
+                                    "name": "entity.name.bool.ice",
+                                    "patterns": [{"include": "#storage.identifier"}]
+                                }
+                            },
+                            "patterns": [
+                                {"include": "#storage.basic.assignment"}
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "meta.byte.ice",
+                    "begin": "\\\\?\\bbyte\\b",
+                    "end": "(;)|((?=}))",
+                    "beginCaptures": {
+                        "0": {"patterns": [{"include": "#storage.types"}]}
+                    },
+                    "endCaptures": {
+                        "1": {"name": "punctuation.terminator.semicolon.ice"},
+                        "2": {"name": "invalid.illegal.missing.semicolon.ice"}
+                    },
+                    "patterns": [
+                        {"include": "#standard"},
+                        {
+                            "begin": "\\\\?\\b\\w+\\b",
+                            "end": "(?=;|})",
+                            "beginCaptures": {
+                                "0": {
+                                    "name": "entity.name.byte.ice",
+                                    "patterns": [{"include": "#storage.identifier"}]
+                                }
+                            },
+                            "patterns": [
+                                {"include": "#storage.basic.assignment"}
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "meta.short.ice",
+                    "begin": "\\\\?\\bshort\\b",
+                    "end": "(;)|((?=}))",
+                    "beginCaptures": {
+                        "0": {"patterns": [{"include": "#storage.types"}]}
+                    },
+                    "endCaptures": {
+                        "1": {"name": "punctuation.terminator.semicolon.ice"},
+                        "2": {"name": "invalid.illegal.missing.semicolon.ice"}
+                    },
+                    "patterns": [
+                        {"include": "#standard"},
+                        {
+                            "begin": "\\\\?\\b\\w+\\b",
+                            "end": "(?=;|})",
+                            "beginCaptures": {
+                                "0": {
+                                    "name": "entity.name.short.ice",
+                                    "patterns": [{"include": "#storage.identifier"}]
+                                }
+                            },
+                            "patterns": [
+                                {"include": "#storage.basic.assignment"}
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "meta.int.ice",
+                    "begin": "\\\\?\\bint\\b",
+                    "end": "(;)|((?=}))",
+                    "beginCaptures": {
+                        "0": {"patterns": [{"include": "#storage.types"}]}
+                    },
+                    "endCaptures": {
+                        "1": {"name": "punctuation.terminator.semicolon.ice"},
+                        "2": {"name": "invalid.illegal.missing.semicolon.ice"}
+                    },
+                    "patterns": [
+                        {"include": "#standard"},
+                        {
+                            "begin": "\\\\?\\b\\w+\\b",
+                            "end": "(?=;|})",
+                            "beginCaptures": {
+                                "0": {
+                                    "name": "entity.name.int.ice",
+                                    "patterns": [{"include": "#storage.identifier"}]
+                                }
+                            },
+                            "patterns": [
+                                {"include": "#storage.basic.assignment"}
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "meta.long.ice",
+                    "begin": "\\\\?\\blong\\b",
+                    "end": "(;)|((?=}))",
+                    "beginCaptures": {
+                        "0": {"patterns": [{"include": "#storage.types"}]}
+                    },
+                    "endCaptures": {
+                        "1": {"name": "punctuation.terminator.semicolon.ice"},
+                        "2": {"name": "invalid.illegal.missing.semicolon.ice"}
+                    },
+                    "patterns": [
+                        {"include": "#standard"},
+                        {
+                            "begin": "\\\\?\\b\\w+\\b",
+                            "end": "(?=;|})",
+                            "beginCaptures": {
+                                "0": {
+                                    "name": "entity.name.long.ice",
+                                    "patterns": [{"include": "#storage.identifier"}]
+                                }
+                            },
+                            "patterns": [
+                                {"include": "#storage.basic.assignment"}
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "meta.float.ice",
+                    "begin": "\\\\?\\bfloat\\b",
+                    "end": "(;)|((?=}))",
+                    "beginCaptures": {
+                        "0": {"patterns": [{"include": "#storage.types"}]}
+                    },
+                    "endCaptures": {
+                        "1": {"name": "punctuation.terminator.semicolon.ice"},
+                        "2": {"name": "invalid.illegal.missing.semicolon.ice"}
+                    },
+                    "patterns": [
+                        {"include": "#standard"},
+                        {
+                            "begin": "\\\\?\\b\\w+\\b",
+                            "end": "(?=;|})",
+                            "beginCaptures": {
+                                "0": {
+                                    "name": "entity.name.float.ice",
+                                    "patterns": [{"include": "#storage.identifier"}]
+                                }
+                            },
+                            "patterns": [
+                                {"include": "#storage.basic.assignment"}
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "meta.double.ice",
+                    "begin": "\\\\?\\bdouble\\b",
+                    "end": "(;)|((?=}))",
+                    "beginCaptures": {
+                        "0": {"patterns": [{"include": "#storage.types"}]}
+                    },
+                    "endCaptures": {
+                        "1": {"name": "punctuation.terminator.semicolon.ice"},
+                        "2": {"name": "invalid.illegal.missing.semicolon.ice"}
+                    },
+                    "patterns": [
+                        {"include": "#standard"},
+                        {
+                            "begin": "\\\\?\\b\\w+\\b",
+                            "end": "(?=;|})",
+                            "beginCaptures": {
+                                "0": {
+                                    "name": "entity.name.double.ice",
+                                    "patterns": [{"include": "#storage.identifier"}]
+                                }
+                            },
+                            "patterns": [
+                                {"include": "#storage.basic.assignment"}
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "meta.string.ice",
+                    "begin": "\\\\?\\bstring\\b",
+                    "end": "(;)|((?=}))",
+                    "beginCaptures": {
+                        "0": {"patterns": [{"include": "#storage.types"}]}
+                    },
+                    "endCaptures": {
+                        "1": {"name": "punctuation.terminator.semicolon.ice"},
+                        "2": {"name": "invalid.illegal.missing.semicolon.ice"}
+                    },
+                    "patterns": [
+                        {"include": "#standard"},
+                        {
+                            "begin": "\\\\?\\b\\w+\\b",
+                            "end": "(?=;|})",
+                            "beginCaptures": {
+                                "0": {
+                                    "name": "entity.name.string.ice",
+                                    "patterns": [{"include": "#storage.identifier"}]
+                                }
+                            },
+                            "patterns": [
+                                {"include": "#storage.basic.assignment"}
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "meta.type.ice",
+                    "begin": "\\\\?\\b[:\\w]+\\b",
+                    "end": "(;)|((?=}))",
+                    "beginCaptures": {
+                        "0": {"patterns": [{"include": "#storage.types.custom"}]}
+                    },
+                    "endCaptures": {
+                        "1": {"name": "punctuation.terminator.semicolon.ice"},
+                        "2": {"name": "invalid.illegal.missing.semicolon.ice"}
+                    },
+                    "patterns": [
+                        {"include": "#standard"},
+                        {
+                            "begin": "\\\\?\\b\\w+\\b",
+                            "end": "(?=;|})",
+                            "beginCaptures": {
+                                "0": {
+                                    "name": "entity.name.ice",
+                                    "patterns": [{"include": "#storage.identifier"}]
+                                }
+                            },
+                            "patterns": [
+                                {"include": "#storage.basic.assignment"}
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "storage.basic.assignment": {
+            "patterns": [
+                {"include": "#standard"},
+                {
+                    "begin": "=",
+                    "end": "(?=;|})",
+                    "beginCaptures": {
+                        "0": {"name": "keyword.operator.assignment.ice"}
+                    },
+                    "patterns": [
+                        {"include": "#standard"},
+                        {"include": "#constant"}
+                    ]
+                }
+            ]
+        },
+        "storage.types": {
+            "patterns": [
+                {
+                    "match": "(\\\\)?\\b(?:(bool)|(byte)|(short)|(int)|(long)|(float)|(double)|(string)|(Object)|(LocalObject)|(Value))\\b",
+                    "captures": {
+                        "1": {"name": "punctuation.escape.backslash.ice"},
+                        "2": {"name": "storage.type.bool.ice"},
+                        "3": {"name": "storage.type.byte.ice"},
+                        "4": {"name": "storage.type.short.ice"},
+                        "5": {"name": "storage.type.int.ice"},
+                        "6": {"name": "storage.type.long.ice"},
+                        "7": {"name": "storage.type.float.ice"},
+                        "8": {"name": "storage.type.double.ice"},
+                        "9": {"name": "storage.type.string.ice"},
+                        "10": {"name": "storage.type.object.ice"},
+                        "11": {"name": "storage.type.localobject.ice"},
+                        "12": {"name": "storage.type.value.ice"}
+                    }
+                },
+                {"include": "#storage.types.custom"}
+            ]
+        },
+        "storage.types.custom": {
+            "patterns": [
+                {
+                    "match": "(\\\\)?([:\\w]+)",
+                    "captures": {
+                        "1": {"name": "punctuation.escape.backslash.ice"},
+                        "2": {
+                            "patterns": [
+                                {
+                                    "name": "variable.type.ice",
+                                    "match": "\\w+"
+                                },
+                                {
+                                    "name": "punctuation.accessor.ice",
+                                    "match": "::"
+                                },
+                                {
+                                    "name": "invalid.illegal.accessor.ice",
+                                    "match": ":"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {"include": "#invalid"}
+            ]
+        },
+        "storage.types.void": {
+            "name": "storage.type.void.ice",
+            "match": "(\\\\)?\\bvoid\\b",
+            "captures": {
+                "1": {"name": "punctuation.escape.backslash.ice"}
+            }
+        },
+        "storage.modifier": {
+            "patterns": [
+                {
+                    "begin": "(?=\\[)",
+                    "end": "(?<=])",
+                    "patterns": [
+                        {"include": "#standard"},
+                        {"include": "#metadata.local"}
+                    ]
+                },
+                {
+                    "match": "(?<!\\\\)\\b(?:(local)|(const)|(idempotent)|(out)|(optional\\([-a-zA-Z0-9_:]*\\)))(?:\\b|(?<=\\)))",
+                    "captures": {
+                        "1": {"name": "storage.modifier.local.ice"},
+                        "2": {"name": "storage.modifier.const.ice"},
+                        "3": {"name": "storage.modifier.idempotent.ice"},
+                        "4": {"name": "storage.modifier.out.ice"},
+                        "5": {
+                            "patterns": [
+                                {
+                                    "match": "(optional)(\\()([-a-zA-Z0-9_:]*)(\\))",
+                                    "captures": {
+                                        "1": {"name": "storage.modifier.optional.ice"},
+                                        "2": {"name": "punctuation.section.group.optional.begin.ice"},
+                                        "3": {
+                                            "patterns": [
+                                                {"include": "#constant.numeric.oct"},
+                                                {"include": "#constant.numeric.dec"},
+                                                {"include": "#constant.numeric.hex"},
+                                                {"include": "#storage.types.custom"}
+                                            ]
+                                        },
+                                        "4": {"name": "punctuation.section.group.optional.end.ice"}
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        "storage.identifier": {
+            "patterns": [
+                {
+                    "name": "invalid.illegal.reserved.identifier.ice",
+                    "match": "(?<!\\\\)\\b(?:bool|byte|class|const|dictionary|double|enum|exception|extends|false|float|idempotent|implements|int|interface|local|LocalObject|long|module|Object|optional|out|sequence|short|string|struct|throws|true|Value|void)\\b"
+                },
+                {
+                    "match": "(\\\\)?\\b([a-zA-Z_][a-zA-Z0-9_]*)\\b",
+                    "captures": {
+                        "1": {"name": "punctuation.escape.backslash.ice"},
+                        "2": {
+                            "patterns": [
+                                {
+                                    "name": "invalid.illegal.underscore.ice",
+                                    "match": "__+|\\b_|_\\b"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "invalid.illegal.identifier.ice",
+                    "match": "."
+                }
+            ]
+        },
+
+        "constant": {
+            "patterns": [
+                {"include": "#constant.boolean"},
+                {"include": "#constant.string"},
+                {"include": "#constant.numeric.float"},
+                {"include": "#constant.numeric.hex"},
+                {"include": "#constant.numeric.oct"},
+                {"include": "#constant.numeric.dec"}
+            ]
+        },
+        "constant.boolean": {
+            "match": "\\b(?:(true)|(false))\\b",
+            "captures": {
+                "0": {"name": "constant.language.ice"},
+                "1": {"name": "constant.boolean.true.ice"},
+                "2": {"name": "constant.boolean.false.ice"}
+            }
+        },
+        "constant.numeric.dec": {
+            "name": "constant.numeric.integer.ice",
+            "match": "(-|\\+)?\\b(?:0|[1-9]\\d*)\\b",
+            "captures": {
+                "1": {"name": "punctuation.definition.numeric.sign.ice"}
+            }
+        },
+        "constant.numeric.oct": {
+            "name": "constant.numeric.octal.ice",
+            "match": "(-|\\+)?\\b(0)(\\d+)\\b",
+            "captures": {
+                "1": {"name": "punctuation.definition.numeric.sign.ice"},
+                "2": {"name": "punctuation.definition.numeric.oct.ice"},
+                "3": {"patterns": [
+                    {
+                        "name": "invalid.illegal.oct.ice",
+                        "match": "[8-9]"
+                    }
+                ]}
+            }
+        },
+        "constant.numeric.hex": {
+            "name": "constant.numeric.hex.ice",
+            "match": "(-|\\+)?\\b(0x)[\\da-fA-F]+\\b",
+            "captures": {
+                "1": {"name": "punctuation.definition.numeric.sign.ice"},
+                "2": {"name": "punctuation.definition.numeric.hex.ice"}
+            }
+        },
+        "constant.numeric.float": {
+            "name": "constant.numeric.float.ice",
+            "match": "(-|\\+)?(?:\\d+(\\.)\\d*|\\d*(\\.)\\d+|\\d+(?=e|E|f|F))(?:(e|E)-?\\d+)?(f|F)?",
+            "captures": {
+                "1": {"name": "punctuation.numeric.sign.ice"},
+                "2": {"name": "punctuation.separator.decimal.ice"},
+                "3": {"name": "punctuation.separator.decimal.ice"},
+                "4": {"name": "punctuation.numeric.exponent.ice"},
+                "5": {"name": "punctuation.definition.float.ice"}
+            }
+        },
+        "constant.string": {
+            "name": "string.quoted.double.ice",
+            "begin": "\"",
+            "end": "(\")|$",
+            "beginCaptures": {
+                "0": {"name": "punctuation.definition.string.begin.ice"}
+            },
+            "endCaptures": {
+                "1": {"name": "punctuation.definition.string.end.ice"},
+                "2": {"name": "invalid.illegal.mismatched-quotes.ice"}
+            },
+            "patterns": [
+                {
+                    "match": "\\\\."
+                },
+                {"include": "#line.continuation"}
+            ]
+        },
+
+        "invalid": {
+            "name": "invalid.illegal",
+            "match": "\\S"
+        },
+        "line.continuation": {
+            "begin": "(\\\\)\\s*$",
+            "end": "^",
+            "beginCaptures": {
+                "1": {"name": "punctuation.separator.continuation.backslash.ice"}
+            }
+        },
+        "standardP": {
+            "patterns": [
+                {"include": "#comment"},
+                {"include": "#line.continuation"}
+            ]
+        },
+        "standard": {
+            "patterns": [
+                {"include": "#comment"},
+                {"include": "#preprocessor"},
+                {"include": "#line.continuation"}
+            ]
+        }
+    }
+}
