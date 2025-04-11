@@ -19,18 +19,13 @@ using Task = System.Threading.Tasks.Task;
 namespace IceBuilder
 {
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-    [InstalledProductRegistration("#110", "#112", "6.0.3", IconResourceID = 400)]
+    [InstalledProductRegistration("#110", "#112", "6.0.4", IconResourceID = 400)]
     [ProvideOptionPage(typeof(IceOptionsPage), "Projects", "Ice Builder", 113, 0, true)]
     [ProvideAutoLoad(UIContextGuids80.NoSolution, PackageAutoLoadFlags.BackgroundLoad)]
     [Guid(IceBuilderPackageString)]
-
-#if !VS2022
     [ProvideObject(typeof(PropertyPage), RegisterUsing = RegistrationMethod.CodeBase)]
-#endif
-
     [ProvideProjectFactory(typeof(ProjectFactory), "Ice Builder", null, null, null, @"..\Templates\Projects")]
     [ProvideProjectFactory(typeof(ProjectFactoryOld), "Ice Builder Old", null, null, null, @"..\Templates\Projects")]
-
     public sealed class Package : AsyncPackage
     {
         public static readonly string[] AssemblyNames =

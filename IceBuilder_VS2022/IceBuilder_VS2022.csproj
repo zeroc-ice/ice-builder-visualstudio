@@ -39,14 +39,19 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.0.31902.203" ExcludeAssets="runtime" />
-    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.0.5233" />
-    <PackageReference Include="Microsoft.Build" Version="17.0.0" />
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.0.0" />
-    <PackageReference Include="Microsoft.VisualStudio.ProjectSystem" Version="17.0.1313-pre" />
-    <PackageReference Include="System.ComponentModel.Composition" Version="6.0.0" />
+    <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.13.40008" ExcludeAssets="runtime">
+      <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.13.2126">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Build" Version="17.13.9" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.13.9" />
+    <PackageReference Include="Microsoft.VisualStudio.ProjectSystem" Version="17.9.380" />
+    <PackageReference Include="System.ComponentModel.Composition" Version="9.0.4" />
     <!-- Visual Studio 2022 includes 6.0.0-preview.0.2 we want to reference the same version -->
-    <PackageReference Include="NuGet.VisualStudio" Version="6.0.0-preview.0.2" />
+    <PackageReference Include="NuGet.VisualStudio" Version="17.13.2" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\IceBuilder_Common\NuGetI.cs">
