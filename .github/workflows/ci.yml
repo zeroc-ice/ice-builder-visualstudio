@@ -38,14 +38,14 @@ jobs:
 
       - name: Sign VSIX Package
         run: |
-          .\sign.exe ".\IceBuilder.Next\bin\Release\IceBuilder.Next.vsix" `
-            --trusted-signing `
-            --endpoint https://eus.codesigning.azure.net/ `
-            --account-name zeroc `
-            --certificate-profile zeroc-ice `
-            --azure-tenant-id ${{ secrets.AZURE_TENANT_ID }} `
-            --azure-client-id ${{ secrets.AZURE_CLIENT_ID }} `
-            --azure-client-secret ${{ secrets.AZURE_CLIENT_SECRET }}
+          .\sign.exe code trusted-signing ".\IceBuilder.Next\bin\Release\IceBuilder.Next.vsix" `
+            --trusted-signing-endpoint https://eus.codesigning.azure.net/ `
+            --timestamp-url http://timestamp.acs.microsoft.com `
+            --trusted-signing-account zeroc `
+            --trusted-signing-certificate-profile zeroc-ice `
+            --azure-key-vault-tenant-id ${{ secrets.AZURE_TENANT_ID }} `
+            --azure-key-vault-client-id ${{ secrets.AZURE_CLIENT_ID }} `
+            --azure-key-vault-client-secret ${{ secrets.AZURE_CLIENT_SECRET }}
 
       - name: Upload Visual Studio 2022 Extension
         uses: actions/upload-artifact@v4
