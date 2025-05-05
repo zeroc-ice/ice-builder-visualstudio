@@ -21,9 +21,12 @@ jobs:
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
 
-      - name: Install Visual Studio Extension Workload
+      - name: Add nuget to PATH
+        uses: nuget/setup-nuget@v1
+
+      - name: Restore NuGet packages
         run: |
-          vs_installer.exe modify --add Microsoft.VisualStudio.Workload.VisualStudioExtensionBuildTools --quiet --wait
+          nuget restore IceBuilder.VS2022.sln
 
       - name: Build Visual Studio 2022 Extension
         run: |
