@@ -21,6 +21,10 @@ jobs:
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
 
+      - name: Install Visual Studio Extension Workload
+        run: |
+          vs_installer.exe modify --add Microsoft.VisualStudio.Workload.VisualStudioExtensionBuildTools --quiet --wait
+
       - name: Build Visual Studio 2022 Extension
         run: |
           MSBuild IceBuilder.VS2022.sln /p:Configuration=Release /p:Platform="Any CPU"
