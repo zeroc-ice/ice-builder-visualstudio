@@ -7,10 +7,18 @@
     ],
 
     "patterns": [
-        {"include": "#comment"},
-        {"include": "#preprocessor"},
-        {"include": "#metadata.global"},
-        {"include": "#storage.module"}
+        {"include": "#standard"},
+        {"include": "#metadata"},
+        {"include": "#constant"},
+        {"include": "#storage.module"},
+        {"include": "#storage.enum"},
+        {"include": "#storage.struct"},
+        {"include": "#storage.sequence"},
+        {"include": "#storage.dictionary"},
+        {"include": "#storage.interface"},
+        {"include": "#storage.exception"},
+        {"include": "#storage.class"},
+        {"include": "#storage.operation"}
     ],
 
     "repository": {
@@ -68,9 +76,9 @@
 
         "preprocessor": {
             "patterns": [
-                {"include": "#preprocessor.if"},
                 {"include": "#preprocessor.ifdef"},
                 {"include": "#preprocessor.ifndef"},
+                {"include": "#preprocessor.if"},
                 {"include": "#preprocessor.elif"},
                 {"include": "#preprocessor.else"},
                 {"include": "#preprocessor.endif"},
@@ -611,6 +619,14 @@
                                     "patterns": [
                                         {"include": "#standard"},
                                         {
+                                            "begin": "(?=\\[)",
+                                            "end": "(?<=])",
+                                            "patterns": [
+                                                {"include": "#standard"},
+                                                {"include": "#metadata.local"}
+                                            ]
+                                        },
+                                        {
                                             "begin": "\\\\?\\b\\w+\\b",
                                             "end": "(?=})|(,)",
                                             "beginCaptures": {
@@ -713,6 +729,7 @@
                             },
                             "patterns": [
                                 {"include": "#standard"},
+                                {"include": "#storage.modifier"},
                                 {
                                     "begin": "(\\\\?[:\\w]+)|(?=\\>)",
                                     "end": "(?=;|})",
@@ -779,6 +796,7 @@
                             },
                             "patterns": [
                                 {"include": "#standard"},
+                                {"include": "#storage.modifier"},
                                 {
                                     "begin": "(\\\\?[:\\w]+)|(?=\\>)",
                                     "end": "(?=;|})",
@@ -801,6 +819,7 @@
                                             },
                                             "patterns": [
                                                 {"include": "#standard"},
+                                                {"include": "#storage.modifier"},
                                                 {
                                                     "begin": "(\\\\?[:\\w]+)|(?=\\>)",
                                                     "end": "(?=;|})",
