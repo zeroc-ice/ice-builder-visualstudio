@@ -1,7 +1,15 @@
+## Changes in Ice Builder for Visual Studio 6.0.4
+
+- Fixed the installation of the Slice grammar and updated the grammar to the latest version.
+- Fixed compatibility issues with Visual Studio 2022 17.10. See #29.
+- Fixed registration of the property page used by .NET Framework projects. See #30.
+
 ## Changes in Ice Builder for Visual Studio 6.0.3
+
 - Add support for Visual Studio 2022.
 
 ## Changes in Ice Builder for Visual Studio 6.0.2
+
 - Fixed a bug that cause TFS projects checkout during build, even if there is
   no project modifications.
 
@@ -35,6 +43,7 @@
 ## Changes in Ice Builder for Visual Studio 5.0.1
 
 - Fixes to support .NET Core project system:
+
   - Fixed renaming of SliceCompile items in .NET Core project,
     that was causing Visual Studio to Freeze while adding the
     new generated item see dotnet/project-system#3229
@@ -48,6 +57,7 @@
 ## Changes in Ice Builder for Visual Studio 5.0.0
 
 - Split Ice Builder in two components:
+
   - Ice Builder for MSBuild, in the ice-builder-msbuild repository, distributed
     as a NuGet package on nuget.org.
   - Ice Builder for Visual Studio, a Visual Studio extension, distributed in the
@@ -56,32 +66,32 @@
     for Ice Builder for MSBuild within the Visual Studio IDE; Ice Builder for
     MSBuild controls the Slice compilation.
 
- - Ice Builder no longer fully supports Ice source installations: if your project
-   uses Ice built from source (in a source tree), you have to add the path to
-   the Ice C++ include directory to your C++ include directories (etc.) yourself.
+- Ice Builder no longer fully supports Ice source installations: if your project
+  uses Ice built from source (in a source tree), you have to add the path to
+  the Ice C++ include directory to your C++ include directories (etc.) yourself.
 
- - You no longer add Ice Builder to your project. As of this release, you add
- the NuGet package `zeroc.icebuilder.msbuild` to our project.
+- You no longer add Ice Builder to your project. As of this release, you add
+  the NuGet package `zeroc.icebuilder.msbuild` to our project.
 
- - Added support for C# .NET Core projects.
+- Added support for C# .NET Core projects.
 
- - The Ice Builder 4.x MSBuild properties have been replaced by item metadata
- of SliceCompile in Ice Builder for MSBuild. The names have remained mostly the
- same, except without the IceBuilder prefix.
+- The Ice Builder 4.x MSBuild properties have been replaced by item metadata
+  of SliceCompile in Ice Builder for MSBuild. The names have remained mostly the
+  same, except without the IceBuilder prefix.
 
- - Added C++ Mapping property to C++ projects. It defaults to C++11 with Visual
- Studio 2015 and greater, and to C++98 with earlier Visual Studio releases.
+- Added C++ Mapping property to C++ projects. It defaults to C++11 with Visual
+  Studio 2015 and greater, and to C++98 with earlier Visual Studio releases.
 
- - When you open a solution with projects that use Ice Builder 4.x, Ice Builder
- offers you to convert these projects to the 5.0 format. This conversion adds
- `zeroc.icebuilder.msbuild` to the converted projects and is not reversible.
+- When you open a solution with projects that use Ice Builder 4.x, Ice Builder
+  offers you to convert these projects to the 5.0 format. This conversion adds
+  `zeroc.icebuilder.msbuild` to the converted projects and is not reversible.
 
- - The partial support for Visual Studio 2010 in Ice Builder 4.x is now
- provided by Ice Builder for MSBuild, and as a result Ice Builder for
- Visual Studio no longer supports Visual Studio 2010.
+- The partial support for Visual Studio 2010 in Ice Builder 4.x is now
+  provided by Ice Builder for MSBuild, and as a result Ice Builder for
+  Visual Studio no longer supports Visual Studio 2010.
 
- - Ice Builder no longer converts projects that use the old Ice Visual Studio
- Add-in.
+- Ice Builder no longer converts projects that use the old Ice Visual Studio
+  Add-in.
 
 ## Changes in Ice Builder for Visual Studio 4.3.10
 
