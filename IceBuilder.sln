@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31912.275
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.35931.194
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Templates", "Templates", "{077FF067-76D0-4C84-8DEF-37D8BDEF5515}"
 EndProject
@@ -34,11 +34,6 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "IceBuilder.Shared", "IceBui
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "IceBuilder_Common.Shared", "IceBuilder_Common.Shared\IceBuilder_Common.Shared.shproj", "{449835BC-2889-45FB-BF79-BCC700FB5998}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IceBuilder.Next", "IceBuilder.Next\IceBuilder.Next.csproj", "{A51B4AA4-714B-4E23-A8C1-E0759BF5B609}"
-	ProjectSection(ProjectDependencies) = postProject
-		{C998637F-98DD-45D3-AF85-47D883697E54} = {C998637F-98DD-45D3-AF85-47D883697E54}
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IceBuilder_Common.Next", "IceBuilder_Common.Next\IceBuilder_Common.Next.csproj", "{C014D4BF-6EB0-409E-AD9B-5B783450200F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IceBuilder_VS2022", "IceBuilder_VS2022\IceBuilder_VS2022.csproj", "{C998637F-98DD-45D3-AF85-47D883697E54}"
@@ -49,7 +44,6 @@ Global
 		IceBuilder.Shared\IceBuilder.Shared.projitems*{28b94594-c9a1-4212-a538-6d0ac85d6993}*SharedItemsImports = 13
 		IceBuilder_Common.Shared\IceBuilder_Common.Shared.projitems*{449835bc-2889-45fb-bf79-bcc700fb5998}*SharedItemsImports = 13
 		IceBuilder_Common.Shared\IceBuilder_Common.Shared.projitems*{9d33c9b1-4436-4c37-bacf-89165396b12d}*SharedItemsImports = 4
-		IceBuilder.Shared\IceBuilder.Shared.projitems*{a51b4aa4-714b-4e23-a8c1-e0759bf5b609}*SharedItemsImports = 4
 		IceBuilder_Common.Shared\IceBuilder_Common.Shared.projitems*{c014d4bf-6eb0-409e-ad9b-5b783450200f}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -115,14 +109,6 @@ Global
 		{C14FE348-5198-4CFD-9316-C548622E5419}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C14FE348-5198-4CFD-9316-C548622E5419}.Release|x86.ActiveCfg = Release|Any CPU
 		{C14FE348-5198-4CFD-9316-C548622E5419}.Release|x86.Build.0 = Release|Any CPU
-		{A51B4AA4-714B-4E23-A8C1-E0759BF5B609}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A51B4AA4-714B-4E23-A8C1-E0759BF5B609}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A51B4AA4-714B-4E23-A8C1-E0759BF5B609}.Debug|x86.ActiveCfg = Debug|x86
-		{A51B4AA4-714B-4E23-A8C1-E0759BF5B609}.Debug|x86.Build.0 = Debug|x86
-		{A51B4AA4-714B-4E23-A8C1-E0759BF5B609}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A51B4AA4-714B-4E23-A8C1-E0759BF5B609}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A51B4AA4-714B-4E23-A8C1-E0759BF5B609}.Release|x86.ActiveCfg = Release|x86
-		{A51B4AA4-714B-4E23-A8C1-E0759BF5B609}.Release|x86.Build.0 = Release|x86
 		{C014D4BF-6EB0-409E-AD9B-5B783450200F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C014D4BF-6EB0-409E-AD9B-5B783450200F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C014D4BF-6EB0-409E-AD9B-5B783450200F}.Debug|x86.ActiveCfg = Debug|Any CPU
