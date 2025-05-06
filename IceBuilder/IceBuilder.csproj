@@ -140,7 +140,7 @@
       <Link>Resources\Package.ico</Link>
     </Resource>
     <Content Include="..\assets\Grammars.pkgdef">
-      <Link>Grammars\Grammars.pkgdef</Link>
+      <Link>Grammars.pkgdef</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="..\assets\Package.png">

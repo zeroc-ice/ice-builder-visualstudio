@@ -46,7 +46,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="..\assets\Grammars.pkgdef">
-      <Link>Grammars\Grammars.pkgdef</Link>
+      <Link>Grammars.pkgdef</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="..\assets\LICENSE.rtf">

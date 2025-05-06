@@ -12,8 +12,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
-    runs-on: windows-latest
+  build-visualstudio-2022:
+    runs-on: windows-2022
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -53,3 +53,45 @@ jobs:
           name: vs2022-vsix
           path: |
             ./IceBuilder.Next/bin/Release/*.vsix
+
+  build-visualstudio-2019:
+    runs-on: windows-2019
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Add nuget to PATH
+        uses: nuget/setup-nuget@v1
+
+      - name: Install SignTool
+        run: |
+          dotnet tool install --tool-path . --prerelease sign
+
+      - name: Restore NuGet packages
+        run: |
+          nuget restore IceBuilder.sln
+
+      - name: Build Visual Studio 2019 Extension
+        run: |
+          MSBuild IceBuilder.sln /p:Configuration=Release /p:Platform="Any CPU"
+
+      - name: Sign VSIX Package
+        run: |
+          .\sign.exe code trusted-signing ".\IceBuilder\bin\Release\IceBuilder.vsix" `
+            --trusted-signing-endpoint https://eus.codesigning.azure.net/ `
+            --timestamp-url http://timestamp.acs.microsoft.com `
+            --trusted-signing-account zeroc `
+            --trusted-signing-certificate-profile zeroc-ice `
+            --azure-key-vault-tenant-id ${{ secrets.AZURE_TENANT_ID }} `
+            --azure-key-vault-client-id ${{ secrets.AZURE_CLIENT_ID }} `
+            --azure-key-vault-client-secret ${{ secrets.AZURE_CLIENT_SECRET }}
+
+      - name: Upload Visual Studio 2019 Extension
+        uses: actions/upload-artifact@v4
+        with:
+          name: vs2019-vsix
+          path: |
+            ./IceBuilder/bin/Release/*.vsix
