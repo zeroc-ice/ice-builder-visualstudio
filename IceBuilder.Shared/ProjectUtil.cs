@@ -30,10 +30,18 @@ namespace IceBuilder
 
         public static IVsProject GetParentProject(IVsProject project)
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
-            ErrorHandler.ThrowOnFailure(((IVsHierarchy)project).GetProperty(
-                VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_ParentHierarchy, out object value));
-            return value as IVsProject;
+            try
+            {
+                ThreadHelper.ThrowIfNotOnUIThread();
+                ErrorHandler.ThrowOnFailure(((IVsHierarchy)project).GetProperty(
+                    VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_ParentHierarchy, out object value));
+                return value as IVsProject;
+            }
+            catch (System.NotImplementedException)
+            {
+                // Can happen if IVsProject represents a solution.
+                return null;
+            }
         }
 
         public static bool IsSliceFileName(string name) =>
