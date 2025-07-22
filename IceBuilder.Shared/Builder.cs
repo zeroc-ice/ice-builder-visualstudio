@@ -30,7 +30,7 @@ namespace IceBuilder
                 {
                     ThreadHelper.ThrowIfNotOnUIThread();
 
-                    // We need to set this before we acquire the build resources otherwise Msbuild will not see the changes.
+                    // We need to set this before we acquire the build resources otherwise MSBuild will not see the changes.
                     bool onlyLogCriticalEvents = msproject.ProjectCollection.OnlyLogCriticalEvents;
                     msproject.ProjectCollection.Loggers.Add(buildLogger);
                     msproject.ProjectCollection.OnlyLogCriticalEvents = false;

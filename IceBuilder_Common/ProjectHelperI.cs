@@ -199,7 +199,7 @@ namespace IceBuilder
                         // If there is a glob item that already match the evaluated include path we can remove the non
                         // glob item as it is a duplicate.
                         var globItem = msproject.AllEvaluatedItems.FirstOrDefault(i =>
-                            i.HasMetadata("SliceCompileSource") &&
+                            i.GetMetadata("SliceCompileSource") != null &&
                             !i.EvaluatedInclude.Equals(i.UnevaluatedInclude, StringComparison.OrdinalIgnoreCase) &&
                             i.EvaluatedInclude.Equals(item.Include, StringComparison.OrdinalIgnoreCase));
                         if (globItem != null)
@@ -231,7 +231,7 @@ namespace IceBuilder
                             // If there is a glob item that already match the evaluated include path we can remove the
                             // non glob item as it is a duplicate.
                             var globItem = msproject.AllEvaluatedItems.FirstOrDefault(i =>
-                                i.HasMetadata("SliceCompileSource") &&
+                                i.GetMetadata("SliceCompileSource") != null &&
                                 !i.EvaluatedInclude.Equals(i.UnevaluatedInclude, StringComparison.OrdinalIgnoreCase) &&
                                 i.EvaluatedInclude.Equals(item.Include, StringComparison.OrdinalIgnoreCase));
                             if (globItem != null)

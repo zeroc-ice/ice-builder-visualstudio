@@ -301,7 +301,7 @@ namespace IceBuilder
                     return msproject.AllEvaluatedItems.Where(
                         item =>
                         {
-                            if (item.ItemType.Equals("Compile") && item.HasMetadata("SliceCompileSource"))
+                            if (item.ItemType.Equals("Compile") && item.GetMetadata("SliceCompileSource") != null)
                             {
                                 if (item.GetMetadataValue("SliceCompileSource").Equals(fileset.filename))
                                 {
@@ -343,14 +343,14 @@ namespace IceBuilder
                 return msproject.AllEvaluatedItems.Where(
                     item =>
                     {
-                        if (item.ItemType.Equals("ClCompile") && item.HasMetadata("SliceCompileSource"))
+                        if (item.ItemType.Equals("ClCompile") && item.GetMetadata("SliceCompileSource") != null)
                         {
                             if (item.GetMetadataValue("SliceCompileSource").Equals(fileset.filename))
                             {
                                 return !fileset.sources.ContainsKey(Path.GetFullPath(Path.Combine(projectDir, item.EvaluatedInclude)));
                             }
                         }
-                        else if (item.ItemType.Equals("ClInclude") && item.HasMetadata("SliceCompileSource"))
+                        else if (item.ItemType.Equals("ClInclude") && item.GetMetadata("SliceCompileSource") != null)
                         {
                             if (item.GetMetadataValue("SliceCompileSource").Equals(fileset.filename))
                             {
@@ -444,7 +444,7 @@ namespace IceBuilder
             ThreadHelper.ThrowIfNotOnUIThread();
             var projectDir = project.GetProjectBaseDirectory();
 
-            // Remove all Compile, ClCompile and ClInclude items that have an associted SliceCompileSource item
+            // Remove all Compile, ClCompile and ClInclude items that have an associated SliceCompileSource item
             // metadata that doesn't match any of the project SliceCompile items.
             if (project.IsCppProject())
             {
@@ -459,9 +459,10 @@ namespace IceBuilder
                         {
                             if (item.ItemType.Equals("ClCompile") || item.ItemType.Equals("ClInclude"))
                             {
-                                if (item.HasMetadata("SliceCompileSource"))
+                                var metadata = item.GetMetadata("SliceCompileSource");
+                                if (metadata != null)
                                 {
-                                    var value = item.GetMetadataValue("SliceCompileSource");
+                                    var value = metadata.EvaluatedValue;
                                     return !sliceCompile.Contains(value);
                                 }
                             }
@@ -477,19 +478,22 @@ namespace IceBuilder
                             item => item.ItemType.Equals("SliceCompile")).Select(
                             item => item.EvaluatedInclude);
 
-                        return msproject.AllEvaluatedItems.Where(
+                        var items = msproject.AllEvaluatedItems.Where(
                             item =>
                                 {
                                     if (item.ItemType.Equals("Compile"))
                                     {
-                                        if (item.HasMetadata("SliceCompileSource"))
+                                        var metadata = item.GetMetadata("SliceCompileSource");
+                                        if (metadata != null)
                                         {
-                                            var value = item.GetMetadataValue("SliceCompileSource");
+                                            var value = metadata.EvaluatedValue;
                                             return !sliceCompile.Contains(value);
                                         }
                                     }
                                     return false;
                                 }).Select(item => Path.Combine(projectDir, item.EvaluatedInclude)).ToList();
+
+                        return items;
                     }));
             }
 

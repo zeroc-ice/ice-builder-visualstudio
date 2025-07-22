@@ -125,15 +125,16 @@ namespace IceBuilder
             var includeValue = FileUtil.RelativePath(projectDir, path);
             return project.WithProject((MSProject msproject) =>
                 {
-                    return msproject.AllEvaluatedItems.FirstOrDefault(
+                    var selectedItem = msproject.AllEvaluatedItems.FirstOrDefault(
                         item =>
                         {
                             return (item.ItemType.Equals("Compile") ||
                                     item.ItemType.Equals("ClCompile") ||
                                     item.ItemType.Equals("ClInclude")) &&
                                     item.EvaluatedInclude.Equals(includeValue) &&
-                                    item.HasMetadata("SliceCompileSource");
-                        }) != null;
+                                    item.GetMetadata("SliceCompileSource") != null;
+                        });
+                    return selectedItem != null;
                 });
         }
 
