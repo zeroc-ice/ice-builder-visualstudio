@@ -7,5 +7,5 @@ using System.Reflection;
 [assembly: AssemblyCompany("ZeroC, Inc.")]
 [assembly: AssemblyProduct("Ice Visual Studio Extension")]
 [assembly: AssemblyCopyright("Copyright (c) ZeroC, Inc.")]
-[assembly: AssemblyVersion("6.0.3")]
+[assembly: AssemblyVersion("6.0.5")]
 [assembly: AssemblyDelaySign(false)]

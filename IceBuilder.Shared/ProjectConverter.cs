@@ -161,7 +161,7 @@ namespace IceBuilder
                                                         referenceItem.ItemType.Equals("Reference") &&
                                                         referenceItem.EvaluatedInclude.Split(
                                                             ",".ToCharArray()).ElementAt(0).Equals(r.Name));
-                                                if (item != null &&  item.HasMetadata("HintPath"))
+                                                if (item != null && item.GetMetadata("HintPath") != null)
                                                 {
                                                     var hintPath = item.GetMetadata("HintPath").UnevaluatedValue;
                                                     if (hintPath.Contains("$(IceAssembliesDir)"))

@@ -19,7 +19,7 @@ using Task = System.Threading.Tasks.Task;
 namespace IceBuilder
 {
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-    [InstalledProductRegistration("#110", "#112", "6.0.4", IconResourceID = 400)]
+    [InstalledProductRegistration("#110", "#112", "6.0.5", IconResourceID = 400)]
     [ProvideOptionPage(typeof(IceOptionsPage), "Projects", "Ice Builder", 113, 0, true)]
     [ProvideAutoLoad(UIContextGuids80.NoSolution, PackageAutoLoadFlags.BackgroundLoad)]
     [Guid(IceBuilderPackageString)]

@@ -26,7 +26,8 @@ namespace IceBuilder
             }
             else
             {
-                return item.HasMetadata(name) ? item.GetMetadata(name).UnevaluatedValue : defaultValue;
+                var metadata = item.GetMetadata(name);
+                return metadata != null ? metadata.UnevaluatedValue : defaultValue;
             }
         }
 
