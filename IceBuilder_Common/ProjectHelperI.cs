@@ -1,23 +1,16 @@
 ﻿// Copyright (c) ZeroC, Inc. All rights reserved.
 
-using System;
-using System.Threading.Tasks;
-using Microsoft.VisualStudio.Shell.Interop;
-using MSProject = Microsoft.Build.Evaluation.Project;
-using Microsoft.VisualStudio.Shell;
-using System.Linq;
-using System.Collections.Generic;
-
-#if VS2017 || VS2019 || VS2022
-using System.IO;
-using System.Threading.Tasks.Dataflow;
-#else
-using Microsoft.VisualStudio.Threading;
-using Microsoft.VisualStudio.ProjectSystem.Designers;
-#endif
-
 using Microsoft.VisualStudio.ProjectSystem;
 using Microsoft.VisualStudio.ProjectSystem.Properties;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
+using MSProject = Microsoft.Build.Evaluation.Project;
 
 namespace IceBuilder
 {
@@ -124,6 +117,7 @@ namespace IceBuilder
                 await unconfiguredProject.ProjectService.Services.ThreadingPolicy.SwitchToUIThread();
             }
         }
+
         public static UnconfiguredProject GetUnconfiguredProject(IVsProject project)
         {
             UnconfiguredProject unconfiguredProject = null;
@@ -160,7 +154,7 @@ namespace IceBuilder
 
         public void AddFromFile(IVsProject project, string file)
         {
-#if VS2017 || VS2019 || VS2022
+            ThreadHelper.ThrowIfNotOnUIThread();
             if (project.IsCppProject() || GetUnconfiguredProject(project) == null)
             {
                 project.GetDTEProject().ProjectItems.AddFromFile(file);
@@ -180,12 +174,8 @@ namespace IceBuilder
                         }
                     });
             }
-#else
-            project.GetDTEProject().ProjectItems.AddFromFile(file);
-#endif
         }
 
-#if VS2017 || VS2019 || VS2022
         private bool HasGeneratedItemDuplicates(IVsProject project)
         {
             if (!project.IsCppProject() && GetUnconfiguredProject(project) != null)
@@ -212,11 +202,9 @@ namespace IceBuilder
             }
             return false;
         }
-#endif
 
         public void RemoveGeneratedItemDuplicates(IVsProject project)
         {
-#if VS2017 || VS2019 || VS2022
             // With .NET project system when default compile items are enabled we can end up with duplicate generated
             // items, as the call to AddItem doesn't detect that the new create file is already part of a glob and adds
             // a second item with the given include.
@@ -241,12 +229,10 @@ namespace IceBuilder
                         }
                     });
             }
-#endif
         }
 
         public void RemoveGeneratedItemCustomMetadata(IVsProject project, List<string> paths)
         {
-#if VS2017 || VS2019 || VS2022
             var projectDir = project.GetProjectBaseDirectory();
             project.UpdateProject((MSProject msproject) =>
                 {
@@ -269,7 +255,6 @@ namespace IceBuilder
                         item.Parent.RemoveChild(item);
                     }
                 });
-#endif
         }
 
         public void SetGeneratedItemCustomMetadata(IVsProject project, string slice, string generated,
@@ -294,7 +279,7 @@ namespace IceBuilder
                         {
                             item.SetMetadataValue("SliceCompileSource", slice);
                         }
-#if VS2017 || VS2019 || VS2022
+
                         // With Visual Studio 2017 and abvove if the item originate from a glob we update the item
                         // medata using the Update attribute.
                         else
@@ -321,14 +306,12 @@ namespace IceBuilder
                                 updateItem.AddMetadata("SliceCompileSource", slice);
                             }
                         }
-#endif
                     }
                 });
         }
 
         public IDisposable OnProjectUpdate(IVsProject project, Action onProjectUpdate)
         {
-#if VS2017 || VS2019 || VS2022
             var unconfiguredProject = GetUnconfiguredProject(project);
             if (unconfiguredProject != null)
             {
@@ -338,7 +321,6 @@ namespace IceBuilder
                 return projectSource.SourceBlock.LinkTo(
                     new ActionBlock<IProjectVersionedValue<IProjectSnapshot>>(update => onProjectUpdate()));
             }
-#endif
             return null;
         }
     }

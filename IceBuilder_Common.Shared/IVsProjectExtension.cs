@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ZeroC, Inc. All rights reserved.
 
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.Collections.Generic;
@@ -69,6 +70,7 @@ namespace IceBuilder
         // Get the Guid that identifies the type of the project
         public static Guid GetProjecTypeGuid(this IVsProject project)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             if (project is IVsHierarchy hierarchy)
             {
                 try

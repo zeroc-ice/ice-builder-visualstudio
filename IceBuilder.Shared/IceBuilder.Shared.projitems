@@ -31,7 +31,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)MSBuildUtils.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Package.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Project.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ProjectConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ProjectFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ProjectSettigns.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ProjectUtil.cs" />
@@ -40,18 +39,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)SolutionEventHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)StreamReader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UIUtil.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)UpgradeDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)UpgradeDialog.Designer.cs">
-      <DependentUpon>UpgradeDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)UpgradeDialogProgress.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)UpgradeDialogProgress.Designer.cs">
-      <DependentUpon>UpgradeDialogProgress.cs</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="$(MSBuildThisFileDirectory)CSharpConfigurationView.resx">
@@ -59,12 +46,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="$(MSBuildThisFileDirectory)IceHomeEditor.resx">
       <DependentUpon>IceHomeEditor.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="$(MSBuildThisFileDirectory)UpgradeDialog.resx">
-      <DependentUpon>UpgradeDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="$(MSBuildThisFileDirectory)UpgradeDialogProgress.resx">
-      <DependentUpon>UpgradeDialogProgress.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="$(MSBuildThisFileDirectory)VSPackage.resx">
       <SubType>Designer</SubType>

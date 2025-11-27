@@ -31,15 +31,6 @@ namespace IceBuilder
             ThreadHelper.ThrowIfNotOnUIThread();
             try
             {
-                if (Editor.SetIceHome(Editor.IceHome))
-                {
-                    Package.Instance.SetIceHome(Editor.IceHome);
-                }
-                else
-                {
-                    e.ApplyBehavior = ApplyKind.CancelNoNavigate;
-                }
-
                 Package.Instance.SetAutoBuilding(Editor.AutoBuilding);
             }
             catch (Exception ex)
@@ -53,7 +44,6 @@ namespace IceBuilder
             ThreadHelper.ThrowIfNotOnUIThread();
             try
             {
-                Editor.IceHome = Package.Instance.GetIceHome();
                 Editor.AutoBuilding = Package.Instance.AutoBuilding;
             }
             catch (Exception ex)

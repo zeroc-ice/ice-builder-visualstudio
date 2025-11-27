@@ -100,38 +100,6 @@ namespace IceBuilder
             }
         }
 
-        public static void SetItemMetadata(this Project project, string name, string value) =>
-            project.SetItemMetadata("SliceCompile", "IceBuilder", name, value);
-
-        public static void SetClCompileAdditionalIncludeDirectories(this Project project, string value) =>
-            // Set AdditionalIncludeDirectories in all ClCompile ItemDefinitions
-            project.Xml.ItemDefinitionGroups.SelectMany(def => def.ItemDefinitions)
-                .Where(element => element.ItemType.Equals("ClCompile")).ToList()
-                .ForEach(cl =>
-                {
-                    var metadata = cl.Metadata.FirstOrDefault(m => m.Name.Equals("AdditionalIncludeDirectories"));
-                    if (metadata == null)
-                    {
-                        metadata = cl.AddMetadata("AdditionalIncludeDirectories",
-                            string.Format("{0};%(AdditionalIncludeDirectories)", value));
-                    }
-                    else
-                    {
-                        metadata.Value = string.Format("{0};{1}", value, metadata.Value);
-                    }
-                });
-
-        public static bool RemovePropertyWithName(this Project project, string name)
-        {
-            var property = project.Xml.Properties.FirstOrDefault(p => p.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase));
-            if (property != null)
-            {
-                property.Parent.RemoveChild(property);
-                return true;
-            }
-            return false;
-        }
-
         public static string GetPropertyWithDefault(
             this Project project,
             string name,
@@ -157,49 +125,6 @@ namespace IceBuilder
 
         public static string GetEvaluatedProperty(this Project project, string name) =>
             project.GetPropertyValue(name);
-
-        public static void SetProperty(this Project project, string name, string value, string label)
-        {
-            if (string.IsNullOrEmpty(label))
-            {
-                project.SetProperty(name, value);
-            }
-            else
-            {
-                var group = project.Xml.PropertyGroups.FirstOrDefault(
-                    g => g.Label.Equals(label, StringComparison.CurrentCultureIgnoreCase));
-                if (group == null)
-                {
-                    // Create our property group after the main language targets are imported so we can use the properties
-                    // defined in this files.
-                    var import = project.Xml.Imports.FirstOrDefault(
-                        p => p.Project.IndexOf("Microsoft.Cpp.targets", StringComparison.CurrentCultureIgnoreCase) != -1 ||
-                             p.Project.Equals("Microsoft.CSharp.targets", StringComparison.CurrentCultureIgnoreCase));
-                    if (import != null)
-                    {
-                        group = project.Xml.CreatePropertyGroupElement();
-                        project.Xml.InsertAfterChild(group, import);
-                    }
-                    else
-                    {
-                        group = project.Xml.CreatePropertyGroupElement();
-                        project.Xml.AppendChild(group);
-                    }
-                    group.Label = label;
-                }
-
-                var property = group.Properties.FirstOrDefault(
-                    p => p.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase));
-                if (property != null)
-                {
-                    property.Value = value;
-                }
-                else
-                {
-                    group.AddProperty(name, value);
-                }
-            }
-        }
 
         public static bool HasProjectFlavor(this Project project, string flavor)
         {

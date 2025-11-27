@@ -28,21 +28,6 @@ namespace IceBuilder
     [ProvideProjectFactory(typeof(ProjectFactoryOld), "Ice Builder Old", null, null, null, @"..\Templates\Projects")]
     public sealed class Package : AsyncPackage
     {
-        public static readonly string[] AssemblyNames =
-        {
-            "Glacier2",
-            "Ice",
-            "IceBox",
-            "IceDiscovery",
-            "IceLocatorDiscovery",
-            "IceGrid",
-            "IcePatch2",
-            "IceSSL",
-            "IceStorm"
-        };
-
-        public static readonly string NuGetBuilderPackageId = "zeroc.icebuilder.msbuild";
-
         public IVsShell Shell { get; private set; }
         public EnvDTE.DTE DTE => DTE2.DTE;
         public EnvDTE80.DTE2 DTE2 { get; private set; }
@@ -102,175 +87,6 @@ namespace IceBuilder
         }
         public Guid OutputPaneGUID = new Guid("CE9BFDCD-5AFD-4A77-BD40-75E0E1E5162C");
 
-        private static void TryRemoveAssemblyFoldersExKey()
-        {
-            RegistryKey key = null;
-            try
-            {
-                key = Registry.CurrentUser.OpenSubKey(
-                   @"Software\Microsoft\.NETFramework\v2.0.50727\AssemblyFoldersEx", true);
-
-                if (key.GetSubKeyNames().Contains("Ice"))
-                {
-                    key.DeleteSubKey("Ice");
-                }
-            }
-            catch
-            {
-            }
-            finally
-            {
-                if (key != null)
-                {
-                    key.Close();
-                }
-            }
-        }
-
-        public void SetIceHome(string value)
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-            if (string.IsNullOrEmpty(value))
-            {
-                // Remove all registry settings.
-                Registry.SetValue(IceBuilderKey, IceHomeValue, "", RegistryValueKind.String);
-                Registry.SetValue(IceBuilderKey, IceVersionValue, "", RegistryValueKind.String);
-                Registry.SetValue(IceBuilderKey, IceIntVersionValue, "", RegistryValueKind.String);
-                Registry.SetValue(IceBuilderKey, IceVersionMMValue, "", RegistryValueKind.String);
-
-                TryRemoveAssemblyFoldersExKey();
-                return;
-            }
-            else
-            {
-                string props = new string[]
-                    {
-                        Path.Combine(value, "config", "ice.props"),
-                        Path.Combine(value,"cpp", "config", "ice.props"),
-                        Path.Combine(value, "config", "icebuilder.props")
-                    }.FirstOrDefault(path => File.Exists(path));
-
-                if (!string.IsNullOrEmpty(props))
-                {
-                    Microsoft.Build.Evaluation.Project p = new Microsoft.Build.Evaluation.Project(
-                        props,
-                        new Dictionary<string, string>()
-                            {
-                                { "ICE_HOME", value }
-                            },
-                        null);
-                    Registry.SetValue(IceBuilderKey, IceHomeValue, value, RegistryValueKind.String);
-
-                    string version = p.GetPropertyValue(IceVersionValue);
-                    Registry.SetValue(IceBuilderKey, IceVersionValue, version, RegistryValueKind.String);
-
-                    string intVersion = p.GetPropertyValue(IceIntVersionValue);
-                    Registry.SetValue(IceBuilderKey, IceIntVersionValue, intVersion, RegistryValueKind.String);
-
-                    string mmVersion = p.GetPropertyValue(IceVersionMMValue);
-                    Registry.SetValue(IceBuilderKey, IceVersionMMValue, mmVersion, RegistryValueKind.String);
-
-                    Registry.SetValue(IceCSharpAssembleyKey, "", GetAssembliesDir(), RegistryValueKind.String);
-                    ICollection<Microsoft.Build.Evaluation.Project> projects =
-                        ProjectCollection.GlobalProjectCollection.GetLoadedProjects(props);
-                    if (projects.Count > 0)
-                    {
-                        ProjectCollection.GlobalProjectCollection.UnloadProject(p);
-                    }
-                }
-                else
-                {
-                    Version v = null;
-                    try
-                    {
-                        string compiler = GetSliceCompilerVersion(value);
-                        if (string.IsNullOrEmpty(compiler))
-                        {
-                            MessageBox.Show(
-                                $"Unable to find a valid Ice installation in `${value}'",
-                                "Ice Builder",
-                                MessageBoxButtons.OK,
-                                MessageBoxIcon.Error,
-                                MessageBoxDefaultButton.Button1,
-                                0);
-                            return;
-                        }
-                        else
-                        {
-                            v = Version.Parse(compiler);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(
-                            $"Failed to run Slice compiler using Ice installation from `{value}'\n{ex}",
-                            "Ice Builder",
-                            MessageBoxButtons.OK,
-                            MessageBoxIcon.Error,
-                            MessageBoxDefaultButton.Button1,
-                            0);
-                        return;
-                    }
-                    Registry.SetValue(IceBuilderKey, IceHomeValue, value, RegistryValueKind.String);
-
-                    Registry.SetValue(IceBuilderKey, IceVersionValue, v.ToString(), RegistryValueKind.String);
-
-                    var iceIntVersion = string.Format("{0}{1:00}{2:00}", v.Major, v.Minor, v.Build);
-                    Registry.SetValue(IceBuilderKey, IceIntVersionValue, iceIntVersion, RegistryValueKind.String);
-
-                    var iceVersionMM = string.Format("{0}.{1}", v.Major, v.Minor);
-                    Registry.SetValue(IceBuilderKey, IceVersionMMValue, iceVersionMM, RegistryValueKind.String);
-
-                    Registry.SetValue(IceCSharpAssembleyKey, "", GetAssembliesDir(), RegistryValueKind.String);
-                }
-            }
-        }
-
-        public string GetAssembliesDir(IVsProject project = null)
-        {
-            if (project != null)
-            {
-                string assembliesDir = project.GetEvaluatedProperty(IceAssembliesDir);
-                if (Directory.Exists(assembliesDir))
-                {
-                    return assembliesDir;
-                }
-            }
-
-            string iceHome = GetIceHome(project);
-            if (Directory.Exists(Path.Combine(iceHome, "Assemblies")))
-            {
-                return Path.Combine(iceHome, "Assemblies");
-            }
-            else if (Directory.Exists(Path.Combine(iceHome, "csharp", "Assemblies")))
-            {
-                return Path.Combine(iceHome, "csharp", "Assemblies");
-            }
-            else if (Directory.Exists(Path.Combine(iceHome, "lib")))
-            {
-                return Path.Combine(iceHome, "lib");
-            }
-
-            return string.Empty;
-        }
-
-        public string GetIceHome(IVsProject project = null)
-        {
-            string iceHome = string.Empty;
-            if (project != null)
-            {
-                iceHome = project.GetEvaluatedProperty(IceHomeValue);
-            }
-
-            if (string.IsNullOrEmpty(iceHome))
-            {
-                object value = Registry.GetValue(IceBuilderKey, IceHomeValue, "");
-                iceHome = value == null ? string.Empty : value.ToString();
-            }
-
-            return iceHome;
-        }
-
         public void QueueProjectsForBuilding(ICollection<IVsProject> projects)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -310,22 +126,12 @@ namespace IceBuilder
             }
         }
 
-        public void ReloadProject(IVsProject project)
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-            IVsHierarchy hier = project as IVsHierarchy;
-            IVsSolution.GetGuidOfProject(hier, out Guid projectGUID);
-            IVsSolution4.UnloadProject(projectGUID, (uint)_VSProjectUnloadStatus.UNLOADSTATUS_UnloadedByUser);
-            IVsSolution4.ReloadProject(ref projectGUID);
-        }
-
         public void InitializeProjects(List<IVsProject> projects)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
             try
             {
                 NuGet.OnNugetBatchEnd(null);
-                ProjectConverter.TryUpgrade(projects);
                 projects = DTEUtil.GetProjects();
                 foreach (IVsProject project in projects)
                 {
@@ -421,23 +227,8 @@ namespace IceBuilder
                     InstallDirectory,
                     RegistryValueKind.String);
 
-                Assembly assembly = null;
-                if (version.StartsWith("14.0"))
-                {
-                    assembly = Assembly.LoadFrom(Path.Combine(ResourcesDirectory, "IceBuilder.VS2015.dll"));
-                }
-                else if (version.StartsWith("15.0"))
-                {
-                    assembly = Assembly.LoadFrom(Path.Combine(ResourcesDirectory, "IceBuilder.VS2017.dll"));
-                }
-                else if (version.StartsWith("16.0"))
-                {
-                    assembly = Assembly.LoadFrom(Path.Combine(ResourcesDirectory, "IceBuilder.VS2019.dll"));
-                }
-                else
-                {
-                    assembly = Assembly.LoadFrom(Path.Combine(InstallDirectory, "IceBuilder.VS2022.dll"));
-                }
+                // TODO avoid dynamic loading if we can use the same assembly for VS2022 and VS2026
+                Assembly assembly = Assembly.LoadFrom(Path.Combine(InstallDirectory, "IceBuilder.VS2022.dll"));
 
                 var factory = assembly.GetType("IceBuilder.ProjectHelperFactoryI").GetConstructor(new Type[] { }).Invoke(
                     new object[] { }) as IVsProjectHelperFactory;
@@ -625,130 +416,6 @@ namespace IceBuilder
             }
         }
 
-        // With Ice >= 3.7.0 we get the compiler version from Ice.props
-        private string GetSliceCompilerVersion(string iceHome)
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-            string sliceCompiler = GetSliceCompilerPath(null, iceHome);
-            if (!File.Exists(sliceCompiler))
-            {
-                string message = string.Format("'{0}' not found, review your Ice installation", sliceCompiler);
-                OutputPane.OutputTaskItemString(
-                    message,
-                    EnvDTE.vsTaskPriority.vsTaskPriorityHigh,
-                    "BuildCompile",
-                    EnvDTE.vsTaskIcon.vsTaskIconCompile,
-                    sliceCompiler,
-                    0,
-                    message);
-                return null;
-            }
-
-            Process process = new Process();
-            process.StartInfo.FileName = sliceCompiler;
-            process.StartInfo.Arguments = "-v";
-            process.StartInfo.CreateNoWindow = true;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.RedirectStandardError = true;
-            process.StartInfo.RedirectStandardOutput = true;
-
-            process.StartInfo.WorkingDirectory = Path.GetDirectoryName(sliceCompiler);
-            StreamReader reader = new StreamReader();
-            process.OutputDataReceived += new DataReceivedEventHandler(reader.AppendData);
-
-            try
-            {
-                process.Start();
-
-                // When StandardError and StandardOutput are redirected, at least one should use asynchronous reads
-                // to prevent deadlocks when calling process.WaitForExit; the other can be read synchronously using
-                // ReadToEnd. See the Remarks section at:
-                //
-                // http://msdn.microsoft.com/en-us/library/system.diagnostics.process.standarderror.aspx
-
-                process.BeginOutputReadLine();
-                string version = process.StandardError.ReadToEnd().Trim();
-                process.WaitForExit();
-
-                if (process.ExitCode != 0)
-                {
-                    string message = string.Format("Slice compiler `{0}' failed to start(error code {1})",
-                        sliceCompiler, process.ExitCode);
-                    OutputPane.OutputTaskItemString(
-                        message,
-                        EnvDTE.vsTaskPriority.vsTaskPriorityHigh,
-                        "BuildCompile",
-                        EnvDTE.vsTaskIcon.vsTaskIconCompile,
-                        sliceCompiler,
-                        0,
-                        message);
-                    return null;
-                }
-
-                // Convert beta version to is numeric value
-                if (version.EndsWith("b"))
-                {
-                    version = string.Format("{0}.{1}", version.Substring(0, version.Length - 1), 51);
-                }
-                return version;
-            }
-            catch (Exception ex)
-            {
-                string message = string.Format("An exception was thrown when trying to start the Slice compiler\n{0}",
-                        ex.ToString());
-                OutputPane.OutputTaskItemString(
-                    message,
-                    EnvDTE.vsTaskPriority.vsTaskPriorityHigh,
-                    "BuildCompile",
-                    EnvDTE.vsTaskIcon.vsTaskIconCompile,
-                    sliceCompiler,
-                    0,
-                    message);
-                return null;
-            }
-            finally
-            {
-                process.Close();
-            }
-        }
-
-        private string GetSliceCompilerPath(Microsoft.Build.Evaluation.Project project, string iceHome)
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-            string compiler = MSBuildUtils.IsCSharpProject(project) ? "slice2cs.exe" : "slice2cpp.exe";
-            if (!string.IsNullOrEmpty(iceHome))
-            {
-                if (File.Exists(Path.Combine(iceHome, "cpp", "bin", compiler)))
-                {
-                    return Path.Combine(iceHome, "cpp", "bin", compiler);
-                }
-
-                if (File.Exists(Path.Combine(iceHome, "bin", compiler)))
-                {
-                    return Path.Combine(iceHome, "bin", compiler);
-                }
-            }
-
-            string message = "'" + compiler + "' not found";
-            if (!string.IsNullOrEmpty(iceHome))
-            {
-                message += " in '" + iceHome + "'. You may need to update Ice Home in 'Tools > Options > Ice'";
-            }
-            else
-            {
-                message += ". You may need to set Ice Home in 'Tools > Options > Ice'";
-            }
-            OutputPane.OutputTaskItemString(
-                message,
-                EnvDTE.vsTaskPriority.vsTaskPriorityHigh,
-                "BuildCompile",
-                EnvDTE.vsTaskIcon.vsTaskIconCompile,
-                compiler,
-                0,
-                message);
-            return null;
-        }
-
         private readonly string BuildOutputPaneGUID = "{1BD8A850-02D1-11d1-BEE7-00A0C913D1F8}";
         private EnvDTE.OutputWindowPane _outputPane = null;
         public EnvDTE.OutputWindowPane OutputPane
@@ -817,24 +484,8 @@ namespace IceBuilder
         private readonly HashSet<IVsProject> _buildProjects = new HashSet<IVsProject>();
 
         public static readonly string IceBuilderKey = @"HKEY_CURRENT_USER\Software\ZeroC\IceBuilder";
-        public static readonly string IceHomeValue = "IceHome";
-        public static readonly string IceVersionValue = "IceVersion";
-        public static readonly string IceVersionMMValue = "IceVersionMM";
-        public static readonly string IceIntVersionValue = "IceIntVersion";
-        public static readonly string IceAssembliesDir = "IceAssembliesDir";
-        public static readonly string IceCSharpAssembleyKey =
-            @"HKEY_CURRENT_USER\Software\Microsoft\.NETFramework\v2.0.50727\AssemblyFoldersEx\Ice";
         public static readonly string IceAutoBuilding = "IceAutoBuilding";
-
-        public const string IceBuilderPackageString =
-#if VS2022
-            "0CEF9F9D-FA1F-45D0-9D1E-BBD2A86D5F62";
-#else
-            "ef9502be-dbc2-4568-a846-02b8e42d04c2";
-#endif
-
-        public const string IceBuilderOldFlavorGuid = "3C53C28F-DC44-46B0-8B85-0C96B85B2042";
-        public const string IceBuilderOldFlavor = "{" + IceBuilderOldFlavorGuid + "}";
+        public const string IceBuilderPackageString ="0CEF9F9D-FA1F-45D0-9D1E-BBD2A86D5F62";
         public const string IceBuilderNewFlavorGuid = "28993779-3132-408A-BCB0-1D78225F4824";
         public const string IceBuilderNewFlavor = "{" + IceBuilderNewFlavorGuid + "}";
     }
