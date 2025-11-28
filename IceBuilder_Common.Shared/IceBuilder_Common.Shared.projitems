@@ -9,7 +9,6 @@
     <Import_RootNamespace>IceBuilder_Common.Shared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)DTEProjectExtension.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileUtil.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GeneratedFileSet.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IVsProjectExtension.cs" />

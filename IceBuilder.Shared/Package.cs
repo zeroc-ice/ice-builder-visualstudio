@@ -25,7 +25,6 @@ namespace IceBuilder
     [Guid(IceBuilderPackageString)]
     [ProvideObject(typeof(PropertyPage), RegisterUsing = RegistrationMethod.CodeBase)]
     [ProvideProjectFactory(typeof(ProjectFactory), "Ice Builder", null, null, null, @"..\Templates\Projects")]
-    [ProvideProjectFactory(typeof(ProjectFactoryOld), "Ice Builder Old", null, null, null, @"..\Templates\Projects")]
     public sealed class Package : AsyncPackage
     {
         public IVsShell Shell { get; private set; }
@@ -261,7 +260,6 @@ namespace IceBuilder
 
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             RegisterProjectFactory(new ProjectFactory());
-            RegisterProjectFactory(new ProjectFactoryOld());
 
             value = null;
             IVsSolution.GetProperty((int)__VSPROPID.VSPROPID_IsSolutionOpen, out value);

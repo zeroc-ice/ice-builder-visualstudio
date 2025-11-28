@@ -11,15 +11,11 @@ namespace IceBuilder
     {
         protected override object PreCreateForOuter(IntPtr IUnknown)
         {
-            Project project = new Project();
-            project.Package = Package.Instance;
+            var project = new Project
+            {
+                Package = Package.Instance
+            };
             return project;
         }
-    }
-
-    [Guid(Package.IceBuilderOldFlavorGuid)]
-    public class ProjectFactoryOld : FlavoredProjectFactoryBase
-    {
-        protected override object PreCreateForOuter(IntPtr IUnknown) => new ProjectOld();
     }
 }
