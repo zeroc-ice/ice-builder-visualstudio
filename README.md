@@ -2,7 +2,7 @@
 
 Ice Builder for Visual Studio is a Visual Studio extension that configures [Ice Builder for MSBuild](https://github.com/zeroc-ice/ice-builder-msbuild) for your C++ and C# projects, all within the Visual Studio IDE. It serves as a front-end for Ice Builder for MSBuild: all the build-time processing is performed by Ice Builder for MSBuild.
 
-Ice Builder for Visual Studio is compatible with Visual Studio 2015, 2017, 2019 or 2022, and works best with the following Ice installations:
+Ice Builder for Visual Studio is compatible with Visual Studio 2022 and 2026, and works best with the following Ice installations:
 
 - Ice NuGet package for Ice 3.7 or greater
 
@@ -54,10 +54,6 @@ You can configure the Ice Builder global options on the `Tools` > `Options` > `P
 ### Compile on Save Configuration
 
 If the `Compile Slice files immediately after save` box is checked, Ice Builder compiles a Slice file when you save it, otherwise it compiles Slice files only during project builds.
-
-### Ice Home Configuration (Ice 3.6)
-
-With Ice 3.6, you need to specify the Ice installation used by Ice Builder. This Ice Home setting is ignored by projects that install Ice as a NuGet package.
 
 ## C++ Usage
 
@@ -137,7 +133,7 @@ Follow these steps:
 
 Ice Builder allows you to change the options given to `slice2cs` when compiling a Slice file. You can specify the options that apply to all Slice files in a project with the `Ice Builder` tab of your project's properties:
 
-![Missing csharp property page](Screenshots/csharp-property-page.png)
+![csharp property page](Screenshots/csharp-property-page.png)
 
 These options are the same for all configurations and platforms, and map to item metadata of the SliceCompile type:
 
@@ -149,51 +145,18 @@ These options are the same for all configurations and platforms, and map to item
 
 See [Customizing the Slice to C# Compilation](https://github.com/zeroc-ice/ice-builder-msbuild/blob/master/README.md#customizing-the-slice-to-c-compilation-1) with Ice Builder for MSBuild for further details.
 
-## Upgrading your Projects from Ice Builder 4.x
-
-When you open a solution with one or more projects that use the Ice Builder 4.x extension, Ice Builder offers you to upgrade these projects to the latest format. We recommend you backup your projects before performing this upgrade.
-
-If you decline this upgrade, the solution loads but Ice Builder ignores the Ice Builder 4.x configuration.
-
-If you proceed with this upgrade, all upgraded C++ projects are configured with `C++ Mapping` set to `C++98`. If you are using the Slice to C++11 mapping, you should then:
-
-- change `C++ Mapping` to `C++11`, as shown on [Selecting the Slice to C++ Mapping](#selecting-the-slice-to-c-mapping) above
-- remove the now redundant `ICE_CPP11_MAPPING` definition from your projects' C/C++ Preprocessor Definitions
-
-## Migration from the Ice Add-in
-
-Ice Builder no longer supports direct migration from the old Ice add-in for Visual Studio to Ice Builder. The migration from the Ice add-in to Ice Builder is now a two-step process:
-
-- Install [Ice Builder 4.3.10](https://github.com/zeroc-ice/ice-builder-visualstudio/releases/tag/v4.3.10) to migrate your projects to the Ice Builder 4.3.10 format
-- Install the latest Ice Builder to convert your projects (that are now using Ice Builder 4.3.10) to the latest Ice Builder format
-
 ## Building Ice Builder from Source
 
 ### Build Requirements
 
-You need Visual Studio 2022 or Visual Studio 2019
-
-**AND**
-
-to install ALL of the following Visual Studio SDKs:
-
-- [Visual Studio 2015 SDK](https://msdn.microsoft.com/en-us/library/bb166441.aspx)
-- [Visual Studio 2017 SDK](https://docs.microsoft.com/en-us/visualstudio/extensibility/installing-the-visual-studio-sdk)
+You need Visual Studio 2026
 
 ### Build Instructions
 
 #### Building Visual Studio 2022 extension
 
-Open the `IceBuilder.VS2022.sln` solution file in Visual Studio 2022 and build the `IceBuilder.Next` project.
+Open the `IceBuilder.sln` solution file in Visual Studio 2026 and build the `IceBuilder` project.
 
 After building the Ice Builder extension, there would be a VSIX package in:
 
-- `IceBuilder.Next\bin\Debug\IceBuilder.vsix` or `IceBuilder.Next\bin\Release\IceBuilder.vsix`
-
-#### Building Visual Studio 2019, 2017 and 2015 extension
-
-Open the `IceBuilder.sln` solution file in Visual Studio 2019 and build the `IceBuilder` project.
-
-After building the Ice Builder extension, there would be a VSIX package in:
-
-- `IceBuilder\bin\Debug\IceBuilder.vsix` or `IceBuilder\bin\Release\IceBuilder.vsix`
+- `IceBuilder\bin\Debug\IceBuilder.vsix` or `IceBuilder.Next\bin\Release\IceBuilder.vsix`

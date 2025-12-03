@@ -18,6 +18,7 @@ public static class IVsProjectExtension
 
     private static void EnsureIsCheckout(EnvDTE.Project project, string path)
     {
+        ThreadHelper.ThrowIfNotOnUIThread();
         var sc = project.DTE.SourceControl;
         if (sc != null)
         {
@@ -30,6 +31,7 @@ public static class IVsProjectExtension
 
     public static EnvDTE.Project GetDTEProject(this IVsProject project)
     {
+        ThreadHelper.ThrowIfNotOnUIThread();
         object obj = null;
         if (project is IVsHierarchy hierarchy)
         {
@@ -49,12 +51,14 @@ public static class IVsProjectExtension
 
     public static string GetProjectBaseDirectory(this IVsProject project)
     {
+        ThreadHelper.ThrowIfNotOnUIThread();
         ErrorHandler.ThrowOnFailure(project.GetMkDocument(VSConstants.VSITEMID_ROOT, out string fullPath));
         return Path.GetFullPath(Path.GetDirectoryName(fullPath));
     }
 
     public static string GetProjectFullPath(this IVsProject project)
     {
+        ThreadHelper.ThrowIfNotOnUIThread();
         try
         {
             ErrorHandler.ThrowOnFailure(project.GetMkDocument(VSConstants.VSITEMID_ROOT, out string fullPath));
@@ -102,20 +106,32 @@ public static class IVsProjectExtension
         if (type.Equals(cppProjectGUID) || type.Equals(cppStoreAppProjectGUID) || type.Equals(csharpProjectGUID))
         {
             // Find the full path of MSBuild Ice Builder props and target files and check they exists
-            var props = project.WithProject(msproject =>
+            string[] prefixes = ["ZeroC.IceBuilder.MSBuild", "ZeroC.Ice.Slice.Tools.Cpp", "ZeroC.Ice.Slice.Tools"];
+            foreach (var prefix in prefixes)
             {
+                string props = project.WithProject(msproject =>
+                {
                     return msproject.Imports.Where(
-                        import => import.ImportedProject.FullPath.EndsWith("zeroc.icebuilder.msbuild.props")).Select(
+                        import => import.ImportedProject.FullPath.EndsWith(
+                            $"{prefix}.props",
+                            StringComparison.OrdinalIgnoreCase)).Select(
                         import => import.ImportedProject.FullPath).FirstOrDefault();
                 });
 
-            var targets = project.WithProject(msproject =>
-            {
+                string targets = project.WithProject(msproject =>
+                {
                     return msproject.Imports.Where(
-                        import => import.ImportedProject.FullPath.EndsWith("zeroc.icebuilder.msbuild.targets")).Select(
+                        import => import.ImportedProject.FullPath.EndsWith(
+                            $"{prefix}.targets",
+                            StringComparison.OrdinalIgnoreCase)).Select(
                         import => import.ImportedProject.FullPath).FirstOrDefault();
                 });
-            return !string.IsNullOrEmpty(props) && !string.IsNullOrEmpty(targets) && File.Exists(props) && File.Exists(targets);
+
+                if (props is not null && targets is not null)
+                {
+                    return File.Exists(props) && File.Exists(targets);
+                }
+            }
         }
         return false;
     }
@@ -213,6 +229,7 @@ public static class IVsProjectExtension
 
     public static EnvDTE.ProjectItem GetProjectItem(this IVsProject project, uint item)
     {
+        ThreadHelper.ThrowIfNotOnUIThread();
         object value = null;
         if (project is IVsHierarchy hierarchy)
         {
@@ -223,6 +240,7 @@ public static class IVsProjectExtension
 
     public static EnvDTE.ProjectItem GetProjectItem(this IVsProject project, string path)
     {
+        ThreadHelper.ThrowIfNotOnUIThread();
         var priority = new VSDOCUMENTPRIORITY[1];
         ErrorHandler.ThrowOnFailure(project.IsDocumentInProject(path, out int found, priority, out uint item));
         if (found == 0 || (priority[0] != VSDOCUMENTPRIORITY.DP_Standard && priority[0] != VSDOCUMENTPRIORITY.DP_Intrinsic))
@@ -240,6 +258,7 @@ public static class IVsProjectExtension
 
     public static void DeleteItems(this IVsProject project, List<string> paths)
     {
+        ThreadHelper.ThrowIfNotOnUIThread();
         if (paths.Count > 0)
         {
             project.EnsureIsCheckout();

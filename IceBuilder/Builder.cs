@@ -11,12 +11,10 @@ using System.Threading;
 
 namespace IceBuilder;
 
-public class Builder
+public class Builder(IVsBuildManagerAccessor2 accessor)
 {
     private ManualResetEvent BuildAvailableEvent { get; set; }
-    private IVsBuildManagerAccessor2 BuildManagerAccessor { get; set; }
-
-    public Builder(IVsBuildManagerAccessor2 accessor) => BuildManagerAccessor = accessor;
+    private IVsBuildManagerAccessor2 BuildManagerAccessor { get; set; } = accessor;
 
     public bool Build(
         IVsProject project,
@@ -76,7 +74,7 @@ public class Builder
                                 msproject.FullPath,
                                 properties,
                                 null,
-                                new string[] { "SliceCompile" },
+                                ["SliceCompile"],
                                 msproject.ProjectCollection.HostServices,
                                 BuildRequestDataFlags.ProvideProjectStateAfterBuild |
                                 BuildRequestDataFlags.IgnoreExistingProjectState |
@@ -114,16 +112,10 @@ public class Builder
     }
 }
 
-public class BuildCallback
+public class BuildCallback(IVsProject project, EnvDTE.OutputWindowPane outputPane)
 {
-    private readonly IVsProject _project;
-    private readonly EnvDTE.OutputWindowPane _outputPane;
-
-    public BuildCallback(IVsProject project, EnvDTE.OutputWindowPane outputPane)
-    {
-        _project = project;
-        _outputPane = outputPane;
-    }
+    private readonly IVsProject _project = project;
+    private readonly EnvDTE.OutputWindowPane _outputPane = outputPane;
 
     public void BeginBuild(string platform, string configuration)
     {

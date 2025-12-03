@@ -41,6 +41,7 @@ public static class ProjectHelper
     }
     public static void UpdateProject(IVsProject project, Action<MSBuildProject> action, bool switchToMainThread = false)
     {
+        ThreadHelper.ThrowIfNotOnUIThread();
         project.EnsureIsCheckout();
         ThreadHelper.JoinableTaskFactory.Run(async () =>
             {
