@@ -4,11 +4,8 @@ Ice Builder for Visual Studio is a Visual Studio extension that configures Slice
 projects directly within the Visual Studio IDE. It serves as a front-end for the Slice MSBuild tasks; all build-time
 processing is performed by these MSBuild tasks.
 
-Ice Builder for Visual Studio is compatible with Visual Studio 2022 and 2026, and works best with the following
-Ice installations:
-
-- Ice 3.8 for C++ and C#
-- Ice 3.7 for C++ and C#
+Ice Builder for Visual Studio is compatible with Visual Studio 2022 and 2026, and requires Ice 3.7 or 3.8 for C++ 
+or C#.
 
 ## Contents
 
@@ -31,8 +28,7 @@ installed directly through Visual Studio’s **Extensions → Manage Extensions*
 We encourage you to [rate and review] Ice Builder for Visual Studio on the Visual Studio Marketplace. Your feedback
 helps us improve the extension.
 
-You can also report issues [here on GitHub], and ask questions on the [community forums] or on Ice Builder for Visual
-Studio's [Q & A] page.
+You can also report issues [here on GitHub], and ask questions on Ice Builder for Visual Studio's [Q & A] page.
 
 ## Overview
 
@@ -94,7 +90,7 @@ These options map to the item metadata of the `SliceCompile` type:
 | Generated Source Extension            | SourceExt                                |
 | Additional Options                    | AdditionalOptions                        |
 
-The C++ Mapping option is exclusive to Ice 3.7 and maps to the `IceCppMapping` project property, which allows you to
+The C++ Mapping option applies only to Ice 3.7 and maps to the `IceCppMapping` project property, which allows you to
 select between the **C++11** and **C++98** mappings. The corresponding values are `cpp11` and `cpp98`.
 
 | Property    | Corresponding Project Property |
@@ -172,7 +168,7 @@ Or add existing Slice files using the **Add > Existing Item...** context menu co
 ## Updating from older versions
 
 The Ice Builder for Visual Studio 7.x release is compatible with Ice Builder for Visual Studio 6.x and 5.x, If your
-projects were created with Ice Builder for Visual Studio 6.x or 5.x, they will continue to work without any modifications.
+project was created with Ice Builder for Visual Studio 6.x or 5.x, it will continue to work without any modifications.
 
 If you are upgrading from Ice Builder for Visual Studio 4.x or earlier, you will need to first use the Ice Builder for Visual Studio
 6.x extension to update your projects. See [Upgrading your Projects from Ice Builder 4.x] for more information.
@@ -193,7 +189,6 @@ After the build completes, the generated VSIX package will be located in:
 - `IceBuilder\bin\Debug\IceBuilder.vsix`, or
 - `IceBuilder\bin\Release\IceBuilder.vsix`
 
-[community forums]: https://github.com/orgs/zeroc-ice/discussions
 [here on GitHub]: https://github.com/zeroc-ice/ice-builder-visualstudio/issues
 [Q & A]: https://marketplace.visualstudio.com/items?itemName=ZeroCInc.IceBuilder2022#qna
 [rate and review]: https://marketplace.visualstudio.com/items?itemName=ZeroCInc.IceBuilder2022#review-details
