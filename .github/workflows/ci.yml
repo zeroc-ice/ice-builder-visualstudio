@@ -44,7 +44,7 @@ jobs:
       - name: Sign VSIX Package
         if: env.AZURE_TENANT_ID != '' && env.AZURE_CLIENT_ID != '' && env.AZURE_CLIENT_SECRET != ''
         run: |
-          .\sign.exe code trusted-signing ".\IceBuilder.Next\bin\Release\IceBuilder.Next.vsix" `
+          .\sign.exe code trusted-signing ".\IceBuilder\bin\Release\IceBuilder.vsix" `
             --trusted-signing-endpoint https://eus.codesigning.azure.net/ `
             --timestamp-url http://timestamp.acs.microsoft.com `
             --trusted-signing-account zeroc `
