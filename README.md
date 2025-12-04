@@ -43,6 +43,25 @@ Studio's [Q & A] page.
 Ice Builder for Visual Studio configures Slice compilation for your C++ and C# projects inside the Visual Studio IDE.
 The available options depend on your project’s target language and the version of Ice you are using.
 
+### Ice Builder for Visual Studio Options
+
+#### Visual Studio 2026
+
+You can configure the Ice Builder global options on the Tools > Options > Project and Solutions > More Settings > Ice Builder.
+
+[!ice builder options vs2026](Screenshots/ice-builder-options-vs2026.png)
+
+#### Visual Studio 2022
+
+You can configure the Ice Builder global options on the Tools > Options > Project and Solutions > Ice Builder.
+
+[!ice builder options vs2022](Screenshots/ice-builder-options-vs2022.png)
+
+#### Compile on Save Configuration
+
+If the Compile Slice files immediately after save box is checked, Ice Builder compiles a Slice file when you save it,
+otherwise it compiles Slice files only during project builds.
+
 ### C++ Projects
 
 #### Ice 3.8 (C++)
@@ -53,7 +72,9 @@ Slice-to-C++ compiler (`slice2cpp`) required to compile Slice (`.ice`) files int
 
 ![cpp options](Screenshots/cpp-options-38.png)
 
-These options apply to all configurations and platforms and map to the item metadata of the `SliceCompile` type:
+The Options page is only available for C++ projects using the [ZeroC.Ice.Cpp] NuGet package.
+
+These options map to the item metadata of the `SliceCompile` type:
 
 | Property                              | Corresponding SliceCompile Item Metadata |
 | ------------------------------------- | ---------------------------------------- |
@@ -74,7 +95,9 @@ package, which provides the MSBuild tasks. In this setup, the Slice-to-C++ compi
 
 ![cpp options](Screenshots/cpp-options-37.png)
 
-These options apply to all configurations and platforms and map to the item metadata of the `SliceCompile` type:
+The Options page is only available for C++ projects using the [ZeroC.Ice.VC143] NuGet package.
+
+These options map to the item metadata of the `SliceCompile` type:
 
 | Property                              | Corresponding SliceCompile Item Metadata |
 | ------------------------------------- | ---------------------------------------- |
@@ -92,6 +115,38 @@ select between the **C++11** and **C++98** mappings. The corresponding values ar
 | Property    | Corresponding Project Property |
 | ----------- | ------------------------------ |
 | C++ Mapping | IceCppMapping                  |
+
+### Configuring Slice Compilation for C++ Projects
+
+For both Ice 3.7 and Ice 3.8 C++ projects, the Ice Builder for Visual Studio extension creates a **Slice** file filter
+in the Solution Explorer. We recommend adding your Slice (`.ice`) files to this filter for convenience, but you may
+place Slice files in any filter within your project.
+
+The extension also provides a **Slice** item template that you can use to add new Slice files to your project.
+
+![cpp new slice file](Screenshots/cpp-new-slice-file.png)
+
+You can also add existing Slice files using the **Add > Existing Item...** context menu command.
+
+The extension automatically sets the **Item Type** property of added Slice files to `SliceCompile`, which enables Slice
+compilation for those files.
+
+The extension adds a `CLCompile` item for each generated C++ source file and a `CLInclude` item for each generated C++
+header file. These generated files are placed in the output directories specified in the Slice compilation options.
+
+The generated items are added when you first build the project—or, if the **Compile Slice files immediately after save**
+option is enabled, when you save the Slice file.
+
+By default, generated files are placed in `$(IntDir)`, the intermediate directory for the current build configuration and
+platform.
+
+To configure the Slice compilation options for a specific Slice file, right-click the file in Solution Explorer and
+select **Properties**. The **Slice Compile** property page will appear in the Properties window.
+
+![cpp slice file properties](Screenshots/cpp-slice-file-properties.png)
+
+The per-file options override the global project options configured in the Ice Builder options page for a specific Slice
+file.
 
 ### C# Projects
 
@@ -134,6 +189,23 @@ These options are the same for all configurations and platforms and map to item 
 | Output Directory    | OutputDir                                |
 | Include Directories | IncludeDirectories                       |
 | Additional Options  | AdditionalOptions                        |
+
+### Configuring Slice Compilation for C# Projects
+
+Add the required NuGet packages to your C# project
+
+#### For 3.8:
+
+- [ZeroC.Ice.Slice.Tools]
+- [ZeroC.Ice]
+
+#### For 3.7:
+
+- [ZeroC.IceBuilder.MSBuild]
+- [ZeroC.Ice.Net]
+
+For .NET Framework projects you must reload the project before the Ice Builder options become available and allow
+you to change the Slice compilation settings.
 
 ## Updating from older versions
 
