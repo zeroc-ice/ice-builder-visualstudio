@@ -112,7 +112,7 @@ public class DTEUtil
         ThreadHelper.ThrowIfNotOnUIThread();
         IVsHierarchy hier = null;
         var sp = new ServiceProvider(
-            Package.Instance.DTE as Microsoft.VisualStudio.OLE.Interop.IServiceProvider);
+            Package.Instance.DTE2.DTE as Microsoft.VisualStudio.OLE.Interop.IServiceProvider);
 
         // There isn't an open project.
         if (sp.GetService(typeof(IVsMonitorSelection)) is IVsMonitorSelection selectionMonitor)

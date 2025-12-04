@@ -64,38 +64,27 @@ otherwise it compiles Slice files only during project builds.
 
 ### C++ Projects
 
-#### Ice 3.8 (C++)
+Add the required NuGet packages to your C++ project
 
-For C++ projects using Ice 3.8, Ice Builder for Visual Studio configures the Slice compilation options provided by the
-[ZeroC.Ice.Cpp] NuGet package installed in your project. This package includes the Slice Tools MSBuild tasks and the
-Slice-to-C++ compiler (`slice2cpp`) required to compile Slice (`.ice`) files into C++ source files.
+#### For C++ Projects using Ice 3.8:
+
+- [ZeroC.Ice.Cpp]
+
+#### For C# Projects using Ice 3.7:
+
+- [ZeroC.IceBuilder.MSBuild]
+- [ZeroC.Ice.VC143]
+
+After the required NuGet packages are installed, the Ice Builder for Visual Studio extension provides a dedicated Options page
+for configuring Slice compilation for your C++ project.
+
+**Ice 3.8 (C++) Options Page:**
 
 ![cpp options](Screenshots/cpp-options-38.png)
 
-The Options page is only available for C++ projects using the [ZeroC.Ice.Cpp] NuGet package.
-
-These options map to the item metadata of the `SliceCompile` type:
-
-| Property                              | Corresponding SliceCompile Item Metadata |
-| ------------------------------------- | ---------------------------------------- |
-| Output Directory                      | OutputDir                                |
-| Header Output Directory               | HeaderOutputDir                          |
-| Include Directories                   | IncludeDirectories                       |
-| Base Directory For Generated #include | BaseDirectoryForGeneratedInclude         |
-| Generated Header Extension            | HeaderExt                                |
-| Generated Source Extension            | SourceExt                                |
-| Additional Options                    | AdditionalOptions                        |
-
-#### Ice 3.7 (C++)
-
-For C++ projects using Ice 3.7, Ice Builder for Visual Studio configures the Slice compilation options provided by the
-[ZeroC.Ice.VC143] NuGet package installed in your project. These projects must also install the [ZeroC.IceBuilder.MSBuild]
-package, which provides the MSBuild tasks. In this setup, the Slice-to-C++ compiler (`slice2cpp`) is provided by the
-[ZeroC.Ice.VC143] package.
+**Ice 3.7 (C++) Options Page:**
 
 ![cpp options](Screenshots/cpp-options-37.png)
-
-The Options page is only available for C++ projects using the [ZeroC.Ice.VC143] NuGet package.
 
 These options map to the item metadata of the `SliceCompile` type:
 
@@ -116,11 +105,8 @@ select between the **C++11** and **C++98** mappings. The corresponding values ar
 | ----------- | ------------------------------ |
 | C++ Mapping | IceCppMapping                  |
 
-### Configuring Slice Compilation for C++ Projects
-
-For both Ice 3.7 and Ice 3.8 C++ projects, the Ice Builder for Visual Studio extension creates a **Slice** file filter
-in the Solution Explorer. We recommend adding your Slice (`.ice`) files to this filter for convenience, but you may
-place Slice files in any filter within your project.
+The Ice Builder for Visual Studio extension creates a **Slice** file filter in the Solution Explorer. We recommend adding
+your Slice (`.ice`) files to this filter for convenience, but you may place Slice files in any filter within your project.
 
 The extension also provides a **Slice** item template that you can use to add new Slice files to your project.
 
@@ -132,7 +118,8 @@ The extension automatically sets the **Item Type** property of added Slice files
 compilation for those files.
 
 The extension adds a `CLCompile` item for each generated C++ source file and a `CLInclude` item for each generated C++
-header file. These generated files are placed in the output directories specified in the Slice compilation options.
+header file, ensuring the C++ code generated from the Slice definitions is compiled along your project C++ sources.
+These generated files are placed in the output directories specified in the Slice compilation options.
 
 The generated items are added when you first build the project—or, if the **Compile Slice files immediately after save**
 option is enabled, when you save the Slice file.
@@ -145,34 +132,24 @@ select **Properties**. The **Slice Compile** property page will appear in the Pr
 
 ![cpp slice file properties](Screenshots/cpp-slice-file-properties.png)
 
-The per-file options override the global project options configured in the Ice Builder options page for a specific Slice
-file.
+The per-file options override the global project options configured in the Ice Builder options page described above.
 
 ### C# Projects
 
-#### Ice 3.8 (C#)
+Add the required NuGet packages to your C# project
 
-For C# projects using Ice 3.8, Ice Builder for Visual Studio configures the Slice compilation options provided by the
-[ZeroC.Ice.Slice.Tools] NuGet package installed in your project. This package includes the Slice Tools MSBuild tasks
-and the Slice-to-C# compiler (`slice2cs`) used to compile Slice (`.ice`) files into C# source files. The generated C#
-code depends on the [ZeroC.Ice] package, which provides the Ice runtime for C#.
+#### For C# Projects using Ice 3.8:
 
-![cs options](Screenshots/cs-options-38.png)
+- [ZeroC.Ice.Slice.Tools]
+- [ZeroC.Ice]
 
-These options are the same for all configurations and platforms and map to item metadata of the `SliceCompile` type:
+#### For C# Projects using Ice 3.7:
 
-| Property            | Corresponding SliceCompile Item Metadata |
-| ------------------- | ---------------------------------------- |
-| Output Directory    | OutputDir                                |
-| Include Directories | IncludeDirectories                       |
-| Additional Options  | AdditionalOptions                        |
+- [ZeroC.IceBuilder.MSBuild]
+- [ZeroC.Ice.Net]
 
-#### Ice 3.7 (C#)
-
-For C# projects using Ice 3.7, Ice Builder for Visual Studio configures the Slice compilation options provided by the
-[ZeroC.IceBuilder.MSBuild] and [ZeroC.Ice.Net] NuGet packages installed in your project. The [ZeroC.IceBuilder.MSBuild]
-package provides the Slice Tools MSBuild tasks, while the [ZeroC.Ice.Net] package includes both the Slice-to-C# compiler
-(`slice2cs`) used to compile Slice (`.ice`) files into C# source files and the Ice runtime for C#.
+> For .NET Framework projects you must reload the project before the Ice Builder options become available and allow
+> you to change the Slice compilation settings.
 
 **.NET SDK-style project options:**
 
@@ -190,22 +167,11 @@ These options are the same for all configurations and platforms and map to item 
 | Include Directories | IncludeDirectories                       |
 | Additional Options  | AdditionalOptions                        |
 
-### Configuring Slice Compilation for C# Projects
+You can add new Slice files to your C# project using the **Add > New Item...**
 
-Add the required NuGet packages to your C# project
+![cs new slice file](Screenshots/cs-new-slice-file.png)
 
-#### For 3.8:
-
-- [ZeroC.Ice.Slice.Tools]
-- [ZeroC.Ice]
-
-#### For 3.7:
-
-- [ZeroC.IceBuilder.MSBuild]
-- [ZeroC.Ice.Net]
-
-For .NET Framework projects you must reload the project before the Ice Builder options become available and allow
-you to change the Slice compilation settings.
+Or add existing Slice files using the **Add > Existing Item...** context menu command.
 
 ## Updating from older versions
 

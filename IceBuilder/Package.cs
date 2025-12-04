@@ -1,9 +1,11 @@
 // Copyright (c) ZeroC, Inc. All rights reserved.
 
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.Win32;
+using NuGet.VisualStudio;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -25,7 +27,6 @@ namespace IceBuilder;
 public sealed class Package : AsyncPackage
 {
     public IVsShell Shell { get; private set; }
-    public EnvDTE.DTE DTE => DTE2.DTE;
     public EnvDTE80.DTE2 DTE2 { get; private set; }
     public IVsUIShell UIShell { get; private set; }
     public IVsSolution IVsSolution { get; private set; }
@@ -70,6 +71,7 @@ public sealed class Package : AsyncPackage
             return false;
         }
     }
+
     public Guid OutputPaneGUID = new("CE9BFDCD-5AFD-4A77-BD40-75E0E1E5162C");
 
     public void QueueProjectsForBuilding(ICollection<IVsProject> projects)
@@ -116,7 +118,7 @@ public sealed class Package : AsyncPackage
         ThreadHelper.ThrowIfNotOnUIThread();
         try
         {
-            _nuget.OnNugetBatchEnd(null);
+            _packageInstalled = null;
             projects = DTEUtil.GetProjects();
             foreach (IVsProject project in projects)
             {
@@ -125,7 +127,7 @@ public sealed class Package : AsyncPackage
         }
         finally
         {
-            _nuget.OnNugetBatchEnd(PackageInstalled);
+            _packageInstalled = PackageInstalled;
         }
     }
 
@@ -212,8 +214,10 @@ public sealed class Package : AsyncPackage
                 InstallDirectory,
                 RegistryValueKind.String);
 
-            _nuget = new NuGet();
-            _nuget.OnNugetBatchEnd(PackageInstalled);
+            var model = await GetServiceAsync(typeof(SComponentModel)) as IComponentModel;
+            _installerEvents = model.GetService<IVsPackageInstallerEvents>();
+            _installerEvents.PackageReferenceAdded += PackageInstallerEvents_PackageReferenceAdded;
+            _packageInstalled = PackageInstalled;
 
             RunningDocumentTableEventHandler = new RunningDocumentTableEventHandler(
                 await GetServiceAsync(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable);
@@ -243,6 +247,18 @@ public sealed class Package : AsyncPackage
             RunningDocumentTableEventHandler.BeginTrack();
             InitializeProjects(DTEUtil.GetProjects());
         }
+    }
+
+    private void PackageInstallerEvents_PackageReferenceAdded(IVsPackageMetadata metadata)
+    {
+        ThreadHelper.JoinableTaskFactory.Run(async () =>
+        {
+            if (_packageInstalled is not null)
+            {
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                _packageInstalled.Invoke();
+            }
+        });
     }
 
     private void PackageInstalled()
@@ -424,7 +440,7 @@ public sealed class Package : AsyncPackage
         {
             ThreadHelper.ThrowIfNotOnUIThread();
             object value = Registry.GetValue(
-                Path.Combine("HKEY_CURRENT_USER", DTE.RegistryRoot, "General"),
+                Path.Combine("HKEY_CURRENT_USER", DTE2.DTE.RegistryRoot, "General"),
                 "MSBuildLoggerVerbosity", 2);
 
             if (!uint.TryParse(value == null ? "2" : value.ToString(), out uint verbosity))
@@ -447,8 +463,9 @@ public sealed class Package : AsyncPackage
     public static string ResourcesDirectory { get; private set; }
     private bool Building { get; set; }
 
-    private readonly HashSet<IVsProject> _buildProjects = new();
-    private NuGet _nuget;
+    private readonly HashSet<IVsProject> _buildProjects = [];
+    private Action _packageInstalled;
+    private IVsPackageInstallerEvents _installerEvents;
 
     public static readonly string IceBuilderKey = @"HKEY_CURRENT_USER\Software\ZeroC\IceBuilder";
     public static readonly string IceAutoBuilding = "IceAutoBuilding";

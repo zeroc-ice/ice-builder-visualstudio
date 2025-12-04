@@ -118,7 +118,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="NuGetI.cs" />
     <Compile Include="ProjectHelperI.cs" />
     <Compile Include="VCUtilI.cs" />
     <Compile Include="AssemblyInfo.cs" />
