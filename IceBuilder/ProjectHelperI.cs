@@ -164,16 +164,16 @@ public static class ProjectHelper
         {
             project.UpdateProject(msproject =>
             {
-                    if (Path.GetExtension(file).Equals(".cs", StringComparison.CurrentCultureIgnoreCase))
+                if (Path.GetExtension(file).Equals(".cs", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    var path = FileUtil.RelativePath(Path.GetDirectoryName(msproject.FullPath), file);
+                    var items = msproject.GetItemsByEvaluatedInclude(path);
+                    if (items.Count == 0)
                     {
-                        var path = FileUtil.RelativePath(Path.GetDirectoryName(msproject.FullPath), file);
-                        var items = msproject.GetItemsByEvaluatedInclude(path);
-                        if (items.Count == 0)
-                        {
-                            msproject.AddItem("Compile", path);
-                        }
+                        msproject.AddItem("Compile", path);
                     }
-                });
+                }
+            });
         }
     }
 
@@ -213,22 +213,22 @@ public static class ProjectHelper
         {
             project.UpdateProject(msproject =>
             {
-                    var all = msproject.Xml.Items.Where(item => item.ItemType.Equals("Compile"));
+                var all = msproject.Xml.Items.Where(item => item.ItemType.Equals("Compile"));
 
-                    foreach (var item in all)
+                foreach (var item in all)
+                {
+                    // If there is a glob item that already match the evaluated include path we can remove the
+                    // non glob item as it is a duplicate.
+                    var globItem = msproject.AllEvaluatedItems.FirstOrDefault(i =>
+                        i.GetMetadata("SliceCompileSource") != null &&
+                        !i.EvaluatedInclude.Equals(i.UnevaluatedInclude, StringComparison.OrdinalIgnoreCase) &&
+                        i.EvaluatedInclude.Equals(item.Include, StringComparison.OrdinalIgnoreCase));
+                    if (globItem != null)
                     {
-                        // If there is a glob item that already match the evaluated include path we can remove the
-                        // non glob item as it is a duplicate.
-                        var globItem = msproject.AllEvaluatedItems.FirstOrDefault(i =>
-                            i.GetMetadata("SliceCompileSource") != null &&
-                            !i.EvaluatedInclude.Equals(i.UnevaluatedInclude, StringComparison.OrdinalIgnoreCase) &&
-                            i.EvaluatedInclude.Equals(item.Include, StringComparison.OrdinalIgnoreCase));
-                        if (globItem != null)
-                        {
-                            item.Parent.RemoveChild(item);
-                        }
+                        item.Parent.RemoveChild(item);
                     }
-                });
+                }
+            });
         }
     }
 
@@ -237,25 +237,25 @@ public static class ProjectHelper
         var projectDir = project.GetProjectBaseDirectory();
         project.UpdateProject(msproject =>
         {
-                var items = msproject.Xml.Items.Where(item =>
-                    {
-                        if (item.ItemType.Equals("Compile", StringComparison.OrdinalIgnoreCase) ||
-                            item.ItemType.Equals("ClCompile", StringComparison.OrdinalIgnoreCase) ||
-                            item.ItemType.Equals("ClInclude", StringComparison.OrdinalIgnoreCase))
-                        {
-                            return paths.Contains(Path.Combine(projectDir, item.Update));
-                        }
-                        else
-                        {
-                            return false;
-                        }
-                    });
-
-                foreach (var item in items)
+            var items = msproject.Xml.Items.Where(item =>
                 {
-                    item.Parent.RemoveChild(item);
-                }
-            });
+                    if (item.ItemType.Equals("Compile", StringComparison.OrdinalIgnoreCase) ||
+                        item.ItemType.Equals("ClCompile", StringComparison.OrdinalIgnoreCase) ||
+                        item.ItemType.Equals("ClInclude", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return paths.Contains(Path.Combine(projectDir, item.Update));
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                });
+
+            foreach (var item in items)
+            {
+                item.Parent.RemoveChild(item);
+            }
+        });
     }
 
     public static void SetGeneratedItemCustomMetadata(IVsProject project, string slice, string generated,
@@ -263,48 +263,48 @@ public static class ProjectHelper
     {
         project.UpdateProject(msproject =>
         {
-                var item = msproject.AllEvaluatedItems.FirstOrDefault(i => generated.Equals(i.EvaluatedInclude));
-                if (item != null)
+            var item = msproject.AllEvaluatedItems.FirstOrDefault(i => generated.Equals(i.EvaluatedInclude));
+            if (item != null)
+            {
+                var element = item.Xml;
+                if (excludedConfigurations != null)
                 {
-                    var element = item.Xml;
-                    if (excludedConfigurations != null)
+                    foreach (var conf in excludedConfigurations)
                     {
-                        foreach (var conf in excludedConfigurations)
-                        {
-                            var metadata = element.AddMetadata("ExcludedFromBuild", "true");
-                            metadata.Condition = string.Format("'$(Configuration)|$(Platform)'=='{0}'", conf);
-                        }
-                    }
-                    // Only set SliceCompileSource if the item doesn't originate from a glob expression
-                    if (item.EvaluatedInclude.Equals(item.UnevaluatedInclude))
-                    {
-                        item.SetMetadataValue("SliceCompileSource", slice);
-                    }
-
-                    // With Visual Studio 2017 and abvove if the item originate from a glob we update the item
-                    // medata using the Update attribute.
-                    else
-                    {
-                        var updateItem = msproject.Xml.Items.FirstOrDefault(i => generated.Equals(i.Update));
-                        if (updateItem == null)
-                        {
-                            updateItem = msproject.Xml.CreateItemElement(item.ItemType);
-                            var group = msproject.Xml.ItemGroups.FirstOrDefault() ?? msproject.Xml.AddItemGroup();
-                            updateItem.Update = generated;
-                            group.AppendChild(updateItem);
-                        }
-                        var metadata = updateItem.Metadata.FirstOrDefault(m => m.Name.Equals("SliceCompileSource"));
-                        if (metadata != null)
-                        {
-                            metadata.Value = slice;
-                        }
-                        else
-                        {
-                            updateItem.AddMetadata("SliceCompileSource", slice);
-                        }
+                        var metadata = element.AddMetadata("ExcludedFromBuild", "true");
+                        metadata.Condition = string.Format("'$(Configuration)|$(Platform)'=='{0}'", conf);
                     }
                 }
-            });
+                // Only set SliceCompileSource if the item doesn't originate from a glob expression
+                if (item.EvaluatedInclude.Equals(item.UnevaluatedInclude))
+                {
+                    item.SetMetadataValue("SliceCompileSource", slice);
+                }
+
+                // With Visual Studio 2017 and abvove if the item originate from a glob we update the item
+                // medata using the Update attribute.
+                else
+                {
+                    var updateItem = msproject.Xml.Items.FirstOrDefault(i => generated.Equals(i.Update));
+                    if (updateItem == null)
+                    {
+                        updateItem = msproject.Xml.CreateItemElement(item.ItemType);
+                        var group = msproject.Xml.ItemGroups.FirstOrDefault() ?? msproject.Xml.AddItemGroup();
+                        updateItem.Update = generated;
+                        group.AppendChild(updateItem);
+                    }
+                    var metadata = updateItem.Metadata.FirstOrDefault(m => m.Name.Equals("SliceCompileSource"));
+                    if (metadata != null)
+                    {
+                        metadata.Value = slice;
+                    }
+                    else
+                    {
+                        updateItem.AddMetadata("SliceCompileSource", slice);
+                    }
+                }
+            }
+        });
     }
 
     public static IDisposable OnProjectUpdate(IVsProject project, Action onProjectUpdate)

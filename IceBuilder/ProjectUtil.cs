@@ -293,19 +293,19 @@ public class ProjectUtil
         // First remove any generated items that are not in the current generated items set for this Slice file.
         project.DeleteItems(project.WithProject(msproject =>
         {
-                return msproject.AllEvaluatedItems.Where(
-                    item =>
+            return msproject.AllEvaluatedItems.Where(
+                item =>
+                {
+                    if (item.ItemType.Equals("Compile") && item.GetMetadata("SliceCompileSource") != null)
                     {
-                        if (item.ItemType.Equals("Compile") && item.GetMetadata("SliceCompileSource") != null)
+                        if (item.GetMetadataValue("SliceCompileSource").Equals(fileset.filename))
                         {
-                            if (item.GetMetadataValue("SliceCompileSource").Equals(fileset.filename))
-                            {
-                                return !fileset.sources.ContainsKey(Path.GetFullPath(Path.Combine(projectDir, item.EvaluatedInclude)));
-                            }
+                            return !fileset.sources.ContainsKey(Path.GetFullPath(Path.Combine(projectDir, item.EvaluatedInclude)));
                         }
-                        return false;
-                    }).Select(item => Path.Combine(projectDir, item.EvaluatedInclude)).ToList();
-            }));
+                    }
+                    return false;
+                }).Select(item => Path.Combine(projectDir, item.EvaluatedInclude)).ToList();
+        }));
 
         foreach (var entry in fileset.sources)
         {
@@ -465,27 +465,27 @@ public class ProjectUtil
         {
             project.DeleteItems(project.WithProject(msproject =>
             {
-                    var sliceCompile = msproject.AllEvaluatedItems.Where(
-                        item => item.ItemType.Equals("SliceCompile")).Select(
-                        item => item.EvaluatedInclude);
+                var sliceCompile = msproject.AllEvaluatedItems.Where(
+                    item => item.ItemType.Equals("SliceCompile")).Select(
+                    item => item.EvaluatedInclude);
 
-                    var items = msproject.AllEvaluatedItems.Where(
-                        item =>
+                var items = msproject.AllEvaluatedItems.Where(
+                    item =>
+                        {
+                            if (item.ItemType.Equals("Compile"))
                             {
-                                if (item.ItemType.Equals("Compile"))
+                                var metadata = item.GetMetadata("SliceCompileSource");
+                                if (metadata != null)
                                 {
-                                    var metadata = item.GetMetadata("SliceCompileSource");
-                                    if (metadata != null)
-                                    {
-                                        var value = metadata.EvaluatedValue;
-                                        return !sliceCompile.Contains(value);
-                                    }
+                                    var value = metadata.EvaluatedValue;
+                                    return !sliceCompile.Contains(value);
                                 }
-                                return false;
-                            }).Select(item => Path.Combine(projectDir, item.EvaluatedInclude)).ToList();
+                            }
+                            return false;
+                        }).Select(item => Path.Combine(projectDir, item.EvaluatedInclude)).ToList();
 
-                    return items;
-                }));
+                return items;
+            }));
         }
 
         // Now add any missing generated items

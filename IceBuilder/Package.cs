@@ -469,7 +469,7 @@ public sealed class Package : AsyncPackage
 
     public static readonly string IceBuilderKey = @"HKEY_CURRENT_USER\Software\ZeroC\IceBuilder";
     public static readonly string IceAutoBuilding = "IceAutoBuilding";
-    public const string IceBuilderPackageString ="0CEF9F9D-FA1F-45D0-9D1E-BBD2A86D5F62";
+    public const string IceBuilderPackageString = "0CEF9F9D-FA1F-45D0-9D1E-BBD2A86D5F62";
     public const string IceBuilderNewFlavorGuid = "28993779-3132-408A-BCB0-1D78225F4824";
     public const string IceBuilderNewFlavor = "{" + IceBuilderNewFlavorGuid + "}";
 }

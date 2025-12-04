@@ -1,8 +1,5 @@
 // Copyright (c) ZeroC, Inc. All rights reserved.
 
-using Microsoft.VisualStudio.Shell;
-using System;
-using System.IO;
 using System.Windows.Forms;
 
 namespace IceBuilder

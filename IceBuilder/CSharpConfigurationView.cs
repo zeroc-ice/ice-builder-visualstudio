@@ -60,7 +60,7 @@ namespace IceBuilder
         public bool _dirty;
         public bool Dirty
         {
-            get =>_dirty;
+            get => _dirty;
             set
             {
                 ThreadHelper.ThrowIfNotOnUIThread();

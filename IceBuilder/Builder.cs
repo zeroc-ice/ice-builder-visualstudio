@@ -25,90 +25,90 @@ public class Builder(IVsBuildManagerAccessor2 accessor)
     {
         return project.WithProject(msproject =>
         {
-                ThreadHelper.ThrowIfNotOnUIThread();
+            ThreadHelper.ThrowIfNotOnUIThread();
 
-                // We need to set this before we acquire the build resources otherwise MSBuild will not see the changes.
-                bool onlyLogCriticalEvents = msproject.ProjectCollection.OnlyLogCriticalEvents;
-                msproject.ProjectCollection.Loggers.Add(buildLogger);
-                msproject.ProjectCollection.OnlyLogCriticalEvents = false;
+            // We need to set this before we acquire the build resources otherwise MSBuild will not see the changes.
+            bool onlyLogCriticalEvents = msproject.ProjectCollection.OnlyLogCriticalEvents;
+            msproject.ProjectCollection.Loggers.Add(buildLogger);
+            msproject.ProjectCollection.OnlyLogCriticalEvents = false;
 
-                int err = BuildManagerAccessor.AcquireBuildResources(
-                    VSBUILDMANAGERRESOURCE.VSBUILDMANAGERRESOURCE_DESIGNTIME |
-                    VSBUILDMANAGERRESOURCE.VSBUILDMANAGERRESOURCE_UITHREAD,
-                    out uint cookie);
+            int err = BuildManagerAccessor.AcquireBuildResources(
+                VSBUILDMANAGERRESOURCE.VSBUILDMANAGERRESOURCE_DESIGNTIME |
+                VSBUILDMANAGERRESOURCE.VSBUILDMANAGERRESOURCE_UITHREAD,
+                out uint cookie);
 
-                if (err != VSConstants.E_PENDING && err != VSConstants.S_OK)
+            if (err != VSConstants.E_PENDING && err != VSConstants.S_OK)
+            {
+                ErrorHandler.ThrowOnFailure(err);
+            }
+
+            if (err == VSConstants.E_PENDING)
+            {
+                msproject.ProjectCollection.Loggers.Remove(buildLogger);
+                msproject.ProjectCollection.OnlyLogCriticalEvents = onlyLogCriticalEvents;
+
+                BuildAvailableEvent = new ManualResetEvent(false)
                 {
-                    ErrorHandler.ThrowOnFailure(err);
-                }
+                    SafeWaitHandle = new SafeWaitHandle(BuildManagerAccessor.DesignTimeBuildAvailable, false)
+                };
 
-                if (err == VSConstants.E_PENDING)
+                ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
+                {
+                    BuildAvailableEvent.WaitOne();
+                    await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                    Package.Instance.BuildNextProject();
+                });
+                return false;
+            }
+            else
+            {
+                try
+                {
+                    var properties = new Dictionary<string, string>
+                    {
+                        ["Platform"] = platform,
+                        ["Configuration"] = configuration
+                    };
+
+                    var buildRequest = new BuildRequestData(
+                            msproject.FullPath,
+                            properties,
+                            null,
+                            ["SliceCompile"],
+                            msproject.ProjectCollection.HostServices,
+                            BuildRequestDataFlags.ProvideProjectStateAfterBuild |
+                            BuildRequestDataFlags.IgnoreExistingProjectState |
+                            BuildRequestDataFlags.ReplaceExistingProjectInstance);
+
+                    BuildSubmission submission = BuildManager.DefaultBuildManager.PendBuildRequest(buildRequest);
+                    ErrorHandler.ThrowOnFailure(BuildManagerAccessor.RegisterLogger(submission.SubmissionId, buildLogger));
+                    buildCallback.BeginBuild(platform, configuration);
+
+                    submission.ExecuteAsync(s =>
+                    {
+                        ThreadHelper.JoinableTaskFactory.Run(async () =>
+                            {
+                                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                                msproject.ProjectCollection.Loggers.Remove(buildLogger);
+                                msproject.ProjectCollection.OnlyLogCriticalEvents = onlyLogCriticalEvents;
+                                BuildManagerAccessor.ReleaseBuildResources(cookie);
+                                s.BuildManager.ResetCaches();
+                                BuildManagerAccessor.UnregisterLoggers(s.SubmissionId);
+                                buildCallback.EndBuild(s.BuildResult.OverallResult == BuildResultCode.Success);
+                            });
+                    }, null);
+
+                    return true;
+                }
+                catch (Exception)
                 {
                     msproject.ProjectCollection.Loggers.Remove(buildLogger);
                     msproject.ProjectCollection.OnlyLogCriticalEvents = onlyLogCriticalEvents;
-
-                    BuildAvailableEvent = new ManualResetEvent(false)
-                    {
-                        SafeWaitHandle = new SafeWaitHandle(BuildManagerAccessor.DesignTimeBuildAvailable, false)
-                    };
-
-                    ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
-                    {
-                        BuildAvailableEvent.WaitOne();
-                        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-                        Package.Instance.BuildNextProject();
-                    });
-                    return false;
+                    BuildManagerAccessor.ReleaseBuildResources(cookie);
+                    throw;
                 }
-                else
-                {
-                    try
-                    {
-                        var properties = new Dictionary<string, string>
-                        {
-                            ["Platform"] = platform,
-                            ["Configuration"] = configuration
-                        };
-
-                        var buildRequest = new BuildRequestData(
-                                msproject.FullPath,
-                                properties,
-                                null,
-                                ["SliceCompile"],
-                                msproject.ProjectCollection.HostServices,
-                                BuildRequestDataFlags.ProvideProjectStateAfterBuild |
-                                BuildRequestDataFlags.IgnoreExistingProjectState |
-                                BuildRequestDataFlags.ReplaceExistingProjectInstance);
-
-                        BuildSubmission submission = BuildManager.DefaultBuildManager.PendBuildRequest(buildRequest);
-                        ErrorHandler.ThrowOnFailure(BuildManagerAccessor.RegisterLogger(submission.SubmissionId, buildLogger));
-                        buildCallback.BeginBuild(platform, configuration);
-
-                        submission.ExecuteAsync(s =>
-                        {
-                            ThreadHelper.JoinableTaskFactory.Run(async () =>
-                                {
-                                    await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-                                    msproject.ProjectCollection.Loggers.Remove(buildLogger);
-                                    msproject.ProjectCollection.OnlyLogCriticalEvents = onlyLogCriticalEvents;
-                                    BuildManagerAccessor.ReleaseBuildResources(cookie);
-                                    s.BuildManager.ResetCaches();
-                                    BuildManagerAccessor.UnregisterLoggers(s.SubmissionId);
-                                    buildCallback.EndBuild(s.BuildResult.OverallResult == BuildResultCode.Success);
-                                });
-                        }, null);
-
-                        return true;
-                    }
-                    catch (Exception)
-                    {
-                        msproject.ProjectCollection.Loggers.Remove(buildLogger);
-                        msproject.ProjectCollection.OnlyLogCriticalEvents = onlyLogCriticalEvents;
-                        BuildManagerAccessor.ReleaseBuildResources(cookie);
-                        throw;
-                    }
-                }
-            }, true);
+            }
+        }, true);
     }
 }
 

@@ -142,17 +142,17 @@ public static class IVsProjectExtension
         var includeValue = FileUtil.RelativePath(projectDir, path);
         return project.WithProject(msproject =>
         {
-                var selectedItem = msproject.AllEvaluatedItems.FirstOrDefault(
-                    item =>
-                    {
-                        return (item.ItemType.Equals("Compile") ||
-                                item.ItemType.Equals("ClCompile") ||
-                                item.ItemType.Equals("ClInclude")) &&
-                                item.EvaluatedInclude.Equals(includeValue) &&
-                                item.GetMetadata("SliceCompileSource") != null;
-                    });
-                return selectedItem != null;
-            });
+            var selectedItem = msproject.AllEvaluatedItems.FirstOrDefault(
+                item =>
+                {
+                    return (item.ItemType.Equals("Compile") ||
+                            item.ItemType.Equals("ClCompile") ||
+                            item.ItemType.Equals("ClInclude")) &&
+                            item.EvaluatedInclude.Equals(includeValue) &&
+                            item.GetMetadata("SliceCompileSource") != null;
+                });
+            return selectedItem != null;
+        });
     }
 
     public static void UpdateProject(
