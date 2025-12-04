@@ -15,12 +15,8 @@ Ice installations:
 - [Installation](#installation)
 - [Feedback](#feedback)
 - [Overview](#overview)
-  - [C++ Projects](#c-projects)
-    - [Ice 3.8 (C++)](#ice-38-c)
-    - [Ice 3.7 (C++)](#ice-37-c)
-  - [C# Projects](#c-projects-1)
-    - [Ice 3.8 (C#)](#ice-38-c-1)
-    - [Ice 3.7 (C#)](#ice-37-c-1)
+- [C++ Projects](#c-projects)
+- [C# Projects](#c-projects-1)
 - [Building Ice Builder from Source](#building-ice-builder-from-source)
   - [Build Requirements](#build-requirements)
   - [Build Instructions](#build-instructions)
@@ -62,18 +58,18 @@ You can configure the Ice Builder global options on the Tools > Options > Projec
 If the Compile Slice files immediately after save box is checked, Ice Builder compiles a Slice file when you save it,
 otherwise it compiles Slice files only during project builds.
 
-### C++ Projects
+## C++ Projects
 
 Add the required NuGet packages to your C++ project
 
-#### For C++ Projects using Ice 3.8:
+### For C++ Projects using Ice 3.8
 
 - [ZeroC.Ice.Cpp]
 
-#### For C# Projects using Ice 3.7:
+### For C++ Projects using Ice 3.7
 
 - [ZeroC.IceBuilder.MSBuild]
-- [ZeroC.Ice.VC143]
+- [ZeroC.Ice.V143]
 
 After the required NuGet packages are installed, the Ice Builder for Visual Studio extension provides a dedicated Options page
 for configuring Slice compilation for your C++ project.
@@ -134,16 +130,16 @@ select **Properties**. The **Slice Compile** property page will appear in the Pr
 
 The per-file options override the global project options configured in the Ice Builder options page described above.
 
-### C# Projects
+## C# Projects
 
 Add the required NuGet packages to your C# project
 
-#### For C# Projects using Ice 3.8:
+### For C# Projects using Ice 3.8
 
 - [ZeroC.Ice.Slice.Tools]
 - [ZeroC.Ice]
 
-#### For C# Projects using Ice 3.7:
+### For C# Projects using Ice 3.7
 
 - [ZeroC.IceBuilder.MSBuild]
 - [ZeroC.Ice.Net]
@@ -199,7 +195,6 @@ After the build completes, the generated VSIX package will be located in:
 
 [community forums]: https://github.com/orgs/zeroc-ice/discussions
 [here on GitHub]: https://github.com/zeroc-ice/ice-builder-visualstudio/issues
-[Ice Builder for MSBuild]: https://github.com/zeroc-ice/ice-builder-msbuild
 [Q & A]: https://marketplace.visualstudio.com/items?itemName=ZeroCInc.IceBuilder2022#qna
 [rate and review]: https://marketplace.visualstudio.com/items?itemName=ZeroCInc.IceBuilder2022#review-details
 [Visual Studio Marketplace]: https://marketplace.visualstudio.com/items?itemName=ZeroCInc.IceBuilder2022
