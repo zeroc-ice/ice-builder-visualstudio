@@ -301,12 +301,9 @@ public sealed class Package : AsyncPackage
                     }
                 }
 
-                foreach (IVsProject project in projects)
+                foreach (IVsProject project in projects.Where(project => project.IsMSBuildIceBuilderInstalled()))
                 {
-                    if (project.IsMSBuildIceBuilderInstalled())
-                    {
-                        ProjectUtil.SetupGenerated(project);
-                    }
+                    ProjectUtil.SetupGenerated(project);
                 }
             }
         }
@@ -388,7 +385,6 @@ public sealed class Package : AsyncPackage
             BuildingProject = project;
             var dteproject = project.GetDTEProject();
             var activeConfiguration = dteproject.ConfigurationManager.ActiveConfiguration;
-            var properties = new Dictionary<string, string>();
             string platform = activeConfiguration.PlatformName.Equals("Any CPU") ? "AnyCPU" : activeConfiguration.PlatformName;
             string configuration = activeConfiguration.ConfigurationName;
 

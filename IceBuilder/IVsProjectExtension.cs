@@ -262,16 +262,11 @@ public static class IVsProjectExtension
         if (paths.Count > 0)
         {
             project.EnsureIsCheckout();
-            var projectDir = project.GetProjectBaseDirectory();
 
             project.RemoveGeneratedItemCustomMetadata(paths);
 
             var sliceCompileDependencies = paths.Distinct().Select(
-                p =>
-                {
-                    return Path.Combine(Path.GetDirectoryName(p),
-                        string.Format("SliceCompile.{0}.d", Path.GetFileNameWithoutExtension(p)));
-                });
+                p => Path.Combine(Path.GetDirectoryName(p), $"SliceCompile.{Path.GetFileNameWithoutExtension(p)}.d"));
 
             foreach (var path in paths.Concat(sliceCompileDependencies))
             {

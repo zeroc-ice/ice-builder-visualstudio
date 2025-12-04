@@ -50,14 +50,9 @@ public class ProjectUtil
     {
         ThreadHelper.ThrowIfNotOnUIThread();
         IVsProject parent = GetParentProject(project);
-        if (parent != null)
-        {
-            return Path.Combine(GetProjectName(parent), GetItemName(project, VSConstants.VSITEMID_ROOT));
-        }
-        else
-        {
-            return GetItemName(project, VSConstants.VSITEMID_ROOT);
-        }
+        return parent is not null ?
+            Path.Combine(GetProjectName(parent), GetItemName(project, VSConstants.VSITEMID_ROOT)) :
+            GetItemName(project, VSConstants.VSITEMID_ROOT);
     }
 
     public static GeneratedFileSet GetCppGeneratedFiles(
@@ -70,8 +65,8 @@ public class ProjectUtil
         var fileset = new GeneratedFileSet
         {
             filename = item,
-            sources = new Dictionary<string, List<string>>(),
-            headers = new Dictionary<string, List<string>>()
+            sources = [],
+            headers = []
         };
 
         var outputDir = project.GetItemMetadata(item, "OutputDir");
@@ -182,62 +177,32 @@ public class ProjectUtil
         ThreadHelper.ThrowIfNotOnUIThread();
         var projectDir = project.GetProjectBaseDirectory();
         var dteproject = project.GetDTEProject();
+
+        var generated = new List<string>();
+
         if (project.IsCSharpProject())
         {
             var fileset = GetCsharpGeneratedFiles(project, dteproject, projectDir, path);
-            foreach (var source in fileset.sources.Keys)
-            {
-                if (File.Exists(source))
-                {
-                    const string message =
-                        "A file named '{0}' already exists. If you want to add '{1}' first remove '{0}'.";
-
-                    UIUtil.ShowErrorDialog("Ice Builder",
-                        string.Format(message,
-                            FileUtil.RelativePath(projectDir, source),
-                            FileUtil.RelativePath(projectDir, path)));
-                    return false;
-                }
-            }
+            generated.AddRange(fileset.sources.Keys);
         }
         else
         {
-            var fileset = GetCppGeneratedFiles(
-                project,
-                dteproject,
-                projectDir,
-                path);
-
-            foreach (var source in fileset.sources.Keys)
-            {
-                if (File.Exists(source))
-                {
-                    const string message =
-                        "A file named '{0}' already exists. If you want to add '{1}' first remove '{0}' .";
-
-                    UIUtil.ShowErrorDialog("Ice Builder",
-                        string.Format(message,
-                            FileUtil.RelativePath(projectDir, source),
-                            FileUtil.RelativePath(projectDir, path)));
-                    return false;
-                }
-            }
-
-            foreach (var header in fileset.headers.Keys)
-            {
-                if (File.Exists(header))
-                {
-                    const string message =
-                        "A file named '{0}' already exists. If you want to add '{1}' first remove '{0}' .";
-
-                    UIUtil.ShowErrorDialog("Ice Builder",
-                        string.Format(message,
-                            FileUtil.RelativePath(projectDir, header),
-                            FileUtil.RelativePath(projectDir, path)));
-                    return false;
-                }
-            }
+            var fileset = GetCppGeneratedFiles(project, dteproject, projectDir, path);
+            generated.AddRange(fileset.sources.Keys);
+            generated.AddRange(fileset.headers.Keys);
         }
+
+        if (generated.FirstOrDefault(key => File.Exists(key)) is string source)
+        {
+            UIUtil.ShowErrorDialog(
+                "Ice Builder",
+                string.Format(
+                    "A file named '{0}' already exists. If you want to add '{1}' first remove '{0}'.",
+                    FileUtil.RelativePath(projectDir, source),
+                    FileUtil.RelativePath(projectDir, path)));
+            return false;
+        }
+
         return true;
     }
 

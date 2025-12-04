@@ -1,5 +1,6 @@
 ﻿// Copyright (c) ZeroC, Inc. All rights reserved.
 
+using Microsoft.Build.Construction;
 using Microsoft.Build.Evaluation;
 using System;
 using System.Linq;
@@ -87,14 +88,13 @@ public static class MSProjectExtension
         var item = group.ItemDefinitions.FirstOrDefault(i => i.ItemType.Equals(itemType));
         item ??= group.AddItemDefinition(itemType);
 
-        var metadata = item.Metadata.FirstOrDefault(m => m.Name.Equals(name));
-        if (metadata == null)
+        if (item.Metadata.FirstOrDefault(m => m.Name.Equals(name) is true) is ProjectMetadataElement metadata)
         {
-            metadata = item.AddMetadata(name, value);
+            metadata.Value = value;
         }
         else
         {
-            metadata.Value = value;
+            item.AddMetadata(name, value);
         }
     }
 
@@ -111,7 +111,7 @@ public static class MSProjectExtension
     public static string GetProperty(this MSBuildProject project, string name, bool imported = true)
     {
         var property = project.GetProperty(name);
-        if (property != null)
+        if (property is not null)
         {
             if (imported || !property.IsImported)
             {
@@ -136,23 +136,16 @@ public static class MSProjectExtension
         var property = project.Xml.Properties.FirstOrDefault(
             p => p.Name.Equals("ProjectTypeGuids", StringComparison.CurrentCultureIgnoreCase));
 
-        if (property != null)
+        if (property is not null)
         {
             if (property.Value.IndexOf(flavor) == -1)
             {
-                if (string.IsNullOrEmpty(property.Value))
-                {
-                    property.Value = string.Format("{0};{1}", flavor, CSharpProjectGUI);
-                }
-                else
-                {
-                    property.Value = string.Format("{0};{1}", flavor, property.Value);
-                }
+                property.Value = string.IsNullOrEmpty(property.Value) ? $"{flavor};{CSharpProjectGUI}" : $"{flavor};{property.Value}";
             }
         }
         else
         {
-            project.Xml.AddProperty("ProjectTypeGuids", string.Format("{0};{1}", flavor, CSharpProjectGUI));
+            project.Xml.AddProperty("ProjectTypeGuids", $"{flavor};{CSharpProjectGUI}");
         }
     }
 
