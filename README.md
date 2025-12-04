@@ -1,111 +1,92 @@
 # Ice Builder for Visual Studio
 
-Ice Builder for Visual Studio is a Visual Studio extension that configures [Ice Builder for MSBuild](https://github.com/zeroc-ice/ice-builder-msbuild) for your C++ and C# projects, all within the Visual Studio IDE. It serves as a front-end for Ice Builder for MSBuild: all the build-time processing is performed by Ice Builder for MSBuild.
+Ice Builder for Visual Studio is a Visual Studio extension that configures Slice MSBuild tasks for your C++ and C#
+projects directly within the Visual Studio IDE. It serves as a front-end for the Slice MSBuild tasks; all build-time
+processing is performed by these MSBuild tasks.
 
-Ice Builder for Visual Studio is compatible with Visual Studio 2015, 2017, 2019 or 2022, and works best with the following Ice installations:
+Ice Builder for Visual Studio is compatible with Visual Studio 2022 and 2026, and works best with the following
+Ice installations:
 
-- Ice NuGet package for Ice 3.7 or greater
+- Ice 3.8 for C++ and C#
+- Ice 3.7 for C++ and C#
 
 ## Contents
 
 - [Installation](#installation)
 - [Feedback](#feedback)
 - [Overview](#overview)
-- [Ice Builder Options](#ice-builder-options)
-  - [Compile on Save Configuration](#compile-on-save-configuration)
-  - [Ice Home Configuration (Ice 3.6)](#ice-home-configuration-ice-36)
-- [C++ Usage](#c-usage)
-  - [Adding Slice Files to a C++ Project](#adding-slice-files-to-a-c-project)
-  - [Selecting the Slice to C++ Mapping](#selecting-the-slice-to-c-mapping)
-  - [Customizing the Slice to C++ Compilation](#customizing-the-slice-to-c-compilation)
-- [C# Usage](#c-usage-1)
-  - [Adding Slice Files to a C# Project](#adding-slice-files-to-a-c-project-1)
-  - [Customizing the Slice to C# Compilation](#customizing-the-slice-to-c-compilation-1)
-- [Upgrading your Projects from Ice Builder 4.x](#upgrading-your-projects-from-ice-builder-4x)
-- [Migration from the Ice Add-in](#migration-from-the-ice-add-in)
+  - [C++ Projects](#c-projects)
+    - [Ice 3.8 (C++)](#ice-38-c)
+    - [Ice 3.7 (C++)](#ice-37-c)
+  - [C# Projects](#c-projects-1)
+    - [Ice 3.8 (C#)](#ice-38-c-1)
+    - [Ice 3.7 (C#)](#ice-37-c-1)
 - [Building Ice Builder from Source](#building-ice-builder-from-source)
   - [Build Requirements](#build-requirements)
   - [Build Instructions](#build-instructions)
 
 ## Installation
 
-The latest version of Ice Builder is published in the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=ZeroCInc.IceBuilder) and can be installed directly using Visual Studio's Tools > Extensions and Updates.
-
-You can also install older versions or preview releases of Ice Builder by downloading the desired `IceBuilder.vsix` from the [GitHub Releases page](https://github.com/zeroc-ice/ice-builder-visualstudio/releases), and then double-clicking on `IceBuilder.vsix`.
+The latest version of Ice Builder for Visual Studio is published in the [Visual Studio Marketplace] and can be
+installed directly through Visual Studio’s **Extensions → Manage Extensions** dialog.
 
 ## Feedback
 
-We encourage you to [rate and review](https://marketplace.visualstudio.com/items?itemName=ZeroCInc.IceBuilder#review-details) Ice Builder in the Visual Studio Marketplace.
+We encourage you to [rate and review] Ice Builder for Visual Studio on the Visual Studio Marketplace. Your feedback
+helps us improve the extension.
 
-You can also report issues [here on GitHub](https://github.com/zeroc-ice/ice-builder-visualstudio/issues), and ask questions on the [community forums](https://github.com/orgs/zeroc-ice/discussions) or on Ice Builder's [Q & A](https://marketplace.visualstudio.com/items?itemName=ZeroCInc.IceBuilder#qna) page.
+You can also report issues [here on GitHub], and ask questions on the [community forums] or on Ice Builder for Visual
+Studio's [Q & A] page.
 
 ## Overview
 
-Ice Builder for MSBuild provides support for compiling Slice source files (`.ice` files) in MSBuild projects, including projects created by Visual Studio. It compiles these Slice files using the Slice to C++ compiler (`slice2cpp`) or the Slice to C# compiler (`slice2cs`) provided by your Ice installation.
+Ice Builder for Visual Studio configures Slice compilation for your C++ and C# projects inside the Visual Studio IDE.
+The available options depend on your project’s target language and the version of Ice you are using.
 
-You tell Ice Builder for MSBuild which Slice files to compile by adding these files to your project, as described in the sections below. Ice Builder checks whether Slice files need to be compiled or recompiled each time Visual Studio loads a project, and each time you build a project. And if you remove or rename a Slice file with the Visual Studio IDE, Ice Builder for Visual Studio automatically removes the corresponding generated files.
+### Ice Builder for Visual Studio Options
 
-## Ice Builder Options
+#### Visual Studio 2026
 
-You can configure the Ice Builder global options on the `Tools` > `Options` > `Project and Solutions` > `Ice Builder` page.
+You can configure the Ice Builder global options on the Tools > Options > Project and Solutions > More Settings > Ice Builder.
 
-![Ice home screenshot](Screenshots/options.png)
+[!ice builder options vs2026](Screenshots/ice-builder-options-vs2026.png)
 
-### Compile on Save Configuration
+#### Visual Studio 2022
 
-If the `Compile Slice files immediately after save` box is checked, Ice Builder compiles a Slice file when you save it, otherwise it compiles Slice files only during project builds.
+You can configure the Ice Builder global options on the Tools > Options > Project and Solutions > Ice Builder.
 
-### Ice Home Configuration (Ice 3.6)
+[!ice builder options vs2022](Screenshots/ice-builder-options-vs2022.png)
 
-With Ice 3.6, you need to specify the Ice installation used by Ice Builder. This Ice Home setting is ignored by projects that install Ice as a NuGet package.
+#### Compile on Save Configuration
 
-## C++ Usage
+If the Compile Slice files immediately after save box is checked, Ice Builder compiles a Slice file when you save it,
+otherwise it compiles Slice files only during project builds.
 
-### Adding Slice Files to a C++ Project
+### C++ Projects
 
-Follow these steps:
+Add the required NuGet packages to your C++ project
 
-1. Add the Ice Builder NuGet package (`zeroc.icebuilder.msbuild`) to your C++ project.
+#### For C++ Projects using Ice 3.8:
 
-   Adding Ice Builder creates a `Slice Files` filter in your project.
+- [ZeroC.Ice.Cpp]
 
-2. Add one or more Slice (`.ice`) files to your project.
+#### For C# Projects using Ice 3.7:
 
-3. Add the directory where Ice Builder outputs generated C++ header files (`$(IntDir)` by default) to your project's C/C++ Additional Include Directories:
+- [ZeroC.IceBuilder.MSBuild]
+- [ZeroC.Ice.VC143]
 
-![Missing cpp additional include directories](Screenshots/cpp-additional-include-directories.png)
+After the required NuGet packages are installed, the Ice Builder for Visual Studio extension provides a dedicated Options page
+for configuring Slice compilation for your C++ project.
 
-> :white_check_mark: Make sure to select `All Configurations` and `All Platforms` as shown above.
+**Ice 3.8 (C++) Options Page:**
 
-### Selecting the Slice to C++ Mapping
+![cpp options](Screenshots/cpp-options-38.png)
 
-As of Ice 3.7, `slice2cpp` generates C++ code for two mappings, the [Slice to C++11](https://doc.zeroc.com/pages/viewpage.action?pageId=18255283) mapping and the [Slice to C++98](https://doc.zeroc.com/pages/viewpage.action?pageId=18255332) mapping. You select the C++ mapping used by your C++ code by defining or not defining `ICE_CPP11_MAPPING` during C++ compilation.
+**Ice 3.7 (C++) Options Page:**
 
-Ice Builder selects C++11 as the default mapping when using Visual Studio 2015 or greater, and C++98 as the default mapping with older versions of Visual Studio.
+![cpp options](Screenshots/cpp-options-37.png)
 
-You can overwrite this default selection by setting `C++ Mapping` on the `Ice Builder` property page in the `Configuration Properties` of your project:
-
-![Missing cpp mapping](Screenshots/cpp-mapping.png)
-
-> :arrows_counterclockwise: Ice Builder's property page appears after you add `zeroc.icebuilder.msbuild` to your project, but not immediately after you restore this NuGet package in your project. You need to reload your project or solution after a NuGet restore to see this page.
-
-This C++ Mapping selection always applies to all configurations and platforms. See [Selecting the Slice to C++ Mapping](https://github.com/zeroc-ice/ice-builder-msbuild/blob/master/README.md#selecting-the-slice-to-c-mapping) with Ice Builder for MSBuild for further details.
-
-> :information_source: When C++ Mapping is set to C++11, Ice Builder defines `ICE_CPP11_MAPPING` during C++ compilation of your project even though you don't see `ICE_CPP11_MAPPING` among the C/C++ Preprocessor Definitions in the Visual Studio IDE.
-
-### Customizing the Slice to C++ Compilation
-
-Ice Builder allows you to change the options given to `slice2cpp` when compiling a Slice file. You can specify the options that apply to all Slice files in a project with the `Ice Builder` property page in the `Configuration Properties` of your project:
-
-![Missing cpp property page](Screenshots/cpp-property-page.png)
-
-You can also specify options that apply to a single Slice file with the `Ice Builder` property page of that file (this is less common):
-
-![Missing file cpp property page](Screenshots/file-cpp-property-page.png)
-
-> :arrows_counterclockwise: Ice Builder's property pages appear after you add `zeroc.icebuilder.msbuild` to your project, but not immediately after you restore this NuGet package in your project. You need to reload your project or solution after a NuGet restore to see these pages.
-
-These options are always the same for all configurations and platforms, and map to item metadata of the SliceCompile type:
+These options map to the item metadata of the `SliceCompile` type:
 
 | Property                              | Corresponding SliceCompile Item Metadata |
 | ------------------------------------- | ---------------------------------------- |
@@ -117,29 +98,68 @@ These options are always the same for all configurations and platforms, and map 
 | Generated Source Extension            | SourceExt                                |
 | Additional Options                    | AdditionalOptions                        |
 
-See [Customizing the Slice to C++ Compilation](https://github.com/zeroc-ice/ice-builder-msbuild/blob/master/README.md#customizing-the-slice-to-c-compilation) with Ice Builder for MSBuild for further details.
+The C++ Mapping option is exclusive to Ice 3.7 and maps to the `IceCppMapping` project property, which allows you to
+select between the **C++11** and **C++98** mappings. The corresponding values are `cpp11` and `cpp98`.
 
-## C# Usage
+| Property    | Corresponding Project Property |
+| ----------- | ------------------------------ |
+| C++ Mapping | IceCppMapping                  |
 
-### Adding Slice Files to a C# Project
+The Ice Builder for Visual Studio extension creates a **Slice** file filter in the Solution Explorer. We recommend adding
+your Slice (`.ice`) files to this filter for convenience, but you may place Slice files in any filter within your project.
 
-Follow these steps:
+The extension also provides a **Slice** item template that you can use to add new Slice files to your project.
 
-1. Add the Ice Builder NuGet package (`zeroc.icebuilder.msbuild`) to your C# project.
+![cpp new slice file](Screenshots/cpp-new-slice-file.png)
 
-   Adding Ice Builder creates a `Slice Files` filter in your project.
+You can also add existing Slice files using the **Add > Existing Item...** context menu command.
 
-2. Reload your project if it targets the .NET Framework and you want to customize the Slice to C# compilation described in the next paragraph. If you skip this step, Ice Builder is fully functional except there is no `Ice Builder` tab in your projects's properties.
+The extension automatically sets the **Item Type** property of added Slice files to `SliceCompile`, which enables Slice
+compilation for those files.
 
-3. Add one or more Slice (`.ice`) files to your project.
+The extension adds a `CLCompile` item for each generated C++ source file and a `CLInclude` item for each generated C++
+header file, ensuring the C++ code generated from the Slice definitions is compiled along your project C++ sources.
+These generated files are placed in the output directories specified in the Slice compilation options.
 
-### Customizing the Slice to C# Compilation
+The generated items are added when you first build the project—or, if the **Compile Slice files immediately after save**
+option is enabled, when you save the Slice file.
 
-Ice Builder allows you to change the options given to `slice2cs` when compiling a Slice file. You can specify the options that apply to all Slice files in a project with the `Ice Builder` tab of your project's properties:
+By default, generated files are placed in `$(IntDir)`, the intermediate directory for the current build configuration and
+platform.
 
-![Missing csharp property page](Screenshots/csharp-property-page.png)
+To configure the Slice compilation options for a specific Slice file, right-click the file in Solution Explorer and
+select **Properties**. The **Slice Compile** property page will appear in the Properties window.
 
-These options are the same for all configurations and platforms, and map to item metadata of the SliceCompile type:
+![cpp slice file properties](Screenshots/cpp-slice-file-properties.png)
+
+The per-file options override the global project options configured in the Ice Builder options page described above.
+
+### C# Projects
+
+Add the required NuGet packages to your C# project
+
+#### For C# Projects using Ice 3.8:
+
+- [ZeroC.Ice.Slice.Tools]
+- [ZeroC.Ice]
+
+#### For C# Projects using Ice 3.7:
+
+- [ZeroC.IceBuilder.MSBuild]
+- [ZeroC.Ice.Net]
+
+> For .NET Framework projects you must reload the project before the Ice Builder options become available and allow
+> you to change the Slice compilation settings.
+
+**.NET SDK-style project options:**
+
+![.NET SDK Project options](Screenshots/cs-options-37-1.png)
+
+**.NET Framework project options:**
+
+![.NET Framework Project options](Screenshots/cs-options-37-2.png)
+
+These options are the same for all configurations and platforms and map to item metadata of the `SliceCompile` type:
 
 | Property            | Corresponding SliceCompile Item Metadata |
 | ------------------- | ---------------------------------------- |
@@ -147,53 +167,46 @@ These options are the same for all configurations and platforms, and map to item
 | Include Directories | IncludeDirectories                       |
 | Additional Options  | AdditionalOptions                        |
 
-See [Customizing the Slice to C# Compilation](https://github.com/zeroc-ice/ice-builder-msbuild/blob/master/README.md#customizing-the-slice-to-c-compilation-1) with Ice Builder for MSBuild for further details.
+You can add new Slice files to your C# project using the **Add > New Item...**
 
-## Upgrading your Projects from Ice Builder 4.x
+![cs new slice file](Screenshots/cs-new-slice-file.png)
 
-When you open a solution with one or more projects that use the Ice Builder 4.x extension, Ice Builder offers you to upgrade these projects to the latest format. We recommend you backup your projects before performing this upgrade.
+Or add existing Slice files using the **Add > Existing Item...** context menu command.
 
-If you decline this upgrade, the solution loads but Ice Builder ignores the Ice Builder 4.x configuration.
+## Updating from older versions
 
-If you proceed with this upgrade, all upgraded C++ projects are configured with `C++ Mapping` set to `C++98`. If you are using the Slice to C++11 mapping, you should then:
+The Ice Builder for Visual Studio 7.x release is compatible with Ice Builder for Visual Studio 6.x and 5.x, If your
+projects were created with Ice Builder for Visual Studio 6.x or 5.x, they will continue to work without any modifications.
 
-- change `C++ Mapping` to `C++11`, as shown on [Selecting the Slice to C++ Mapping](#selecting-the-slice-to-c-mapping) above
-- remove the now redundant `ICE_CPP11_MAPPING` definition from your projects' C/C++ Preprocessor Definitions
+If you are upgrading from Ice Builder for Visual Studio 4.x or earlier, you will need to first use the Ice Builder for Visual Studio
+6.x extension to update your projects. See [Upgrading your Projects from Ice Builder 4.x] for more information.
 
-## Migration from the Ice Add-in
-
-Ice Builder no longer supports direct migration from the old Ice add-in for Visual Studio to Ice Builder. The migration from the Ice add-in to Ice Builder is now a two-step process:
-
-- Install [Ice Builder 4.3.10](https://github.com/zeroc-ice/ice-builder-visualstudio/releases/tag/v4.3.10) to migrate your projects to the Ice Builder 4.3.10 format
-- Install the latest Ice Builder to convert your projects (that are now using Ice Builder 4.3.10) to the latest Ice Builder format
-
-## Building Ice Builder from Source
+## Building Ice Builder for Visual Studio from Source
 
 ### Build Requirements
 
-You need Visual Studio 2022 or Visual Studio 2019
-
-**AND**
-
-to install ALL of the following Visual Studio SDKs:
-
-- [Visual Studio 2015 SDK](https://msdn.microsoft.com/en-us/library/bb166441.aspx)
-- [Visual Studio 2017 SDK](https://docs.microsoft.com/en-us/visualstudio/extensibility/installing-the-visual-studio-sdk)
+- Visual Studio 2026
 
 ### Build Instructions
 
-#### Building Visual Studio 2022 extension
+1. Open the `IceBuilder.sln` solution file in Visual Studio 2026.
+2. Build the `IceBuilder` project.
 
-Open the `IceBuilder.VS2022.sln` solution file in Visual Studio 2022 and build the `IceBuilder.Next` project.
+After the build completes, the generated VSIX package will be located in:
 
-After building the Ice Builder extension, there would be a VSIX package in:
+- `IceBuilder\bin\Debug\IceBuilder.vsix`, or
+- `IceBuilder\bin\Release\IceBuilder.vsix`
 
-- `IceBuilder.Next\bin\Debug\IceBuilder.vsix` or `IceBuilder.Next\bin\Release\IceBuilder.vsix`
-
-#### Building Visual Studio 2019, 2017 and 2015 extension
-
-Open the `IceBuilder.sln` solution file in Visual Studio 2019 and build the `IceBuilder` project.
-
-After building the Ice Builder extension, there would be a VSIX package in:
-
-- `IceBuilder\bin\Debug\IceBuilder.vsix` or `IceBuilder\bin\Release\IceBuilder.vsix`
+[community forums]: https://github.com/orgs/zeroc-ice/discussions
+[here on GitHub]: https://github.com/zeroc-ice/ice-builder-visualstudio/issues
+[Ice Builder for MSBuild]: https://github.com/zeroc-ice/ice-builder-msbuild
+[Q & A]: https://marketplace.visualstudio.com/items?itemName=ZeroCInc.IceBuilder2022#qna
+[rate and review]: https://marketplace.visualstudio.com/items?itemName=ZeroCInc.IceBuilder2022#review-details
+[Visual Studio Marketplace]: https://marketplace.visualstudio.com/items?itemName=ZeroCInc.IceBuilder2022
+[Upgrading your Projects from Ice Builder 4.x]: https://github.com/zeroc-ice/ice-builder-visualstudio/tree/v6.0.4?tab=readme-ov-file#upgrading-your-projects-from-ice-builder-4x
+[ZeroC.Ice.Cpp]: https://www.nuget.org/packages/ZeroC.Ice.Cpp/
+[ZeroC.Ice.Net]: https://www.nuget.org/packages/ZeroC.Ice.Net/
+[ZeroC.Ice.Slice.Tools]: https://www.nuget.org/packages/ZeroC.Ice.Slice.Tools/
+[ZeroC.Ice.V143]: https://www.nuget.org/packages/ZeroC.Ice.V143/
+[ZeroC.IceBuilder.MSBuild]: https://www.nuget.org/packages/ZeroC.IceBuilder.MSBuild/
+[ZeroC.Ice]: https://www.nuget.org/packages/ZeroC.Ice/

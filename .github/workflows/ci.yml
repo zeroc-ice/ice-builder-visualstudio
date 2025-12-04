@@ -12,8 +12,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-visualstudio-2022:
-    runs-on: windows-2022
+  build:
+    runs-on: windows-2025
+    env:
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -30,26 +35,27 @@ jobs:
 
       - name: Restore NuGet packages
         run: |
-          nuget restore IceBuilder.VS2022.sln
+          nuget restore IceBuilder.sln
 
-      - name: Build Visual Studio 2022 Extension
+      - name: Build Extension
         run: |
-          MSBuild IceBuilder.VS2022.sln /p:Configuration=Release /p:Platform="Any CPU"
+          MSBuild IceBuilder.sln /p:Configuration=Release /p:Platform="Any CPU"
 
       - name: Sign VSIX Package
+        if: env.AZURE_TENANT_ID != '' && env.AZURE_CLIENT_ID != '' && env.AZURE_CLIENT_SECRET != ''
         run: |
           .\sign.exe code trusted-signing ".\IceBuilder.Next\bin\Release\IceBuilder.Next.vsix" `
             --trusted-signing-endpoint https://eus.codesigning.azure.net/ `
             --timestamp-url http://timestamp.acs.microsoft.com `
             --trusted-signing-account zeroc `
             --trusted-signing-certificate-profile zeroc-ice `
-            --azure-key-vault-tenant-id ${{ secrets.AZURE_TENANT_ID }} `
-            --azure-key-vault-client-id ${{ secrets.AZURE_CLIENT_ID }} `
-            --azure-key-vault-client-secret ${{ secrets.AZURE_CLIENT_SECRET }}
+            --azure-key-vault-tenant-id ${{ env.AZURE_TENANT_ID }} `
+            --azure-key-vault-client-id ${{ env.AZURE_CLIENT_ID }} `
+            --azure-key-vault-client-secret ${{ env.AZURE_CLIENT_SECRET }}
 
-      - name: Upload Visual Studio 2022 Extension
+      - name: Upload Extension
         uses: actions/upload-artifact@v4
         with:
-          name: vs2022-vsix
+          name: IceBuilder
           path: |
-            ./IceBuilder.Next/bin/Release/*.vsix
+            ./IceBuilder/bin/Release/*.vsix
