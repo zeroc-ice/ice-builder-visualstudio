@@ -14,7 +14,7 @@ or C#.
 - [Overview](#overview)
 - [C++ Projects](#c-projects)
 - [C# Projects](#c-projects-1)
-- [Building Ice Builder from Source](#building-ice-builder-from-source)
+- [Building Ice Builder for Visual Studio from Source](#building-ice-builder-for-visual-studio-from-source)
   - [Build Requirements](#build-requirements)
   - [Build Instructions](#build-instructions)
 
@@ -41,13 +41,13 @@ The available options depend on your project’s target language and the version
 
 You can configure the Ice Builder global options on the Tools > Options > Project and Solutions > More Settings > Ice Builder.
 
-[!ice builder options vs2026](Screenshots/ice-builder-options-vs2026.png)
+![ice builder options vs2026](Screenshots/ice-builder-options-vs2026.png)
 
 #### Visual Studio 2022
 
 You can configure the Ice Builder global options on the Tools > Options > Project and Solutions > Ice Builder.
 
-[!ice builder options vs2022](Screenshots/ice-builder-options-vs2022.png)
+![ice builder options vs2022](Screenshots/ice-builder-options-vs2022.png)
 
 #### Compile on Save Configuration
 
