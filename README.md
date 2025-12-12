@@ -1,19 +1,18 @@
-# Ice Builder for Visual Studio
+# Ice Builder for Visual Studio <!-- omit in toc -->
 
 Ice Builder for Visual Studio is a Visual Studio extension that configures Slice MSBuild tasks for your C++ and C#
 projects directly within the Visual Studio IDE. It serves as a front-end for the Slice MSBuild tasks; all build-time
 processing is performed by these MSBuild tasks.
 
-Ice Builder for Visual Studio is compatible with Visual Studio 2022 and 2026, and requires Ice 3.7 or 3.8 for C++ 
+Ice Builder for Visual Studio is compatible with Visual Studio 2022 and 2026, and requires Ice 3.7 or 3.8 for C++
 or C#.
-
-## Contents
 
 - [Installation](#installation)
 - [Feedback](#feedback)
-- [Overview](#overview)
+- [Configuration](#configuration)
 - [C++ Projects](#c-projects)
 - [C# Projects](#c-projects-1)
+- [Updating from older versions](#updating-from-older-versions)
 - [Building Ice Builder for Visual Studio from Source](#building-ice-builder-for-visual-studio-from-source)
   - [Build Requirements](#build-requirements)
   - [Build Instructions](#build-instructions)
@@ -30,72 +29,60 @@ helps us improve the extension.
 
 You can also report issues [here on GitHub], and ask questions on Ice Builder for Visual Studio's [Q & A] page.
 
-## Overview
+## Configuration
 
 Ice Builder for Visual Studio configures Slice compilation for your C++ and C# projects inside the Visual Studio IDE.
-The available options depend on your project’s target language and the version of Ice you are using.
+The options depend on your project’s target language and the version of Ice you are using.
 
-### Ice Builder for Visual Studio Options
+<figure>
+   <img src="Screenshots/ice-builder-options-vs2026.png" alt="Ice Builder Options for VS2026"/>
+   <figcaption>Visual Studio 2026: use Tools > Options > Project and Solutions > More Settings > Ice Builder</figcaption>
+</figure>
 
-#### Visual Studio 2026
+<figure>
+   <img src="Screenshots/ice-builder-options-vs2022.png" alt="Ice Builder Options for VS2022"/>
+   <figcaption>Visual Studio 2022: use Tools > Options > Project and Solutions > Ice Builder</figcaption>
+</figure>
 
-You can configure the Ice Builder global options on the Tools > Options > Project and Solutions > More Settings > Ice Builder.
+***Compile on Save***
 
-![ice builder options vs2026](Screenshots/ice-builder-options-vs2026.png)
-
-#### Visual Studio 2022
-
-You can configure the Ice Builder global options on the Tools > Options > Project and Solutions > Ice Builder.
-
-![ice builder options vs2022](Screenshots/ice-builder-options-vs2022.png)
-
-#### Compile on Save Configuration
-
-If the Compile Slice files immediately after save box is checked, Ice Builder compiles a Slice file when you save it,
-otherwise it compiles Slice files only during project builds.
+If you check the box _Compile Slice files immediately after save_ Ice Builder compiles a Slice file when you save it;
+otherwise, it compiles Slice files only when you build the project.
 
 ## C++ Projects
 
-Add the required NuGet packages to your C++ project
+Add the required NuGet packages to your C++ project:
 
-### For C++ Projects using Ice 3.8
+| C++ Project using Ice 3.8 | C++ Project using Ice 3.7  |
+|---------------------------|----------------------------|
+| [ZeroC.Ice.Cpp]           | [ZeroC.IceBuilder.MSBuild] |
+|                           | [ZeroC.Ice.V143]           |
 
-- [ZeroC.Ice.Cpp]
+After the required NuGet packages are installed, the Ice Builder for Visual Studio extension provides a dedicated
+Options page for configuring Slice compilation for your C++ project.
 
-### For C++ Projects using Ice 3.7
+<figure>
+   <img src="Screenshots/cpp-options-38.png" alt="C++ Options for Ice 3.8"/>
+   <figcaption>Options for Ice 3.8</figcaption>
+</figure>
 
-- [ZeroC.IceBuilder.MSBuild]
-- [ZeroC.Ice.V143]
-
-After the required NuGet packages are installed, the Ice Builder for Visual Studio extension provides a dedicated Options page
-for configuring Slice compilation for your C++ project.
-
-**Ice 3.8 (C++) Options Page:**
-
-![cpp options](Screenshots/cpp-options-38.png)
-
-**Ice 3.7 (C++) Options Page:**
-
-![cpp options](Screenshots/cpp-options-37.png)
+<figure>
+   <img src="Screenshots/cpp-options-37.png" alt="C++ Options for Ice 3.7"/>
+   <figcaption>Options for Ice 3.7</figcaption>
+</figure>
 
 These options map to the item metadata of the `SliceCompile` type:
 
-| Property                              | Corresponding SliceCompile Item Metadata |
-| ------------------------------------- | ---------------------------------------- |
-| Output Directory                      | OutputDir                                |
-| Header Output Directory               | HeaderOutputDir                          |
-| Include Directories                   | IncludeDirectories                       |
-| Base Directory For Generated #include | BaseDirectoryForGeneratedInclude         |
-| Generated Header Extension            | HeaderExt                                |
-| Generated Source Extension            | SourceExt                                |
-| Additional Options                    | AdditionalOptions                        |
-
-The C++ Mapping option applies only to Ice 3.7 and maps to the `IceCppMapping` project property, which allows you to
-select between the **C++11** and **C++98** mappings. The corresponding values are `cpp11` and `cpp98`.
-
-| Property    | Corresponding Project Property |
-| ----------- | ------------------------------ |
-| C++ Mapping | IceCppMapping                  |
+| Property                              | Corresponding SliceCompile Item Metadata | Notes            |
+| ------------------------------------- | ---------------------------------------- |------------------|
+| Output Directory                      | OutputDir                                |                  |
+| Header Output Directory               | HeaderOutputDir                          |                  |
+| Include Directories                   | IncludeDirectories                       |                  |
+| Base Directory For Generated #include | BaseDirectoryForGeneratedInclude         |                  |
+| Generated Header Extension            | HeaderExt                                |                  |
+| Generated Source Extension            | SourceExt                                |                  |
+| Additional Options                    | AdditionalOptions                        |                  |
+| C++ Mapping                           | IceCppMapping **Project property**       | Only for Ice 3.7 |
 
 The Ice Builder for Visual Studio extension creates a **Slice** file filter in the Solution Explorer. We recommend adding
 your Slice (`.ice`) files to this filter for convenience, but you may place Slice files in any filter within your project.
@@ -128,28 +115,25 @@ The per-file options override the global project options configured in the Ice B
 
 ## C# Projects
 
-Add the required NuGet packages to your C# project
+Add the required NuGet packages to your C# project:
 
-### For C# Projects using Ice 3.8
+| C# Project using Ice 3.8 | C# Project using Ice 3.7   |
+|--------------------------|----------------------------|
+| [ZeroC.Ice.Slice.Tools]  | [ZeroC.IceBuilder.MSBuild] |
+| [ZeroC.Ice]              | [ZeroC.Ice.Net]            |
 
-- [ZeroC.Ice.Slice.Tools]
-- [ZeroC.Ice]
-
-### For C# Projects using Ice 3.7
-
-- [ZeroC.IceBuilder.MSBuild]
-- [ZeroC.Ice.Net]
-
-> For .NET Framework projects you must reload the project before the Ice Builder options become available and allow
+> For .NET Framework projects, you must reload the project before the Ice Builder options become available and allow
 > you to change the Slice compilation settings.
 
-**.NET SDK-style project options:**
+<figure>
+   <img src="Screenshots/cs-options-37-1.png" alt=".NET SDK-style project options"/>
+   <figcaption>.NET SDK-style project options</figcaption>
+</figure>
 
-![.NET SDK Project options](Screenshots/cs-options-37-1.png)
-
-**.NET Framework project options:**
-
-![.NET Framework Project options](Screenshots/cs-options-37-2.png)
+<figure>
+   <img src="Screenshots/cs-options-37-2.png" alt=".NET Framework-style project options"/>
+   <figcaption>.NET Framework-style project options</figcaption>
+</figure>
 
 These options are the same for all configurations and platforms and map to item metadata of the `SliceCompile` type:
 
