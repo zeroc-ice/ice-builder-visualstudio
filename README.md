@@ -38,11 +38,13 @@ The options depend on your project’s target language and the version of Ice yo
    <img src="Screenshots/ice-builder-options-vs2026.png" alt="Ice Builder Options for VS2026"/>
    <figcaption>Visual Studio 2026: use Tools > Options > Project and Solutions > More Settings > Ice Builder</figcaption>
 </figure>
+<br><br><br>
 
 <figure>
    <img src="Screenshots/ice-builder-options-vs2022.png" alt="Ice Builder Options for VS2022"/>
    <figcaption>Visual Studio 2022: use Tools > Options > Project and Solutions > Ice Builder</figcaption>
 </figure>
+<br><br>
 
 ***Compile on Save***
 
@@ -65,11 +67,13 @@ Options page for configuring Slice compilation for your C++ project.
    <img src="Screenshots/cpp-options-38.png" alt="C++ Options for Ice 3.8"/>
    <figcaption>Options for Ice 3.8</figcaption>
 </figure>
+<br><br><br>
 
 <figure>
    <img src="Screenshots/cpp-options-37.png" alt="C++ Options for Ice 3.7"/>
    <figcaption>Options for Ice 3.7</figcaption>
 </figure>
+<br><br>
 
 These options map to the item metadata of the `SliceCompile` type:
 
@@ -129,11 +133,13 @@ Add the required NuGet packages to your C# project:
    <img src="Screenshots/cs-options-37-1.png" alt=".NET SDK-style project options"/>
    <figcaption>.NET SDK-style project options</figcaption>
 </figure>
+<br><br><br>
 
 <figure>
    <img src="Screenshots/cs-options-37-2.png" alt=".NET Framework-style project options"/>
    <figcaption>.NET Framework-style project options</figcaption>
 </figure>
+<br><br>
 
 These options are the same for all configurations and platforms and map to item metadata of the `SliceCompile` type:
 
