@@ -7,9 +7,6 @@ processing is performed by these MSBuild tasks.
 Ice Builder for Visual Studio is compatible with Visual Studio 2022 and 2026, and requires Ice 3.7 or 3.8 for C++
 or C#.
 
-## Contents
-
-- [Contents](#contents)
 - [Installation](#installation)
 - [Feedback](#feedback)
 - [Configuration](#configuration)
@@ -44,7 +41,7 @@ The options depend on your project’s target language and the version of Ice yo
 
 <figure>
    <img src="Screenshots/ice-builder-options-vs2022.png" alt="Ice Builder Options for VS2022"/>
-   <figcaption>Visual Studio 2022: use Tools > Options > Project and Solutions > Ice Builder.</figcaption>
+   <figcaption>Visual Studio 2022: use Tools > Options > Project and Solutions > Ice Builder</figcaption>
 </figure>
 
 ***Compile on Save***
@@ -85,7 +82,7 @@ These options map to the item metadata of the `SliceCompile` type:
 | Generated Header Extension            | HeaderExt                                |                  |
 | Generated Source Extension            | SourceExt                                |                  |
 | Additional Options                    | AdditionalOptions                        |                  |
-| C++ Mapping                           | IceCppMapping                            | Only for Ice 3.7 |
+| C++ Mapping                           | IceCppMapping **Project property**       | Only for Ice 3.7 |
 
 The Ice Builder for Visual Studio extension creates a **Slice** file filter in the Solution Explorer. We recommend adding
 your Slice (`.ice`) files to this filter for convenience, but you may place Slice files in any filter within your project.
